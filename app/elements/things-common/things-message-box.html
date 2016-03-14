@@ -1,0 +1,48 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<dom-module id="things-message-box">
+  <template>
+
+  <style>
+  	paper-dialog.colored {
+      border: 2px solid;
+      border-color: var(--paper-blue-500);
+      background-color: var(--paper-light-blue-50);
+      color: var(--paper-blue-500);
+    }
+
+    paper-dialog.size {
+      width: 400px;
+      height: 180px;
+      overflow: auto;
+    }
+  </style>
+
+		<paper-dialog id="dialog" class='colored size'>
+			<h2>[[title]]</h2>
+			<p>[[message]]</p>
+			<div class="buttons">
+        <paper-button dialog-confirm autofocus>OK</paper-button>
+			</div>
+		</paper-dialog>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'things-message-box',
+
+        show: function() {
+          this.$.dialog.open();
+        }
+
+      });
+    })();
+  </script>
+</dom-module>

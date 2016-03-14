@@ -1,0 +1,36 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="./things-message-box.html">
+
+<dom-module id="things-event-handler">
+  <template>
+  	<things-message-box id="msg-box" title="Things Message Box" message="This is Message Box"></things-message-box>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'things-event-handler',
+
+        listeners: {
+        	'showMessage' : 'showMessage'
+        },
+
+        /**
+         * Show Message
+         */
+        showMessage: function(e) {
+          var title = e.detail.title;
+          var message = e.detail.message;
+          this.$['msg-box'].title = title;
+          this.$['msg-box'].message = message;
+          this.$['msg-box'].show();
+        }
+
+      });
+    })();
+  </script>
+</dom-module>

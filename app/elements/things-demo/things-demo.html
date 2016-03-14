@@ -1,0 +1,171 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../things-common/things-message-box.html">
+<link rel="import" href="../things-common/things-event-handler.html">
+<link rel="import" href="../things-common/things-alarm-badge.html">
+
+<dom-module id="things-demo">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      @import "things-demo";
+    </style>
+    
+    <paper-material class="Page-paper" elevation="1">
+      <h2 class="Page-title">[[title]]</h2>
+
+      <p class="paper-font-subhead">Things Components Demo</p>
+    </paper-material>
+
+    <paper-material class="Page-paper" elevation="1">
+      <p class="paper-font-subhead">Things Profile</p>
+
+      <things-profile name="elidom" email="elidom@example.com" img="../../images/profile.png"></things-profile>
+    </paper-material>    
+
+    <paper-material class="Page-paper" elevation="1">
+      <p class="paper-font-subhead">Things Message Box</p>
+
+      <div class="buttons">
+        <paper-button raised id="msg-button">Dialog</paper-button>
+      </div>      
+    </paper-material>
+
+    <paper-material class="Page-paper" elevation="1">
+      <p class="paper-font-subhead">Things Event Handler</p>
+
+      <div class="buttons">
+        <paper-button raised id="evt-button">Fire Event</paper-button>
+      </div>
+    </paper-material>
+
+    <paper-material class="Page-paper" elevation="1">
+      <p class="paper-font-subhead">Web Socket</p>
+
+        <paper-input  name="wsurl" 
+                      type="text" 
+                      label="Web Socket URL" 
+                      value="{{wsUrl}}">
+        </paper-input>
+
+        <paper-input  name="status" 
+                      type="text" 
+                      label="Web Socket Status" 
+                      value="{{wsStatus}}">
+        </paper-input>
+
+        <paper-input  name="message" 
+                      type="text" 
+                      label="Message To Send" 
+                      value="{{wsSendMessage}}">
+        </paper-input>
+
+        <paper-input  name="returnMessage" 
+                      type="text" 
+                      label="Received Message" 
+                      value="[[wsReceiveMessage]]">
+        </paper-input>
+
+        <div class="buttons">
+          <paper-button raised id="ws-open-button">Open</paper-button>
+          <paper-button raised id="ws-send-button">Send Message</paper-button>
+          <paper-button raised id="ws-close-button">Close</paper-button>
+        </div>
+    </paper-material>
+
+    <paper-material class="Page-paper" elevation="1">
+      <p class="paper-font-subhead">Things Alarm</p>
+
+      <things-alarm-badge count="3"></things-alarm-badge>
+
+      <div class="buttons">
+        <paper-button raised id="alarm-button">Alarm Badge Click</paper-button>
+      </div>
+    </paper-material>    
+
+    <things-message-box id="msg-box" title="Things Message Box" message="This is Message Box"></things-message-box>
+
+    <things-websocket id="ws" url="{{wsUrl}}"></things-websocket>
+
+  </template>
+
+  <!--script src="things-demo.js"></script-->
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'things-demo',
+
+        properties: {
+          title: {
+            value: 'Title'
+          },
+          wsUrl: {
+            value: 'ws://localhost:9004/ws'
+          },
+          wsStatus: {
+            value: 'disconnected'
+          }
+        },
+
+        listeners: {
+          'msg-button.tap' : 'onTapMsgButton',
+          'evt-button.tap' : 'onTapEvtButton',
+          'ws-open-button.tap' : 'onTapWsOpenButton',
+          'ws-send-button.tap' : 'onTapWsSendButton',
+          'ws-close-button.tap' : 'onTapWsCloseButton',
+          'ws.onmessage' : 'onWsMessageReceive',
+          'ws.onerror' : 'onWsMessageReceive',
+          'ws.onopen' : 'onWsMessageReceive',
+          'ws.onclose' : 'onWsMessageReceive'
+        },
+
+        onTapMsgButton: function(e) {
+          this.$['msg-box'].show();
+        },
+
+        onTapEvtButton: function(e) {
+          // index.html에 event-handler 추가
+          app.$['event-handler'].fire('showMessage', { title : 'This is Title', message : 'This is Message!' });
+        },
+
+        onTapWsOpenButton: function(e) {
+          this.$.ws.open();
+        },
+
+        onTapWsSendButton: function(e) {
+          this.$.ws.send(this.wsSendMessage);
+        },
+
+        onTapWsCloseButton: function(e) {
+          this.wsSendMessage = '';
+          this.$.ws.close();
+        },
+
+        onWsMessageReceive: function(e) {
+          if(typeof(e.detail) == "string") {
+            this.wsReceiveMessage = e.detail;  
+          } else {
+            this.wsReceiveMessage = e.type;
+            this.wsStatus = this.$.ws.status();
+          }
+        }        
+
+      });
+    })();
+  </script>  
+
+</dom-module>
