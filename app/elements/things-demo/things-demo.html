@@ -14,6 +14,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../things-common/things-message-box.html">
 <link rel="import" href="../things-common/things-event-handler.html">
 <link rel="import" href="../things-common/things-alarm-badge.html">
+<link rel="import" href="../things-common/things-spinner.html">
 
 <dom-module id="things-demo">
   <template>
@@ -32,13 +33,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <p class="paper-font-subhead">Things Profile</p>
 
       <things-profile name="elidom" email="elidom@example.com" img="../../images/profile.png"></things-profile>
+    </paper-material>
+
+    <paper-material class="Page-paper" elevation="1">
+      <p class="paper-font-subhead">Things Button</p>
+
+      <paper-input  name="buttonAction" 
+                    type="text" 
+                    label="Button Action" 
+                    value="{{thingsButtonMessage}}">
+      </paper-input>
+
+      <div class="buttons">
+        <things-button id="things-button-1">Search Button</things-button>
+
+        <things-button id="things-button-2" confirm=true confirmTitle="Confirm" confirmMsg="Are you sure to process?">Transaction Button</things-button>
+      </div>
     </paper-material>    
 
     <paper-material class="Page-paper" elevation="1">
-      <p class="paper-font-subhead">Things Message Box</p>
+      <p class="paper-font-subhead">Things Message Box / Spinner</p>
 
       <div class="buttons">
-        <paper-button raised id="msg-button">Dialog</paper-button>
+        <paper-button raised id="msg-button">Message Box</paper-button>
+        <paper-button raised id="spn-button">Spinner</paper-button>
       </div>      
     </paper-material>
 
@@ -92,7 +110,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div class="buttons">
         <paper-button raised id="alarm-button">Alarm Badge Click</paper-button>
       </div>
-    </paper-material>    
+    </paper-material>
+
+    <things-spinner id="spinner" loading=false></things-spinner>
 
     <things-message-box id="msg-box" title="Things Message Box" message="This is Message Box"></things-message-box>
 
@@ -122,19 +142,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         listeners: {
+          'things-button-1.tap' : 'onTapThingsButton1',
+          'things-button-2.confirm' : 'onConfirmMsgBox',
           'msg-button.tap' : 'onTapMsgButton',
+          'spn-button.tap' : 'onTapSpnButton',
           'evt-button.tap' : 'onTapEvtButton',
           'ws-open-button.tap' : 'onTapWsOpenButton',
           'ws-send-button.tap' : 'onTapWsSendButton',
           'ws-close-button.tap' : 'onTapWsCloseButton',
+          'msg-box.confirm' : 'onConfirmMsgBox',
           'ws.onmessage' : 'onWsMessageReceive',
           'ws.onerror' : 'onWsMessageReceive',
           'ws.onopen' : 'onWsMessageReceive',
           'ws.onclose' : 'onWsMessageReceive'
         },
 
+        onTapThingsButton1: function(e) {
+          this.thingsButtonMessage = 'Search Button Pressesd';
+        },
+
         onTapMsgButton: function(e) {
           this.$['msg-box'].show();
+        },
+
+        onTapSpnButton: function(e) {
+          this.$.spinner.loading = !this.$.spinner.loading;
         },
 
         onTapEvtButton: function(e) {
@@ -153,6 +185,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         onTapWsCloseButton: function(e) {
           this.wsSendMessage = '';
           this.$.ws.close();
+        },
+
+        onConfirmMsgBox: function(e) {
+          if(e.detail == 'ok') {
+            this.thingsButtonMessage = e.detail + ' pressed';
+          } else {
+            this.thingsButtonMessage = e.detail + ' pressed';
+          }
         },
 
         onWsMessageReceive: function(e) {

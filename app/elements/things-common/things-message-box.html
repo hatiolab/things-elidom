@@ -25,7 +25,8 @@
 			<h2>[[title]]</h2>
 			<p>[[message]]</p>
 			<div class="buttons">
-        <paper-button dialog-confirm autofocus>OK</paper-button>
+        <paper-button id="cancel" dialog-dismiss>Cancel</paper-button>
+        <paper-button id="ok" dialog-confirm autofocus>OK</paper-button>
 			</div>
 		</paper-dialog>
 
@@ -38,8 +39,25 @@
       Polymer({
         is: 'things-message-box',
 
+        listeners: {
+          'cancel.tap' : 'onTapCancel',
+          'ok.tap' : 'onTapOk'
+        },
+
         show: function() {
           this.$.dialog.open();
+        },
+
+        confirm: function() {
+          
+        },
+
+        onTapCancel: function(e) {
+          this.fire('confirm', 'cancel');
+        },
+
+        onTapOk: function(e) {
+          this.fire('confirm', 'ok');
         }
 
       });

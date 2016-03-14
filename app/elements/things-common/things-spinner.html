@@ -1,0 +1,66 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+
+<dom-module id="things-spinner">
+  <style>
+    #refresh {
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    #spinner {
+      background: #fff;
+      border-radius: 50%;
+      padding: 10px;
+      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+                  0 1px 5px 0 rgba(0, 0, 0, 0.12),
+                  0 3px 1px -2px rgba(0, 0, 0, 0.2);
+      transition: transform 300ms cubic-bezier(0,0,0.2,1);
+      will-change: transform;
+    } 
+
+    #spinner.shrink {
+      transform: scale(0);
+    }
+  </style>
+
+  <template>
+    <template is="dom-if" if="{{loading}}">
+      <div id="refresh" class="fit layout vertical center-center">
+        <div id="spinner" class="layout vertical center-center shrink">
+          <paper-spinner active></paper-spinner>
+        </div>
+      </div>
+    </template>
+  </template>
+
+  <script>
+      Polymer({
+        is: 'things-spinner',
+
+        properties: {
+          loading: {
+            type: Boolean,
+            notify: true,
+            value: false,
+            observer: '_loadingChanged'
+          }
+        },
+
+        _loadingChanged: function(e) {
+          var spinnerElement = this.querySelector('#spinner');
+
+          if(spinnerElement) {
+            if(this.loading) {
+              spinnerElement.classList.remove('shrink');
+            } else {
+              spinnerElement.classList.add('shrink');
+            }
+          }
+        }
+
+      });
+  </script>
+
+</dom-module>
