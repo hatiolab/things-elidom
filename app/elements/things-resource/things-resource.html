@@ -1,0 +1,221 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../things-setting/things-global-behavior.html">
+<!--
+A comment describing this element
+
+Example:
+
+		<things-resource>
+			<h2>Hello things-resource</h2>
+		</things-resource>
+
+@demo demo/index.html
+-->
+
+<dom-module id="things-resource">
+	<template>
+
+		<iron-ajax
+		    id="_ajax"
+			auto="[[auto]]"
+			url="[[entityUrl]]"
+			handle-as="json"
+			method="[[dynamicMethod]]"
+			content-type="application/json"
+			last-response="{{outputData}}"
+			headers="{'X-Requested-With':'XMLHttpRequest'}"
+			on-response="_successResponse"
+			on-error="_failureResponse"
+			body="[[params]]"
+			loading="{{loading}}"
+			on-loading-changed="_onLoadingChanged"
+			with-credentials=true>
+	    </iron-ajax>
+
+	</template>
+
+	<script>
+		Polymer({
+			is: 'things-resource',
+	    
+			properties: {
+				/**
+				 * Resource Entity In Data Service
+				 * @type {[type]}
+				 */
+				entity : String,
+				/**
+				 * entity에 대항 엑세스 방법 정의
+				 * 모든 리소스는 아래와 같은 일반 Action을 갖고 있다
+				 *
+				 * multi-data Actions : index, update_multiple,imports, export, create
+				 * single-data Actions : findOne, update, delete, isExist(url={id}/exist)
+				 * for single data actions must present entityId
+				 * 
+				 * 일반 액션을 벗어난 Action에 대하여서는 {globals.basicUrl}/{entity}/{action}
+				 * 이런 형태로 호출한다.
+				 * 
+				 * @type {[String]}
+				 */
+				action : {
+					type:String,
+					notify:true
+				},
+				/**
+				 * request prameters
+				 * @type {[Object]}
+				 */
+				params : Object,
+				/**
+				 * entity ID, when use findOne, Delete, Update, exists
+				 */
+				entityId: String,
+				/**
+				 * data have received on this transaction 
+				 * @type {[Object]}
+				 */
+				outputData: {
+					type : Object,
+					notify : true
+				},
+				/**
+				 * When request sent and response not received loading will be true, 
+				 * after response received loading will be false.
+				 * @type {[Boolean]}
+				 */
+				loading:{
+					type:Boolean,
+					notify:true,
+					readOnly : true
+				},
+
+				entityUrl:{
+					computed : '_prepareUrl(globals.basicUrl,action)'
+				},
+
+				method:{
+					type:String,
+					notify:true
+				},
+
+				dynamicMethod:{
+					computed : '_prepareMethod(action,method)'
+				},
+
+				auto:{
+					type:Boolean,
+					value:false
+				},
+
+				rootProperty:String
+			},
+
+			// Element Behavior
+			behaviors: [ThingsGlobalBehavior],
+
+			listeners: {
+				'_ajax.request' : '_onAjaxRequest'
+			},
+
+			/**
+			 * URL 생성
+			 * 
+			 * @param  {[type]} basicUrl [description]
+			 * @param  {[type]} action [description]
+			 * @return {[type]}          [description]
+			 */
+			_prepareUrl : function(basicUrl, action) {
+				if(!action) return;
+
+				if(!this.entity) {
+					return [basicUrl, action].join('/');
+					
+				} else {
+					/**
+					 * multi-data Actions : index, updateMutiple, imports, export, create
+					 * single-data Actions : findOne, update, delete, isExist(url={id}/exist)
+					 */
+					var callByAction = ['update_multiple', 'imports', 'export'];
+					var singleDataActions =['update', 'delete', 'findOne', 'exist'];
+					var callByEntityName = ['index', 'create']
+
+					if(singleDataActions.indexOf(action) > 0) {
+						if(action !== 'exist') {
+							return [basicUrl, this.entity, this.entityId].join('/');
+						} else {
+							return [basicUrl, this.entity, this.entityId, this.action].join('/');
+						}
+					} else if(callByEntityName.indexOf(this.action) > 0) {
+						return [basicUrl, this.entity].join('/')
+					} else {
+						return [basicUrl, this.entity, this.action].join('/');
+					}
+				}
+			},
+
+			_prepareMethod: function(action, method) {
+				if(method) {
+					return method
+				} else {
+					var postActions = ['update_multiple','create','import','replace'];
+					if(postActions.indexOf(action) > 0) {
+						return 'POST'
+					} else if(action==='update') {
+						return 'PUT'
+					} else if(action==='delete') {
+						return 'DELETE'
+					} else {
+						return 'GET'
+					}
+				}
+			},
+
+			_successResponse: function(event) {
+				if(this.rootProperty) this.outputData = this.outputData[this.rootProperty];
+				this.fire('response', event.detail.xhr.response);
+				if(this.method && this.method != 'GET') {
+					this.showToast('Success');
+				}
+			},
+
+			_failureResponse: function(event) {
+				if(event && event.detail && 
+				   event.detail.request && 
+				   event.detail.request.xhr && 
+				   event.detail.request.xhr.response) {
+
+					var response = event.detail.request.xhr.response;				   	
+					if(response.status == 401) {
+						this.handleUnauthorized();
+					} else {
+						this.showToast('Error : ' + response.error + ', Status : ' + response.status + ', Message : ' + response.message);
+					}
+
+					this.fire('error', event.detail.request.xhr.response);
+				} else {
+					this.showToast('Something wrong! Please ask to administrator');
+					this.fire('error', event);
+				}
+			},
+
+			_onAjaxRequest: function() {
+				// ?
+			},
+
+			generateRequest: function() {
+				this.$._ajax.generateRequest();
+			},
+
+			/**
+			 * Loading change 시점에 spinner show/hide
+			 */
+			_onLoadingChanged: function(e) {
+				if(e.detail) {
+					app.$.spinner.loading = e.detail.value;
+				}
+			}
+			
+		});
+	</script>
+</dom-module>
