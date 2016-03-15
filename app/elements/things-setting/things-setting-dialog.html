@@ -3,7 +3,7 @@
 <link rel="import" href="../../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
 <link rel="import" href="../../bower_components/paper-dialog-behavior/paper-dialog-shared-styles.html">
 
-<link rel="import" href="./things-setting/things-global-behavior.html">
+<link rel="import" href="./things-global-behavior.html">
 
 <dom-module id="things-setting-dialog">
   <template>
@@ -13,10 +13,7 @@
 
     <h2>Setting</h2>
 
-    <paper-input-container>
-      <label>Base URL</label>
-      <input is="iron-input" bind-value="{{globals.basicUrl}}" autofocus></input>
-    </paper-input-container>
+    <paper-input label="Base URL" value="{{globals.basicUrl}}"></paper-input>
 
   </template>
 
@@ -26,12 +23,6 @@
 
       Polymer({
         is: 'things-setting-dialog',
-
-        properties: {
-        },
-
-        listeners: {
-        },
 
         behaviors: [
           Polymer.PaperDialogBehavior, ThingsGlobalBehavior

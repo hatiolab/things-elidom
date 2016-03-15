@@ -9,6 +9,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../things-setting/things-global-behavior.html">
+
 <dom-module id="things-demo">
   <template>
     <style include="shared-styles"></style>
@@ -20,6 +22,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <h2 class="Page-title">[[title]]</h2>
 
       <p class="paper-font-subhead">Things Components Demo</p>
+    </paper-material>
+
+    <paper-material class="Page-paper" elevation="1">
+      <p class="paper-font-subhead">Things Setting</p>
+
+      <paper-input label="Base URL" value="{{globals.basicUrl}}"></paper-input>
+
+      <things-setting id="setting"></things-setting>
+
+      <div class="buttons">
+        <things-button color="green" id="setting-btn">Search Button</things-button>
+      </div>
     </paper-material>
 
     <paper-material class="Page-paper" elevation="1">
@@ -38,11 +52,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </paper-input>
 
       <div class="buttons">
-        <things-button color="green" id="things-button-1">Search Button</things-button>
+        <things-button color="green" id="things-btn-1">Search Button</things-button>
 
-        <things-button id="things-button-2" color="indigo" confirm=true title="Confirm" message="Are you sure to save?">Save Button</things-button>
+        <things-button id="things-btn-2" color="indigo" confirm=true title="Confirm" message="Are you sure to save?">Save Button</things-button>
 
-        <things-button id="things-button-3" color="pink" confirm=true title="Confirm" message="Are you sure to delete?">Delete Button</things-button>
+        <things-button id="things-btn-3" color="pink" confirm=true title="Confirm" message="Are you sure to delete?">Delete Button</things-button>
       </div>
     </paper-material>    
 
@@ -136,10 +150,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         },
 
+        behaviors : [ThingsGlobalBehavior],
+
         listeners: {
-          'things-button-1.tap' : 'onTapThingsButton1',
-          'things-button-2.confirm' : 'onConfirmMsgBox',
-          'things-button-3.confirm' : 'onConfirmMsgBox',
+          'setting-btn.tap' : 'onTapSetting',
+          'things-btn-1.tap' : 'onTapThingsButton1',
+          'things-btn-2.confirm' : 'onConfirmMsgBox',
+          'things-btn-3.confirm' : 'onConfirmMsgBox',
           'msg-button.tap' : 'onTapMsgButton',
           'spn-button.tap' : 'onTapSpnButton',
           'evt-button.tap' : 'onTapEvtButton',
@@ -151,6 +168,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'ws.onerror' : 'onWsMessageReceive',
           'ws.onopen' : 'onWsMessageReceive',
           'ws.onclose' : 'onWsMessageReceive'
+        },
+
+        onTapSetting: function(e) {
+          this.$.setting.open();
         },
 
         onTapThingsButton1: function(e) {
