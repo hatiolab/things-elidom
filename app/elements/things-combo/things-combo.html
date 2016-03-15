@@ -1,18 +1,29 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
-<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/vaadin-combo-box/vaadin-combo-box.html">
+<!--link rel="import" href="../../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
-<link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html"-->
 
 <dom-module id="things-combo">
 	<template>
-    <paper-dropdown-menu id="combo" label="Language" value="{{value}}">
+    <!--paper-dropdown-menu id="combo" label="{{label}}" value="{{value}}">
       <paper-menu class="dropdown-content" selected="{{findSelected(value)}}">
         <template is="dom-repeat" items="{{items}}">
           <paper-item value="{{item.name}}">{{item.description}}</paper-item>
         </template>
       </paper-menu>
-    </paper-dropdown-menu>    
+    </paper-dropdown-menu-->
+
+    <vaadin-combo-box 
+      id="combo" 
+      label="{{label}}" 
+      items="{{items}}" 
+      item-label-path="description" 
+      item-value-path="name" 
+      value="{{value}}">
+    </vaadin-combo-box>
+
 	</template>
 
   <script type="text/javascript">
@@ -38,12 +49,17 @@
           }
         },
 
-        listeners: {
+        /*listeners: {
           'combo.iron-select' : 'onComboSelected',
           'combo.iron-deselect' : 'onComboDeselected'
-        },
+        },*/
 
-        findSelected: function (value) {
+        listeners: {
+          'combo.selected-item-changed' : 'onComboSelected',
+          'combo.value-changed' : 'onComboDeselected'
+        },        
+
+        /*findSelected: function (value) {
           for(var i = 0; i < this.items.length; i++) {
             if(this.items[i].value == value) {
               return i;
@@ -51,14 +67,18 @@
           }
 
           return 0;
-        },
+        },*/
 
         onComboSelected: function(e) {
-          this.fire('select', { name : e.detail.item.value, description : e.detail.item.textContent });
+          if(e.detail.value) {
+            this.fire('select', { name : e.detail.value.name, description : e.detail.value.description });
+          }
         },
 
         onComboDeselected: function(e) {
-          this.fire('deselect', { name : e.detail.item.value, description : e.detail.item.textContent });
+          if(e.detail.value) {
+            this.fire('deselect', { name : e.detail.value.name, description : e.detail.value.description });
+          }
         }
       })
   	})();
