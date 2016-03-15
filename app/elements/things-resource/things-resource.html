@@ -18,16 +18,19 @@ Example:
 		    id="_ajax"
 			auto="[[auto]]"
 			url="[[entityUrl]]"
-			handle-as="json"
+			handle-as="{{handleAs}}"
 			method="[[dynamicMethod]]"
-			content-type="application/json"
+			content-type="[[contentType]]"
+			last-request="{{lastRequest}}"
 			last-response="{{outputData}}"
 			on-response="_successResponse"
 			on-error="_failureResponse"
 			body="[[params]]"
 			loading="{{loading}}"
 			on-loading-changed="_onLoadingChanged"
-			with-credentials=true>
+			query-string="{{queryString}}"
+			with-credentials=[[withCredentials]]
+			timeout="[[timeout]]">
 	    </iron-ajax>
 
 	    <things-spinner id="spinner"></things-spinner>
@@ -75,7 +78,10 @@ Example:
 				 * @type {[Object]}
 				 */
 				outputData: {
-					type : Object,
+					type:Object,
+					value: function() {
+          					return {};
+        			},
 					notify : true
 				},
 				/**
@@ -107,7 +113,43 @@ Example:
 					value:false
 				},
 
-				rootProperty:String
+				rootProperty:String,
+				handleAs:{
+					type:String,
+					value:'json'
+				},
+				headers:{
+					type:Object,
+					value: function() {
+          					return {};
+        			}
+				},
+				lastRequest:{
+					type:Object,
+					value: function() {
+          					return {};
+        			}
+				}
+				jsonPrefix:{
+					type:String,
+					value:''
+				},
+				contentType:{
+					type:String,
+					value:null
+				},
+				withCredentials:{
+					type:Boolean,
+					value:true
+				},
+				queryString:{
+					type:String,
+					value:null
+				},
+				timeout:{
+					type:Number,
+					value:0
+				}
 			},
 
 			// Element Behavior
@@ -169,7 +211,23 @@ Example:
 					}
 				}
 			},
+			/**
+			* Fired when a response is received.
+			*
+			* @event response
+			*/
 
+			/**
+			* Fired when an error is received.
+			*
+			* @event error
+			*/
+		
+			/**
+			* Fired when search button is clicked.
+			*
+			* @event request
+			*/
 			_successResponse: function(event) {
 				if(this.rootProperty) this.outputData = this.outputData[this.rootProperty];
 				this.fire('response', event.detail.xhr.response);
@@ -199,7 +257,7 @@ Example:
 			},
 
 			_onAjaxRequest: function() {
-				// ?
+				this.fire('request', this.lastRequest);
 			},
 
 			generateRequest: function() {
