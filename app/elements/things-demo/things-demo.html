@@ -9,6 +9,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 <link rel="import" href="../things-setting/things-global-behavior.html">
 
 <dom-module id="things-demo">
@@ -174,7 +175,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         },
 
-        behaviors : [ThingsGlobalBehavior],
+        behaviors : [
+          ThingsMsgBoxBehavior, 
+          ThingsGlobalBehavior
+        ],
 
         listeners: {
           'setting-btn.tap' : 'onTapSetting',
@@ -205,7 +209,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         onTapMsgButton: function(e) {
-          this.$['msg-box'].show();
+          //this.$['msg-box'].show();
+          this.open({ title : 'Info Title', text : 'Info Message', type : 'info', timer : 3000 });
         },
 
         onTapSpnButton: function(e) {

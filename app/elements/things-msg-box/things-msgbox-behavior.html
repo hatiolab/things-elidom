@@ -1,0 +1,35 @@
+<script>
+
+var ThingsMsgBoxBehavior = {
+  
+  /**
+   * @param config
+   * @title
+   * @text
+   * @imageUrl
+   * @type info, success, warning, ...
+   * @timer Number 1000 mean 1 second
+   * @html Boolean
+   * @showConfirmButton Boolean
+   * @closeOnConfirm Boolean
+   */
+  open: function(config) {
+    swal(config);
+  },
+
+  /**
+   * TODO
+   */
+  confirm: function(config) {
+    swal(config)
+  },
+
+  /**
+   * TODO Return Value
+   */
+  prompt: function(config) {
+    swal(config);
+  }
+
+};
+</script>

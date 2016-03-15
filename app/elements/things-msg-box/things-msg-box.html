@@ -21,14 +21,14 @@
     }
   </style>
 
-		<paper-dialog id="dialog" class='colored size'>
+		<!--paper-dialog id="dialog" class='colored size'>
 			<h2>[[title]]</h2>
 			<p>[[message]]</p>
 			<div class="buttons">
         <paper-button id="cancel" dialog-dismiss>Cancel</paper-button>
         <paper-button id="ok" dialog-confirm autofocus>OK</paper-button>
 			</div>
-		</paper-dialog>
+		</paper-dialog-->
 
   </template>
 
@@ -39,13 +39,23 @@
       Polymer({
         is: 'things-msg-box',
 
-        listeners: {
-          'cancel.tap' : 'onTapCancel',
-          'ok.tap' : 'onTapOk'
+        properties: {
+          title: {
+            type: String
+          },
+          message: {
+            type: String
+          }
         },
 
+        /*listeners: {
+          'cancel.tap' : 'onTapCancel',
+          'ok.tap' : 'onTapOk'
+        },*/
+
         show: function() {
-          this.$.dialog.open();
+          //this.$.dialog.open();
+          swal(this.title, this.message);
         },
 
         onTapCancel: function(e) {
