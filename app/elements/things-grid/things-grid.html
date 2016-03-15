@@ -1,0 +1,128 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<!--
+A comment describing this element
+
+Example:
+
+    <my-elem></my-elem>
+
+Example:
+
+    <my-elem>
+      <h2>Hello my-elem</h2>
+    </my-elem>
+
+@demo demo/index.html
+-->
+
+<dom-module id="things-grid">
+	<template>
+		<style>
+			:host {
+				display: block;
+			}
+		</style>
+		<div id="gridContainer" style=" width: 700px;height: 300px;"></div>
+	</template>
+
+	<script src='../../../bower_components/grid/dataludi.lic.eval-1.2.0.min.js'></script>
+	<script src='../../../bower_components/grid/dataludi.eval-1.2.1.min.js'></script>
+	<script>
+		Polymer({
+			is: 'things-grid',
+			//Properties
+			properties: {
+				mode:{
+				  type:String,
+				  value:'canvas'
+				},
+				/**
+				 * [fields description]
+				 * @type {Object}
+				 */
+				fields : {
+				  type:Array,
+				  observer:"setFields"
+				},
+				/**
+				 * [columns description]
+				 * @type {Object}
+				 */
+				columns : {
+				  type:Array,
+				  observer:"setColumns"
+				},
+				input :{
+				  type:Array,
+				  observer:"loadData"
+				},
+				headerMenu:{
+				  type:Array
+				},
+				output :{
+				  type:Array,
+				  notify:true
+				},
+				dataSet:{
+					type:Object,
+					value :function(){
+						return this.dataSet = DataLudi.createGridDataSet();
+					}
+				},
+				grid:{
+					type:Object
+				}
+			},
+
+			created:function(){
+				DataLudi.setRootContext('');
+				DataLudi.setAssetRoot('images/grid');
+			},
+			// Element Lifecycle
+			ready: function() {
+
+			},
+
+			attached: function() {
+				// var grid = document.getElementById('gridContainer');
+				this.grid= DataLudi.createGridView('gridContainer', null, false);
+				console.log('attached');
+			},
+
+			detached: function() {},
+
+			// Element Behavior
+			behaviors: [],
+			// Observers
+			observers: [
+				'setFields(fields)',
+				'setColumns(columns)',
+				'loadData(input)'
+			],
+
+			// Event listener
+			listeners : {},
+			setFields :function(fields){
+				console.log(fields);
+				this.dataSet.setFields(fields);
+				this.setDataSource(this.dataSet);
+			},
+			setColumns:function(columns){
+				console.log(columns);
+				this.grid.setColumns(columns);
+				// this.grid.orderByFields (['ID'],DataLudi.SortDirection.DESCENDING);
+				this.grid.resetSize();
+			},
+			loadData:function(input){
+				this.dataSet.setRows(input);
+				this.output=input;
+				this.setDataSource(this.dataSet);
+			},
+			setDataSource:function(dataSet){
+				this.grid.setDataSource(dataSet);
+				// this.grid.resetSize();
+			}
+		});
+	</script>
+</dom-module>

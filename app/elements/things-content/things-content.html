@@ -1,0 +1,108 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<!--
+A comment describing this element
+
+Example:
+
+    <my-elem></my-elem>
+
+Example:
+
+    <my-elem>
+      <h2>Hello my-elem</h2>
+    </my-elem>
+
+@demo demo/index.html
+-->
+
+<dom-module id="things-content">
+	<template>
+		<style>
+			:host {
+				display: block;
+			}
+		</style>
+		<div class="[[layout]]">
+			<iron-ajax
+				auto
+				url="[[gridFieldUrl]]"
+				handle-as="json"
+				last-response="{{searchFields}}"></iron-ajax>
+			<things-form 
+				search-fields ="[[searchFields]]" 
+				action="[[searchActionUrl]]" 
+				method="GET"
+				content-type="application/json"
+				output="{{gridData}}"
+				class="flex">
+			</things-form>
+
+			<iron-ajax
+				auto
+				url="[[gridFieldUrl]]"
+				handle-as="json"
+				last-response="{{gridFields}}"></iron-ajax>
+			<iron-ajax
+				auto
+				url="[[gridColumnUrl]]"
+				handle-as="json"
+				last-response="{{gridColumns}}"></iron-ajax>
+			<things-grid 
+				fields ="[[gridFields]]" 
+				columns="[[gridColumns]]" 
+				input="[[gridData]]"
+				class="flex"
+				output="{{gridOuput}}">
+			</things-grid>
+		</div>
+	</template>
+	<script>
+		Polymer({
+			is: 'things-content',
+			//Properties
+			properties: {
+				layout:{
+					type:String
+				},
+				searchFieldUrl:{
+					type:String
+				},
+				searchActionUrl:{
+					type:String
+				},
+				gridFieldUrl:{
+					type:String
+				},
+				gridColumnUrl:{
+					type:String
+				},
+				gridOuput:{
+					type:Object
+				},
+				gridColumns:{
+					type:Array
+				},
+				gridFields:{
+					type:Array
+				},
+				gridData:{
+					type:Array
+				}
+			},
+
+			// Element Lifecycle
+			ready: function() {},
+
+			attached: function() {},
+
+			detached: function() {},
+
+			// Element Behavior
+			behaviors: [],
+
+			// Event listener
+			listeners : {},
+			observer:[]
+		});
+	</script>
+</dom-module>

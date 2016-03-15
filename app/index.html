@@ -112,11 +112,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
           <section class="Page" data-route="contact">
             <paper-material class="Page-paper" elevation="1">
-              <h2 class="Page-title">Contact</h2>
-              <p>This is the contact section</p>
-              <div class="buttons">
-                <paper-button>Dialog</paper-button>
-              </div>
+<!--               <iron-ajax
+                 auto
+                 url="http://192.168.35.229:9002/rest/diy_services/DynamicScreen/query.json"
+                 handle-as="json"
+                 last-response="{{data}}"></iron-ajax>
+              <iron-ajax
+                 auto
+                 url="http://192.168.35.229:9002/rest/diy_services/ElidomGridModel/query.json"
+                 handle-as="json"
+                 last-response="{{field}}"></iron-ajax>
+              <iron-ajax
+                 auto
+                 url="http://192.168.35.229:9002/rest/diy_services/ElidomGridColumn/query.json"
+                 handle-as="json"
+                 last-response="{{columns}}"></iron-ajax>
+              <things-grid fields="{{field}}" columns = "{{columns}}" input="{{data}}"> </things-grid> -->
+              <things-content 
+                search-field-url="http://192.168.35.229:9002/rest/diy_services/ElidomSearchForm/query.json"
+                search-action-url="http://192.168.35.229:9002/rest/diy_services/DynamicScreen/query.json"
+                grid-field-url="http://192.168.35.229:9002/rest/diy_services/ElidomGridModel/query.json"
+                grid-column-url="http://192.168.35.229:9002/rest/diy_services/ElidomGridColumn/query.json"
+                layout="layout vertical">
+              </things-content>
             </paper-material>
           </section>
 
