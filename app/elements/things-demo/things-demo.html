@@ -124,11 +124,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-material class="Page-paper" elevation="1">
       <p class="paper-font-subhead">Things Combo</p>
 
-      <paper-input label="Selected" value="{{codeItem}}"></paper-input>
+      <paper-input label="Selected Name" value="{{codeName}}"></paper-input>
 
-      <things-combo id="combo" label="Language" value="en-US" items="{{codeItems}}"></things-combo>
+      <paper-input label="Selected Description" value="{{codeDesc}}"></paper-input>
+
+      <things-combo id="combo" label="Language" value="en-US" items="{{comboItems}}"></things-combo>
 
       <things-code-selector id="code-selector" label="Language" value="en-US" name="LOCALE"></things-code-selector>
+
     </paper-material>
 
     <things-spinner id="spinner" loading=false></things-spinner>
@@ -158,13 +161,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           wsStatus: {
             value: 'disconnected'
           },
-          codeItems: [ {
-            name : 'English', value : 'en-US'
-          }, {
-            name : '한글', value : 'ko-KR'
-          }, {
-            name : 'Chinese', value : 'zh-CN'
-          } ]
+          comboItems: {
+            type: Array,
+            value: [{
+              name : 'ko-KR', description: '한글'
+            }, {
+              name : 'en-US', description: 'English'
+            }, {
+              name : 'zh-CN', description: 'Chinese'
+            }],
+            notify: true
+          }
         },
 
         behaviors : [ThingsGlobalBehavior],
@@ -241,7 +248,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         onComboSelected: function(e) {
-          this.codeItem = e.detail;
+          if(e.detail) {
+            this.codeName = e.detail.name;
+            this.codeDesc = e.detail.description;
+          }
         }
 
       });

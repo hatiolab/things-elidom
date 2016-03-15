@@ -9,7 +9,7 @@
     <paper-dropdown-menu id="combo" label="Language" value="{{value}}">
       <paper-menu class="dropdown-content" selected="{{findSelected(value)}}">
         <template is="dom-repeat" items="{{items}}">
-          <paper-item value="{{item.value}}">{{item.name}}</paper-item>
+          <paper-item value="{{item.name}}">{{item.description}}</paper-item>
         </template>
       </paper-menu>
     </paper-dropdown-menu>    
@@ -28,13 +28,8 @@
 
           items: {
             type: Array,
-            value: [ {
-              name : 'English', value : 'en-US'
-            }, {
-              name : '한글', value : 'ko-KR'
-            }, {
-              name : 'Chinese', value : 'zh-CN'
-            } ]
+            notify: true,
+            value: []
           },
 
           value: {
@@ -45,7 +40,7 @@
 
         listeners: {
           'combo.iron-select' : 'onComboSelected',
-          'combo.iron-deselect' : 'onComboDeselected',
+          'combo.iron-deselect' : 'onComboDeselected'
         },
 
         findSelected: function (value) {
@@ -59,11 +54,11 @@
         },
 
         onComboSelected: function(e) {
-          this.fire('select', e.detail.item.value);
+          this.fire('select', { name : e.detail.item.value, description : e.detail.item.textContent });
         },
 
         onComboDeselected: function(e) {
-          this.fire('deselect', e.detail.item.value);
+          this.fire('deselect', { name : e.detail.item.value, description : e.detail.item.textContent });
         }
       })
   	})();

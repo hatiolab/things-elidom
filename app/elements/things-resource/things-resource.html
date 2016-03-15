@@ -231,7 +231,8 @@ Example:
 			*/
 			_successResponse: function(event) {
 				if(this.rootProperty) this.outputData = this.outputData[this.rootProperty];
-				this.fire('response', event.detail.xhr.response);
+				this.fire('response', this.outputData);
+
 				if(this.method && this.method != 'GET') {
 					this.showToast('Success');
 				}

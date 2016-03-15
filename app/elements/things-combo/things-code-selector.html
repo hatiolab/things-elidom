@@ -6,7 +6,7 @@
 
 <dom-module id="things-code-selector">
 	<template>
-    <paper-dropdown-menu label="Language" value="{{value}}">
+    <paper-dropdown-menu id="combo" label="Language" value="{{value}}">
       <paper-menu class="dropdown-content" selected="{{findSelected(value)}}">
         <template is="dom-repeat" items="{{items}}">
           <paper-item value="{{item.name}}">{{item.description}}</paper-item>
@@ -15,11 +15,12 @@
     </paper-dropdown-menu>
 
     <things-resource
-      auto 
+      auto
       id="resource" 
       action="{{computeUrl(name)}}" 
       method="GET" 
-      outout-data="{{result}}">
+      root-property="items"
+      outout-data="{{items}}">
     </things-resource>
 
 	</template>
@@ -43,16 +44,14 @@
           value: {
             type: String,
             value: 'zh-CN'
-          },
-
-          result: {
-            type: Object,
-            observer: 'resultChanged'
           }
+
         },
 
-        attached: function() {
-          //this.$.resource.generateRequest();
+        listeners: {
+          'combo.iron-select' : 'onComboSelected',
+          'combo.iron-deselect' : 'onComboDeselected',          
+          'resource.response' : 'onResponse'
         },
 
         computeUrl: function(code) {
@@ -69,10 +68,17 @@
           return 0;
         },
 
-        resultChanged: function(newValue, oldValue) {
-          console.log(newValue);
-          this.items = newValue.items;
-        }
+        onResponse: function(e) {
+          this.items = e.detail;
+        },
+
+        onComboSelected: function(e) {
+          this.fire('select', { name : e.detail.item.value, description : e.detail.item.textContent });
+        },
+
+        onComboDeselected: function(e) {
+          this.fire('deselect', { name : e.detail.item.value, description : e.detail.item.textContent });
+        }        
 
       })
   	})();
