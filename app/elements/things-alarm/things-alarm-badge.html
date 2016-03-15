@@ -9,24 +9,24 @@
 
 <dom-module id="things-alarm-badge">
 	<template>
-		<paper-icon-button id="alarm-button" icon="alarm" alt="alarm">
+		<paper-icon-button id="alarm-button" src="https://assets-cdn.github.com/images/modules/logos_page/Octocat.png" alt="alarm">
 		</paper-icon-button>
 		<paper-badge for="number" label="[[count]]"></paper-badge>
 	</template>
+
+  <script type="text/javascript">
+  	(function() {
+      Polymer({
+        is: "things-alarm-badge",
+
+        listeners: {
+        	'tap' : 'openAlarm' 
+        },
+
+        openAlarm: function (e) {
+        	this.count = 0;
+        }
+      })
+  	})();
+  </script>
 </dom-module>
-
-<script type="text/javascript">
-	(function() {
-    Polymer({
-      is: "things-alarm-badge",
-
-      listeners: {
-      	'tap' : 'openAlarm' 
-      },
-
-      openAlarm: function (e) {
-      	this.count = 0;
-      }
-    })
-	})();
-</script>

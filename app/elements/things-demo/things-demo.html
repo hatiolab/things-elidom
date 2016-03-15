@@ -58,7 +58,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <things-button id="things-btn-3" color="pink" confirm=true title="Confirm" message="Are you sure to delete?">Delete Button</things-button>
       </div>
-    </paper-material>    
+    </paper-material>
 
     <paper-material class="Page-paper" elevation="1">
       <p class="paper-font-subhead">Things Message Box / Spinner</p>
@@ -121,6 +121,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </div>
     </paper-material>
 
+    <paper-material class="Page-paper" elevation="1">
+      <p class="paper-font-subhead">Things Code Selector</p>
+
+      <paper-input label="Selected" value="{{codeItem}}"></paper-input>
+
+      <things-combo id="combo" label="Language" value="en-US" items="{{codeItems}}"></things-code-selector>
+    </paper-material>    
+
     <things-spinner id="spinner" loading=false></things-spinner>
 
     <things-msg-box id="msg-box" title="Things Message Box" message="This is Message Box"></things-msg-box>
@@ -147,7 +155,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           },
           wsStatus: {
             value: 'disconnected'
-          }
+          },
+          codeItems: [ {
+            name : 'English', value : 'en-US'
+          }, {
+            name : '한글', value : 'ko-KR'
+          }, {
+            name : 'Chinese', value : 'zh-CN'
+          } ]
         },
 
         behaviors : [ThingsGlobalBehavior],
@@ -167,7 +182,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'ws.onmessage' : 'onWsMessageReceive',
           'ws.onerror' : 'onWsMessageReceive',
           'ws.onopen' : 'onWsMessageReceive',
-          'ws.onclose' : 'onWsMessageReceive'
+          'ws.onclose' : 'onWsMessageReceive',
+          'combo.select' : 'onComboSelected' 
         },
 
         onTapSetting: function(e) {
@@ -219,7 +235,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.wsReceiveMessage = e.type;
             this.wsStatus = this.$.ws.status();
           }
-        }        
+        },
+
+        onComboSelected: function(e) {
+          this.codeItem = e.detail;
+        }
 
       });
     })();

@@ -4,9 +4,9 @@
 <link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 
-<dom-module id="things-code-selector">
+<dom-module id="things-combo">
 	<template>
-    <paper-dropdown-menu label="Language" value="{{value}}">
+    <paper-dropdown-menu id="combo" label="Language" value="{{value}}">
       <paper-menu class="dropdown-content" selected="{{findSelected(value)}}">
         <template is="dom-repeat" items="{{items}}">
           <paper-item value="{{item.value}}">{{item.name}}</paper-item>
@@ -18,7 +18,7 @@
   <script type="text/javascript">
   	(function() {
       Polymer({
-        is: "things-code-selector",
+        is: "things-combo",
 
         properties: {
           code: {
@@ -44,10 +44,8 @@
         },
 
         listeners: {
-        },
-
-        attached: function() {
-          // TODO Ajax call and set items
+          'combo.iron-select' : 'onComboSelected',
+          'combo.iron-deselect' : 'onComboDeselected',
         },
 
         findSelected: function (value) {
@@ -58,6 +56,14 @@
           }
 
           return 0;
+        },
+
+        onComboSelected: function(e) {
+          this.fire('select', e.detail.item.value);
+        },
+
+        onComboDeselected: function(e) {
+          this.fire('deselect', e.detail.item.value);
         }
       })
   	})();
