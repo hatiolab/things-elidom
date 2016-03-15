@@ -9,10 +9,19 @@
     <paper-dropdown-menu label="Language" value="{{value}}">
       <paper-menu class="dropdown-content" selected="{{findSelected(value)}}">
         <template is="dom-repeat" items="{{items}}">
-          <paper-item value="{{item.value}}">{{item.name}}</paper-item>
+          <paper-item value="{{item.name}}">{{item.description}}</paper-item>
         </template>
       </paper-menu>
-    </paper-dropdown-menu>    
+    </paper-dropdown-menu>
+
+    <things-resource
+      auto 
+      id="resource" 
+      action="{{computeUrl(name)}}" 
+      method="GET" 
+      outout-data="{{result}}">
+    </things-resource>
+
 	</template>
 
   <script type="text/javascript">
@@ -21,33 +30,33 @@
         is: "things-code-selector",
 
         properties: {
-          code: {
+          name: {
             type: String,
             notify: true
           },
 
           items: {
             type: Array,
-            value: [ {
-              name : 'English', value : 'en-US'
-            }, {
-              name : '한글', value : 'ko-KR'
-            }, {
-              name : 'Chinese', value : 'zh-CN'
-            } ]
+            value: []
           },
 
           value: {
             type: String,
             value: 'zh-CN'
+          },
+
+          result: {
+            type: Object,
+            observer: 'resultChanged'
           }
         },
 
-        listeners: {
+        attached: function() {
+          //this.$.resource.generateRequest();
         },
 
-        attached: function() {
-          // TODO Ajax call and set items
+        computeUrl: function(code) {
+          return 'common_codes/show_by_name?name=' + code;
         },
 
         findSelected: function (value) {
@@ -58,7 +67,13 @@
           }
 
           return 0;
+        },
+
+        resultChanged: function(newValue, oldValue) {
+          console.log(newValue);
+          this.items = newValue.items;
         }
+
       })
   	})();
   </script>

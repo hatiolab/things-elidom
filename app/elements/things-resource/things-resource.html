@@ -1,17 +1,15 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../things-setting/things-global-behavior.html">
-<!--
-A comment describing this element
+<!--A comment describing this element
 
 Example:
 
-		<things-resource>
-			<h2>Hello things-resource</h2>
-		</things-resource>
+<things-resource>
+	<h2>Hello things-resource</h2>
+</things-resource>
 
-@demo demo/index.html
--->
+@demo demo/index.html-->
 
 <dom-module id="things-resource">
 	<template>
@@ -24,7 +22,6 @@ Example:
 			method="[[dynamicMethod]]"
 			content-type="application/json"
 			last-response="{{outputData}}"
-			headers="{'X-Requested-With':'XMLHttpRequest'}"
 			on-response="_successResponse"
 			on-error="_failureResponse"
 			body="[[params]]"
@@ -32,6 +29,8 @@ Example:
 			on-loading-changed="_onLoadingChanged"
 			with-credentials=true>
 	    </iron-ajax>
+
+	    <things-spinner id="spinner"></things-spinner>
 
 	</template>
 
@@ -212,7 +211,7 @@ Example:
 			 */
 			_onLoadingChanged: function(e) {
 				if(e.detail) {
-					app.$.spinner.loading = e.detail.value;
+					this.$.spinner.loading = e.detail.value;
 				}
 			}
 			

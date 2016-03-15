@@ -18,8 +18,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   app.displayInstalledToast = () => {
     // Check to make sure caching is actually enabled—it won't be in the dev environment.
     if (!Polymer.dom(document).querySelector('platinum-sw-cache').disabled) {
-      Polymer.dom(document).querySelector('#toastInfo').text = 'Caching complete! This app will work offline.';
-      Polymer.dom(document).querySelector('#toastInfo').show();
+      Polymer.dom(document).querySelector('#toast').text = 'Caching complete! This app will work offline.';
+      Polymer.dom(document).querySelector('#toast').show();
     }
   };
 

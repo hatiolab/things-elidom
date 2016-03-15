@@ -122,12 +122,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </paper-material>
 
     <paper-material class="Page-paper" elevation="1">
-      <p class="paper-font-subhead">Things Code Selector</p>
+      <p class="paper-font-subhead">Things Combo</p>
 
       <paper-input label="Selected" value="{{codeItem}}"></paper-input>
 
-      <things-combo id="combo" label="Language" value="en-US" items="{{codeItems}}"></things-code-selector>
-    </paper-material>    
+      <things-combo id="combo" label="Language" value="en-US" items="{{codeItems}}"></things-combo>
+
+      <things-code-selector id="code-selector" label="Language" value="en-US" name="LOCALE"></things-code-selector>
+    </paper-material>
 
     <things-spinner id="spinner" loading=false></things-spinner>
 
@@ -183,7 +185,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'ws.onerror' : 'onWsMessageReceive',
           'ws.onopen' : 'onWsMessageReceive',
           'ws.onclose' : 'onWsMessageReceive',
-          'combo.select' : 'onComboSelected' 
+          'combo.select' : 'onComboSelected',
+          'code-selector.select' : 'onComboSelected'
         },
 
         onTapSetting: function(e) {
