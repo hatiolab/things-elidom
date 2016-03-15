@@ -3,7 +3,7 @@
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
-<dom-module id="things-message-box">
+<dom-module id="things-msg-box">
   <template>
 
   <style>
@@ -37,7 +37,7 @@
       'use strict';
 
       Polymer({
-        is: 'things-message-box',
+        is: 'things-msg-box',
 
         listeners: {
           'cancel.tap' : 'onTapCancel',
@@ -46,10 +46,6 @@
 
         show: function() {
           this.$.dialog.open();
-        },
-
-        confirm: function() {
-          
         },
 
         onTapCancel: function(e) {

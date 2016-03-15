@@ -1,0 +1,41 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+
+<link rel="import" href="./things-setting/things-global-behavior.html">
+
+<dom-module id="things-setting">
+  <template>
+
+    <things-setting-dialog id="dialog"></things-setting-dialog>
+
+    <iron-localstorage name="setting.basicUrl" value="{{globals.basicUrl}}"
+                       on-iron-localstorage-load-empty="onBaseUrlEmpty">
+    </iron-localstorage>
+
+    <iron-localstorage name="setting.user" value="{{globals.user}}">
+    </iron-localstorage>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'things-setting',
+
+        behaviors: [ThingsGlobalBehavior],
+
+        onBaseUrlEmpty: function() {
+          this.showToast('Base URL should not be empty.');
+        },
+
+        open: function() {
+          this.$.dialog.open()
+        }
+
+      });
+    })();
+  </script>
+</dom-module>

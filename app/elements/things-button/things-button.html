@@ -5,6 +5,8 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-behaviors/paper-button-behavior.html">
 
+<link rel="import" href="../things-msg-box/things-msg-box.html">
+
 <dom-module id="things-button">
   <template>
 
@@ -52,9 +54,9 @@
 
     </style>
 
-    <paper-button raised class="custom indigo"><content></content></paper-button>
+    <paper-button raised><content></content></paper-button>
 
-    <things-message-box id="msg-box" title="{{confirmTitle}}" message="{{confirmMsg}}"></things-message-box>
+    <things-msg-box id="msg-box" title="{{title}}" message="{{message}}"></things-msg-box>
 
   </template>
 
@@ -70,24 +72,36 @@
         ],
 
         properties: {
+          color: {
+            type: String,
+            value: ''
+          },
+
           confirm: {
             type: Boolean,
             value: false
           },
 
-          confirmTitle: {
+          title: {
             type: String,
             value: 'Confirm'
           },
 
-          confirmMsg: {
+          message: {
             type: String,
-            value: 'Are you sure to process?'
+            value: ''
           }
         },
 
         listeners: {
           'msg-box.confirm' : 'onConfirm'
+        },
+
+        attached : function() {
+          var el = this.querySelector('paper-button');
+          if(this.color) {
+            el.classList.add(this.color);
+          }
         },
 
         onConfirm: function(e) {

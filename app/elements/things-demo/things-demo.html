@@ -9,13 +9,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
-<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../things-common/things-message-box.html">
-<link rel="import" href="../things-common/things-event-handler.html">
-<link rel="import" href="../things-common/things-alarm-badge.html">
-<link rel="import" href="../things-common/things-spinner.html">
-
 <dom-module id="things-demo">
   <template>
     <style include="shared-styles"></style>
@@ -45,9 +38,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </paper-input>
 
       <div class="buttons">
-        <things-button id="things-button-1">Search Button</things-button>
+        <things-button color="green" id="things-button-1">Search Button</things-button>
 
-        <things-button id="things-button-2" confirm=true confirmTitle="Confirm" confirmMsg="Are you sure to process?">Transaction Button</things-button>
+        <things-button id="things-button-2" color="indigo" confirm=true title="Confirm" message="Are you sure to save?">Save Button</things-button>
+
+        <things-button id="things-button-3" color="pink" confirm=true title="Confirm" message="Are you sure to delete?">Delete Button</things-button>
       </div>
     </paper-material>    
 
@@ -114,7 +109,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <things-spinner id="spinner" loading=false></things-spinner>
 
-    <things-message-box id="msg-box" title="Things Message Box" message="This is Message Box"></things-message-box>
+    <things-msg-box id="msg-box" title="Things Message Box" message="This is Message Box"></things-msg-box>
 
     <things-websocket id="ws" url="{{wsUrl}}"></things-websocket>
 
@@ -144,6 +139,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         listeners: {
           'things-button-1.tap' : 'onTapThingsButton1',
           'things-button-2.confirm' : 'onConfirmMsgBox',
+          'things-button-3.confirm' : 'onConfirmMsgBox',
           'msg-button.tap' : 'onTapMsgButton',
           'spn-button.tap' : 'onTapSpnButton',
           'evt-button.tap' : 'onTapEvtButton',
