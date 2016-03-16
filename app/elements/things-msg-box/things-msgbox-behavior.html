@@ -15,14 +15,14 @@ var ThingsMsgBoxBehavior = {
    * @showConfirmButton Boolean
    * @closeOnConfirm Boolean
    */
-  open: function(config) {
+  openInfoMsg: function(config) {
     swal(config);
   },
 
   /**
    * Open Confirmation Message Box
    */
-  confirm: function(config, okCallback, cancelCallback) {
+  openConfirmMsg: function(config, okCallback, cancelCallback) {
     swal(config, function(isConfirm) {
       if (isConfirm) {
         if (okCallback) {
@@ -39,7 +39,7 @@ var ThingsMsgBoxBehavior = {
   /**
    * Open Prompt Message Box
    */
-  prompt: function(config, promptCallback) {
+  openPromptMsg: function(config, promptCallback) {
     swal(config, function(inputValue) {
 
       if (inputValue === '') {
@@ -54,6 +54,11 @@ var ThingsMsgBoxBehavior = {
         promptCallback(inputValue);
       }
     });
+  },
+
+  showToastMsg: function(msg) {
+    app.$.toast.text = msg;
+    app.$.toast.open();
   }
 
 };

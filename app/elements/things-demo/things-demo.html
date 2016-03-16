@@ -227,12 +227,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         onTapMsgButton: function(e) {
-          //this.$['msg-box'].show();
-          this.open({ title : 'Info Title', text : 'Info Message', type : 'info', timer : 3000 });
+          this.openInfoMsg({ title : 'Info Title', text : 'Info Message', type : 'info', timer : 3000 });
         },
 
         onTapConfirmButton: function(e) {
-          this.confirm( { title: 'Are you sure?',
+          this.openConfirmMsg( { title: 'Are you sure?',
                           text: 'You will not be able to recover this imaginary file!',
                           type: 'warning',
                           showCancelButton: true,
@@ -252,7 +251,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         onTapPromptButton: function(e) {
-          this.prompt( { title : 'An input!',
+          this.openPromptMsg( { title : 'An input!',
                          text : 'Write something interesting!',
                          type : 'input',
                          showCancelButton: true,
