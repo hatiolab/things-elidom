@@ -11,11 +11,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../things-setting/things-global-behavior.html">
 
-<dom-module id="things-test">
+<dom-module id="things-example">
   <template>
     <style include="shared-styles"></style>
     <style>
-      @import "things-test";
+      @import "things-example";
       h4 {
           text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
       }
@@ -26,7 +26,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <paper-material class="Page-paper" elevation="1">
       <h4>Hi {{name}}!</h4>
-      <h4>Welcome to Test Field!</h4>
+      <h4>Welcome to Example Field!</h4>
       <input type="text" value={{name::input}}>
     </paper-material>
 
@@ -37,7 +37,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       'use strict';
 
       Polymer({
-        is: 'things-test',
+        is: 'things-example',
 
         properties: {
           title: {

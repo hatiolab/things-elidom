@@ -42,8 +42,8 @@ window.addEventListener('WebComponentsReady', () => {
     app.route = 'demo';
   });
 
-  page('/test', scrollToTop, () => {
-    app.route = 'test';
+  page('/example', scrollToTop, () => {
+    app.route = 'example';
   });
 
   page('*', function(attempted) {

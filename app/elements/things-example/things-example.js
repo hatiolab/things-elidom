@@ -10,7 +10,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 class ThingsTest {
   beforeRegister() {
-    this.is = 'things-test';
+    this.is = 'things-example';
     
     this.properties = {
       title: {
