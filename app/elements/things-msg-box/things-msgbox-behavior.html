@@ -20,8 +20,16 @@ var ThingsMsgBoxBehavior = {
   /**
    * TODO
    */
-  confirm: function(config) {
-    swal(config)
+  confirm: function(config, okCallback, cancelCallback) {
+    swal(config, function(isConfirm) {
+      if(isConfirm) {
+        if(okCallback)
+          okCallback();
+      } else {
+        if(cancelCallback)
+          cancelCallback();
+      }
+    });
   },
 
   /**
@@ -29,6 +37,8 @@ var ThingsMsgBoxBehavior = {
    */
   prompt: function(config) {
     swal(config);
+
+    return "";
   }
 
 };
