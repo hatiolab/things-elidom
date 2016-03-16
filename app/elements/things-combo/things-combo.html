@@ -17,6 +17,7 @@
 
     <vaadin-combo-box 
       id="combo" 
+      name="{{name}}"
       label="{{label}}" 
       items="{{items}}" 
       item-label-path="{{labelPath}}" 
@@ -40,47 +41,21 @@
 
           value: {
             type: String,
-            value: 'zh-CN'
+            notify: true
           }
         },
-
-        /*listeners: {
-          'combo.iron-select' : 'onComboSelected',
-          'combo.iron-deselect' : 'onComboDeselected'
-        },*/
 
         listeners: {
-          'combo.selected-item-changed' : 'onComboSelected',
-          'combo.value-changed' : 'onComboDeselected'
+          'combo.value-changed' : 'onComboSelected'
         },
-
-        /*findSelected: function (value) {
-          for(var i = 0; i < this.items.length; i++) {
-            if(this.items[i].value == value) {
-              return i;
-            }
-          }
-
-          return 0;
-        },*/
 
         onComboSelected: function(e) {
           if(e.detail.value && this.valuePath) {
-            this.fire('select', this._makeEventData(e));
+            var detail = {};
+            detail[this.labelPath] = e.detail.value[this.labelPath];
+            detail[this.valuePath] = e.detail.value[this.valuePath];
+            this.fire('select', detail);
           }
-        },
-
-        onComboDeselected: function(e) {
-          if(e.detail.value && this.valuePath) {
-            this.fire('deselect', this._makeEventData(e));
-          }
-        },
-
-        _makeEventData: function(e) {
-          var detail = {};
-          detail[this.labelPath] = e.detail.value[this.labelPath];
-          detail[this.valuePath] = e.detail.value[this.valuePath];
-          return detail;
         }
 
       })

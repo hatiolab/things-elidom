@@ -4,20 +4,21 @@
 
 <dom-module id="things-code-selector">
 	<template>
-    <!--paper-dropdown-menu id="combo" label="{{label}}" value="{{value}}">
-      <paper-menu class="dropdown-content" selected="{{findSelected(value)}}">
-        <template is="dom-repeat" items="{{items}}">
-          <paper-item value="{{item.name}}">{{item.description}}</paper-item>
-        </template>
-      </paper-menu>
-    </paper-dropdown-menu-->
 
-    <things-combo id="combo" label="{{label}}" value="{{value}}" items="{{items}}" label-path="{{labelPath}}" value-path="{{valuePath}}"></things-combo>
+    <things-combo 
+      id="combo" 
+      name="{{name}}" 
+      label="{{label}}" 
+      value="{{value}}" 
+      items="{{items}}" 
+      label-path="{{labelPath}}" 
+      value-path="{{valuePath}}">
+    </things-combo>
 
     <things-resource
       auto
       id="resource" 
-      action="{{computeUrl(name)}}" 
+      action="{{computeUrl(codeName)}}" 
       method="GET" 
       root-property="items"
       outout-data="{{items}}">
@@ -31,70 +32,22 @@
         is: "things-code-selector",
 
         properties: {
-          name: {
+          codeName: {
             type: String,
             notify: true
-          },
-
-          items: {
-            type: Array,
-            value: []
-          },
-
-          value: {
-            type: String,
-            value: 'zh-CN'
           }
-
         },
 
-        /*listeners: {
-          'combo.iron-select' : 'onComboSelected',
-          'combo.iron-deselect' : 'onComboDeselected',          
-          'resource.response' : 'onResponse'
-        },*/
-
         listeners: {
-          'combo.selected-item-changed' : 'onComboSelected',
-          'combo.value-changed' : 'onComboDeselected',
           'resource.response' : 'onResponse'
         },        
 
-        computeUrl: function(code) {
-          return 'common_codes/show_by_name?name=' + code;
-        },
-
-        findSelected: function (value) {
-          for(var i = 0; i < this.items.length; i++) {
-            if(this.items[i].value == value) {
-              return i;
-            }
-          }
-
-          return 0;
+        computeUrl: function(codeName) {
+          return 'common_codes/show_by_name?name=' + codeName;
         },
 
         onResponse: function(e) {
           this.items = e.detail;
-        },
-
-        onComboSelected: function(e) {
-          if(e.detail.value && this.valuePath) {
-            this.fire('select', this._makeEventData(e));
-          }
-        },
-
-        onComboDeselected: function(e) {
-          if(e.detail.value && this.valuePath) {
-            this.fire('deselect', this._makeEventData(e));
-          }
-        },
-
-        _makeEventData: function(e) {
-          var detail = {};
-          detail[this.labelPath] = e.detail.value[this.labelPath];
-          detail[this.valuePath] = e.detail.value[this.valuePath];
-          return detail;
         }
 
       })
