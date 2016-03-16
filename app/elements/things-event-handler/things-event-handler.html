@@ -5,9 +5,6 @@
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 
 <dom-module id="things-event-handler">
-  <template>
-  	<!--things-msg-box id="msg-box" title="Things Message Box" message="This is Message Box"></things-msg-box-->
-  </template>
 
   <script>
     (function() {
@@ -28,12 +25,7 @@
          * Show Message
          */
         showMessage: function(e) {
-          var title = e.detail.title;
-          var message = e.detail.message;
-          this.open({ title : title, text : message });
-          //this.$['msg-box'].title = title;
-          //this.$['msg-box'].message = message;
-          //this.$['msg-box'].show();
+          this.open({ title : e.detail.title, text : e.detail.message });
         }
 
       });

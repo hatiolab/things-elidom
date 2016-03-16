@@ -41,19 +41,17 @@ var ThingsMsgBoxBehavior = {
    */
   prompt: function(config, promptCallback) {
     swal(config, function(inputValue) {
-      if(inputValue) {
-        if(inputValue === false) {
-          return false;
 
-        } else if (inputValue === '' ) {
-          swal.showInputError('Empty value is not allowed!');
-          return false;
+      if (inputValue === '') {
+        swal.showInputError('Empty value is not allowed!');
+      }
 
-        } else {
-          if(promptCallback) {
-            promptCallback(inputValue);
-          }
-        }
+      if(!inputValue) {
+        return false;
+      }
+
+      if(promptCallback) {
+        promptCallback(inputValue);
       }
     });
   }
