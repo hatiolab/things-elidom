@@ -129,9 +129,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       <paper-input label="Selected Description" value="{{codeDesc}}"></paper-input>
 
-      <things-combo id="combo" label="Language" value="en-US" items="{{comboItems}}"></things-combo>
+      <things-combo id="combo" label="Language" value="en-US" items="{{comboItems}}" label-path="description" value-path="name"></things-combo>
 
-      <things-code-selector id="code-selector" label="Language" value="en-US" name="LOCALE"></things-code-selector>
+      <things-code-selector id="code-selector" label="Language" value="en-US" name="LOCALE" label-path="description" value-path="name"></things-code-selector>
 
     </paper-material>
 

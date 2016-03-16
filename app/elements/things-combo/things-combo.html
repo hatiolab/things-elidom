@@ -19,8 +19,8 @@
       id="combo" 
       label="{{label}}" 
       items="{{items}}" 
-      item-label-path="description" 
-      item-value-path="name" 
+      item-label-path="{{labelPath}}" 
+      item-value-path="{{valuePath}}" 
       value="{{value}}">
     </vaadin-combo-box>
 
@@ -32,11 +32,6 @@
         is: "things-combo",
 
         properties: {
-          code: {
-            type: String,
-            notify: true
-          },
-
           items: {
             type: Array,
             notify: true,
@@ -57,7 +52,7 @@
         listeners: {
           'combo.selected-item-changed' : 'onComboSelected',
           'combo.value-changed' : 'onComboDeselected'
-        },        
+        },
 
         /*findSelected: function (value) {
           for(var i = 0; i < this.items.length; i++) {
@@ -70,16 +65,24 @@
         },*/
 
         onComboSelected: function(e) {
-          if(e.detail.value) {
-            this.fire('select', { name : e.detail.value.name, description : e.detail.value.description });
+          if(e.detail.value && this.valuePath) {
+            this.fire('select', this._makeEventData(e));
           }
         },
 
         onComboDeselected: function(e) {
-          if(e.detail.value) {
-            this.fire('deselect', { name : e.detail.value.name, description : e.detail.value.description });
+          if(e.detail.value && this.valuePath) {
+            this.fire('deselect', this._makeEventData(e));
           }
+        },
+
+        _makeEventData: function(e) {
+          var detail = {};
+          detail[this.labelPath] = e.detail.value[this.labelPath];
+          detail[this.valuePath] = e.detail.value[this.valuePath];
+          return detail;
         }
+
       })
   	})();
   </script>

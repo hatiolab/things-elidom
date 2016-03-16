@@ -4,7 +4,7 @@
 
 <dom-module id="things-code-selector">
 	<template>
-    <!--paper-dropdown-menu id="combo" label="Language" value="{{value}}">
+    <!--paper-dropdown-menu id="combo" label="{{label}}" value="{{value}}">
       <paper-menu class="dropdown-content" selected="{{findSelected(value)}}">
         <template is="dom-repeat" items="{{items}}">
           <paper-item value="{{item.name}}">{{item.description}}</paper-item>
@@ -12,7 +12,7 @@
       </paper-menu>
     </paper-dropdown-menu-->
 
-    <things-combo id="combo"></things-combo>
+    <things-combo id="combo" label="{{label}}" value="{{value}}" items="{{items}}" label-path="{{labelPath}}" value-path="{{valuePath}}"></things-combo>
 
     <things-resource
       auto
@@ -48,11 +48,17 @@
 
         },
 
-        listeners: {
+        /*listeners: {
           'combo.iron-select' : 'onComboSelected',
           'combo.iron-deselect' : 'onComboDeselected',          
           'resource.response' : 'onResponse'
-        },
+        },*/
+
+        listeners: {
+          'combo.selected-item-changed' : 'onComboSelected',
+          'combo.value-changed' : 'onComboDeselected',
+          'resource.response' : 'onResponse'
+        },        
 
         computeUrl: function(code) {
           return 'common_codes/show_by_name?name=' + code;
@@ -69,17 +75,27 @@
         },
 
         onResponse: function(e) {
-          console.log(e);
           this.items = e.detail;
         },
 
         onComboSelected: function(e) {
-          this.fire('select', { name : e.detail.item.value, description : e.detail.item.textContent });
+          if(e.detail.value && this.valuePath) {
+            this.fire('select', this._makeEventData(e));
+          }
         },
 
         onComboDeselected: function(e) {
-          this.fire('deselect', { name : e.detail.item.value, description : e.detail.item.textContent });
-        }        
+          if(e.detail.value && this.valuePath) {
+            this.fire('deselect', this._makeEventData(e));
+          }
+        },
+
+        _makeEventData: function(e) {
+          var detail = {};
+          detail[this.labelPath] = e.detail.value[this.labelPath];
+          detail[this.valuePath] = e.detail.value[this.valuePath];
+          return detail;
+        }
 
       })
   	})();
