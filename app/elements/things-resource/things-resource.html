@@ -62,8 +62,8 @@ Example:
 				 * @type {[String]}
 				 */
 				action : {
-					type:String,
-					notify:true
+					type: String,
+					notify: true
 				},
 				/**
 				 * request prameters
@@ -79,10 +79,8 @@ Example:
 				 * @type {[Object]}
 				 */
 				outputData: {
-					type:Object,
-					value: function() {
-          					return {};
-        			},
+					type: Object,
+					value: {},
 					notify : true
 				},
 				/**
@@ -115,38 +113,46 @@ Example:
 				},
 
 				rootProperty:String,
+
 				handleAs:{
 					type:String,
 					value:'json'
 				},
+
 				headers:{
 					type:Object,
 					value: function() {
           					return {};
         			}
 				},
+
 				lastRequest:{
 					type:Object,
 					value: function() {
           					return {};
         			}
 				},
+
 				jsonPrefix:{
 					type:String,
 					value:''
 				},
+
 				contentType:{
 					type:String,
 					value:null
 				},
+
 				withCredentials:{
 					type:Boolean,
 					value:true
 				},
+
 				queryString:{
 					type:String,
 					value:null
 				},
+				
 				timeout:{
 					type:Number,
 					value:0

@@ -46,15 +46,12 @@
         },
 
         listeners: {
-          'combo.value-changed' : 'onComboSelected'
+          'combo.value-changed' : 'onValueChanged'
         },
 
-        onComboSelected: function(e) {
+        onValueChanged: function(e) {
           if(e.detail.value && this.valuePath) {
-            var detail = {};
-            detail[this.labelPath] = e.detail.value[this.labelPath];
-            detail[this.valuePath] = e.detail.value[this.valuePath];
-            this.fire('select', detail);
+            this.fire('value-changed', { value : e.detail.value, item: this.$.combo.selectedItem});
           }
         }
 

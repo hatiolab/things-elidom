@@ -23,106 +23,124 @@ Example:
 				display: block;
 			}
 		</style>
-		<div id="gridContainer" style=" width: 700px;height: 300px;"></div>
+	
+		<div id="gridContainer" style="width: 700px;height: 300px;"></div>
 	</template>
 
 	<script src='../../../lib/grid/dataludi.lic.eval-1.2.0.min.js'></script>
 	<script src='../../../lib/grid/dataludi.eval-1.2.1.min.js'></script>
+
 	<script>
 		Polymer({
 			is: 'things-grid',
-			//Properties
+
 			properties: {
-				mode:{
-				  type:String,
-				  value:'canvas'
+				mode: {
+				  type: String,
+				  value: 'canvas'
 				},
+
 				/**
 				 * [fields description]
 				 * @type {Object}
 				 */
-				fields : {
-				  type:Array,
-				  observer:"setFields"
+				fields: {
+				  type: Array,
+				  observer: 'setFields'
 				},
+
 				/**
 				 * [columns description]
 				 * @type {Object}
 				 */
-				columns : {
-				  type:Array,
-				  observer:"setColumns"
+				columns: {
+				  type: Array,
+				  observer: 'setColumns'
 				},
-				input :{
-				  type:Array,
-				  observer:"loadData"
+
+				input: {
+				  type: Array,
+				  observer: 'loadData'
 				},
-				headerMenu:{
-				  type:Array
+
+				headerMenu: {
+				  type: Array
 				},
-				output :{
-				  type:Array,
-				  notify:true
+
+				output: {
+				  type: Array,
+				  notify: true
 				},
-				dataSet:{
-					type:Object,
-					value :function(){
-						return this.dataSet = DataLudi.createGridDataSet();
+
+				dataSet: {
+					type: Object,
+					value: function() {
+						return DataLudi.createGridDataSet();
 					}
 				},
-				grid:{
-					type:Object
+
+				grid: {
+					type: Object
 				}
 			},
 
-			created:function(){
+			listeners : {
+				'gridContainer.resize' : 'onResizeContainer'
+			},
+
+			onResizeContainer: function(e) {
+				console.log(e);
+			},
+
+			created: function() {
 				DataLudi.setRootContext('');
 				DataLudi.setAssetRoot('images/grid');
 			},
-			// Element Lifecycle
-			ready: function() {
-
-			},
 
 			attached: function() {
-				// var grid = document.getElementById('gridContainer');
-				this.grid= DataLudi.createGridView('gridContainer', null, false);
-				console.log('attached');
+				this.grid = DataLudi.createGridView('gridContainer', null, false);
+				this.grid.setDataSource(this.dataSet);
+
+				if(this.fields && this.fields.length > 0) {
+					this.dataSet.setFields(this.fields);
+				}
+
+				if(this.columns && this.columns.length > 0) {
+					this.grid.setColumns(this.columns);
+					this.grid.resetSize();		
+				}
 			},
 
-			detached: function() {},
+			detached: function() {
+				this.output = null;
+				this.input = null;
+				this.dataSet = null;
+				this.fields = null;
+				this.columns = null;
+				this.grid = null;
+			},
 
-			// Element Behavior
-			behaviors: [],
-			// Observers
-			observers: [
-				'setFields(fields)',
-				'setColumns(columns)',
-				'loadData(input)'
-			],
+			setFields: function(fields) {
+				if(fields && fields.length > 0 && this.dataSet) {
+					this.dataSet.setFields(fields);
+				}
+			},
 
-			// Event listener
-			listeners : {},
-			setFields :function(fields){
-				console.log(fields);
-				this.dataSet.setFields(fields);
-				this.setDataSource(this.dataSet);
+			setColumns: function(columns) {
+				if(columns && columns.length > 0 && this.grid) {
+					this.grid.setColumns(columns);
+					this.grid.resetSize();
+					// this.grid.orderByFields (['ID'],DataLudi.SortDirection.DESCENDING);
+				}
 			},
-			setColumns:function(columns){
-				console.log(columns);
-				this.grid.setColumns(columns);
-				// this.grid.orderByFields (['ID'],DataLudi.SortDirection.DESCENDING);
-				this.grid.resetSize();
-			},
-			loadData:function(input){
-				this.dataSet.setRows(input);
-				this.output=input;
-				this.setDataSource(this.dataSet);
-			},
-			setDataSource:function(dataSet){
-				this.grid.setDataSource(dataSet);
-				// this.grid.resetSize();
+
+			loadData: function(input) {
+				if(this.dataSet) {
+					this.dataSet.setRows(input);
+					this.output = input;
+				}
 			}
+
 		});
 	</script>
 </dom-module>

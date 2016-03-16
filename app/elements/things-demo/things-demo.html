@@ -127,13 +127,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-material class="Page-paper" elevation="1">
       <p class="paper-font-subhead">Things Combo</p>
 
-      <paper-input label="Selected Name" value="{{codeName}}"></paper-input>
+      <paper-input label="Selected Value" value="{{codeName}}"></paper-input>
 
       <paper-input label="Selected Description" value="{{codeDesc}}"></paper-input>
 
-      <things-combo id="combo" label="Language" value="en-US" items="{{comboItems}}" label-path="description" value-path="name"></things-combo>
+      <things-combo 
+        id="combo" 
+        label="Language" 
+        value="en-US" 
+        items="{{comboItems}}" 
+        label-path="description" 
+        value-path="name">
+      </things-combo>
 
-      <things-code-selector id="code-selector" label="Language" value="en-US" name="LOCALE" label-path="description" value-path="name"></things-code-selector>
+      <things-code-selector 
+        id="code-selector" 
+        label="Language" 
+        value="en-US" 
+        code-name="LOCALE" 
+        label-path="description" 
+        value-path="name">
+      </things-code-selector>
 
     </paper-material>
 
@@ -200,8 +214,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'ws.onerror' : 'onWsMessageReceive',
           'ws.onopen' : 'onWsMessageReceive',
           'ws.onclose' : 'onWsMessageReceive',
-          'combo.select' : 'onComboSelected',
-          'code-selector.select' : 'onComboSelected'
+          'combo.value-changed' : 'onComboValueChanged',
+          'code-selector.value-changed' : 'onComboValueChanged'
         },
 
         onTapSetting: function(e) {
@@ -290,10 +304,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         },
 
-        onComboSelected: function(e) {
+        onComboValueChanged: function(e) {
           if(e.detail) {
-            this.codeName = e.detail.name;
-            this.codeDesc = e.detail.description;
+            this.codeName = e.detail.value;
+            this.codeDesc = e.detail.item ? e.detail.item.description : '';
           }
         }
 

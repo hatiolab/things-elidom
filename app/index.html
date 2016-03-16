@@ -117,28 +117,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
           <section class="Page" data-route="contact">
             <paper-material class="Page-paper" elevation="1">
-<!--               <iron-ajax
-                 auto
-                 url="http://192.168.35.229:9002/rest/diy_services/DynamicScreen/query.json"
-                 handle-as="json"
-                 last-response="{{data}}"></iron-ajax>
-              <iron-ajax
-                 auto
-                 url="http://192.168.35.229:9002/rest/diy_services/ElidomGridModel/query.json"
-                 handle-as="json"
-                 last-response="{{field}}"></iron-ajax>
-              <iron-ajax
-                 auto
-                 url="http://192.168.35.229:9002/rest/diy_services/ElidomGridColumn/query.json"
-                 handle-as="json"
-                 last-response="{{columns}}"></iron-ajax>
-              <things-grid fields="{{field}}" columns = "{{columns}}" input="{{data}}"> </things-grid> -->
               <things-content 
                 title="Screen1"
-                search-field-url="http://192.168.35.229:9002/rest/diy_services/ElidomSearchForm/query.json"
-                search-action-url="http://192.168.35.229:9002/rest/diy_services/DynamicScreen/query.json"
-                grid-field-url="http://192.168.35.229:9002/rest/diy_services/ElidomGridModel/query.json"
-                grid-column-url="http://192.168.35.229:9002/rest/diy_services/ElidomGridColumn/query.json"
+                search-field-url="diy_services/ElidomSearchForm/query.json"
+                search-action-url="diy_services/DynamicScreen/query.json"
+                grid-field-url="diy_services/ElidomGridModel/query.json"
+                grid-column-url="diy_services/ElidomGridColumn/query.json"
                 layout="layout vertical">
               </things-content>
             </paper-material>
