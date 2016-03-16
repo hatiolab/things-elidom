@@ -1,0 +1,137 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
+
+<script>
+/**
+var ThingsFormBehavior is to generate forms for thing framework
+@demo demo/index.html
+@polymerBehavior
+*/
+var ThingsFormBehavior = {
+	properties: {
+		view:{
+			type :Array,
+			observer : '_viewChange'
+		},
+		action:{
+		type:String
+		},
+		method:String,
+		contentType:String,
+		output:{
+		type:Object,
+		notify:true
+		}
+	},
+	// Event listener
+	listeners : {
+		'iron-form-response' :'_successResponse',
+		'iron-form-error' : '_failureResponse'
+	},
+	/**
+	 * create template use view data from attribute
+	 */
+	_generateElement :function(element){
+		var newElement;
+		switch(element.type) {
+			case 'checkbox':
+				newElement = document.createElement('paper-checkbox');
+				newElement = this._setAttr(newElement, element);
+				newElement.$.checkboxLabel.innerHTML = element.label;
+				break;
+			case 'button':
+				newElement = document.createElement('paper-button');
+				newElement = this._setAttr(newElement, element);
+				newElement.innerHTML =element.label;
+				break;
+			case 'listbox':
+				newElement = this._makeListBox(element.options);
+				newElement = this._setAttr(newElement, element);
+				break;
+			case 'dropdown':
+				newElement = document.createElement('paper-dropdown-menu');
+				newElement = this._setAttr(newElement, element);
+				newChild = this._makeListBox(element.options);
+				newChild.setAttribute('class','dropdown-content');
+				newElement.appendChild(newChild);
+				break;
+			case 'radio':
+				newElement = document.createElement('paper-radio-group');
+				newElement = this._setAttr(newElement, element);
+				for(index in element.child){
+				child = element[index];
+				newChild = document.createElement('paper-radio-button');
+				newChild = this._setAttr(newChild, child);
+				newElement.appendChild(newChild);
+				}
+				break;
+			case 'textarea':
+				newElement = document.createElement('paper-textarea');
+				newElement = this._setAttr(newElement, element)
+				break;
+			default:
+				newElement = document.createElement('paper-input');
+				newElement = this._setAttr(newElement, element);
+		}
+		newElement.setAttribute('class','flex style-scope things-form');
+		return newElement;
+	},
+	/**
+	 * list box creation
+	 * @param{[Array]} items Listbox values
+	 * @return {[paper list box]} 
+	 */
+	_makeListBox:function(items){
+		var listbox = document.createElement('paper-listbox');
+		listbox.setAttribute('selected','0');
+		for(index in items){
+			option = items[index];
+			item = document.createElement('paper-item');
+			item.innerHTML = option;
+			listbox.appendChild(item);
+		}
+		return listbox;
+	},
+	/**
+	 * set element's attributes
+	 */
+	_setAttr:function(element, attrs){
+		for(attr in attrs){
+			element.setAttribute(attr,attrs[attr]);
+		}
+		return element;
+	},
+	/**
+	 * When form success call this function
+	 */
+	_successResponse: function(event){
+		this.output=event.detail.xhr.response;
+		if(this.rootProperty) this.output = this.output[this.rootProperty];
+		this.fire('response', this.output);
+	},
+	/**
+	 * When form failure call this function
+	 */
+	_failureResponse: function(event){
+		var response= event.detail.request.xhr.response;
+		if(response.status==401){
+			this.showToast('Confidential failure.');
+		}else{
+			this.showToast('Error Code:'+response.code+
+			'Error Massage:'+response.msg+'with Status Code:'+response.status);
+		}
+		this.fire('error', event.detail.request.xhr.response);
+	}
+};
+</script>

@@ -1,0 +1,134 @@
+<link rel="import" href="./things-form-behavior.html">
+<link rel="import" href="../../../bower_components/paper-fullscreen-dialog/paper-fullscreen-dialog.html">
+<!--
+A comment describing this element
+
+Example:
+
+	<my-elem></my-elem>
+
+Example:
+
+	<my-elem>
+	  <h2>Hello my-elem</h2>
+	</my-elem>
+
+@demo demo/index.html
+-->
+
+<dom-module id="things-resource-form">
+	<template>
+		<style is="custom-style" include="iron-flex iron-flex-alignment">
+		<style>
+		:host {
+		  display: block;
+		  box-sizing: border-box;
+		  /*text-align: center;*/
+		  /*margin: 0 auto;*/
+		  height: 100%;
+		  width: 98%;
+		}
+
+		:host > h3 {
+		  margin-top: 5px;
+		}
+
+		:host::content img {
+		  border-radius: 50%;
+		}
+
+		:host paper-input {
+		  margin-left: auto;
+		  margin-right: auto;
+		  width: 90%;
+		}
+
+		:host paper-material {
+		  padding: 15px;
+		}
+
+		:host .search{padding:5px 0 3px 5px;}
+		:host .search paper-button{
+		  width:22px;height:22px;
+		  margin-left:3px;
+		  padding:1px;
+		}
+		</style>
+		<paper-fullscreen-dialog id="resourceDialog">
+			<paper-toolbar class="toolbar">
+				<paper-icon-button icon="close" dialog-dismiss></paper-icon-button>
+				<div class="title flex">{{title}}</div>
+				<paper-button dialog-confirm on-tap="save">Save</paper-button>
+				<!-- <paper-button dialog-confirm on-tap="reset">Reset</paper-button> -->
+			</paper-toolbar>
+			<form is="iron-form" 
+				  id="resourceForm" 
+				  action=[[action]]
+				  headers="[[headers]]"
+				  content-type="[[contentType]]"
+				  method="[[method]]"
+				  last-response ="{{output}}">
+				<div class="layout horizontal flex" >
+				  <!-- TODO: dom-repeat with property search-fields -->
+				  <div id="leftFields" class="layout vertical flex" >
+
+				  </div>
+				  <div id="rightFields" class="layout vertical flex" >
+
+				  </div>
+				</div>
+			</form>
+		</paper-fullscreen-dialog>
+	</template>
+	<script>
+		Polymer({
+			is: 'things-resource-form',
+			//Properties
+			properties: {
+				title:String
+			},
+			/**
+			 * view atrribute observer, add view to form
+			 * @return {[type]} [description]
+			 */
+			_viewChange : function(){
+				for(index in this.view){
+					if(index%2==0){
+						this.$.leftFields.appendChild(this._generateElement(this.view[index]));
+					}else{
+						this.$.rightFields.appendChild(this._generateElement(this.view[index]));
+					}
+				}
+			},
+
+			// Element Behavior
+			behaviors: [
+				ThingsFormBehavior
+			],
+			/**
+			 * return data values in form
+			 */
+			serialize: function(){
+			  return this.$.resourceForm.serialize();
+			},
+			/**
+			 * save data from resource detail screen
+			 */
+			save:function(){
+				this.$.resourceForm.submit();
+			},
+			/**
+			 * save data from resource detail screen
+			 */
+			reset:function(){
+				this.$.resourceForm.reset();
+			},
+			/**
+			 * open dialog
+			 */
+			open:function(){
+				this.$.resourceDialog.toggle();
+			}
+		});
+	</script>
+</dom-module>
