@@ -54,6 +54,13 @@ gulp.task('images', function () {
     .pipe($.size({title: 'Copy optimized images to dist/images dir:'}));
 });
 
+// Optimize lib
+gulp.task('lib', function () {
+  return gulp.src('app/lib/**/*')
+    .pipe(gulp.dest('dist/lib'))
+    .pipe($.size({title: 'Copy optimized library to dist/lib dir:'}));
+});
+
 // Copy all files at the root level (app)
 gulp.task('copy', function () {
   var app = gulp.src([
@@ -69,6 +76,7 @@ gulp.task('copy', function () {
 
   var bower = gulp.src([
     'bower_components/**/*.{css,html,js}',
+    'lib/**/*.{css,html,js}',
     '!bower_components/**/index.html',
     '!bower_components/**/{demo,test}/**/*'
   ]).pipe(gulp.dest('dist/bower_components'));
@@ -199,7 +207,7 @@ gulp.task('clean', function (cb) {
 });
 
 // Watch files for changes & reload
-gulp.task('serve', ['images', 'js', 'lint', 'manifest', 'styles', 'views'], function () {
+gulp.task('serve', ['images','lib', 'js', 'lint', 'manifest', 'styles', 'views'], function () {
   browserSync({
     browser: config.browserSync.browser,
     https: config.browserSync.https,
@@ -218,7 +226,7 @@ gulp.task('serve', ['images', 'js', 'lint', 'manifest', 'styles', 'views'], func
       baseDir: ['.tmp', 'app'],
       middleware: [ historyApiFallback() ],
       routes: {
-        '/bower_components': 'bower_components'
+        '/bower_components': 'bower_components',
       }
     },
     ui: {
@@ -232,8 +240,10 @@ gulp.task('serve', ['images', 'js', 'lint', 'manifest', 'styles', 'views'], func
     'app/content/**/*.md'
   ], ['views', reload]);
   gulp.watch(['app/{elements,themes}/**/*.{css,html}'], ['styles', reload]);
-  gulp.watch(['app/{scripts,elements}/**/*.{js,html}'], ['jshint', 'js']);
+  // gulp.watch(['app/{scripts,elements}/**/*.{js,html}'], ['jshint', 'js']);
+  gulp.watch(['app/{scripts,elements}/**/*.{js,html}'], ['js']);
   gulp.watch(['app/images/**/*'], reload);
+  gulp.watch(['app/lib/**/*'], reload);
 });
 
 // Build and serve the output from the dist build
@@ -297,7 +307,8 @@ gulp.task('views', require(task('views-nunjucks'))($, config, gulp));
 // Build Production Files, the Default Task
 gulp.task('default', ['clean'], function (cb) {
   runSequence(
-    ['copy', 'js', 'jshint', 'lint', 'manifest', 'styles'],
+    // ['copy', 'js', 'jshint', 'lint', 'manifest', 'styles'],
+    ['copy', 'js', 'lint', 'manifest', 'styles'],
     ['fonts', 'html', 'images'],
     'vulcanize',
     ['clean-dist', 'minify-dist'],
