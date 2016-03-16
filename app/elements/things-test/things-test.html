@@ -8,8 +8,8 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../things-setting/things-global-behavior.html">
 
+<link rel="import" href="../things-setting/things-global-behavior.html">
 
 <dom-module id="things-test">
   <template>
@@ -25,18 +25,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </paper-material>
 
     <paper-material class="Page-paper" elevation="1">
-      <h4>Who are you?</h4>
-      <h4>Please type your name in below Field Box</h4>
-      <input type="text" value={{name::input}}><br><br><br>
-      <a>Hi {{name}}!</a><br>
-      <a>Welcome to Test Field</a>
+      <h4>Hi {{name}}!</h4>
+      <h4>Welcome to Test Field!</h4>
+      <input type="text" value={{name::input}}>
     </paper-material>
 
-    <paper-material class="Page-paper" elevation="1">
-      <h1>Badge Test</h1><br>
-      <paper-icon-button id="number" icon="menu" alt="menu" on-click="{{increseNum}}"></paper-icon-button>
-      <paper-badge for="number" label="{{badgeNum}}"></paper-badge>
-    </paper-material>
   </template>
 
   <script>
@@ -52,16 +45,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           },
           name: {
             value: 'there'
-          },
-          badgeNum: {
-            value: 0
           }
         },
-
-        increseNum: function() {
-          this.badgeNum = 10;
-        }    
-
         show: function() {
           this.$.dialog.open();
         },

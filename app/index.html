@@ -46,6 +46,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <iron-icon class="Navigation-icon" icon="menu"></iron-icon>
             <span>Elidom</span>
           </a>
+
+          <a class="Navigation-link" data-route="test" href="/test" on-tap="onDataRouteClick">
+            <iron-icon class="Navigation-icon" icon="menu"></iron-icon>
+            <span>Test Field</span>
+          </a>
         </paper-menu>
         </nav>
       </paper-scroll-header-panel>
@@ -144,6 +149,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </paper-material>
           </section>
 
+          <section class="Page" data-route="test">
+            <paper-material class="Page-paper" elevation="1">
+              <things-test title="Test Field"></things-test>
+            </paper-material>
+          </section>
         </iron-pages>
       </paper-scroll-header-panel>
     </paper-drawer-panel>
