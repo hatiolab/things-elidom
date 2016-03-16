@@ -11,6 +11,8 @@
 <link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
+
+<link rel="import" href="../things-spinner/things-spinner-behavior.html">
 <!--
 A things login form asking for login and password.
 
@@ -128,9 +130,9 @@ Example:
         // TODO Remove All Child Elements
       },
 
-      // Element Behavior
       behaviors: [
-        'IronFormElementBehavior'
+        'IronFormElementBehavior',
+        ThingsSpinnerBehavior
       ],
 
       // Event listener
@@ -245,6 +247,8 @@ Example:
       },
 
       _searchHandler: function() {
+        this.startSpinner();
+
         if(this.getAttribute('on-submit')) {
           this.fire('submit', this.serialize());
         } else {
@@ -264,12 +268,16 @@ Example:
       },
       
       _successResponse: function(event) {
+        this.stopSpinner();
+
         this.output = event.detail.xhr.response;
         if(this.rootProperty) this.output = this.output[this.rootProperty];
         this.fire('response', this.output);
       },
 
       _failureResponse: function(event) {
+        this.stopSpinner();
+
         var response= event.detail.request.xhr.response;
         if(response.status == 401) {
           this.showToast('Confidential failure.');
@@ -282,7 +290,6 @@ Example:
       },
       
       serialize: function() {
-        console.log(this.$.searchForm.serialize());
         return this.$.searchForm.serialize();
       }
 

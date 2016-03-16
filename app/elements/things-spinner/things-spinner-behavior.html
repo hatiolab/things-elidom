@@ -1,0 +1,34 @@
+<script>
+
+var ThingsSpinnerBehavior = {
+  
+  /**
+   * Start spinner
+   */
+  startSpinner: function() {
+    app.$.spinner.loading = true;
+  },
+
+  /**
+   * Stop spinner
+   */
+  stopSpinner: function() {
+    app.$.spinner.loading = false;
+  },
+
+  /**
+   * Spinner is running?
+   */
+  isLoadingSpinner: function() {
+    return app.$.spinner.loading;
+  },
+
+  /**
+   * Toggle spinner
+   */
+  toggleSpinner: function() {
+    app.$.spinner.loading = !app.$.spinner.loading;
+  }
+
+};
+</script>

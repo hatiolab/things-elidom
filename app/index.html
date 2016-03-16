@@ -123,7 +123,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 search-action-url="diy_services/DynamicScreen/query.json"
                 grid-field-url="diy_services/ElidomGridModel/query.json"
                 grid-column-url="diy_services/ElidomGridColumn/query.json"
-                layout="layout vertical">
+                layout="fullbleed layout vertical">
               </things-content>
             </paper-material>
           </section>
@@ -147,6 +147,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <span class="Toast-button" role="button" tabindex="0" on-tap="onToastConfirmTap">OK</span>
     </paper-toast>
 
+    <things-spinner id="spinner" loading=false></things-spinner>
+    
     <paper-toast id="toast" class="Toast" duration="8000"></paper-toast>
 
     <things-event-handler id="event-handler"></things-event-handler>

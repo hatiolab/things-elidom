@@ -3,6 +3,8 @@
 var ThingsMsgBoxBehavior = {
   
   /**
+   * Open Information Message Box
+   *
    * @param config
    * @title
    * @text
@@ -18,30 +20,39 @@ var ThingsMsgBoxBehavior = {
   },
 
   /**
-   * TODO
+   * Open Confirmation Message Box
    */
   confirm: function(config, okCallback, cancelCallback) {
     swal(config, function(isConfirm) {
       if (isConfirm) {
-        if (okCallback)
+        if (okCallback) {
           okCallback();
+        }
       } else {
-        if(cancelCallback)
+        if(cancelCallback) {
           cancelCallback();
+        }
       }
     });
   },
 
+  /**
+   * Open Prompt Message Box
+   */
   prompt: function(config, promptCallback) {
     swal(config, function(inputValue) {
       if(inputValue) {
         if(inputValue === false) {
           return false;
+
         } else if (inputValue === '' ) {
-          swal.showInputError('Yout need to write something!');
+          swal.showInputError('Empty value is not allowed!');
           return false;
+
         } else {
-          promptCallback(inputValue);
+          if(promptCallback) {
+            promptCallback(inputValue);
+          }
         }
       }
     });

@@ -36,8 +36,8 @@ Example:
 
 			properties: {
 				mode: {
-				  type: String,
-				  value: 'canvas'
+					type: String,
+					value: 'canvas'
 				},
 
 				/**
@@ -45,8 +45,8 @@ Example:
 				 * @type {Object}
 				 */
 				fields: {
-				  type: Array,
-				  observer: 'setFields'
+					type: Array,
+					observer: 'setFields'
 				},
 
 				/**
@@ -54,22 +54,22 @@ Example:
 				 * @type {Object}
 				 */
 				columns: {
-				  type: Array,
-				  observer: 'setColumns'
+					type: Array,
+					observer: 'setColumns'
 				},
 
 				input: {
-				  type: Array,
-				  observer: 'loadData'
+					type: Array,
+					observer: 'loadData'
 				},
 
 				headerMenu: {
-				  type: Array
+					type: Array
 				},
 
 				output: {
-				  type: Array,
-				  notify: true
+					type: Array,
+					notify: true
 				},
 
 				dataSet: {
@@ -84,20 +84,14 @@ Example:
 				}
 			},
 
-			listeners : {
-				'gridContainer.resize' : 'onResizeContainer'
-			},
-
-			onResizeContainer: function(e) {
-				console.log(e);
-			},
-
 			created: function() {
 				DataLudi.setRootContext('');
 				DataLudi.setAssetRoot('images/grid');
 			},
 
 			attached: function() {
+				console.log(this.offsetWidth);
+
 				this.grid = DataLudi.createGridView('gridContainer', null, false);
 				this.grid.setDataSource(this.dataSet);
 

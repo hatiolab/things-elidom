@@ -1,6 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../things-setting/things-global-behavior.html">
+<link rel="import" href="../things-spinner/things-spinner-behavior.html">
+
 <!--A comment describing this element
 
 Example:
@@ -34,8 +36,6 @@ Example:
 			json-prefix="[[jsonPrefix]]">
 	    </iron-ajax>
 
-	    <things-spinner id="spinner"></things-spinner>
-
 	</template>
 
 	<script>
@@ -48,6 +48,7 @@ Example:
 				 * @type {[type]}
 				 */
 				entity : String,
+
 				/**
 				 * entity에 대항 엑세스 방법 정의
 				 * 모든 리소스는 아래와 같은 일반 Action을 갖고 있다
@@ -65,15 +66,18 @@ Example:
 					type: String,
 					notify: true
 				},
+
 				/**
 				 * request prameters
 				 * @type {[Object]}
 				 */
 				params : Object,
+
 				/**
 				 * entity ID, when use findOne, Delete, Update, exists
 				 */
 				entityId: String,
+
 				/**
 				 * data have received on this transaction 
 				 * @type {[Object]}
@@ -83,6 +87,7 @@ Example:
 					value: {},
 					notify : true
 				},
+
 				/**
 				 * When request sent and response not received loading will be true, 
 				 * after response received loading will be false.
@@ -159,8 +164,10 @@ Example:
 				}
 			},
 
-			// Element Behavior
-			behaviors: [ThingsGlobalBehavior],
+			behaviors: [
+				ThingsGlobalBehavior,
+				ThingsSpinnerBehavior
+			],
 
 			listeners: {
 				'_ajax.request' : '_onAjaxRequest'
@@ -218,17 +225,6 @@ Example:
 					}
 				}
 			},
-			/**
-			* Fired when a response is received.
-			*
-			* @event response
-			*/
-
-			/**
-			* Fired when an error is received.
-			*
-			* @event error
-			*/
 		
 			/**
 			* Fired when search button is clicked.
@@ -277,7 +273,11 @@ Example:
 			 */
 			_onLoadingChanged: function(e) {
 				if(e.detail) {
-					this.$.spinner.loading = e.detail.value;
+					if(e.detail.value === false) {
+						this.stopSpinner();
+					} else if(e.detail.value === true) {
+						this.startSpinner();
+					}
 				}
 			}
 			

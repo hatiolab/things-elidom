@@ -11,6 +11,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 <link rel="import" href="../things-setting/things-global-behavior.html">
+<link rel="import" href="../things-spinner/things-spinner-behavior.html">
 
 <dom-module id="things-demo">
   <template>
@@ -151,8 +152,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     </paper-material>
 
-    <things-spinner id="spinner" loading=false></things-spinner>
-
     <things-msg-box id="msg-box" title="Things Message Box" message="This is Message Box"></things-msg-box>
 
     <things-websocket id="ws" url="{{wsUrl}}"></things-websocket>
@@ -193,7 +192,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         behaviors : [
           ThingsMsgBoxBehavior, 
-          ThingsGlobalBehavior
+          ThingsGlobalBehavior,
+          ThingsSpinnerBehavior,
         ],
 
         listeners: {
@@ -266,7 +266,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         onTapSpnButton: function(e) {
-          this.$.spinner.loading = !this.$.spinner.loading;
+          this.toggleSpinner();
         },
 
         onTapEvtButton: function(e) {
