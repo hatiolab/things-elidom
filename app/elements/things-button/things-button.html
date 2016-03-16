@@ -5,7 +5,7 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-behaviors/paper-button-behavior.html">
 
-<link rel="import" href="../things-msg-box/things-msg-box.html">
+<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 
 <dom-module id="things-button">
   <template>
@@ -56,8 +56,6 @@
 
     <paper-button raised><content></content></paper-button>
 
-    <things-msg-box id="msg-box" title="{{title}}" message="{{message}}"></things-msg-box>
-
   </template>
 
   <script>
@@ -68,7 +66,8 @@
         is: 'things-button',
 
         behaviors: [
-          Polymer.PaperButtonBehavior
+          Polymer.PaperButtonBehavior,
+          ThingsMsgBoxBehavior
         ],
 
         properties: {
@@ -93,10 +92,6 @@
           }
         },
 
-        listeners: {
-          'msg-box.confirm' : 'onConfirm'
-        },
-
         attached : function() {
           var el = this.querySelector('paper-button');
           if(this.color) {
@@ -104,13 +99,17 @@
           }
         },
 
-        onConfirm: function(e) {
-          this.fire('confirm', e.detail);
-        },
-
         _tapHandler: function() {
           if(this.confirm) {
-            this.$['msg-box'].show();
+            var self = this;
+            this.openConfirmMsg({ 
+              type: 'warning',
+              title: this.title,
+              text: this.message,
+              showCancelButton: true
+            }, function() { 
+              self.fire('confirm', true); 
+            });
 
           } else {
             if (this.toggles) {

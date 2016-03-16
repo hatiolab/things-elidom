@@ -1,6 +1,8 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../things-resource/things-resource.html">
+<link rel="import" href="../things-button/things-button.html">
+
 <!--
 A comment describing this element
 
@@ -27,7 +29,6 @@ Example:
 		</style>
 
 		<div class="[[layout]]">
-
 			<things-resource 
 				auto
 				action="[[searchFieldUrl]]" 
@@ -65,13 +66,32 @@ Example:
 				selected-row-data="{{selectedRow}}"
 				output="{{gridOuput}}">
 			</things-grid>
+
 			<things-resource-form 
 				id="dialog"
 				view="{{resView}}" 
 				input="{{selectedRow}}">
 			</things-resource-form>
-		</div>
 
+			<div class="group-btnline">
+				<paper-icon-button id="goFirst" icon="icons:arrow-back"></paper-icon-button>
+				<paper-icon-button id="goBefore" icon="icons:chevron-left"></paper-icon-button>
+				<input type="text" value={{name::input}}>
+				<paper-icon-button id="goAfter" icon="icons:chevron-right"></paper-icon-button>
+				<paper-icon-button id="goLast" icon="icons:arrow-forward"></paper-icon-button>
+
+				<paper-tooltip for="goFirst" offset="0">Go First</paper-tooltip>
+				<paper-tooltip for="goBefore" offset="0">Before</paper-tooltip>
+				<paper-tooltip for="goAfter" offset="0">After</paper-tooltip>
+				<paper-tooltip for="goLast" offset="0">Go Last</paper-tooltip>
+
+				<things-button color="green" id="import-btn" class="pull_right">Import</things-button>
+				<things-button color="green" id="export-btn">Export</things-button>
+				<things-button color="green" id="add-btn">Add</things-button>
+				<things-button color="pink" id="delete-btn">Delete</things-button>
+				<things-button color="indigo" id="save-btn" confirm=true title="Confirm" message="Are you sure to Save?">Save</things-button>
+			</div>
+		</div>
 	</template>
 
 	<script>
@@ -111,24 +131,26 @@ Example:
 				gridData: {
 					type: Array
 				},
-				selectedRow:{
-					type:Object,
-					observer:'_onSelectedRowChange'
+				selectedRow: {
+					type: Object,
+					observer: '_onSelectedRowChange'
 				}
 			},
+
+			listeners : {
+				'grid.on-detail-clicked': '_openDialog'
+			},			
 
 			computeSearchUrl: function(basicUrl, searchActionUrl) {
 				return basicUrl + '/' + searchActionUrl;
 			},
-			// Event listener
-			listeners : {
-				'grid.on-detail-clicked': '_openDialog'
-			},
-			_onSelectedRowChange:function(){
-				if(this.selectedRow){
+			
+			_onSelectedRowChange: function() {
+				if(this.selectedRow) {
 					var keys = Object.keys(this.selectedRow);
+
 					console.log(keys);
-					// for(index in keys){
+					// for(index in keys) {
 					// 	var element.name = keys[index];
 					// 	element.label = keys[index].charAt(0).toUpperCase() + string.slice(1);
 					// 	var data = selectedRow[keys[index]];
@@ -136,11 +158,10 @@ Example:
 					// }
 				}
 			},
-			_openDialog:function(row,grid){
+
+			_openDialog: function(row, grid) {
 				this.$.dialog.open();
 			}
-
-
 		});
 	</script>
 </dom-module>
