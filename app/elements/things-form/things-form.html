@@ -176,12 +176,12 @@ Example:
               case 'checkbox':
                   newElement = document.createElement('paper-checkbox');
                   newElement = this._setAttr(newElement, field);
-                  newElement.innerHTML =field.name;
+                  newElement.$.checkboxLabel.innerHTML = field.label;
                   break;
               case 'button':
                   newElement = document.createElement('paper-button');
                   newElement = this._setAttr(newElement, field);
-                  newElement.innerHTML =field.name;
+                  newElement.innerHTML =field.label;
                   break;
               case 'listbox':
                   newElement = this._makeListBox(field.options);
@@ -192,9 +192,7 @@ Example:
                   newElement = this._setAttr(newElement, field);
                   newChild = this._makeListBox(field.options);
                   newChild.setAttribute('class','dropdown-content');
-                  console.log(newChild);
                   newElement.appendChild(newChild)
-                  console.log(newElement);
                   break;
               case 'radio':
                   newElement = document.createElement('paper-radio-group');
