@@ -66,6 +66,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       <div class="buttons">
         <paper-button raised id="msg-button">Message Box</paper-button>
+        <paper-button raised id="confirm-button">Confirm Box</paper-button>
+        <paper-button raised id="prompt-button">Prompt Box</paper-button>
         <paper-button raised id="spn-button">Spinner</paper-button>
       </div>      
     </paper-material>
@@ -186,6 +188,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'things-btn-2.confirm' : 'onConfirmMsgBox',
           'things-btn-3.confirm' : 'onConfirmMsgBox',
           'msg-button.tap' : 'onTapMsgButton',
+          'confirm-button.tap' : 'onTapConfirmButton',
+          'prompt-button.tap' : 'onTapPromptButton',
           'spn-button.tap' : 'onTapSpnButton',
           'evt-button.tap' : 'onTapEvtButton',
           'ws-open-button.tap' : 'onTapWsOpenButton',
@@ -213,6 +217,40 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.open({ title : 'Info Title', text : 'Info Message', type : 'info', timer : 3000 });
         },
 
+        onTapConfirmButton: function(e) {
+          this.confirm( { title: 'Are you sure?',
+                          text: 'You will not be able to recover this imaginary file!',
+                          type: 'warning',
+                          showCancelButton: true,
+                          confirmButtonColor: '#DD6B55',
+                          confirmButtonText: 'Yes, delete it!',
+                          cancelButtonText: 'No, cancel plx!',
+                          closeOnConfirm: false,
+                          closeOnCancel: false }, this.okCallback, this.cancelCallback);
+        },
+
+        okCallback: function() {
+          swal('Deleted!', 'Your imaginary file has been deleted', 'success');
+        },
+
+        cancelCallback: function() {
+          swal('Cancelled', 'Your imaginary file is safe.', 'error');
+        },
+
+        onTapPromptButton: function(e) {
+          this.prompt( { title : 'An input!',
+                         text : 'Write something interesting!',
+                         type : 'input',
+                         showCancelButton: true,
+                         closeOnConfirm : false,
+                         animation : 'slide-from-too',
+                         inputPlaceholder : 'Write Something' }, this.promptCallback);
+        },
+
+        promptCallback: function(inputValue) {
+          swal("Nice!", "You wrote: " + inputValue, "success");
+        },
+
         onTapSpnButton: function(e) {
           this.$.spinner.loading = !this.$.spinner.loading;
         },
@@ -232,7 +270,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         onTapWsCloseButton: function(e) {
           this.wsSendMessage = '';
-          this.$.ws.close();
+          this.$.ws.close();  
         },
 
         onConfirmMsgBox: function(e) {

@@ -22,8 +22,8 @@ var ThingsMsgBoxBehavior = {
    */
   confirm: function(config, okCallback, cancelCallback) {
     swal(config, function(isConfirm) {
-      if(isConfirm) {
-        if(okCallback)
+      if (isConfirm) {
+        if (okCallback)
           okCallback();
       } else {
         if(cancelCallback)
@@ -32,13 +32,19 @@ var ThingsMsgBoxBehavior = {
     });
   },
 
-  /**
-   * TODO Return Value
-   */
-  prompt: function(config) {
-    swal(config);
-
-    return "";
+  prompt: function(config, promptCallback) {
+    swal(config, function(inputValue) {
+      if(inputValue) {
+        if(inputValue === false) {
+          return false;
+        } else if (inputValue === '' ) {
+          swal.showInputError('Yout need to write something!');
+          return false;
+        } else {
+          promptCallback(inputValue);
+        }
+      }
+    });
   }
 
 };
