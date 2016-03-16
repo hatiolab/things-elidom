@@ -56,6 +56,19 @@ var ThingsMsgBoxBehavior = {
     });
   },
 
+  openResponseError: function(response) {
+    this.openInfoMsg({
+      type : 'warning',
+      title : 'Error (' + response.error_id + ')',
+      text : '<span>Code : ' + response.code + '<br/><span>Status</span> : ' + response.status + '<br/><p><span>Message</span> : ' + response.msg,
+      html : true
+    });
+  },
+
+  openUnkownError: function(response) {
+    this.openInfoMsg({ title : 'Error', text : 'Something went wrong, Please ask to administrator', type : 'warning' });
+  },
+
   showToastMsg: function(msg) {
     app.$.toast.text = msg;
     app.$.toast.open();

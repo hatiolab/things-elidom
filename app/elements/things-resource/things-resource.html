@@ -2,6 +2,7 @@
 
 <link rel="import" href="../things-setting/things-global-behavior.html">
 <link rel="import" href="../things-spinner/things-spinner-behavior.html">
+<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 
 <!--A comment describing this element
 
@@ -166,7 +167,8 @@ Example:
 
 			behaviors: [
 				ThingsGlobalBehavior,
-				ThingsSpinnerBehavior
+				ThingsSpinnerBehavior,
+				ThingsMsgBoxBehavior
 			],
 
 			listeners: {
@@ -236,7 +238,7 @@ Example:
 				this.fire('response', this.outputData);
 
 				if(this.method && this.method != 'GET') {
-					this.showToast('Success');
+					this.showToastMsg('Success');
 				}
 			},
 
@@ -250,12 +252,13 @@ Example:
 					if(response.status == 401) {
 						this.handleUnauthorized();
 					} else {
-						this.showToast('Error : ' + response.error + ', Status : ' + response.status + ', Message : ' + response.message);
+						this.openResponseError(response);
 					}
 
 					this.fire('error', event.detail.request.xhr.response);
+
 				} else {
-					this.showToast('Something wrong! Please ask to administrator');
+					this.openUnkownError(response);
 					this.fire('error', event);
 				}
 			},

@@ -13,6 +13,7 @@
 <link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
 
 <link rel="import" href="../things-spinner/things-spinner-behavior.html">
+<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 <!--
 A things login form asking for login and password.
 
@@ -23,7 +24,7 @@ Example:
 
 @demo demo/index.html
 -->
-<dom-module id="things-form">
+<dom-module id="things-search-form">
   <template>
     <style is="custom-style" include="iron-flex iron-flex-alignment">
     <style>
@@ -99,30 +100,26 @@ Example:
 
   <script>
   Polymer({
-    is: 'things-form',
+    is: 'things-search-form',
       
-      //Properties
       properties: {
-        searchFields:{
-          type :Array,
-          observer : '_searchFieldsChange'
+        searchFields: {
+          type: Array,
+          observer: '_searchFieldsChange'
         },
-        action:{
-          type:String
+
+        action: {
+          type: String
         },
-        method:String,
-        contentType:String,
-        output:{
-          type:Object,
-          notify:true
+
+        method: String,
+
+        contentType: String,
+
+        output: {
+          type: Object,
+          notify: true
         }
-      },
-
-      // Element Lifecycle
-      ready: function() {
-      },
-
-      attached: function() {
       },
 
       detached: function() {
@@ -131,10 +128,10 @@ Example:
 
       behaviors: [
         'IronFormElementBehavior',
-        ThingsSpinnerBehavior
+        ThingsSpinnerBehavior,
+        ThingsMsgBoxBehavior
       ],
 
-      // Event listener
       listeners : {
         'iron-form-response' :'_successResponse',
         'iron-form-error' : '_failureResponse'
@@ -277,12 +274,11 @@ Example:
       _failureResponse: function(event) {
         this.stopSpinner();
 
-        var response= event.detail.request.xhr.response;
+        var response = event.detail.request.xhr.response;
         if(response.status == 401) {
-          this.showToast('Confidential failure.');
+          this.handleUnauthorized();
         } else {
-          this.showToast('Error Code:'+response.code+
-            'Error Massage:'+response.msg+'with Status Code:'+response.status);
+          this.openResponseError(response);
         }
 
         this.fire('error', event.detail.request.xhr.response);
