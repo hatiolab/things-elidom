@@ -152,6 +152,32 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     </paper-material>
 
+    <paper-material class="Page-paper" elevation="1">
+      <p class="paper-font-subhead">Date Picker</p>
+      <paper-button raised on-tap="showDatePicker">Change Date</paper-button>
+      <paper-dialog id="dateDialog" modal class="paper-date-picker-dialog" on-iron-overlay-closed="dismissDialog">
+        <paper-date-picker date="{{date}}"></paper-date-picker>
+        <div class="buttons">
+          <paper-button raised dialog-confirm on-tap="selectDate">Select</paper-button>
+          <paper-button raised dialog-dismiss>Cancel</paper-button>
+        </div>
+      </paper-dialog> 
+      <p>Selected Date is {{selectedDate}}</p>
+    </paper-material>
+
+    <paper-material class="Page-paper" elevation="1">
+      <p class="paper-font-subhead">Time Picker</p>
+      <paper-button raised on-tap="showTimePicker">Change Time</paper-button>
+      <paper-dialog id="timeDialog" modal class="paper-time-picker-dialog" on-iron-overlay-closed="dismissDialog">
+        <paper-time-picker id="timePicker" time="{{time}}"></paper-time-picker>
+        <div class="buttons">
+          <paper-button raised dialog-confirm on-tap="selectTime">Select</paper-button>
+          <paper-button raised dialog-dismiss>Cancel</paper-button>
+        </div>
+      </paper-dialog>
+      <p>Selected Time is {{selectedTime}}</p>
+    </paper-material>
+
     <things-msg-box id="msg-box" title="Things Message Box" message="This is Message Box"></things-msg-box>
 
     <things-websocket id="ws" url="{{wsUrl}}"></things-websocket>
@@ -308,7 +334,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.codeName = e.detail.value;
             this.codeDesc = e.detail.item ? e.detail.item.description : '';
           }
-        }
+        },
+
+        showDatePicker: function() {
+          this.$.dateDialog.toggle();  
+        },
+
+        selectDate: function() {
+          this.selectedDate = this.date;
+        },      
+
+        showTimePicker: function() {
+          this.$.timeDialog.toggle();
+        },
+
+        selectTime: function() {
+          this.selectedTime = this.time;
+        }        
 
       });
     })();
