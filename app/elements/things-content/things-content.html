@@ -57,13 +57,19 @@ Example:
 			</things-resource>
 
 			<things-grid 
+				id="grid"
 				fields ="[[gridFields]]" 
 				columns="[[gridColumns]]" 
 				input="[[gridData]]"
 				class="flex"
+				selected-row-data="{{selectedRow}}"
 				output="{{gridOuput}}">
 			</things-grid>
-
+			<things-resource-form 
+				id="dialog"
+				view="{{resView}}" 
+				input="{{selectedRow}}">
+			</things-resource-form>
 		</div>
 
 	</template>
@@ -104,12 +110,36 @@ Example:
 				},
 				gridData: {
 					type: Array
+				},
+				selectedRow:{
+					type:Object,
+					observer:'_onSelectedRowChange'
 				}
 			},
 
 			computeSearchUrl: function(basicUrl, searchActionUrl) {
 				return basicUrl + '/' + searchActionUrl;
+			},
+			// Event listener
+			listeners : {
+				'grid.on-detail-clicked': '_openDialog'
+			},
+			_onSelectedRowChange:function(){
+				if(this.selectedRow){
+					var keys = Object.keys(this.selectedRow);
+					console.log(keys);
+					// for(index in keys){
+					// 	var element.name = keys[index];
+					// 	element.label = keys[index].charAt(0).toUpperCase() + string.slice(1);
+					// 	var data = selectedRow[keys[index]];
+					// 	element.type = typeof data;
+					// }
+				}
+			},
+			_openDialog:function(row,grid){
+				this.$.dialog.open();
 			}
+
 
 		});
 	</script>

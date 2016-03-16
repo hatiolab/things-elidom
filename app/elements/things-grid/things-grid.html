@@ -81,6 +81,18 @@ Example:
 
 				grid: {
 					type: Object
+				},
+
+				selectedRowData:{
+					type:Object,
+					notify:true,
+					readonly:true
+				},
+
+				selectedCellData:{
+					type:Object,
+					notify:true,
+					readonly:true
 				}
 			},
 
@@ -103,6 +115,8 @@ Example:
 					this.grid.setColumns(this.columns);
 					this.grid.resetSize();		
 				}
+				//register grid event here
+				this.registerGridEvent();
 			},
 
 			detached: function() {
@@ -133,6 +147,42 @@ Example:
 					this.dataSet.setRows(input);
 					this.output = input;
 				}
+			},
+			registerGridEvent:function(){
+				var me = this;
+				//on data clicked
+				this.grid.onDataCellClicked = function (grid, index) {
+					if (index && index.dataColumn() && index.getDataIndex(grid) >= 0) {
+						var rowIndex = index.getDataIndex(grid);
+						var colIndex = index.dataField();
+						me.onCellClicked(rowIndex,colIndex);
+					}
+				};
+				//
+			},
+			/**
+			 * [onCellClicked description]
+			 * @event on-detail-clicked
+			 */
+			onCellClicked:function(rowIndex,colIndex){
+				console.log('onCellClicked');
+				if(index.dataField()<0){
+					this.onDetailClicked();
+				}else{
+					this.selectedCellData = this.dataSet.getValue(rowIndex,colIndex);
+				}
+				
+				var row = this.grid.focusedRow();
+				if (row && row.dataIndex() >= 0) {
+					this.selectedRowData = row.getRowObject();
+				}
+			},
+			/**
+			 * on-detail-clicked when data in detail column clicked fire this event
+			 * @event on-detail-clicked
+			 */
+			onDetailClicked:function(){
+				this.fire('on-detail-clicked',this.selectedRowData);
 			}
 
 		});
