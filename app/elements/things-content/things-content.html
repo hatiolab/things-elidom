@@ -88,6 +88,8 @@ Example:
 				fields="[[gridFields]]" 
 				columns="[[gridColumns]]" 
 				input="[[gridData]]"
+				root-property="items"
+				total-property="total"
 				selected-row-data="{{selectedRow}}"
 				output="{{gridOuput}}"
 				total-count="{{totalCount}}">
@@ -160,30 +162,33 @@ Example:
 			},			
 			
 			_onSelectedRowChange: function() {
-				console.log(this.selectedRow);
 				if(this.selectedRow) {
 					var view = [];
-
 					var keys = Object.keys(this.selectedRow);
+
 					for(index in keys) {
 						var element = {};
 						element.name = keys[index];
-						console.log(element);
 						element.label = keys[index].charAt(0).toUpperCase() + keys[index].slice(1);
 						var data = this.selectedRow[keys[index]];
 						element.type = (typeof data)=='undefined'?'string':(typeof data);
 						element.type = element.type=='string'?'text':element.type;
 						view.push(element);
 					}
-					if(view&&view.length>0){
+					
+					if(view && view.length > 0) {
 						this.resourceFormFields = view;
 					}
 				}
 			},
 
+			/**
+			 * open resource form dialog
+			 */
 			_openDialog: function(row, grid) {
 				this.$.dialog.open();
 			}
+
 		});
 	</script>
 </dom-module>

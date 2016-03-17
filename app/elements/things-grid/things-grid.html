@@ -94,6 +94,24 @@ Example:
 				},
 
 				/**
+				 * root property of loaded data
+				 * @type String
+				 */
+				rootProperty: {
+					type: String,
+					value: ''
+				},
+
+				/**
+				 * total count property of loaded data
+				 * @type String
+				 */
+				totalProperty: {
+					type: String,
+					value: ''
+				},
+
+				/**
 				 * data list for save (new, updated, deleted)
 				 * @type Array
 				 */
@@ -138,6 +156,9 @@ Example:
 				'iron-resize': 'onIronResize'
 			},
 
+			/**
+			 * resize handler
+			 */
 			onIronResize: function(e) {
 				if(this.parentNode.offsetWidth > 0 && this.grid == null) {
 					this.grid = DataLudi.createGridView('gridContainer', null, false);
@@ -215,14 +236,34 @@ Example:
 				}
 			},
 
+			/**
+			 * data fetch 후 후처리 
+			 */
 			loadData: function(input) {
 				if(this.dataSet) {
-					this.totalCount = input.total;
-					this.dataSet.setRows(input.items);
-					this.output = input;
+					if(this.totalProperty && input) {
+						this.totalCount = input[this.totalProperty];
+					}
+
+					var items = null;
+					
+					if(this.rootProperty && input) {
+						items = input[this.rootProperty];
+					} else {
+						items = input;
+					}
+					
+					this.dataSet.setRows(items);
+
+					if(this.totalCount == 0) {
+						this.totalCount = items ? items.length : 0;
+					}
 				}
 			},
 
+			/**
+			 * register grid event
+			 */
 			registerGridEvent: function() {
 				var me = this;
 
@@ -230,7 +271,7 @@ Example:
 					if (indexObject && indexObject.dataColumn() && indexObject.getDataIndex(grid) >= 0) {
 						var rowIndex = indexObject.getDataIndex(grid);
 						var colIndex = indexObject.dataField();
-						me.onCellClicked(rowIndex,colIndex,indexObject);
+						me.onCellClicked(rowIndex, colIndex, indexObject);
 					}
 				};
 			},
@@ -239,7 +280,7 @@ Example:
 			 * grid cell click handler
 			 * @event on-detail-clicked
 			 */
-			onCellClicked: function(rowIndex,colIndex,indexObject) {
+			onCellClicked: function(rowIndex, colIndex, indexObject) {
 				if(indexObject.dataField() < 0) {
 					this.onDetailClicked();
 				} else {
