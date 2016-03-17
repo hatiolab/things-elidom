@@ -12,6 +12,7 @@
 <link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
 
+<link rel="import" href="../things-setting/things-global-behavior.html">
 <link rel="import" href="../things-date-picker/things-date-picker.html">
 <link rel="import" href="../things-time-picker/things-time-picker.html">
 <link rel="import" href="../things-combo/things-code-selector.html">
@@ -35,6 +36,10 @@ var ThingsFormBehaviorImpl = {
 		action: {
 			type: String
 		},
+		
+		actionUrl:{
+			computed:'_computeActionUrl(globals.basicUrl,action)'
+		},
 
 		method: String,
 
@@ -54,7 +59,12 @@ var ThingsFormBehaviorImpl = {
 	_formFieldsChange: function(e) {
 		this.buildFormView();
 	},
-
+	/**
+	 * compute action url for action
+	 */
+	_computeActionUrl: function(basicUrl, action) {
+		return basicUrl + '/' + action;
+	},
 	/**
 	 * create template use view data from attribute
 	 */
@@ -248,7 +258,8 @@ var ThingsFormBehavior = [
 	'IronFormElementBehavior', 
 	ThingsFormBehaviorImpl, 
 	ThingsSpinnerBehavior, 
-	ThingsMsgBoxBehavior 
+	ThingsMsgBoxBehavior,
+	ThingsGlobalBehavior
 ];
 
 </script>

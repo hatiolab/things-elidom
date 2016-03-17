@@ -49,7 +49,7 @@ Example:
 			<things-search-form 
 				title="[[title]]"
 				form-fields ="[[searchFormFields]]" 
-				action="{{searchDataUrl}}" 
+				action="{{searchActionUrl}}" 
 				method="GET"
 				content-type="application/json"
 				output="{{gridData}}"
@@ -80,8 +80,10 @@ Example:
 
 			<things-resource-form 
 				id="dialog"
+				title="Item Detail"
 				form-fields="{{resourceFormFields}}" 
-				input="{{selectedRow}}">
+				input="{{selectedRow}}"
+				action="">
 			</things-resource-form>
 
 			<div class="group-btnline">
@@ -121,9 +123,6 @@ Example:
 				searchActionUrl: {
 					type: String
 				},
-				searchDataUrl: {
-					computed: 'computeSearchUrl(globals.basicUrl,searchActionUrl)'
-				},
 				gridFieldUrl: {
 					type: String
 				},
@@ -151,10 +150,6 @@ Example:
 			listeners : {
 				'grid.on-detail-clicked': '_openDialog'
 			},			
-
-			computeSearchUrl: function(basicUrl, searchActionUrl) {
-				return basicUrl + '/' + searchActionUrl;
-			},
 			
 			_onSelectedRowChange: function() {
 				console.log(this.selectedRow);
@@ -168,12 +163,13 @@ Example:
 						console.log(element);
 						element.label = keys[index].charAt(0).toUpperCase() + keys[index].slice(1);
 						var data = this.selectedRow[keys[index]];
-						element.type = typeof data;
-						console.log(element);
+						element.type = (typeof data)=='undefined'?'string':(typeof data);
+						element.type = element.type=='string'?'text':element.type;
 						view.push(element);
 					}
-					console.log(view);
-
+					if(view&&view.length>0){
+						this.resourceFormFields = view;
+					}
 				}
 			},
 

@@ -2,6 +2,13 @@
 <link rel="import" href="../../../bower_components/paper-fullscreen-dialog/paper-fullscreen-dialog.html">
 
 <link rel="import" href="./things-form-behavior.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../../bower_components/iron-iconset/iron-iconset.html">
+<link rel="import" href="../../../bower_components/iron-iconset-svg/iron-iconset-svg.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
 <!--
 A comment describing this element
 
@@ -61,16 +68,12 @@ Example:
 		</style>
 
 		<paper-fullscreen-dialog id="resourceDialog">
-			<paper-toolbar class="toolbar">
-				<paper-icon-button icon="close" dialog-dismiss></paper-icon-button>
-				<div class="title flex">{{title}}</div>
-				<paper-button dialog-confirm on-tap="save">Save</paper-button>
-				<!--paper-button dialog-confirm on-tap="reset">Reset</paper-button-->
-			</paper-toolbar>
-
+			<paper-icon-button icon="close" affirmative dialog-dismiss></paper-icon-button>
+			<h2>{{title}}</h2>
+			<paper-button affirmative dialog-confirm on-tap="save">Save</paper-button>
 			<form 	is="iron-form" 
 					id="resourceForm" 
-					action=[[action]]
+					action=[[actionUrl]]
 					headers="[[headers]]"
 					content-type="[[contentType]]"
 					method="[[method]]"
@@ -115,6 +118,7 @@ Example:
 			 * save data from resource detail screen
 			 */
 			save: function() {
+				this.method ='post';
 				this._submitForm();
 			},
 
