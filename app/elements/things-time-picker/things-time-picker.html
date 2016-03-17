@@ -9,7 +9,7 @@
 <dom-module id="things-time-picker">
 	<template>
       
-      <input type="text" value="{{selectedTime}}" disabled=true>
+      <input type="text" value="{{selectedTime}}" disabled=true placeholder="Select time from Picker">
       <paper-icon-button class="Navigation-icon" icon="info" on-tap="showTimePicker"></paper-icon-button>
       <paper-dialog id="timeDialog" modal class="paper-time-picker-dialog">
         <paper-time-picker id="timePicker" time="{{time}}"></paper-time-picker>
@@ -32,7 +32,7 @@
 
         selectTime: function() {
           this.selectedTime = this.time;
-        } 
+        }
 
       })
   	})();

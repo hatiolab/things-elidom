@@ -9,7 +9,7 @@
 <dom-module id="things-date-picker">
 	<template>
 	
-		<input type="text" value={{selectedDate}} disabled=true>
+		<input type="text" value={{selectedDate}} disabled=true placeholder="Select date from Picker">
 		<paper-icon-button class="Navigation-icon" icon="info" on-tap="showDatePicker"></paper-icon-button>
     <paper-dialog id="dateDialog" modal class="paper-date-picker-dialog">
       <paper-date-picker date="{{date}}"></paper-date-picker>
@@ -31,35 +31,8 @@
         },
 
         selectDate: function() {
-          var day = this.date.getDay();
-          switch(day) {
-            case 0:
-              day = '일요일';
-              break;
-            case 1:
-              day = '월요일';
-              break;
-            case 2:
-              day = '화요일';
-              break;
-            case 3:
-              day = '수요일';
-              break;
-            case 4:
-              day = '목요일';
-              break;
-            case 5:
-              day = '금요일';
-              break;
-            case 6:
-              day = '토요일';
-              break;
-          };
-          this.selectedDate = this.date.getFullYear() + '년 ' 
-                            + this.date.getMonth() + '월 ' 
-                            + this.date.getDate() + '일 ' 
-                            + day; 
-        },    
+          this.selectedDate = moment(this.date).locale('ko').format('LL');
+        }
 
       })
   	})();
