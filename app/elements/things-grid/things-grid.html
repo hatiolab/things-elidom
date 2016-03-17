@@ -8,13 +8,13 @@ A comment describing this element
 
 Example:
 
-    <my-elem></my-elem>
+	<my-elem></my-elem>
 
 Example:
 
-    <my-elem>
-      <h2>Hello my-elem</h2>
-    </my-elem>
+	<my-elem>
+	  <h2>Hello my-elem</h2>
+	</my-elem>
 
 @demo demo/index.html
 -->
@@ -52,10 +52,18 @@ Example:
 				<things-button color="indigo" id="save-btn" confirm=true title="Confirm" message="Are you sure to Save?">Save</things-button>
 			</div>				
 		</paper-toolbar>
+		<things-resource 
+			id="saveResource"
+			content-type="application/json"
+			action="terminologies/update_multiple" 
+			method = "post"
+			params="{{saveRequest}}">
+		</things-resource>
 	</template>
 
 	<script src='../../../lib/grid/dataludi.lic.eval-1.2.0.min.js'></script>
 	<script src='../../../lib/grid/dataludi.eval-1.2.1.min.js'></script>
+	<script src='../../../bower_components/jszip/dist/jszip.min.js'></script>
 
 	<script>
 		Polymer({
@@ -189,6 +197,15 @@ Example:
 					type: Object,
 					notify: true,
 					readonly: true
+				},
+
+				exportFileName:{
+					type:String
+				},
+				
+				saveRequest:{
+					type:Array,
+					notify:true
 				}
 			},
 
@@ -234,6 +251,62 @@ Example:
 					this.grid.resetSize();
 				}
 			},
+			onImport: function(){
+
+			},
+			onExport:function(){
+				var fileName = this.exportFileName;
+				new DataLudi.GridExcelExporter().export(this.grid, {
+					target: "local",
+					fileName: fileName,
+					numberFormat: "#,##0.00",
+					datetimeFormat: "yyyy.mm.dd"
+				});
+			},
+			onDelete:function(){
+				var row = this.grid.focusedRow();
+				if (row && row.dataIndex() >= 0) {
+					if (this.dataSet.getRowState(row.dataIndex()) == 'created') {
+						this.dataSet.setRowState(row.dataIndex(), 'createAndDeleted');
+					} else {
+						this.dataSet.setRowState(row.dataIndex(), 'deleted');
+					}
+				}
+			},
+			onAdd:function(){
+				var row = Math.max(this.grid.focusedDataIndex(), 0);
+				this.dataSet.insertRow(row, {});
+			},
+			onSave:function(){
+				var data = [];
+
+				var inserted = this.dataSet.getStateRows('created');
+				for (var i = 0; i < inserted.length; i++) {
+					var object = this.dataSet.getRowObject(inserted[i]);
+					object.cud_flag_ = 'c';
+					data.push(object);
+				}
+
+				var updated = this.dataSet.getStateRows('updated');
+				for (var i = 0; i < updated.length; i++) {
+					var object = this.dataSet.getRowObject(updated[i]);
+					object.cud_flag_ = 'u';
+					data.push(object);
+				}
+
+				var deleted = this.dataSet.getStateRows('deleted');
+				for (var i = 0; i < deleted.length; i++) {
+					console.log(deleted[i]);
+					var object = this.dataSet.getRowObject(deleted[i]);
+					object.cud_flag_ = 'd';
+					data.push(object);
+				}
+				this.saveRequest = data;
+				console.log(this.saveRequest);
+				this.$.saveResource.generateRequest();
+				//TODO: ajax.object post
+				
+			},
 
 			created: function() {
 				DataLudi.setRootContext('');
@@ -250,8 +323,13 @@ Example:
 			},
 
 			setFields: function(fields) {
-				if(fields && fields.length > 0 && this.dataSet) {
+				if(fields && fields.length > 0 && this.grid) {
+					var cudField = {	
+						fieldName: "cud_flag_"
+					};
+					fields.push(cudField);
 					this.dataSet.setFields(fields);
+					this.dataSet.setCheckStates(true);
 				}
 			},
 
@@ -276,6 +354,12 @@ Example:
 
 					columns.forEach(function(item) { cols.push(item); });
 					this.grid.setColumns(cols);
+					this.grid.rowIndicator().setStateVisible(true);
+					this.grid.setEditOptions({
+						deletable: true,
+						insertable: true,
+						appendable: true
+					});
 					this.grid.resetSize();
 					// this.grid.orderByFields (['ID'],DataLudi.SortDirection.DESCENDING);
 				}
