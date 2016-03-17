@@ -103,34 +103,16 @@ Example:
   Polymer({
 
     is: 'things-search-form',
-      
-    properties: {
-      searchFields: {
-        type: Array,
-        observer: '_searchFieldsChange'
-      }
-    },
-
-    detached: function() {
-      // TODO Remove All Child Elements
-    },
-
+    
     behaviors: [ ThingsFormBehavior ],
-
-    /**
-     * search fields 값 변경시 form element 구성
-     */
-    _searchFieldsChange: function() {
-      this._createTemplate();
-    },
 
     /**
      * [_createTemplate description]
      * @return {[type]} [description]
      */
-    _createTemplate: function() {
-      for(index in this.searchFields) {
-        var field = this.searchFields[index];
+    buildFormView: function() {
+      for(index in this.formFields) {
+        var field = this.formFields[index];
         var newElement = this._generateElement(field);
 
         if((index % 2) == 0) {

@@ -23,9 +23,9 @@
 var ThingsFormBehaviorImpl = {
 
 	properties: {
-		view: {
+		formFields: {
 			type: Array,
-			observer: '_viewChange'
+			observer: '_formFieldsChange'
 		},
 
 		action: {
@@ -45,6 +45,10 @@ var ThingsFormBehaviorImpl = {
 	listeners : {
 		'iron-form-response' :'_successSubmitResponse',
 		'iron-form-error' : '_failureSubmitResponse'
+	},
+
+	_formFieldsChange: function(e) {
+		this.buildFormView();
 	},
 
 	/**
@@ -125,7 +129,7 @@ var ThingsFormBehaviorImpl = {
 	 * @param{[Array]} items Listbox values
 	 * @return {[paper list box]} 
 	 */
-	_makeListBox:function(items) {
+	_makeListBox: function(items) {
 		var listbox = document.createElement('paper-listbox');
 		listbox.setAttribute('selected','0');
 		
