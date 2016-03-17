@@ -1,4 +1,6 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../things-paginator/things-paginator.html">
 <link rel="import" href="../../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
 
 <!--
@@ -19,6 +21,15 @@ Example:
 
 <dom-module id="things-grid">
 	<template>
+		<style is="custom-style">
+			paper-toolbar.white {
+				--paper-toolbar-background: white;
+				--paper-toolbar-title: {
+					font-style: italic;
+					font-weight: bold;
+				};
+			}
+		</style>
 		<style>
 			:host {
 				display: block;
@@ -29,6 +40,18 @@ Example:
 		</style>
 	
 		<div id="gridContainer"></div>
+
+		<paper-toolbar class="white">
+			<div class="bottom fit">
+				<things-paginator per-page="{{limit}}" current-page="{{page}}" total-count="{{totalCount}}"></things-paginator>
+
+				<things-button color="green" id="import-btn">Import</things-button>
+				<things-button color="green" id="export-btn">Export</things-button>
+				<things-button color="green" id="add-btn">Add</things-button>
+				<things-button color="pink" id="delete-btn">Delete</things-button>
+				<things-button color="indigo" id="save-btn" confirm=true title="Confirm" message="Are you sure to Save?">Save</things-button>
+			</div>				
+		</paper-toolbar>
 	</template>
 
 	<script src='../../../lib/grid/dataludi.lic.eval-1.2.0.min.js'></script>
@@ -57,7 +80,24 @@ Example:
 					value: 0,
 					notify: true
 				},
-
+				/**
+				 * limit record count
+				 * @type number
+				 */
+				limit: {
+					type: Number,
+					value: 50,
+					notify: true
+				},
+				/**
+				 * page record count
+				 * @type number
+				 */
+				page: {
+					type: Number,
+					value: 1,
+					notify: true
+				},
 				/**
 				 * grid data fields
 				 * @type Array
@@ -153,7 +193,12 @@ Example:
 			},
 
 			listeners: {
-				'iron-resize': 'onIronResize'
+				'iron-resize': 'onIronResize',
+				'import-btn' :
+				'export-btn' :
+				'add-btn'    :
+				'delete-btn' :
+				'save-btn'
 			},
 
 			/**
@@ -281,15 +326,15 @@ Example:
 			 * @event on-detail-clicked
 			 */
 			onCellClicked: function(rowIndex, colIndex, indexObject) {
+				var row = this.grid.focusedRow();
+				if (row && row.dataIndex() >= 0) {
+					this.selectedRowData = row.getRowObject();
+				}
+
 				if(indexObject.dataField() < 0) {
 					this.onDetailClicked();
 				} else {
 					this.selectedCellData = this.dataSet.getValue(rowIndex,colIndex);
-				}
-				
-				var row = this.grid.focusedRow();
-				if (row && row.dataIndex() >= 0) {
-					this.selectedRowData = row.getRowObject();
 				}
 			},
 

@@ -33,16 +33,6 @@ Example:
 
 <dom-module id="things-content">
 	<template>
-		<style is="custom-style">
-			paper-toolbar.white {
-				--paper-toolbar-background: white;
-				--paper-toolbar-title: {
-					font-style: italic;
-					font-weight: bold;
-				};
-			}
-		</style>
-
 		<style>
 			:host {
 				display: block;
@@ -92,6 +82,8 @@ Example:
 				total-property="total"
 				selected-row-data="{{selectedRow}}"
 				output="{{gridOuput}}"
+				page="{{page}}"
+				limit="{{limit}}"
 				total-count="{{totalCount}}">
 			</things-grid>
 
@@ -100,20 +92,9 @@ Example:
 				title="Item Detail"
 				form-fields="{{resourceFormFields}}" 
 				input="{{selectedRow}}"
+
 				action="">
 			</things-resource-form>
-
-			<paper-toolbar class="white">
-				<div class="bottom fit">
-					<things-paginator per-page="{{limit}}" current-page="{{page}}" total-count="{{totalCount}}"></things-paginator>
-
-					<things-button color="green" id="import-btn" class="pull_right">Import</things-button>
-					<things-button color="green" id="export-btn">Export</things-button>
-					<things-button color="green" id="add-btn">Add</things-button>
-					<things-button color="pink" id="delete-btn">Delete</things-button>
-					<things-button color="indigo" id="save-btn" confirm=true title="Confirm" message="Are you sure to Save?">Save</things-button>
-				</div>				
-			</paper-toolbar>
 		</div>
 	</template>
 
