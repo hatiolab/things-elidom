@@ -106,7 +106,14 @@ Example:
 
 				this.grid = DataLudi.createGridView('gridContainer', null, false);
 				this.grid.setDataSource(this.dataSet);
-
+				this.grid.registerImageList({
+					name: "images",
+					root: "images/grid/",
+					items: [
+						"iconDetail.png"
+					]
+				});
+				
 				if(this.fields && this.fields.length > 0) {
 					this.dataSet.setFields(this.fields);
 				}
@@ -136,7 +143,28 @@ Example:
 
 			setColumns: function(columns) {
 				if(columns && columns.length > 0 && this.grid) {
-					this.grid.setColumns(columns);
+					var cols= [];
+					var detail = {
+						'name': 'Detail',
+						'width': '25',
+						'imageList': 'images',
+						'renderer': {
+							'type': 'icon'
+						},
+						'styles': {
+							'textAlignment': 'center',
+							'iconIndex': 'iconDetail.png',
+							'iconLocation': 'center'
+						},
+						'header': {
+							'text': ' '
+						}
+					};
+					columns.forEach(function(item){
+						cols.push(item);
+					});
+					cols.unshift(detail);
+					this.grid.setColumns(cols);
 					this.grid.resetSize();
 					// this.grid.orderByFields (['ID'],DataLudi.SortDirection.DESCENDING);
 				}
