@@ -155,7 +155,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-material class="Page-paper" elevation="1">
       <p class="paper-font-subhead">Date Picker</p>
       <paper-button raised on-tap="showDatePicker">Change Date</paper-button>
-      <paper-dialog id="dateDialog" modal class="paper-date-picker-dialog" on-iron-overlay-closed="dismissDialog">
+      <paper-dialog id="dateDialog" modal class="paper-date-picker-dialog">
         <paper-date-picker date="{{date}}"></paper-date-picker>
         <div class="buttons">
           <paper-button raised dialog-confirm on-tap="selectDate">Select</paper-button>
@@ -168,7 +168,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-material class="Page-paper" elevation="1">
       <p class="paper-font-subhead">Time Picker</p>
       <paper-button raised on-tap="showTimePicker">Change Time</paper-button>
-      <paper-dialog id="timeDialog" modal class="paper-time-picker-dialog" on-iron-overlay-closed="dismissDialog">
+      <paper-dialog id="timeDialog" modal class="paper-time-picker-dialog">
         <paper-time-picker id="timePicker" time="{{time}}"></paper-time-picker>
         <div class="buttons">
           <paper-button raised dialog-confirm on-tap="selectTime">Select</paper-button>
@@ -341,8 +341,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         selectDate: function() {
-          this.selectedDate = this.date;
-        },      
+          var day = this.date.getDay();
+          switch(day) {
+            case 0:
+              day = '일요일';
+              break;
+            case 1:
+              day = '월요일';
+              break;
+            case 2:
+              day = '화요일';
+              break;
+            case 3:
+              day = '수요일';
+              break;
+            case 4:
+              day = '목요일';
+              break;
+            case 5:
+              day = '금요일';
+              break;
+            case 6:
+              day = '토요일';
+              break;
+          };
+          this.selectedDate = this.date.getFullYear() + "년 "
+                            + this.date.getMonth() + "월 " 
+                            + this.date.getDate() + "일 " 
+                            + day; 
+        },
 
         showTimePicker: function() {
           this.$.timeDialog.toggle();
@@ -350,7 +377,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         selectTime: function() {
           this.selectedTime = this.time;
-        }        
+        } 
 
       });
     })();
