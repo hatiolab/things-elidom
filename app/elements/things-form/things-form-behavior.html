@@ -242,15 +242,21 @@ var ThingsFormBehaviorImpl = {
 	 */
 	_failureSubmitResponse: function(event) {
 		this.stopSpinner();
-
 		var response = event.detail.request.xhr.response;
-		if(response.status == 401) {
-			this.handleUnauthorized();
-		} else {
-			this.openResponseError(response);
-		}
 
-		this.fire('error', response);
+		if(response && response.status == 401) {
+			this.handleUnauthorized();
+			this.fire('error', response);
+		} else {
+			if(response) {
+				this.openResponseError(response);
+				this.fire('error', response);
+			}
+			else{
+				this.openUnkownError();
+				this.fire('error', event.detail.request);
+			}
+		}
 	}
 };
 

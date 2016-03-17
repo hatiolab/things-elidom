@@ -9,6 +9,8 @@
 <link rel="import" href="../../../bower_components/iron-iconset/iron-iconset.html">
 <link rel="import" href="../../../bower_components/iron-iconset-svg/iron-iconset-svg.html">
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
+
 <!--
 A comment describing this element
 
@@ -67,13 +69,17 @@ Example:
 			}
 		</style>
 
-		<paper-fullscreen-dialog id="resourceDialog">
-			<paper-icon-button icon="close" affirmative dialog-dismiss></paper-icon-button>
+		<paper-fullscreen-dialog
+			id="resourceDialog"
+			modal = "true"
+			dismiss-icon="close"
+			>
+			<!-- <paper-icon-button icon="close" affirmative dialog-dismiss></paper-icon-button> -->
 			<h2>{{title}}</h2>
 			<paper-button affirmative dialog-confirm on-tap="save">Save</paper-button>
 			<form 	is="iron-form" 
 					id="resourceForm" 
-					action=[[actionUrl]]
+					action=[[action]]
 					headers="[[headers]]"
 					content-type="[[contentType]]"
 					method="[[method]]"
@@ -93,7 +99,9 @@ Example:
 			properties: {
 				title: String
 			},
+			detached:function(){
 
+			},
 			/**
 			 * view atrribute observer, add view to form
 			 */
@@ -111,9 +119,15 @@ Example:
 			},
 
 			behaviors: [
-				ThingsFormBehavior
+				ThingsFormBehavior,
+				Polymer.IronResizableBehavior
 			],
-
+			listeners : {
+				'resourceDialog.iron-overlay-closed': 'clearForm',
+				'resourceDialog.iron-overlay-canceled': 'clearForm',
+				'resourceDialog.iron-overlay-opened': 'openForm',
+				'iron-resize': 'onIronResize'
+			},
 			/**
 			 * save data from resource detail screen
 			 */
@@ -127,8 +141,25 @@ Example:
 			 */
 			open: function() {
 				this.$.resourceDialog.toggle();
+			},
+			onIronResize:function(){
+				this.$.resourceForm.style.width = this.parentNode.offsetWidth + 'px';
+			},
+			clearForm :function(){
+				var i = 0;
+				while(this.$.leftFields.childNodes.length>0
+					  ||this.$.rightFields.childNodes.length>0)
+				{
+					if(this.$.leftFields.childNodes[0])
+						this.$.leftFields.removeChild(this.$.leftFields.childNodes[0]);
+					if(this.$.rightFields.childNodes[0])
+						this.$.rightFields.removeChild(this.$.rightFields.childNodes[0]);
+				}
+			},
+			openForm :function(){
+				this.$.resourceDialog.refit();
+				this.fire('resource-form-opened',this.$.resourceForm,this.$.resourceDialog);
 			}
-
 		});
 	</script>
 
