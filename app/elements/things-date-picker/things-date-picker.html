@@ -8,7 +8,7 @@
 
 <dom-module id="things-date-picker">
 	<template>
-		<input type="text" name="{{name}}" value={{selectedDate}} disabled=true placeholder="{{label}}">
+		<input type="text" name="{{name}}" value={{selectedDate}} readOnly placeholder="{{label}}">
 		<paper-icon-button class="Navigation-icon" icon="info" on-tap="showDatePicker"></paper-icon-button>
     <paper-dialog id="dateDialog" modal class="paper-date-picker-dialog">
       <paper-date-picker date="{{date}}"></paper-date-picker>
@@ -28,13 +28,20 @@
         properties: {
           locale: {
             type: String,
-            notify: true
+            notify: true,
+            value: 'en'
           },
 
           readFormat: {
             type: String,
-            notify: true
-          }          
+            notify: true,
+            value: 'YYYY-MM-DD'
+          },
+
+          writeFormat: {
+            type: String,
+            value: 'YYYY-MM-DD'
+          }       
         },
 
         showDatePicker: function() {
@@ -44,9 +51,7 @@
         selectDate: function() {
           // http://momentjs.com/
           //this.selectedDate = moment(this.date).locale('zh-cn').format('LL');
-          var locale = this.locale ? this.locale : 'en';
-          var format = this.readFormat ? this.readFormat : 'LL';
-          this.selectedDate = moment(this.date).locale(locale).format(format);
+          this.selectedDate = moment(this.date).locale(this.locale).format(this.readFormat);
         }
 
       })
