@@ -1,15 +1,15 @@
-<link rel="import" href="./things-form-behavior.html">
-<link rel="import" href="../../../bower_components/paper-fullscreen-dialog/paper-fullscreen-dialog.html">
-
-<link rel="import" href="./things-form-behavior.html">
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/iron-icons/social-icons.html">
 <link rel="import" href="../../../bower_components/iron-icons/maps-icons.html">
 <link rel="import" href="../../../bower_components/iron-iconset/iron-iconset.html">
 <link rel="import" href="../../../bower_components/iron-iconset-svg/iron-iconset-svg.html">
-<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../../../bower_components/paper-fullscreen-dialog/paper-fullscreen-dialog.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="./things-form-behavior.html">
 
 <!--
 A comment describing this element
@@ -35,58 +35,41 @@ Example:
 				display: block;
 				box-sizing: border-box;
 				/*text-align: center;*/
-				/*margin: 0 auto;*/
-				height: 100%;
-				width: 98%;
-			}
-
-			:host > h3 {
-				margin-top: 5px;
-			}
-
-			:host::content img {
-				border-radius: 50%;
-			}
-
-			:host paper-input {
-				margin-left: auto;
-				margin-right: auto;
+				/*margin: 100px auto;*/
+				height: 90%;
 				width: 90%;
 			}
 
-			:host paper-material {
-				padding: 15px;
+			:host .resourceForm {
+				padding: 10px 15px 10px 15px;
 			}
 
-			:host .search {
-				padding:5px 0 3px 5px;
-			}
-
-			:host .search paper-button {
-				width:22px;height:22px;
-				margin-left:3px;
-				padding:1px;
+			:host .fields {
+				padding: 10px;
 			}
 		</style>
 
 		<paper-fullscreen-dialog
 			id="resourceDialog"
-			modal = "true"
-			dismiss-icon="close"
-			>
-			<!-- <paper-icon-button icon="close" affirmative dialog-dismiss></paper-icon-button> -->
+			modal="true"
+			dismiss-icon="close">
+
 			<h2>{{title}}</h2>
-			<paper-button affirmative dialog-confirm on-tap="save">Save</paper-button>
-			<form 	is="iron-form" 
+			
+			<paper-button affirmative dialog-confirm on-tap="saveResourceForm">Save</paper-button>
+			
+			<form
+					is="iron-form" 
 					id="resourceForm" 
+					class="resourceForm"
 					action=[[action]]
 					headers="[[headers]]"
 					content-type="[[contentType]]"
 					method="[[method]]"
 					last-response ="{{output}}">
 				<div class="layout horizontal flex" >
-					<div id="leftFields" class="layout vertical flex"></div>
-					<div id="rightFields" class="layout vertical flex"></div>
+					<div id="leftFields" class="layout vertical flex fields"></div>
+					<div id="rightFields" class="layout vertical flex fields"></div>
 				</div>
 			</form>
 		</paper-fullscreen-dialog>
@@ -99,9 +82,7 @@ Example:
 			properties: {
 				title: String
 			},
-			detached:function(){
 
-			},
 			/**
 			 * view atrribute observer, add view to form
 			 */
@@ -122,44 +103,70 @@ Example:
 				ThingsFormBehavior,
 				Polymer.IronResizableBehavior
 			],
+
 			listeners : {
-				'resourceDialog.iron-overlay-closed': 'clearForm',
-				'resourceDialog.iron-overlay-canceled': 'clearForm',
-				'resourceDialog.iron-overlay-opened': 'openForm',
+				'resourceDialog.iron-overlay-closed': 'clearResourceForm',
+				'resourceDialog.iron-overlay-canceled': 'clearResourceForm',
+				'resourceDialog.iron-overlay-opened': 'onOpenResourceForm',
 				'iron-resize': 'onIronResize'
 			},
+
+			/**
+			 * resize handler 
+			 */
+			onIronResize: function() {
+				this.$.resourceForm.style.width = this.parentNode.offsetWidth + 'px';
+			},
+
 			/**
 			 * save data from resource detail screen
 			 */
-			save: function() {
-				this.method ='post';
+			saveResourceForm: function() {
+				this.method ='put';
 				this._submitForm();
 			},
 
 			/**
-			 * open dialog
+			 * after resource opened
 			 */
-			open: function() {
-				this.$.resourceDialog.toggle();
-			},
-			onIronResize:function(){
-				this.$.resourceForm.style.width = this.parentNode.offsetWidth + 'px';
-			},
-			clearForm :function(){
-				var i = 0;
-				while(this.$.leftFields.childNodes.length>0
-					  ||this.$.rightFields.childNodes.length>0)
-				{
-					if(this.$.leftFields.childNodes[0])
-						this.$.leftFields.removeChild(this.$.leftFields.childNodes[0]);
-					if(this.$.rightFields.childNodes[0])
-						this.$.rightFields.removeChild(this.$.rightFields.childNodes[0]);
+			onOpenResourceForm: function(e) {
+				if(e.srcElement.id == 'resourceDialog') {
+					this.$.resourceDialog.refit();
+					this.fire('resource-form-opened', this.$.resourceForm, this.$.resourceDialog);
 				}
 			},
-			openForm :function(){
-				this.$.resourceDialog.refit();
-				this.fire('resource-form-opened',this.$.resourceForm,this.$.resourceDialog);
+
+			/**
+			 * open resource form dialog
+			 */
+			openResourceForm: function(e) {
+				var data = e.detail;
+
+				if(this.$.leftFields.childNodes.length == 0) {
+					this.buildFormView();
+				}
+
+				// TODO set value to element
+				this.$.resourceDialog.toggle();
+			},
+
+			/**
+			 * clear resource form
+			 */
+			clearResourceForm: function(e) {
+				if(e.srcElement.id == 'resourceDialog') {
+					var i = 0;
+
+					while(this.$.leftFields.childNodes.length > 0 ||this.$.rightFields.childNodes.length > 0) {
+						if(this.$.leftFields.childNodes[0])
+							this.$.leftFields.removeChild(this.$.leftFields.childNodes[0]);
+
+						if(this.$.rightFields.childNodes[0])
+							this.$.rightFields.removeChild(this.$.rightFields.childNodes[0]);
+					}
+				}
 			}
+
 		});
 	</script>
 

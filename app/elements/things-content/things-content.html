@@ -87,13 +87,18 @@ Example:
 				total-count="{{totalCount}}">
 			</things-grid>
 
-			<things-resource-form 
-				id="dialog"
-				title="Item Detail"
-				form-fields="{{resourceFormFields}}" 
-				input="{{selectedRow}}"
+			<things-resource 
+				auto
+				action="[[formFieldUrl]]" 
+				output-data="{{resourceFormFields}}">
+			</things-resource>
 
-				action="">
+			<things-resource-form 
+				id="resource-form"
+				title="Item Detail"
+				form-fields="[[resourceFormFields]]" 
+				input="{{selectedRow}}"
+				action="{{formSaveActionUrl}}">
 			</things-resource-form>
 		</div>
 	</template>
@@ -114,6 +119,12 @@ Example:
 				searchActionUrl: {
 					type: String
 				},
+				formFieldUrl: {
+					type: String
+				},
+				formSaveActionUrl: {
+					type: String
+				},				
 				gridFieldUrl: {
 					type: String
 				},
@@ -139,11 +150,14 @@ Example:
 			},
 
 			listeners : {
-				'grid.on-detail-clicked': '_openDialog'
+				'grid.on-detail-clicked': '_showResourceForm'
 			},			
 			
-			_onSelectedRowChange: function() {
-				if(this.selectedRow) {
+			/**
+			 * Resource Form Field가 초기화 되지 않았다면 초기화 시켜준다.
+			 */
+			_onSelectedRowChange: function(selectedRow) {
+				/*if(this.selectedRow && !this.resourceFormFields) {
 					var view = [];
 					var keys = Object.keys(this.selectedRow);
 
@@ -152,22 +166,24 @@ Example:
 						element.name = keys[index];
 						element.label = keys[index].charAt(0).toUpperCase() + keys[index].slice(1);
 						var data = this.selectedRow[keys[index]];
-						element.type = (typeof data)=='undefined'?'string':(typeof data);
-						element.type = element.type=='string'?'text':element.type;
+						element.type = (typeof data) == 'undefined' ? 'string' : (typeof data);
+						element.type = element.type == 'string' ? 'text' : element.type;
 						view.push(element);
 					}
 					
 					if(view && view.length > 0) {
 						this.resourceFormFields = view;
 					}
-				}
+				}*/
+
+				console.log(selectedRow);
 			},
 
 			/**
 			 * open resource form dialog
 			 */
-			_openDialog: function(row, grid) {
-				this.$.dialog.open();
+			_showResourceForm: function(row) {
+				this.$['resource-form'].openResourceForm(row);
 			}
 
 		});
