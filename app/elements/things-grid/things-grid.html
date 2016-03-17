@@ -1,4 +1,5 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
 
 <!--
 A comment describing this element
@@ -21,10 +22,12 @@ Example:
 		<style>
 			:host {
 				display: block;
+				height: 100%;
+				width: 100%;
 			}
 		</style>
 	
-		<div id="gridContainer" style="width: 700px;height: 300px;"></div>
+		<div id="gridContainer"></div>
 	</template>
 
 	<script src='../../../lib/grid/dataludi.lic.eval-1.2.0.min.js'></script>
@@ -34,6 +37,10 @@ Example:
 		Polymer({
 			is: 'things-grid',
 
+			behaviors: [
+				Polymer.IronResizableBehavior
+			],
+	
 			properties: {
 				mode: {
 					type: String,
@@ -83,47 +90,59 @@ Example:
 					type: Object
 				},
 
-				selectedRowData:{
-					type:Object,
-					notify:true,
-					readonly:true
+				selectedRowData: {
+					type: Object,
+					notify: true,
+					readonly: true
 				},
 
-				selectedCellData:{
-					type:Object,
-					notify:true,
-					readonly:true
+				selectedCellData: {
+					type: Object,
+					notify: true,
+					readonly: true
+				}
+			},
+
+			listeners: {
+				'iron-resize': 'onIronResize'
+			},
+
+			onIronResize: function(e) {
+				console.log('Parent Node width : ' + this.parentNode.offsetWidth + ', hegith: ' + this.parentNode.offsetHeight);
+
+				if(this.parentNode.offsetWidth > 0 && this.grid == null) {
+					this.grid = DataLudi.createGridView('gridContainer', null, false);
+					this.grid.setDataSource(this.dataSet);
+					this.grid.registerImageList({
+						name: "images",
+						root: "images/grid/",
+						items: [
+							"iconDetail.png"
+						]
+					});
+					
+					if(this.fields && this.fields.length > 0) {
+						this.dataSet.setFields(this.fields);
+					}
+
+					if(this.columns && this.columns.length > 0) {
+						this.grid.setColumns(this.columns);
+					}
+
+					//register grid event here
+					this.registerGridEvent();
+				}
+
+				if(this.grid != null) {
+					this.$.gridContainer.style.width = this.parentNode.offsetWidth + 'px';
+					this.$.gridContainer.style.height = '300px';
+					this.grid.resetSize();
 				}
 			},
 
 			created: function() {
 				DataLudi.setRootContext('');
 				DataLudi.setAssetRoot('images/grid');
-			},
-
-			attached: function() {
-				console.log(this.offsetWidth);
-
-				this.grid = DataLudi.createGridView('gridContainer', null, false);
-				this.grid.setDataSource(this.dataSet);
-				this.grid.registerImageList({
-					name: "images",
-					root: "images/grid/",
-					items: [
-						"iconDetail.png"
-					]
-				});
-				
-				if(this.fields && this.fields.length > 0) {
-					this.dataSet.setFields(this.fields);
-				}
-
-				if(this.columns && this.columns.length > 0) {
-					this.grid.setColumns(this.columns);
-					this.grid.resetSize();		
-				}
-				//register grid event here
-				this.registerGridEvent();
 			},
 
 			detached: function() {
