@@ -12,6 +12,10 @@
 <link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
 
+<link rel="import" href="../things-date-picker/things-date-picker.html">
+<link rel="import" href="../things-time-picker/things-time-picker.html">
+<link rel="import" href="../things-combo/things-code-selector.html">
+
 <script>
 
 /**
@@ -109,9 +113,19 @@ var ThingsFormBehaviorImpl = {
 				break;
 
 			case 'date':
+				newElement = document.createElement('things-date-picker');
+				newElement.setAttribute('name', element.name);
+				newElement.setAttribute('label', element.label);
+				break;
+
+			case 'time':
+				newElement = document.createElement('things-time-picker');
+				newElement.setAttribute('name', element.name);
+				newElement.setAttribute('label', element.label);
 				break;
 
 			case 'datetime':
+				// TODO
 				break;
 
 			default:
