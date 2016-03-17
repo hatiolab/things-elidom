@@ -13,6 +13,7 @@
 <link rel="import" href="../things-form/things-search-form.html">
 <link rel="import" href="../things-grid/things-grid.html">
 <link rel="import" href="../things-resource/things-resource.html">
+<link rel="import" href="../things-paginator/things-paginator.html">
 
 <!--
 A comment describing this element
@@ -32,6 +33,16 @@ Example:
 
 <dom-module id="things-content">
 	<template>
+		<style is="custom-style">
+			paper-toolbar.white {
+				--paper-toolbar-background: white;
+				--paper-toolbar-title: {
+					font-style: italic;
+					font-weight: bold;
+				};
+			}
+		</style>
+
 		<style>
 			:host {
 				display: block;
@@ -47,13 +58,16 @@ Example:
 			</things-resource>
 
 			<things-search-form 
+				class="flex"
 				title="[[title]]"
-				form-fields ="[[searchFormFields]]" 
+				form-fields="[[searchFormFields]]" 
 				action="{{searchActionUrl}}" 
 				method="GET"
 				content-type="application/json"
 				output="{{gridData}}"
-				class="flex">
+				page="{{page}}"
+				limit="{{limit}}"
+				total-count="{{totalCount}}">
 			</things-search-form>
 
 			<things-resource 
@@ -70,12 +84,13 @@ Example:
 
 			<things-grid 
 				id="grid"
-				fields ="[[gridFields]]" 
+				class="flex"
+				fields="[[gridFields]]" 
 				columns="[[gridColumns]]" 
 				input="[[gridData]]"
-				class="flex"
 				selected-row-data="{{selectedRow}}"
-				output="{{gridOuput}}">
+				output="{{gridOuput}}"
+				total-count="{{totalCount}}">
 			</things-grid>
 
 			<things-resource-form 
@@ -86,24 +101,17 @@ Example:
 				action="">
 			</things-resource-form>
 
-			<div class="group-btnline">
-				<paper-icon-button id="goFirst" icon="icons:arrow-back"></paper-icon-button>
-				<paper-icon-button id="goBefore" icon="icons:chevron-left"></paper-icon-button>
-				<input type="text" value={{name::input}}>
-				<paper-icon-button id="goAfter" icon="icons:chevron-right"></paper-icon-button>
-				<paper-icon-button id="goLast" icon="icons:arrow-forward"></paper-icon-button>
+			<paper-toolbar class="white">
+				<div class="bottom fit">
+					<things-paginator per-page="{{limit}}" current-page="{{page}}" total-count="{{totalCount}}"></things-paginator>
 
-				<paper-tooltip for="goFirst" offset="0">Go First</paper-tooltip>
-				<paper-tooltip for="goBefore" offset="0">Before</paper-tooltip>
-				<paper-tooltip for="goAfter" offset="0">After</paper-tooltip>
-				<paper-tooltip for="goLast" offset="0">Go Last</paper-tooltip>
-
-				<things-button color="green" id="import-btn" class="pull_right">Import</things-button>
-				<things-button color="green" id="export-btn">Export</things-button>
-				<things-button color="green" id="add-btn">Add</things-button>
-				<things-button color="pink" id="delete-btn">Delete</things-button>
-				<things-button color="indigo" id="save-btn" confirm=true title="Confirm" message="Are you sure to Save?">Save</things-button>
-			</div>
+					<things-button color="green" id="import-btn" class="pull_right">Import</things-button>
+					<things-button color="green" id="export-btn">Export</things-button>
+					<things-button color="green" id="add-btn">Add</things-button>
+					<things-button color="pink" id="delete-btn">Delete</things-button>
+					<things-button color="indigo" id="save-btn" confirm=true title="Confirm" message="Are you sure to Save?">Save</things-button>
+				</div>				
+			</paper-toolbar>
 		</div>
 	</template>
 

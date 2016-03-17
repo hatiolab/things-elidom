@@ -103,25 +103,69 @@ Example:
   Polymer({
 
     is: 'things-search-form',
+
+    properties: {
+      page : {
+        type: Number,
+        value: 1,
+        notify: true,
+        observer: 'pageChanged'
+      },
+
+      limit: {
+        type: Number,
+        value: 50,
+        notify: true
+      },
+
+      totalCount: {
+        type: Number
+      }
+    },
     
     behaviors: [ ThingsFormBehavior ],
 
+    listeners : {
+      'iron-form-presubmit' :'preSubmitHandler',
+    },    
+
     /**
-     * [_createTemplate description]
-     * @return {[type]} [description]
+     * build form view - add child element dynamically
      */
     buildFormView: function() {
-      for(index in this.formFields) {
-        var field = this.formFields[index];
-        var newElement = this._generateElement(field);
+      if(this.formFields.length > 0) {
+        for(index in this.formFields) {
+          var field = this.formFields[index];
+          var newElement = this._generateElement(field);
 
-        if((index % 2) == 0) {
-          this.$.leftFields.appendChild(newElement);
-        } else {
-          this.$.rightFields.appendChild(newElement);
+          if((index % 2) == 0) {
+            this.$.leftFields.appendChild(newElement);
+          } else {
+            this.$.rightFields.appendChild(newElement);
+          }
         }
       }
+    },
+
+    /**
+     * submit form 전에 파라미터 변경 ...
+     */
+    preSubmitHandler: function(e) {
+      var form = this._getForm();
+      form.request.params || {};
+      form.request.params.page = this.page;
+      form.request.params.limit = this.limit;
+    },
+
+    /**
+     * refresh when current page changed
+     */
+    pageChanged: function(page) {
+      if(this.totalCount > 0 && page > 0) {
+        this._submitForm();
+      }
     }
+
   });
   </script>
 </dom-module>

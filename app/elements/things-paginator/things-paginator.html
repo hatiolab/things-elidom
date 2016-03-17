@@ -1,0 +1,464 @@
+<!--
+
+# &lt;mercury-paginator&gt;
+
+>  A element providing a solution to paginate lists (Polymer 1.0 compatible).
+
+## Demo
+
+[Check it live!](https://github.com/bquarks/mercury-paginator)
+
+## Install
+
+Install the component using [Bower](http://bower.io/):
+
+```sh
+$ bower install mercury-paginator --save
+```
+
+Or [download as ZIP](https://github.com/bquarks/mercury-paginator/archive/master.zip).
+
+## Usage
+
+1. Import polyfill:
+
+    ```html
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    ```
+
+2. Import custom element:
+
+    ```html
+    <link rel="import" href="bower_components/mercury-paginator/mercury-paginator.html">
+    ```
+
+3. Start using it!
+
+    ```html
+    <template is="dom-bind">
+
+        <mercury-paginator perpage="15" items="{{items}}"></mercury-paginator>
+
+        <div class="div-table">
+            <div class="head-row">
+                <div class="div-cell">Id</div>
+                <div class="div-cell">Item name</div>
+                <div class="div-cell">Description</div>
+            </div>
+
+            <template id="items" is="dom-repeat" items="{{items}}">
+                <div class="div-row">
+                    <div class="div-cell">{{item.id}}</div>
+                    <div class="div-cell">{{item.name}}</div>
+                    <div class="div-cell">{{item.description}}</div>
+                </div>
+            </template>
+        </div>
+
+    </template>
+    ```
+
+## Usage
+
+Specifies an array of elements to the component through the *items* property and set *perpage* property to a pagination number
+
+*You can use *iron-ajax* element to fetch data from server.
+
+
+## Development
+
+In order to run it locally you'll need to fetch some dependencies and a basic server setup.
+
+1. Install [bower](http://bower.io/) & [polyserve](https://npmjs.com/polyserve):
+
+    ```sh
+    $ npm install -g bower polyserve
+    ```
+
+2. Install local dependencies:
+
+    ```sh
+    $ bower install
+    ```
+
+3. Start development server and open `http://localhost:8080/components/my-repo/`.
+
+    ```sh
+    $ polyserve
+    ```
+
+## History
+
+For detailed changelog, check [Releases](https://github.com/jorguezz/mercury-paginator/releases).
+
+## License
+
+[MIT License](http://opensource.org/licenses/MIT)
+
+
+
+Example:
+
+    <mercury-paginator perpage="10" items="{{items}}"></mercury-paginator>
+
+    <div class="div-table">
+        <div class="head-row">
+            <div class="div-cell">Id</div>
+            <div class="div-cell">Item name</div>
+            <div class="div-cell">Description</div>
+        </div>
+
+        <template id="items" is="dom-repeat" items="{{items}}">
+            <div class="div-row">
+                <div class="div-cell">{{item.id}}</div>
+                <div class="div-cell">{{item.name}}</div>
+                <div class="div-cCell">{{item.description}}</div>
+            </div>
+        </template>
+    </div>
+
+@demo
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="things-paginator">
+
+  <template>
+
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        text-align: left;
+        @apply(--mercury-paginator);
+      }
+
+      .pagination {
+        display: inline-block;
+        list-style: none;
+        margin: 1rem;
+        padding: 1em;
+        vertical-align: bottom;
+        word-spacing: -5px;
+      }
+
+      .pagination li {
+        display: inline-block;
+        font-size: 1em;
+        vertical-align: bottom;
+        word-spacing: normal;
+        @apply(--mercury-paginator-item);
+      }
+
+      .pagination li.active a {
+        background-color: #2BA6CB;
+        color: white;
+        text-decoration: none;
+        @apply(--mercury-paginator-link-selected);
+      }
+
+      .pagination li.disabled a,
+      .pagination li.disabled a:hover {
+        background-color: #F5F5F5;
+        color: #CCCCCC;
+        cursor: default;
+        @apply(--mercury-paginator-link-disabled);
+      }
+
+      .pagination a {
+        background-color: var(--mercury-paginator-item-bg-color, white);
+        border: var(--mercury-paginator-item-border, 1px solid #EEEEEE);
+        color: var(--mercury-paginator-item-color, #2BA6CB);
+        cursor: pointer;
+        display: inline-block;
+        line-height: normal;
+        font-weight: var(--mercury-paginator-item-font-weight, normal);
+        padding: var(--mercury-paginator-item-padding, 0.5em 1em);
+        text-decoration: none;
+        -webkit-transition: var(--mercury-paginator-item-transition, background-color 0.3s ease-in);
+        transition: var(--mercury-paginator-item-transition, background-color 0.3s ease-in);
+        @apply(--mercury-paginator-link);
+      }
+
+      .pagination a:hover,
+      .pagination a:focus {
+        background-color: var(--mercury-paginator-item-hover-bg-color, #F5F5F5);
+        color: var(--mercury-paginator-item-hover-color, #2BA6CB);
+        @apply(--mercury-paginator-link-hover);
+      }
+
+      .pagination a:active {
+        background-color: var(--mercury-paginator-item-active-bg-color, #EEEEEE);
+        @apply(--mercury-paginator-link-active);
+      }
+
+      .current {
+        width: 30px;
+      }
+
+      .label {
+        padding: 0px 10px 0px 10px;
+        color: black;
+      }
+    </style>
+
+    <ul id="paginationlist" class="pagination">
+      <template is="dom-if" if="{{showFirst}}">
+        <li><a on-tap="firstPage">First</a></li>
+      </template>
+
+      <li class$='{{disablePrev}}'>
+        <a on-tap="prevPage">{{previous}}</a>
+      </li>
+
+      <li><a>Page</a><li>
+      <paper-input type='number' value="{{currentPage}}" min="1" class="current"></paper-input>
+      <li><a>of   {{totalPage}}</a><li>
+
+      <li class$='{{disableNext}}'>
+          <a on-tap="nextPage">{{next}}</a>
+      </li>
+
+      <template is="dom-if" if="{{showLast}}">
+        <li><a on-tap="lastPage">Last</a></li>
+      </template>
+
+      <li><a>Total : {{totalCount}}</a></li>
+    </ul>
+  </template>
+
+  <script>
+  'use strict';
+
+    Polymer({
+
+      is: 'things-paginator',
+
+      properties: {
+        /**
+         * The `perPage` attribute defines the number
+         * of items to show per page
+         *
+         * @attribute perPage
+         * @type number
+         */
+        perPage: {
+          type: Number,
+          value: 10,
+          nofity: true
+        },
+
+        /**
+         * The `currentPage` attribute specifies the
+         * current active page in view
+         *
+         * @attribute currentPage
+         * @type number
+         */
+        currentPage: {
+          type: Number,
+          value: 0,
+          notify: true
+        },
+
+        /**
+         * The `totalCount` attribute specifies the
+         * total record count
+         *
+         * @attribute currentpage
+         * @type number
+         */
+        totalCount: {
+          type: Number,
+          value: 0,
+          notify: true
+        },
+
+        /**
+         * The `totalCount` attribute specifies the
+         * total record count
+         *
+         * @attribute currentpage
+         * @type number
+         */
+        totalPage : {
+          type: Number,
+          value: 0,
+          notify: true
+        },
+
+        /**
+         * The `totalCount` attribute specifies the
+         * total record count
+         *
+         * @attribute currentpage
+         * @type number
+         */
+        pageStartIdx: {
+          type: Number,
+          value: 0,
+          notify: true
+        },
+
+        /**
+         * The `totalCount` attribute specifies the
+         * total record count
+         *
+         * @attribute currentpage
+         * @type number
+         */
+        pageEndIdx: {
+          type: Number,
+          value: 0,
+          notify: true
+        },
+
+        /**
+         * The `previous` attribute specifies the label
+         * for the Previous button
+         *
+         * @attribute previous
+         * @type string
+         */
+        previous: {
+          type: String,
+          value: '<'
+        },
+
+        /**
+         * The `next` attribute specifies the label
+         * for the Next button
+         *
+         * @attribute next
+         * @type string
+         */
+        next: {
+          type: String,
+          value: '>'
+        },
+
+        showFirst: {
+          type: Boolean,
+          value: true
+        },
+
+        showLast: {
+          type:Boolean,
+          value: true
+        },
+
+        disableNext: {
+          type: String,
+          computed: '_disableNextBtn(currentPage, totalPage)'
+        },
+
+        disablePrev: {
+          type: String,
+          computed: '_disablePrevBtn(currentPage, totalPage)'
+        }
+
+      },
+
+      observers: [
+        '_totalCountChanged(totalCount)',
+        '_currentPageChanged(currentPage)'
+      ],
+
+      /**
+       * Disable prev buttom if currentpage page is 0
+       *
+       * @param {string} currentpage
+       * @method _disablePrevBtn
+       *
+       */
+      _disablePrevBtn: function(currentPage) {
+        return currentPage === 0 ? 'disabled' : '';
+      },
+
+      /**
+       * Disable next buttom if currentpage page is equal pagecount
+       *
+       * @param {string} currentpage
+       * @method _disableNextBtn
+       *
+       */
+      _disableNextBtn: function(currentPage, totalPage) {
+        return currentPage === totalPage ? 'disabled' : '';
+      },
+
+      /**
+       * Navigate to the first page
+       * @method firstPage
+       */
+      firstPage: function () {
+        this.currentPage = 1;
+      },
+
+      /**
+       * Navigate to the last page
+       * @method lastPage
+       */
+      lastPage: function () {
+        this.currentPage = this.totalPage;
+      },
+
+      /**
+       * Navigate to the previous page
+       *
+       * @method prevPage
+       */
+      prevPage: function () {
+        if(this.currentPage > 1) {
+          this.currentPage--;
+          this.fire('pager-previous', { page: this.currentPage });
+        }
+      },
+
+      /**
+       * Navigate to the next page
+       *
+       * @method nextPage
+       */
+      nextPage: function () {
+        if (this.currentPage < this.totalPage) {
+          this.currentPage++;
+          this.fire('pager-next', { page: this.currentPage });
+        }
+      },
+
+      /**
+       * Get total pages
+       *
+       * @method getPageCount
+       */
+      setTotalPage: function () {
+        var totalPage = Math.ceil( this.totalCount / this.perPage ) - 1;
+        this.totalPage = totalPage >= 0 ? totalPage : 0;
+      },
+
+      /**
+       * Called when the current page changes
+       *
+       * @event pager-change
+       */
+      _currentPageChanged: function (currentPage) {
+        this.fire('pager-change', {
+          page: currentPage,
+          limit: this.perPage
+        });
+      },
+
+      /**
+       * total count가 변경될 때 total page와 current page를 다시 계산하여 설정한다.
+       */
+      _totalCountChanged: function(totalCount) {
+        this.setTotalPage();
+        this.currentPage = 1;
+      }
+
+    });
+
+  </script>
+
+</dom-module>

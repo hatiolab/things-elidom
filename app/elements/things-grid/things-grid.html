@@ -24,7 +24,7 @@ Example:
 				display: block;
 				height: 100%;
 				width: 100%;
-				padding: 10px 0px 10px 0px;
+				padding: 10px 0px 0px 0px;
 			}
 		</style>
 	
@@ -49,8 +49,18 @@ Example:
 				},
 
 				/**
-				 * [fields description]
-				 * @type {Object}
+				 * total record count
+				 * @type number
+				 */
+				totalCount: {
+					type: Number,
+					value: 0,
+					notify: true
+				},
+
+				/**
+				 * grid data fields
+				 * @type Array
 				 */
 				fields: {
 					type: Array,
@@ -58,7 +68,7 @@ Example:
 				},
 
 				/**
-				 * [columns description]
+				 * grid view column
 				 * @type {Object}
 				 */
 				columns: {
@@ -66,20 +76,36 @@ Example:
 					observer: 'setColumns'
 				},
 
+				/**
+				 * grid header menus
+				 * @type Array
+				 */
+				headerMenus: {
+					type: Array
+				},
+
+				/**
+				 * loaded data
+				 * @type Array
+				 */
 				input: {
 					type: Array,
 					observer: 'loadData'
 				},
 
-				headerMenu: {
-					type: Array
-				},
-
+				/**
+				 * data list for save (new, updated, deleted)
+				 * @type Array
+				 */
 				output: {
 					type: Array,
 					notify: true
 				},
 
+				/**
+				 * grid data set
+				 * @type Object
+				 */
 				dataSet: {
 					type: Object,
 					value: function() {
@@ -87,6 +113,10 @@ Example:
 					}
 				},
 
+				/**
+				 * dataludi grid
+				 * @type Object
+				 */
 				grid: {
 					type: Object
 				},
@@ -109,8 +139,6 @@ Example:
 			},
 
 			onIronResize: function(e) {
-				console.log('Parent Node width : ' + this.parentNode.offsetWidth + ', hegith: ' + this.parentNode.offsetHeight);
-
 				if(this.parentNode.offsetWidth > 0 && this.grid == null) {
 					this.grid = DataLudi.createGridView('gridContainer', null, false);
 					this.grid.setDataSource(this.dataSet);
@@ -163,8 +191,7 @@ Example:
 
 			setColumns: function(columns) {
 				if(columns && columns.length > 0 && this.grid) {
-					var cols= [];
-					var detail = {
+					var cols = [ {
 						'name': 'Detail',
 						'width': '25',
 						'imageList': 'images',
@@ -179,11 +206,9 @@ Example:
 						'header': {
 							'text': ' '
 						}
-					};
-					columns.forEach(function(item){
-						cols.push(item);
-					});
-					cols.unshift(detail);
+					} ];
+
+					columns.forEach(function(item) { cols.push(item); });
 					this.grid.setColumns(cols);
 					this.grid.resetSize();
 					// this.grid.orderByFields (['ID'],DataLudi.SortDirection.DESCENDING);
@@ -192,13 +217,15 @@ Example:
 
 			loadData: function(input) {
 				if(this.dataSet) {
-					this.dataSet.setRows(input);
+					this.totalCount = input.total;
+					this.dataSet.setRows(input.items);
 					this.output = input;
 				}
 			},
-			registerGridEvent:function(){
+
+			registerGridEvent: function() {
 				var me = this;
-				//on data clicked
+
 				this.grid.onDataCellClicked = function (grid, indexObject) {
 					if (indexObject && indexObject.dataColumn() && indexObject.getDataIndex(grid) >= 0) {
 						var rowIndex = indexObject.getDataIndex(grid);
@@ -206,17 +233,16 @@ Example:
 						me.onCellClicked(rowIndex,colIndex,indexObject);
 					}
 				};
-				//
 			},
+
 			/**
-			 * [onCellClicked description]
+			 * grid cell click handler
 			 * @event on-detail-clicked
 			 */
-			onCellClicked:function(rowIndex,colIndex,indexObject){
-				console.log('onCellClicked');
-				if(indexObject.dataField()<0){
+			onCellClicked: function(rowIndex,colIndex,indexObject) {
+				if(indexObject.dataField() < 0) {
 					this.onDetailClicked();
-				}else{
+				} else {
 					this.selectedCellData = this.dataSet.getValue(rowIndex,colIndex);
 				}
 				
@@ -225,12 +251,13 @@ Example:
 					this.selectedRowData = row.getRowObject();
 				}
 			},
+
 			/**
 			 * on-detail-clicked when data in detail column clicked fire this event
 			 * @event on-detail-clicked
 			 */
-			onDetailClicked:function(){
-				this.fire('on-detail-clicked',this.selectedRowData);
+			onDetailClicked: function() {
+				this.fire('on-detail-clicked', this.selectedRowData);
 			}
 
 		});
