@@ -12,8 +12,8 @@
 <link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
 
-<link rel="import" href="../things-spinner/things-spinner-behavior.html">
-<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
+<link rel="import" href="./things-form-behavior.html">
+
 <!--
 A things login form asking for login and password.
 
@@ -24,6 +24,7 @@ Example:
 
 @demo demo/index.html
 -->
+
 <dom-module id="things-search-form">
   <template>
     <style is="custom-style" include="iron-flex iron-flex-alignment">
@@ -70,12 +71,12 @@ Example:
 
     </style>
 
-    <paper-material elevation="1" class="flex" on-keypress="_keypressHandler">
+    <paper-material elevation="1" class="flex" on-keypress="_keyPressHandler">
       <paper-toolbar>
         <paper-icon-button icon="menu"></paper-icon-button>
         <span class="title">{{title}}</span>
-        <paper-icon-button icon="search" id="searchBtn" on-click="_searchHandler"></paper-icon-button>
-        <paper-icon-button icon="refresh" id="resetBtn" on-click="_resetHandler"></paper-icon-button>
+        <paper-icon-button icon="search" id="searchBtn" on-click="_submitForm"></paper-icon-button>
+        <paper-icon-button icon="refresh" id="resetBtn" on-click="_resetForm"></paper-icon-button>
         <paper-tooltip for="searchBtn" offset="0">Search</paper-tooltip>
         <paper-tooltip for="resetBtn" offset="0">Reset</paper-tooltip>
       </paper-toolbar>
@@ -100,194 +101,45 @@ Example:
 
   <script>
   Polymer({
+
     is: 'things-search-form',
       
-      properties: {
-        searchFields: {
-          type: Array,
-          observer: '_searchFieldsChange'
-        },
-
-        action: {
-          type: String
-        },
-
-        method: String,
-
-        contentType: String,
-
-        output: {
-          type: Object,
-          notify: true
-        }
-      },
-
-      detached: function() {
-        // TODO Remove All Child Elements
-      },
-
-      behaviors: [
-        'IronFormElementBehavior',
-        ThingsSpinnerBehavior,
-        ThingsMsgBoxBehavior
-      ],
-
-      listeners : {
-        'iron-form-response' :'_successResponse',
-        'iron-form-error' : '_failureResponse'
-      },
-
-      _searchFieldsChange: function() {
-        this._createTemplate();
-      },
-
-      /**
-       * [_createTemplate description]
-       * @return {[type]} [description]
-       */
-      _createTemplate: function() {
-
-        for(index in this.searchFields) {
-
-          var field = this.searchFields[index];
-          var newElement = null;
-
-          switch(field.type) {
-            case 'checkbox':
-              newElement = document.createElement('paper-checkbox');
-              newElement = this._setAttr(newElement, field);
-              newElement.$.checkboxLabel.innerHTML = field.label;
-              break;
-
-            case 'button':
-              newElement = document.createElement('paper-button');
-              newElement = this._setAttr(newElement, field);
-              newElement.innerHTML = field.label;
-              break;
-
-            case 'listbox':
-              newElement = this._makeListBox(field.options);
-              newElement = this._setAttr(newElement, field);
-              break;
-
-            case 'code-combo':
-              newElement = document.createElement('things-code-selector');
-              newElement.setAttribute('name', field.name);
-              newElement.setAttribute('label', field.label);
-              newElement.setAttribute('code-name', field.codeName);
-              newElement.setAttribute('label-path', 'description');
-              newElement.setAttribute('value-path', 'name');
-              break;
-
-            case 'radio':
-              newElement = document.createElement('paper-radio-group');
-              newElement = this._setAttr(newElement, field);
-
-              for(index in field.child) {
-                child = field[index];
-                newChild = document.createElement('paper-radio-button');
-                newChild = this._setAttr(newChild, field);
-                newElement.appendChild(newChild);
-              }
-              break;
-
-            case 'textarea':
-              newElement = document.createElement('paper-textarea');
-              newElement = this._setAttr(newElement, field)
-              break;
-
-            default:
-              newElement = document.createElement('paper-input');
-              newElement = this._setAttr(newElement, field)
-          }
-          
-          // newElement.setAttribute('tabindex',index);
-          newElement.setAttribute('class','flex style-scope things-form');
-
-          if((index % 2) == 0) {
-            this.$.leftFields.appendChild(newElement);
-          } else {
-            this.$.rightFields.appendChild(newElement);
-          }
-
-          newElement = null;
-          newChild = null;
-        }
-      },
-
-      _makeListBox: function(items) {
-        var listbox = document.createElement('paper-listbox');
-        listbox.setAttribute('selected','0');
-        
-        for(index in items) {
-          option = items[index];
-          item = document.createElement('paper-item');
-          item.innerHTML = option;
-          listbox.appendChild(item);
-        }
-
-        return listbox;
-      },
-
-      /**
-       * [_setAttr description]
-       * @param {[type]} element [description]
-       * @param {[type]} attrs   [description]
-       */
-      _setAttr: function(element, attrs) {
-          for(attr in attrs) {
-              element.setAttribute(attr, attrs[attr]);
-          }
-
-          return element;
-      },
-
-      _searchHandler: function() {
-        this.startSpinner();
-
-        if(this.getAttribute('on-submit')) {
-          this.fire('submit', this.serialize());
-        } else {
-          this.$.searchForm.submit();
-        }
-      },
-
-      _resetHandler: function() {
-        searchForm.reset();
-      },
-      
-      _keypressHandler: function(event, detail, sender) {
-        var code = event.keyCode;
-        if(code == 13) {
-          this._searchHandler(event);
-        }
-      },
-      
-      _successResponse: function(event) {
-        this.stopSpinner();
-
-        this.output = event.detail.xhr.response;
-        if(this.rootProperty) this.output = this.output[this.rootProperty];
-        this.fire('response', this.output);
-      },
-
-      _failureResponse: function(event) {
-        this.stopSpinner();
-
-        var response = event.detail.request.xhr.response;
-        if(response.status == 401) {
-          this.handleUnauthorized();
-        } else {
-          this.openResponseError(response);
-        }
-
-        this.fire('error', event.detail.request.xhr.response);
-      },
-      
-      serialize: function() {
-        return this.$.searchForm.serialize();
+    properties: {
+      searchFields: {
+        type: Array,
+        observer: '_searchFieldsChange'
       }
+    },
 
+    detached: function() {
+      // TODO Remove All Child Elements
+    },
+
+    behaviors: [ ThingsFormBehavior ],
+
+    /**
+     * search fields 값 변경시 form element 구성
+     */
+    _searchFieldsChange: function() {
+      this._createTemplate();
+    },
+
+    /**
+     * [_createTemplate description]
+     * @return {[type]} [description]
+     */
+    _createTemplate: function() {
+      for(index in this.searchFields) {
+        var field = this.searchFields[index];
+        var newElement = this._generateElement(field);
+
+        if((index % 2) == 0) {
+          this.$.leftFields.appendChild(newElement);
+        } else {
+          this.$.rightFields.appendChild(newElement);
+        }
+      }
+    }
   });
   </script>
 </dom-module>

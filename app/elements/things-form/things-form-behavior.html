@@ -13,52 +13,64 @@
 <link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
 
 <script>
+
 /**
-var ThingsFormBehavior is to generate forms for thing framework
-@demo demo/index.html
-@polymerBehavior
-*/
-var ThingsFormBehavior = {
+ * var ThingsFormBehavior is to generate forms for thing framework
+ *
+ * @demo demo/index.html
+ * @polymerBehavior
+ */
+var ThingsFormBehaviorImpl = {
+
 	properties: {
-		view:{
-			type :Array,
-			observer : '_viewChange'
+		view: {
+			type: Array,
+			observer: '_viewChange'
 		},
-		action:{
-		type:String
+
+		action: {
+			type: String
 		},
-		method:String,
-		contentType:String,
-		output:{
-		type:Object,
-		notify:true
+
+		method: String,
+
+		contentType: String,
+		
+		output: {
+			type: Object,
+			notify: true
 		}
 	},
-	// Event listener
+
 	listeners : {
-		'iron-form-response' :'_successResponse',
-		'iron-form-error' : '_failureResponse'
+		'iron-form-response' :'_successSubmitResponse',
+		'iron-form-error' : '_failureSubmitResponse'
 	},
+
 	/**
 	 * create template use view data from attribute
 	 */
-	_generateElement :function(element){
-		var newElement;
+	_generateElement: function(element) {
+		var newElement = null;
+
 		switch(element.type) {
 			case 'checkbox':
 				newElement = document.createElement('paper-checkbox');
 				newElement = this._setAttr(newElement, element);
 				newElement.$.checkboxLabel.innerHTML = element.label;
 				break;
+
 			case 'button':
 				newElement = document.createElement('paper-button');
 				newElement = this._setAttr(newElement, element);
 				newElement.innerHTML =element.label;
 				break;
+
 			case 'listbox':
 				newElement = this._makeListBox(element.options);
 				newElement = this._setAttr(newElement, element);
 				break;
+
 			case 'dropdown':
 				newElement = document.createElement('paper-dropdown-menu');
 				newElement = this._setAttr(newElement, element);
@@ -66,72 +78,159 @@ var ThingsFormBehavior = {
 				newChild.setAttribute('class','dropdown-content');
 				newElement.appendChild(newChild);
 				break;
+
 			case 'radio':
 				newElement = document.createElement('paper-radio-group');
 				newElement = this._setAttr(newElement, element);
-				for(index in element.child){
-				child = element[index];
-				newChild = document.createElement('paper-radio-button');
-				newChild = this._setAttr(newChild, child);
-				newElement.appendChild(newChild);
+				for(index in element.child) {
+					child = element[index];
+					newChild = document.createElement('paper-radio-button');
+					newChild = this._setAttr(newChild, child);
+					newElement.appendChild(newChild);
 				}
 				break;
+
 			case 'textarea':
 				newElement = document.createElement('paper-textarea');
 				newElement = this._setAttr(newElement, element)
 				break;
+
+			case 'code-combo':
+				newElement = document.createElement('things-code-selector');
+				newElement.setAttribute('name', element.name);
+				newElement.setAttribute('label', element.label);
+				newElement.setAttribute('code-name', element.codeName);
+				newElement.setAttribute('label-path', 'description');
+				newElement.setAttribute('value-path', 'name');
+				break;
+
+			case 'date':
+				break;
+
+			case 'datetime':
+				break;
+
 			default:
 				newElement = document.createElement('paper-input');
 				newElement = this._setAttr(newElement, element);
 		}
+
 		newElement.setAttribute('class','flex style-scope things-form');
 		return newElement;
 	},
+
 	/**
 	 * list box creation
+	 *
 	 * @param{[Array]} items Listbox values
 	 * @return {[paper list box]} 
 	 */
-	_makeListBox:function(items){
+	_makeListBox:function(items) {
 		var listbox = document.createElement('paper-listbox');
 		listbox.setAttribute('selected','0');
-		for(index in items){
+		
+		for(index in items) {
 			option = items[index];
 			item = document.createElement('paper-item');
 			item.innerHTML = option;
 			listbox.appendChild(item);
 		}
+
 		return listbox;
 	},
+
 	/**
 	 * set element's attributes
 	 */
-	_setAttr:function(element, attrs){
-		for(attr in attrs){
-			element.setAttribute(attr,attrs[attr]);
+	_setAttr: function(element, attrs) {
+		for(attr in attrs) {
+			element.setAttribute(attr, attrs[attr]);
 		}
+
 		return element;
 	},
+
+	/**
+	 * find form
+	 */
+	_getForm: function() {
+		return this.querySelector('form');
+	},
+
+	/**
+	 * reset form
+	 */
+	_resetForm: function() {
+		this._getForm().reset();
+	},
+
+	/**
+	 * submit form
+	 */
+	_submitForm: function() {
+		this.startSpinner();
+
+		if(this.getAttribute('on-submit')) {
+			this.fire('submit', this._serializeForm());
+		} else {
+			this._getForm().submit();
+		}
+	},
+
+	/**
+	 * serialize form
+	 */
+	_serializeForm: function() {
+		return this._getForm().serialize();
+	},
+
+	/**
+	 * key event - enter key이면 submit form
+	 */
+	_keyPressHandler: function(event, detail, sender) {
+		var code = event.keyCode;
+		if(code == 13) {
+			this._submitForm(event);
+		}
+	},	
+
 	/**
 	 * When form success call this function
 	 */
-	_successResponse: function(event){
-		this.output=event.detail.xhr.response;
-		if(this.rootProperty) this.output = this.output[this.rootProperty];
+	_successSubmitResponse: function(event) {
+		this.stopSpinner();
+
+		if(this.rootProperty) { 
+			this.output = event.detail.xhr.response[this.rootProperty]; 
+		} {
+			this.output = event.detail.xhr.response;
+		}
+		
 		this.fire('response', this.output);
 	},
+
 	/**
 	 * When form failure call this function
 	 */
-	_failureResponse: function(event){
-		var response= event.detail.request.xhr.response;
-		if(response.status==401){
-			this.showToast('Confidential failure.');
-		}else{
-			this.showToast('Error Code:'+response.code+
-			'Error Massage:'+response.msg+'with Status Code:'+response.status);
+	_failureSubmitResponse: function(event) {
+		this.stopSpinner();
+
+		var response = event.detail.request.xhr.response;
+		if(response.status == 401) {
+			this.handleUnauthorized();
+		} else {
+			this.openResponseError(response);
 		}
-		this.fire('error', event.detail.request.xhr.response);
+
+		this.fire('error', response);
 	}
 };
+
+var ThingsFormBehavior = [
+	'IronFormElementBehavior', 
+	ThingsFormBehaviorImpl, 
+	ThingsSpinnerBehavior, 
+	ThingsMsgBoxBehavior 
+];
+
 </script>
