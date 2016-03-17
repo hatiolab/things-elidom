@@ -157,16 +157,23 @@ Example:
 			},
 			
 			_onSelectedRowChange: function() {
+				console.log(this.selectedRow);
 				if(this.selectedRow) {
-					var keys = Object.keys(this.selectedRow);
+					var view = [];
 
-					console.log(keys);
-					// for(index in keys) {
-					// 	var element.name = keys[index];
-					// 	element.label = keys[index].charAt(0).toUpperCase() + string.slice(1);
-					// 	var data = selectedRow[keys[index]];
-					// 	element.type = typeof data;
-					// }
+					var keys = Object.keys(this.selectedRow);
+					for(index in keys) {
+						var element = {};
+						element.name = keys[index];
+						console.log(element);
+						element.label = keys[index].charAt(0).toUpperCase() + keys[index].slice(1);
+						var data = this.selectedRow[keys[index]];
+						element.type = typeof data;
+						console.log(element);
+						view.push(element);
+					}
+					console.log(view);
+
 				}
 			},
 

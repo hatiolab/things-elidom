@@ -122,11 +122,11 @@ Example:
 					});
 					
 					if(this.fields && this.fields.length > 0) {
-						this.dataSet.setFields(this.fields);
+						this.setFields(this.fields);
 					}
 
 					if(this.columns && this.columns.length > 0) {
-						this.grid.setColumns(this.columns);
+						this.setColumns(this.columns);
 					}
 
 					//register grid event here
@@ -198,11 +198,11 @@ Example:
 			registerGridEvent:function(){
 				var me = this;
 				//on data clicked
-				this.grid.onDataCellClicked = function (grid, index) {
-					if (index && index.dataColumn() && index.getDataIndex(grid) >= 0) {
-						var rowIndex = index.getDataIndex(grid);
-						var colIndex = index.dataField();
-						me.onCellClicked(rowIndex,colIndex);
+				this.grid.onDataCellClicked = function (grid, indexObject) {
+					if (indexObject && indexObject.dataColumn() && indexObject.getDataIndex(grid) >= 0) {
+						var rowIndex = indexObject.getDataIndex(grid);
+						var colIndex = indexObject.dataField();
+						me.onCellClicked(rowIndex,colIndex,indexObject);
 					}
 				};
 				//
@@ -211,9 +211,9 @@ Example:
 			 * [onCellClicked description]
 			 * @event on-detail-clicked
 			 */
-			onCellClicked:function(rowIndex,colIndex){
+			onCellClicked:function(rowIndex,colIndex,indexObject){
 				console.log('onCellClicked');
-				if(index.dataField()<0){
+				if(indexObject.dataField()<0){
 					this.onDetailClicked();
 				}else{
 					this.selectedCellData = this.dataSet.getValue(rowIndex,colIndex);
