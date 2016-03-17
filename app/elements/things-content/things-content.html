@@ -43,12 +43,12 @@ Example:
 			<things-resource 
 				auto
 				action="[[searchFieldUrl]]" 
-				output-data="{{searchFields}}">
+				output-data="{{searchFormFields}}">
 			</things-resource>
 
 			<things-search-form 
 				title="[[title]]"
-				search-fields ="[[searchFields]]" 
+				form-fields ="[[searchFormFields]]" 
 				action="{{searchDataUrl}}" 
 				method="GET"
 				content-type="application/json"
@@ -80,7 +80,7 @@ Example:
 
 			<things-resource-form 
 				id="dialog"
-				view="{{resView}}" 
+				form-fields="{{resourceFormFields}}" 
 				input="{{selectedRow}}">
 			</things-resource-form>
 
