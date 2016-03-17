@@ -25,6 +25,18 @@
       Polymer({
         is: 'things-date-picker',
 
+        properties: {
+          locale: {
+            type: String,
+            notify: true
+          },
+
+          readFormat: {
+            type: String,
+            notify: true
+          }          
+        },
+
         showDatePicker: function() {
           this.$.dateDialog.toggle();  
         },
@@ -32,7 +44,9 @@
         selectDate: function() {
           // http://momentjs.com/
           //this.selectedDate = moment(this.date).locale('zh-cn').format('LL');
-          this.selectedDate = moment(this.date).locale('ko').format('LL');
+          var locale = this.locale ? this.locale : 'en';
+          var format = this.readFormat ? this.readFormat : 'LL';
+          this.selectedDate = moment(this.date).locale(locale).format(format);
         }
 
       })
