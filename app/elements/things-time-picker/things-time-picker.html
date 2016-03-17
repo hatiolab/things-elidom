@@ -1,0 +1,40 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+
+<link rel="import" href="../../../bower_components/paper-time-picker/paper-time-picker.html">
+<link rel="import" href="../../../bower_components/paper-time-picker/paper-time-picker-dialog-style.html">
+
+
+<dom-module id="things-time-picker">
+	<template>
+      
+      <input type="text" value="{{selectedTime}}" disabled=true>
+      <paper-icon-button class="Navigation-icon" icon="info" on-tap="showTimePicker"></paper-icon-button>
+      <paper-dialog id="timeDialog" modal class="paper-time-picker-dialog">
+        <paper-time-picker id="timePicker" time="{{time}}"></paper-time-picker>
+        <div class="buttons">
+          <paper-button raised dialog-confirm on-tap="selectTime">Select</paper-button>
+          <paper-button raised dialog-dismiss>Cancel</paper-button>
+        </div>
+      </paper-dialog>
+
+  </template>
+
+  <script type='text/javascript'>
+  	(function() {
+      Polymer({
+        is: 'things-time-picker',
+
+        showTimePicker: function() {
+          this.$.timeDialog.toggle();
+        },
+
+        selectTime: function() {
+          this.selectedTime = this.time;
+        } 
+
+      })
+  	})();
+  </script>
+</dom-module>
