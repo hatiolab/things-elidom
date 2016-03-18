@@ -1,0 +1,295 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../../bower_components/iron-iconset/iron-iconset.html">
+<link rel="import" href="../../../bower_components/iron-iconset-svg/iron-iconset-svg.html">
+<link rel="import" href="../../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
+
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../../bower_components/paper-fullscreen-dialog/paper-fullscreen-dialog.html">
+
+<link rel="import" href="./things-std-form-behavior.html">
+
+<!--
+A comment describing this element
+
+	Example:
+
+		<things-std-resource-form></things-std-resource-form>
+
+	Example:
+
+		<things-resource-form>
+	  	<h2>Hello my-elem</h2>
+		</things-resource-form>
+
+@demo ./things-form/demo/index.html
+-->
+
+<dom-module id="things-std-resource-form">
+	<template>
+		<style is="custom-style" include="iron-flex iron-flex-alignment">
+		<style>
+			:host {
+				display: block;
+				box-sizing: border-box;
+				/*text-align: center;*/
+				/*margin: 100px auto;*/
+				height: 90%;
+				width: 90%;
+			}
+
+			:host .resourceForm {
+				padding: 10px 15px 10px 15px;
+			}
+
+			:host .fields {
+				padding: 10px;
+			}
+		</style>
+
+		<paper-fullscreen-dialog
+			id="resourceDialog"
+			modal="true"
+			dismiss-icon="close">
+
+			<h2>{{title}}</h2>
+			
+			<!--paper-button affirmative dialog-confirm on-tap="saveResourceForm">Save</paper-button-->
+			
+			<form
+					is="iron-form" 
+					id="resourceForm" 
+					class="resourceForm"
+					action=[[action]]
+					headers="[[headers]]"
+					content-type="application/json"
+					method="[[method]]"
+					last-response ="{{output}}">
+				<div class="layout horizontal flex" >
+					<div id="leftFields" class="layout vertical flex fields"></div>
+					<div id="rightFields" class="layout vertical flex fields"></div>
+				</div>
+			</form>
+
+			<paper-toolbar>
+				<div class="bottom fit">
+				<paper-button affirmative dialog-confirm on-tap="saveResourceForm">Save</paper-button>
+				</div>
+			</paper-toolbar>			
+		</paper-fullscreen-dialog>
+
+		<things-resource 
+			id="member-resource"
+			action="{{getResourceUrl}}" 
+			method="get"
+			output-data="{{resource}}">
+		</things-resource>
+
+	</template>
+
+	<script>
+		Polymer({
+			is: 'things-std-resource-form',
+			
+			properties: {
+				title: {
+					type: String
+				},
+
+				getResourceUrl: {
+					type: String
+				},
+
+				saveResourceUrl: {
+					type: String
+				},
+
+				resource: {
+					type: Object,
+					observer: 'resourceChanged'
+				},
+
+				removeColumnsOnSave: {
+					type: Array,
+					value: ['creator', 'updater', 'creator_id', 'updater_id', 'created_at', 'updated_at']
+				}
+			},
+
+			/**
+			 * view atrribute observer, add view to form
+			 */
+			buildFormView: function() {
+				for(index in this.formFields) {
+					var field = this.formFields[index];
+					var newElement = this._generateElement(field);
+
+					if((index % 2) == 0) {
+						this.$.leftFields.appendChild(newElement);
+					} else {
+						this.$.rightFields.appendChild(newElement);
+					}
+				}
+			},
+
+			behaviors: [
+				Things.FormBehavior,
+				Polymer.IronResizableBehavior
+			],
+
+			listeners : {
+				'iron-form-presubmit' :'preSubmitHandler',
+				'resourceDialog.iron-overlay-closed': 'clearResourceForm',
+				'resourceDialog.iron-overlay-canceled': 'clearResourceForm',
+				'resourceDialog.iron-overlay-opened': 'onOpenResourceForm',
+				'iron-resize': 'onIronResize',
+				'member-resource.response' : 'onSuccessSave'
+			},
+
+			/**
+			 * resize handler 
+			 */
+			onIronResize: function() {
+				this._getForm().style.width = this.parentNode.offsetWidth + 'px';
+			},
+
+			/**
+			 * save data from resource detail screen
+			 */
+			saveResourceForm: function() {
+				var resourceSetter = this.$['member-resource'];
+				var originalAction = resourceSetter.action;
+				var originalContentType = resourceSetter.contentType;
+
+				if(this.resource.id) {
+					resourceSetter.action = resourceSetter.action.replace(':id', this.resource.id);
+					resourceSetter.method ='PUT';
+				} else {
+					resourceSetter.action = resourceSetter.action.replace('/:id', '');
+					resourceSetter.method ='POST';
+				}
+
+				var params = this._serializeForm();
+				params = this.filterResourceColumns(params);
+				resourceSetter.params = params;
+				resourceSetter.contentType = 'application/json';
+				resourceSetter.generateRequest();
+				resourceSetter.action = originalAction;
+				resourceSetter.contentType = originalContentType;
+			},
+
+			/**
+			 * after resource opened
+			 */
+			onOpenResourceForm: function(e) {
+				if(e.srcElement.id == 'resourceDialog') {
+					this.$.resourceDialog.refit();
+					this.fire('resource-form-opened', this.$.resourceForm, this.$.resourceDialog);
+				}
+			},
+
+			/**
+			 * open resource form dialog
+			 */
+			openResourceForm: function(e) {
+				var data = e.detail;
+
+				if(this.$.leftFields.childNodes.length == 0) {
+					this.buildFormView();
+				}
+
+				this.findResource(data.id);
+				this.$.resourceDialog.toggle();
+			},
+
+			/**
+			 * find resource - ajax
+			 */
+			findResource: function(resourceId) {
+				var resourceGetter = this.$['member-resource'];
+				var originalAction = resourceGetter.action;
+				resourceGetter.method = 'GET';
+				resourceGetter.action = resourceGetter.action.replace(':id', resourceId);
+				resourceGetter.generateRequest();
+				resourceGetter.action = originalAction;
+			},
+
+			/**
+			 * action after resource changed
+			 */
+			resourceChanged: function(resource) {
+				this._bindData(this.$.leftFields.childNodes, resource);
+				this._bindData(this.$.rightFields.childNodes, resource);
+			},
+
+			/**
+			 * data binding...
+			 */
+			_bindData: function(elements, resource) {
+				for(var i = 0 ; i < elements.length ; i++) {
+					elements[i].value = resource[elements[i].name];
+				}
+			},
+
+			/**
+			 * clear resource form
+			 */
+			clearResourceForm: function(e) {
+				if(e.srcElement.id == 'resourceDialog') {
+					var i = 0;
+
+					while(this.$.leftFields.childNodes.length > 0 ||this.$.rightFields.childNodes.length > 0) {
+						if(this.$.leftFields.childNodes[0])
+							this.$.leftFields.removeChild(this.$.leftFields.childNodes[0]);
+
+						if(this.$.rightFields.childNodes[0])
+							this.$.rightFields.removeChild(this.$.rightFields.childNodes[0]);
+					}
+				}
+			},
+
+			/**
+			 * save 전에 저장에 불필요한 컬럼들을 필터링한다.
+			 */
+			filterResourceColumns: function(params) {
+				for(var name in params) {
+					if(this.removeColumnsOnSave.includes(name)) {
+						delete params[name];
+					} else {
+						var value = params[name];
+						if(typeof(value) === 'undefined') {
+							delete params[name];
+						}
+					}
+				}
+
+				return params;
+			},
+
+			/**
+			 * After success save
+			 */
+			onSuccessSave: function(e) {
+				if(e.srcElement.method.toUpperCase() != 'GET') {
+					this.fire('resource-saved', true);
+				}
+			}
+
+		});
+	</script>
+
+</dom-module>

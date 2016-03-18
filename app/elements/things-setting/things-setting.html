@@ -25,7 +25,7 @@
       Polymer({
         is: 'things-setting',
 
-        behaviors: [ThingsGlobalBehavior],
+        behaviors: [Things.GlobalBehavior],
 
         onBaseUrlEmpty: function() {
           this.showToast('Base URL should not be empty.');
