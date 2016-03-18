@@ -15,15 +15,15 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
 
-  <title>things-setting demo</title>
+  <title>things-spinner demo</title>
 
   <script src="../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
 
   <link rel="import" href="../../../bower_components/polymer/polymer.html">
-  <link rel="import" href="../../../bower_components/paper-material/paper-material.html">
   <link rel="import" href="../../things-button/things-button.html">
-  <link rel="import" href="../../things-setting/things-setting.html">
-
+  <link rel="import" href="../../things-spinner/things-spinner.html">
+  <link rel="import" href="../../things-spinner/things-spinner-behavior.html">
+  
   <link rel="stylesheet" href="../../../bower_components/paper-styles/demo.css">
 
   <style is="custom-style">
@@ -63,39 +63,25 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 </head>
 <body unresolved>
 
-  <template is="dom-bind">
-    <section onclick="clickSetting(event)">
+  <template is="dom-bind" id="app">
+    <section onclick="clickSpinner(event)">
 
-      <h3>Setting</h3>
+      <h3>Spinner</h3>
 
       <paper-material class="Page-paper" elevation="1">
-        <things-setting id="setting"></things-setting>
-
         <div class="buttons">
-          <things-button color="green" target-id="setting">Setting</things-button>
-        </div>
+          <things-button color="green" id="spn-button">Spinner</things-button>
+        </div>      
       </paper-material>
 
     </section>
+
+    <things-spinner id="spinner" loading=false></things-spinner>
   </template>
 
   <script>
-    function clickSetting(e) {
-      var button = e.target;
-      while (!button.hasAttribute('target-id') && button !== document.body) {
-        button = button.parentElement;
-      }
-
-      if (!button.hasAttribute('target-id')) {
-        return;
-      }
-
-      var id = button.getAttribute('target-id');
-      var dialog = document.getElementById(id);
-
-      if (dialog) {
-        dialog.open();
-      }
+    function clickSpinner(e) {
+      Things.SpinnerBehavior.toggleSpinner();
     }
   </script>
 
