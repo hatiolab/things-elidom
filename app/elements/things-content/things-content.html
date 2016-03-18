@@ -48,6 +48,7 @@ Example:
 			</things-resource>
 
 			<things-search-form 
+				id="search-form"
 				class="flex"
 				title="[[title]]"
 				form-fields="[[searchFormFields]]" 
@@ -150,7 +151,8 @@ Example:
 			},
 
 			listeners : {
-				'grid.on-detail-clicked': '_showResourceForm'
+				'grid.on-detail-clicked': '_showResourceForm',
+				'grid.refresh-data':'_refreshGridData'
 			},			
 			
 			/**
@@ -158,8 +160,10 @@ Example:
 			 */
 			_showResourceForm: function(row) {
 				this.$['resource-form'].openResourceForm(row);
+			},
+			_refreshGridData:function(grid){
+				this.$['search-form']._getForm().submit();
 			}
-
 		});
 	</script>
 </dom-module>

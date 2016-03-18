@@ -217,7 +217,7 @@ Example:
 				'export-btn.tap' : 'onExport',
 				'add-btn.tap'    : 'onAdd',
 				'delete-btn.tap' : 'onDelete',
-				'save-btn.tap' :'onSave'
+				'save-btn.confirm' :'onSave'
 			},
 
 			/**
@@ -298,16 +298,13 @@ Example:
 
 				var deleted = this.dataSet.getStateRows('deleted');
 				for (var i = 0; i < deleted.length; i++) {
-					console.log(deleted[i]);
 					var object = this.dataSet.getRowObject(deleted[i]);
 					object.cud_flag_ = 'd';
 					data.push(object);
 				}
 				this.saveRequest = data;
-				console.log(this.saveRequest);
 				this.$.saveResource.generateRequest();
-				//TODO: ajax.object post
-				
+				this.fire('refresh-data',this.grid);
 			},
 
 			created: function() {
