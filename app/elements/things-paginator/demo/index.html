@@ -15,18 +15,27 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
 
-  <title>things-std-search-form demo</title>
+  <title>things-paginator demo</title>
 
   <script src="../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
   
   <link rel="import" href="../../../bower_components/polymer/polymer.html">
+  <link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
+  <link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
+  <link rel="import" href="../../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
 
   <link rel="import" href="../../things-resource/things-resource.html">
   <link rel="import" href="../../things-spinner/things-spinner.html">
   <link rel="import" href="../../things-setting/things-setting.html">
+  <link rel="import" href="../../things-setting/things-setting-dialog.html">
+  <link rel="import" href="../../things-setting/things-global-behavior.html">
   <link rel="import" href="../../things-button/things-button.html">
-  <link rel="import" href="../things-std-form-behavior.html">
-  <link rel="import" href="../things-std-search-form.html">
+  <link rel="import" href="../../things-form/things-std-form-behavior.html">
+  <link rel="import" href="../../things-form/things-std-search-form.html">
+  <link rel="import" href="../../things-spinner/things-spinner-behavior.html">
+  <link rel="import" href="../../things-msg-box/things-msgbox-behavior.html">
+
+  <link rel="import" href="../things-paginator.html">
 
   <link rel="stylesheet" href="../../../bower_components/paper-styles/demo.css">
 
@@ -61,14 +70,22 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
         max-height: 300px;
       };
     }
-
   </style>
 
 </head>
 <body unresolved>
 
-  <dom-module id="sample-search-form">
+  <dom-module id="sample-paginator">
     <template>
+      <style>
+        paper-toolbar.white {
+          --paper-toolbar-background: white;
+          --paper-toolbar-title: {
+            font-style: italic;
+            font-weight: bold;
+          };
+        } 
+      </style>
       <div>
         <things-resource 
           auto
@@ -90,6 +107,17 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
           root-property="items"
           items="{{items}}">
         </things-std-search-form>
+
+        <paper-toolbar class="white">
+          <div class="bottom fit">
+            <things-paginator 
+              per-page="{{limit}}" 
+              current-page="{{page}}" 
+              total-count="{{totalCount}}"
+              page-start-idx="{{pageStartIdx}}">
+            </things-paginator>
+          </div>
+        </paper-toolbar>
       </div>
 
       <div>
@@ -101,7 +129,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
     <script>
       Polymer({
 
-        is: 'sample-search-form',
+        is: 'sample-paginator',
 
         listeners: {
           'search-form.things-std-form-response': 'onItemsChanged'
@@ -135,7 +163,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 
       <h3>Dynamic Search Form</h3>
 
-      <sample-search-form></sample-search-form>
+      <sample-paginator></sample-paginator>
 
     </section>
   </template>

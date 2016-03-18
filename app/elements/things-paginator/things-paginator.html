@@ -117,7 +117,7 @@ Example:
         </template>
     </div>
 
-@demo
+@demo ./things-paginator/demo/index.html
 -->
 
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
@@ -261,7 +261,7 @@ Example:
          */
         perPage: {
           type: Number,
-          value: 10,
+          value: 50,
           nofity: true
         },
 
@@ -449,7 +449,7 @@ Example:
        * @method getPageCount
        */
       setTotalPage: function () {
-        var totalPage = Math.ceil( this.totalCount / this.perPage ) - 1;
+        var totalPage = Math.ceil( this.totalCount / this.perPage );
         this.totalPage = totalPage >= 0 ? totalPage : 0;
       },
 
