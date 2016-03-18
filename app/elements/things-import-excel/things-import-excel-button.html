@@ -87,7 +87,7 @@ Example:
 			ready: function() {},
 
 			attached: function() {
-				console.log(this.excel);
+				// console.log(this.excel);
 			},
 
 			detached: function() {},
@@ -245,8 +245,8 @@ Example:
 				var name = f.name;
 				var me = this;
 				reader.onload = function(e) {
-					if(typeof console !== 'undefined') 
-						console.log("onload", new Date(), rABS, use_worker);
+					// if(typeof console !== 'undefined') 
+					// 	console.log("onload", new Date(), rABS, use_worker);
 
 					var data = e.target.result;
 					if(use_worker) {
