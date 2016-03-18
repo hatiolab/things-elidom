@@ -6,29 +6,51 @@ var ThingsSpinnerBehavior = {
    * Start spinner
    */
   startSpinner: function() {
-    app.$.spinner.loading = true;
+    if(this.checkGlobalSpinner()) {
+      app.$.spinner.loading = true;
+    }
   },
 
   /**
    * Stop spinner
    */
   stopSpinner: function() {
-    app.$.spinner.loading = false;
+    if(this.checkGlobalSpinner()) {
+      app.$.spinner.loading = false;
+    }
   },
 
   /**
    * Spinner is running?
    */
   isLoadingSpinner: function() {
-    return app.$.spinner.loading;
+    if(this.checkGlobalSpinner()) {
+      return app.$.spinner.loading;
+    } else {
+      return false;
+    }
   },
 
   /**
    * Toggle spinner
    */
   toggleSpinner: function() {
-    app.$.spinner.loading = !app.$.spinner.loading;
-  }
+    if(this.checkGlobalSpinner()) {
+      app.$.spinner.loading = !app.$.spinner.loading;
+    }
+  },
 
+  /**
+   * check global spinner is exist
+   */
+  checkGlobalSpinner: function() {
+    if(typeof(app) !== 'undefined') {
+      return false;
+    }
+
+    return app.$.spinner;
+  }
 };
 </script>
+
+<link rel="import" href="./things-spinner.html">

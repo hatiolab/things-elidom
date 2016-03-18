@@ -1,28 +1,29 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../../bower_components/iron-input/iron-input.html">
-<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../../bower_components/iron-form/iron-form.html">
-<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/iron-form-element-behavior/iron-form-element-behavior.html">
+
+<link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
-<link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
 
 <link rel="import" href="../things-setting/things-global-behavior.html">
+<link rel="import" href="../things-spinner/things-spinner-behavior.html">
+<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
+<link rel="import" href="../things-combo/things-code-selector.html">
 <link rel="import" href="../things-date-picker/things-date-picker.html">
 <link rel="import" href="../things-date-picker/things-time-picker.html">
-<link rel="import" href="../things-combo/things-code-selector.html">
 
 <script>
 
 window.Things = window.Things || {};
 
 /**
- * var Things.FormBehavior is to generate forms for thing framework
+ * var Things.FormBehavior enables a custom element to be included in an things-search-form or things-resource-form
  *
  * @demo demo/index.html
  * @FormBehavior
@@ -46,23 +47,45 @@ Things.FormBehaviorImpl = {
      * @event error
      */
 
+    /**
+     * Form elements of the form.
+     * Custom Form element have to configure form elements dynamically.
+     * FormBehavior create form element by each of this attributes
+     */
 		formFields: {
 			type: Array,
 			observer: '_formFieldsChange'
 		},
 
+		/**
+		 * Action url of the form. 
+		 * This attribute is configured by base url of the global setting.
+		 */
 		action: {
 			type: String
 		},
 		
-		actionUrl:{
-			computed:'_computeActionUrl(globals.basicUrl,action)'
+		actionUrl: {
+			computed: '_computeActionUrl(globals.basicUrl,action)'
 		},
 
-		method: String,
+		/**
+		 * HTTP Method of the form submit.
+		 */
+		method: {
+			type: String
+		},
 
-		contentType: String,
+		/**
+		 * HTTP Content Type of the form submit.
+		 */
+		contentType: {
+			type: String
+		},
 		
+		/**
+		 * Response Data after form submit
+		 */
 		output: {
 			type: Object,
 			notify: true
@@ -70,22 +93,33 @@ Things.FormBehaviorImpl = {
 	},
 
 	listeners : {
-		'iron-form-response' :'_successSubmitResponse',
-		'iron-form-error' : '_failureSubmitResponse'
+		'iron-form-response' :'_onSuccessResponse',
+		'iron-form-error' : '_onErrorResponse'
 	},
 
-	_formFieldsChange: function(e) {
+  /**
+   * Handler after Form element changed.
+   * Child elements of the form is reconfigured by this function.
+   *
+   * @param {Array} formFields attribute
+   */
+	_formFieldsChange: function(formFields) {
 		this.buildFormView();
 	},
+
 	/**
 	 * compute action url for action
 	 */
 	_computeActionUrl: function(basicUrl, action) {
 		return basicUrl + '/' + action;
 	},
-	/**
-	 * create template use view data from attribute
-	 */
+	
+  /**
+   * Create child element of the form by one of the formFields object
+   *
+   * @param {Object} one of the formFields attribute
+   * @return {Object} created child element for the form
+   */	 
 	_generateElement: function(element) {
 		var newElement = null;
 
@@ -168,8 +202,8 @@ Things.FormBehaviorImpl = {
 	/**
 	 * list box creation
 	 *
-	 * @param{[Array]} items Listbox values
-	 * @return {[paper list box]} 
+	 * @param{Array} items Listbox values
+	 * @return {Object} paper-listbox element 
 	 */
 	_makeListBox: function(items) {
 		var listbox = document.createElement('paper-listbox');
@@ -186,7 +220,7 @@ Things.FormBehaviorImpl = {
 	},
 
 	/**
-	 * set element's attributes
+	 * Set element's attributes by one of formFields 
 	 */
 	_setAttr: function(element, attrs) {
 		for(attr in attrs) {
@@ -197,21 +231,23 @@ Things.FormBehaviorImpl = {
 	},
 
 	/**
-	 * find form
+	 * find form by querySelector and return found form
+	 * @return {Object}
 	 */
 	_getForm: function() {
 		return this.querySelector('form');
 	},
 
 	/**
-	 * reset form
+	 * Resets form
 	 */
 	_resetForm: function() {
 		this._getForm().reset();
 	},
 
 	/**
-	 * submit form
+	 * Submits form
+	 * After form submits, FormBehavior fires a 'submit'
 	 */
 	_submitForm: function() {
 		this.startSpinner();
@@ -224,16 +260,19 @@ Things.FormBehaviorImpl = {
 	},
 
 	/**
-	 * serialize form
+	 * Serialize form and return serialized object.
+	 * It can be used form parameters
+	 * @return {Object} serialized object
 	 */
 	_serializeForm: function() {
 		return this._getForm().serialize();
 	},
 
 	/**
-	 * key event - enter key이면 submit form
+	 * key event - form submits when enter key is monitored
+	 * @param {Event} event A 'KeyPressed' event
 	 */
-	_keyPressHandler: function(event, detail, sender) {
+	_keyPressHandler: function(event) {
 		var code = event.keyCode;
 		if(code == 13) {
 			this._submitForm(event);
@@ -241,9 +280,11 @@ Things.FormBehaviorImpl = {
 	},	
 
 	/**
-	 * When form success call this function
+	 * Successful response handler After form submits.
+	 * FormBehavior fires a 'response' in this function
+	 * @param {Event} event Successful response event
 	 */
-	_successSubmitResponse: function(event) {
+	_onSuccessResponse: function(event) {
 		this.stopSpinner();
 
 		if(this.rootProperty) { 
@@ -256,9 +297,11 @@ Things.FormBehaviorImpl = {
 	},
 
 	/**
-	 * When form failure call this function
+	 * Error response handler After form submits.
+	 * FormBehavior fires a 'error' in this function
+	 * @param {Event} event Error response event
 	 */
-	_failureSubmitResponse: function(event) {
+	_onErrorResponse: function(event) {
 		this.stopSpinner();
 		var response = event.detail.request.xhr.response;
 

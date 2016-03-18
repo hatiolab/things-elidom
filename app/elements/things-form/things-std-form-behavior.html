@@ -1,57 +1,90 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../../bower_components/iron-input/iron-input.html">
-<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../../bower_components/iron-form/iron-form.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/iron-input/iron-input.html">
+
+<link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
-<link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
 
 <link rel="import" href="../things-setting/things-global-behavior.html">
+<link rel="import" href="../things-spinner/things-spinner-behavior.html">
+<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
+<link rel="import" href="../things-combo/things-code-selector.html">
 <link rel="import" href="../things-date-picker/things-date-picker.html">
 <link rel="import" href="../things-date-picker/things-time-picker.html">
-<link rel="import" href="../things-combo/things-code-selector.html">
 
 <script>
 
+window.Things = window.Things || {};
+
 /**
- * var ThingsFormBehavior is to generate forms for thing framework
+ * var Things.StdFormBehavior enables a custom element to be included in an things-search-form or things-resource-form
  *
  * @demo demo/index.html
- * @polymerBehavior
+ * @ThingsBehavior
  */
-
-/**
-  Polymer.IronFormElementBehavior enables a custom element to be included
-  in an `iron-form`.
-  @demo demo/index.html
-  @polymerBehavior
-  */
-var ThingsStdFormBehaviorImpl = {
+Things.StdFormBehaviorImpl = {
 
 	properties: {
+    /**
+     * Fired when the form is submitted
+     *
+     * @event things-std-form-submit
+     */
+    /**
+     * Fired when the successful response is arrived after submit
+     *
+     * @event things-std-form-submit-success
+     */
+    /**
+     * Fired when the error response is arrived after submit
+     *
+     * @event things-std-form-submit-error
+     */
+
+    /**
+     * Meta-Data of the form elements of the form.
+     * Custom Form element can configure child elements of the form dynamically.
+     * StdFormBehavior create form element by each of this attributes
+     */
 		formFields: {
 			type: Array,
 			observer: '_formFieldsChange'
 		},
 
+		/**
+		 * Action url for submit. 
+		 * This attribute is configured by base url of the global setting.
+		 */
 		action: {
+			type: String,
+			computed: '_computeActionUrl(globals.basicUrl, action)'
+		},
+		
+		/**
+		 * HTTP Method for submit.
+		 */
+		method: {
+			type: String
+		},
+
+		/**
+		 * HTTP Content Type for submit.
+		 */
+		contentType: {
 			type: String
 		},
 		
-		actionUrl:{
-			computed:'_computeActionUrl(globals.basicUrl,action)'
-		},
-
-		method: String,
-
-		contentType: String,
-		
+		/**
+		 * Response Data after form submit
+		 */
 		output: {
 			type: Object,
 			notify: true
@@ -59,46 +92,183 @@ var ThingsStdFormBehaviorImpl = {
 	},
 
 	listeners : {
-		'iron-form-response' :'_successSubmitResponse',
-		'iron-form-error' : '_failureSubmitResponse'
+		'iron-form-response' :'_onSuccessResponse',
+		'iron-form-error' : '_onErrorResponse'
 	},
 
-	_formFieldsChange: function(e) {
-		this.buildFormView();
+  /**
+   * Handler after Form element changed.
+   * Child elements of the form is reconfigured by this function.
+   * The form that extends StdFormBehavior must implement 'reconfigureMyForm' function.
+   * Logic of'reconfigureMyForm' function is creation form child elements by formFields attributes and configuration layout.
+   *
+   * @param {Array} formFields attribute
+   */
+	_formFieldsChange: function(formFields) {
+		this.reconfigureMyForm();
 	},
+
 	/**
-	 * compute action url for action
+	 * compute action url by base url of the global settings
+	 * @param {string} basicUrl base url of the global settings
+	 * @param {string} action action attribute
 	 */
 	_computeActionUrl: function(basicUrl, action) {
 		return basicUrl + '/' + action;
 	},
+
 	/**
-	 * create template use view data from attribute
+	 * create list box
+	 *
+	 * @param{Array} items Listbox values
+	 * @return {Object} paper-listbox element 
 	 */
-	_generateElement: function(element) {
+	_makeListBox: function(items) {
+		var listbox = document.createElement('paper-listbox');
+		listbox.setAttribute('selected','0');
+		
+		for(index in items) {
+			option = items[index];
+			item = document.createElement('paper-item');
+			item.innerHTML = option;
+			listbox.appendChild(item);
+		}
+
+		return listbox;
+	},
+
+	/**
+	 * key event - form submits when enter key is monitored
+	 * @param {Event} event A 'KeyPressed' event
+	 */
+	_keyPressHandler: function(event) {
+		var code = event.keyCode;
+		if(code == 13) {
+			this._submitForm(event);
+		}
+	},	
+
+	/**
+	 * Successful response handler After form submits.
+	 * StdFormBehavior fires a 'things-std-form-response' in this function
+	 * @param {Event} event Successful response event
+	 */
+	_onSuccessResponse: function(event) {
+		this.stopSpinner();
+
+		if(this.rootProperty) { 
+			this.output = event.detail.xhr.response[this.rootProperty]; 
+		} {
+			this.output = event.detail.xhr.response;
+		}
+		
+		this.fire('things-std-form-response', this.output);
+	},
+
+	/**
+	 * Error response handler After form submits.
+	 * StdFormBehavior fires a 'things-std-form-error' in this function
+	 * @param {Event} event Error response event
+	 */
+	_onErrorResponse: function(event) {
+		this.stopSpinner();
+		var response = event.detail.request.xhr.response;
+
+		if(response && response.status == 401) {
+			this.handleUnauthorized();
+		} else {
+			if(response) {
+				this.openResponseError(response);
+			} else {
+				this.openUnkownError();
+				response = event.detail.request;
+			}
+		}
+
+		this.fire('things-std-form-error', response);
+	},	
+
+	/**
+	 * Bind element's attribute values by formField informations.
+	 * @param {Object} child element of the form
+	 * @param {Object} element information object from formFields
+	 */
+	bindAttributes: function(element, attrs) {
+		for(attr in attrs) {
+			element.setAttribute(attr, attrs[attr]);
+		}
+
+		return element;
+	},
+
+	/**
+	 * find form by querySelector and return found form
+	 * @return {Object}
+	 */
+	getMyForm: function() {
+		return this.querySelector('form');
+	},
+
+	/**
+	 * Resets form
+	 */
+	resetMyForm: function() {
+		this.getMyForm().reset();
+	},
+
+	/**
+	 * Submits form
+	 * After form submits, StdFormBehavior fires a 'submit'
+	 */
+	submitMyForm: function() {
+		this.startSpinner();
+
+		if(this.getAttribute('on-submit')) {
+			this.fire('things-std-form-submit', this.serializeMyForm());
+		} else {
+			this.getMyForm().submit();
+		}
+	},
+
+	/**
+	 * Serialize form and return serialized object.
+	 * It can be used form parameters
+	 * @return {Object} serialized object
+	 */
+	serializeMyForm: function() {
+		return this.getMyForm().serialize();
+	},
+
+  /**
+   * Create child element of the form by one of the formFields object
+   *
+   * @param {Object} one of the formFields attribute
+   * @return {Object} created child element for the form
+   */	 
+	createMyElement: function(element) {
 		var newElement = null;
 
 		switch(element.type) {
 			case 'checkbox':
 				newElement = document.createElement('paper-checkbox');
-				newElement = this._setAttr(newElement, element);
+				newElement = this.bindAttributes(newElement, element);
 				newElement.$.checkboxLabel.innerHTML = element.label;
 				break;
 
 			case 'button':
 				newElement = document.createElement('paper-button');
-				newElement = this._setAttr(newElement, element);
+				newElement = this.bindAttributes(newElement, element);
 				newElement.innerHTML =element.label;
 				break;
 
 			case 'listbox':
 				newElement = this._makeListBox(element.options);
-				newElement = this._setAttr(newElement, element);
+				newElement = this.bindAttributes(newElement, element);
 				break;
 
 			case 'dropdown':
 				newElement = document.createElement('paper-dropdown-menu');
-				newElement = this._setAttr(newElement, element);
+				newElement = this.bindAttributes(newElement, element);
 				newChild = this._makeListBox(element.options);
 				newChild.setAttribute('class','dropdown-content');
 				newElement.appendChild(newChild);
@@ -106,18 +276,18 @@ var ThingsStdFormBehaviorImpl = {
 
 			case 'radio':
 				newElement = document.createElement('paper-radio-group');
-				newElement = this._setAttr(newElement, element);
+				newElement = this.bindAttributes(newElement, element);
 				for(index in element.child) {
 					child = element[index];
 					newChild = document.createElement('paper-radio-button');
-					newChild = this._setAttr(newChild, child);
+					newChild = this.bindAttributes(newChild, child);
 					newElement.appendChild(newChild);
 				}
 				break;
 
 			case 'textarea':
 				newElement = document.createElement('paper-textarea');
-				newElement = this._setAttr(newElement, element)
+				newElement = this.bindAttributes_(newElement, element)
 				break;
 
 			case 'code-combo':
@@ -147,129 +317,18 @@ var ThingsStdFormBehaviorImpl = {
 
 			default:
 				newElement = document.createElement('paper-input');
-				newElement = this._setAttr(newElement, element);
+				newElement = this.bindAttributes(newElement, element);
 		}
 
-		newElement.setAttribute('class','flex style-scope things-form');
+		newElement.setAttribute('class', 'flex style-scope things-form');
 		return newElement;
-	},
-
-	/**
-	 * list box creation
-	 *
-	 * @param{[Array]} items Listbox values
-	 * @return {[paper list box]} 
-	 */
-	_makeListBox: function(items) {
-		var listbox = document.createElement('paper-listbox');
-		listbox.setAttribute('selected','0');
-		
-		for(index in items) {
-			option = items[index];
-			item = document.createElement('paper-item');
-			item.innerHTML = option;
-			listbox.appendChild(item);
-		}
-
-		return listbox;
-	},
-
-	/**
-	 * set element's attributes
-	 */
-	_setAttr: function(element, attrs) {
-		for(attr in attrs) {
-			element.setAttribute(attr, attrs[attr]);
-		}
-
-		return element;
-	},
-
-	/**
-	 * find form
-	 */
-	_getForm: function() {
-		return this.querySelector('form');
-	},
-
-	/**
-	 * reset form
-	 */
-	_resetForm: function() {
-		this._getForm().reset();
-	},
-
-	/**
-	 * submit form
-	 */
-	_submitForm: function() {
-		this.startSpinner();
-
-		if(this.getAttribute('on-submit')) {
-			this.fire('submit', this._serializeForm());
-		} else {
-			this._getForm().submit();
-		}
-	},
-
-	/**
-	 * serialize form
-	 */
-	_serializeForm: function() {
-		return this._getForm().serialize();
-	},
-
-	/**
-	 * key event - enter key이면 submit form
-	 */
-	_keyPressHandler: function(event, detail, sender) {
-		var code = event.keyCode;
-		if(code == 13) {
-			this._submitForm(event);
-		}
-	},	
-
-	/**
-	 * When form success call this function
-	 */
-	_successSubmitResponse: function(event) {
-		this.stopSpinner();
-
-		if(this.rootProperty) { 
-			this.output = event.detail.xhr.response[this.rootProperty]; 
-		} {
-			this.output = event.detail.xhr.response;
-		}
-		
-		this.fire('response', this.output);
-	},
-
-	/**
-	 * When form failure call this function
-	 */
-	_failureSubmitResponse: function(event) {
-		this.stopSpinner();
-		var response = event.detail.request.xhr.response;
-
-		if(response && response.status == 401) {
-			this.handleUnauthorized();
-			this.fire('error', response);
-		} else {
-			if(response) {
-				this.openResponseError(response);
-				this.fire('error', response);
-			}
-			else{
-				this.openUnkownError();
-				this.fire('error', event.detail.request);
-			}
-		}
 	}
+
 };
 
-var ThingsStdFormBehavior = [
+Things.StdFormBehavior = [
 	'IronFormElementBehavior', 
-	ThingsFormBehaviorImpl, 
+	Things.StdFormBehaviorImpl, 
 	ThingsSpinnerBehavior, 
 	ThingsMsgBoxBehavior,
 	ThingsGlobalBehavior
