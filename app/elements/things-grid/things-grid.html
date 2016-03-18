@@ -217,7 +217,8 @@ Example:
 				'export-btn.tap' : 'onExport',
 				'add-btn.tap'    : 'onAdd',
 				'delete-btn.tap' : 'onDelete',
-				'save-btn.confirm' :'onSave'
+				'save-btn.confirm' :'onSave',
+				'saveResource.response':'onSuccessSave'
 			},
 
 			/**
@@ -251,6 +252,10 @@ Example:
 					this.$.gridContainer.style.width = this.parentNode.offsetWidth + 'px';
 					this.$.gridContainer.style.height = '300px';
 					this.grid.resetSize();
+					this.grid.body().setCellDynamicStyles([{
+						expression: 'row % 2',
+						styles: { background: '#20006060' }
+					}]);
 				}
 			},
 			onImport: function(){
@@ -304,9 +309,10 @@ Example:
 				}
 				this.saveRequest = data;
 				this.$.saveResource.generateRequest();
+			},
+			onSuccessSave:function(){
 				this.fire('refresh-data',this.grid);
 			},
-
 			created: function() {
 				DataLudi.setRootContext('');
 				DataLudi.setAssetRoot('images/grid');
