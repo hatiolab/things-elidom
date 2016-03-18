@@ -44,7 +44,7 @@ var ThingsSpinnerBehavior = {
    * check global spinner is exist
    */
   checkGlobalSpinner: function() {
-    if(typeof(app) !== 'undefined') {
+    if(typeof(app) === 'undefined') {
       return false;
     }
 

@@ -20,18 +20,15 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <script src="../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
   
   <link rel="import" href="../../../bower_components/polymer/polymer.html">
-  <link rel="import" href="../../../bower_components/paper-styles/color.html">
-  <link rel="import" href="../../../bower_components/paper-styles/demo-pages.html">
-  <link rel="import" href="../../../bower_components/paper-toast/paper-toast.html">
-  <link rel="import" href="../../../bower_components/iron-autogrow-textarea/iron-autogrow-textarea.html">
+  <link rel="import" href="../../../bower_components/paper-textarea/paper-textarea.html">
 
-  <link rel="import" href="../things-std-form-behavior.html">
-  <link rel="import" href="../things-std-search-form.html">
   <link rel="import" href="../../things-resource/things-resource.html">
   <link rel="import" href="../../things-spinner/things-spinner.html">
   <link rel="import" href="../../things-setting/things-setting.html">
   <link rel="import" href="../../things-button/things-button.html">
-
+  <link rel="import" href="../things-std-form-behavior.html">
+  <link rel="import" href="../things-std-search-form.html">
+  
   <link rel="stylesheet" href="../../../bower_components/paper-styles/demo.css">
 
   <style is="custom-style">
@@ -71,22 +68,9 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 </head>
 <body unresolved>
 
-  <template is="dom-bind" id="app">
-
-    <paper-material class="Page-paper" elevation="1">
-      <p class="paper-font-subhead">Things Setting</p>
-
-      <things-setting id="setting"></things-setting>
-
-      <div class="buttons">
-        <things-button color="green" id="setting-btn" on-click="{{this.$.setting.open()}}">Setting</things-button>
-      </div>
-    </paper-material>
-
-    <section>
-      <h3>Dynamic Search Form</h3>
-
-      <div class="[[layout]]">
+  <dom-module id="sample-search-form">
+    <template>
+      <div>
         <things-resource 
           auto
           action="diy_services/ElidomSearchForm/query.json" 
@@ -111,20 +95,75 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 
       <div>
         <paper-input value="{{totalCount}}" label="Total Count"></paper-input>
-        <iron-autogrow-textarea rows="12" placeholder="Items" value="{{items}}"></iron-autogrow-textarea>
+        <paper-textarea id="items-target" label="Items"></paper-textarea>
       </div>
+    </template>
+
+    <script>
+      Polymer({
+
+        is: 'sample-search-form',
+
+        listeners: {
+          'search-form.things-std-form-response': 'onItemsChanged'
+        },
+
+        onItemsChanged: function(e) {
+          this.$['items-target'].value = JSON.stringify(e.detail.items, null, 4);
+        }
+
+      });
+    </script>
+  </dom-module>
+
+  <template is="dom-bind">
+    <section onclick="clickSetting(event)">
+
+      <h3>Setting</h3>
+
+      <paper-material class="Page-paper" elevation="1">
+
+        <things-setting id="setting"></things-setting>
+
+        <div class="buttons">
+          <things-button color="green" target-id="setting">Setting</things-button>
+        </div>
+      </paper-material>
+
     </section>
 
-    <things-spinner id="spinner" loading=false></things-spinner>
-    
-    <paper-toast id="toast" class="Toast" duration="8000"></paper-toast>
+    <section>
+
+      <h3>Dynamic Search Form</h3>
+
+      <sample-search-form></sample-search-form>
+
+    </section>
+  </template>
 
   <script>
-    function onSettingTap(e) {
-      document.querySelector('setting').open();
+    function clickSetting(e) {
+      var button = e.target;
+      while (!button.hasAttribute('target-id') && button !== document.body) {
+        button = button.parentElement;
+      }
+
+      if (!button.hasAttribute('target-id')) {
+        return;
+      }
+
+      var id = button.getAttribute('target-id');
+      var dialog = document.getElementById(id);
+
+      if (dialog) {
+        dialog.open();
+      }
+    }
+
+    function valueChanged(e) {
+      console.log(e);
     }
   </script>
-  </template>
 
 </body>
 </html>
