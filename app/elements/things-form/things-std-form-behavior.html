@@ -19,33 +19,22 @@
 
 <script>
 
-window.Things = window.Things || {};
-
 /**
- * var Things.FormBehavior is to generate forms for thing framework
+ * var ThingsFormBehavior is to generate forms for thing framework
  *
  * @demo demo/index.html
- * @FormBehavior
+ * @polymerBehavior
  */
-Things.FormBehaviorImpl = {
+
+/**
+  Polymer.IronFormElementBehavior enables a custom element to be included
+  in an `iron-form`.
+  @demo demo/index.html
+  @polymerBehavior
+  */
+var ThingsStdFormBehaviorImpl = {
 
 	properties: {
-    /**
-     * Fired when the form is submitted
-     *
-     * @event submit
-     */
-    /**
-     * Fired when the successful response is arrived after submit
-     *
-     * @event response
-     */
-    /**
-     * Fired when the error response is arrived after submit
-     *
-     * @event error
-     */
-
 		formFields: {
 			type: Array,
 			observer: '_formFieldsChange'
@@ -269,7 +258,8 @@ Things.FormBehaviorImpl = {
 			if(response) {
 				this.openResponseError(response);
 				this.fire('error', response);
-			} else {
+			}
+			else{
 				this.openUnkownError();
 				this.fire('error', event.detail.request);
 			}
@@ -277,9 +267,9 @@ Things.FormBehaviorImpl = {
 	}
 };
 
-Things.FormBehavior = [
+var ThingsStdFormBehavior = [
 	'IronFormElementBehavior', 
-	Things.FormBehaviorImpl, 
+	ThingsFormBehaviorImpl, 
 	ThingsSpinnerBehavior, 
 	ThingsMsgBoxBehavior,
 	ThingsGlobalBehavior
