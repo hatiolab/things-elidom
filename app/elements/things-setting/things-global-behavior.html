@@ -1,7 +1,6 @@
 <script>
 
 window.Things = window.Things || {};
-
 var instances = [];
 var dataGlobal = {};
 
@@ -59,7 +58,7 @@ Things.GlobalBehavior = {
   },
 
   /**
-   * check signedin 
+   * check signed-in 
    */
   isSignedIn: function() {
     return this.get('globals.user') ? true : false;
@@ -70,8 +69,17 @@ Things.GlobalBehavior = {
    */
   handleUnauthorized: function() {
     this.set('globals.user', null);
-    this.showToast("Unauthorized, Signin First Please");
+    this.showToastMsg("Unauthorized, Signin First Please");
     page('/login');
+  },
+
+  /**
+   * message를 toast로 표시한다.
+   * @param {string} msg 
+   */
+  showToastMsg: function(msg) {
+    app.$.toast.text = msg;
+    app.$.toast.open();
   }
 
 };

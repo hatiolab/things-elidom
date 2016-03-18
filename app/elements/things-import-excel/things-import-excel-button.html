@@ -41,19 +41,17 @@ Example:
 					value: XLSX,
 					readonly:true
 				},
-				excelWorker:{
-					type : Object,
-					value : function(){
-						return {
-									/* worker message */
-									msg: 'xlsx',
-									/* worker scripts */
-									rABS: './xlsxworker2.js',
-									norABS: './xlsxworker1.js',
-									noxfer: './xlsxworker.js'
-								}
-					},
-					readonly:true
+				excelWorker: {
+					type: Object,
+					readonly: true,
+					value: {
+						/* worker message */
+						msg: 'xlsx',
+						/* worker scripts */
+						rABS: './xlsxworker2.js',
+						norABS: './xlsxworker1.js',
+						noxfer: './xlsxworker.js'
+					}
 				},
 				parsedResult:{
 					type:Object,
