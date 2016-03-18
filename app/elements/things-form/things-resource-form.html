@@ -81,7 +81,7 @@ Example:
 		</paper-fullscreen-dialog>
 
 		<things-resource 
-			id="get-resource"
+			id="member-resource"
 			action="{{getResourceUrl}}" 
 			method="get"
 			output-data="{{resource}}">
@@ -111,7 +111,7 @@ Example:
 					observer: 'resourceChanged'
 				},
 
-				filterColumns: {
+				removeColumnsOnSave: {
 					type: Array,
 					value: ['creator', 'updater', 'creator_id', 'updater_id', 'created_at', 'updated_at']
 				}
@@ -143,7 +143,8 @@ Example:
 				'resourceDialog.iron-overlay-closed': 'clearResourceForm',
 				'resourceDialog.iron-overlay-canceled': 'clearResourceForm',
 				'resourceDialog.iron-overlay-opened': 'onOpenResourceForm',
-				'iron-resize': 'onIronResize'
+				'iron-resize': 'onIronResize',
+				'member-resource.response' : 'onSuccessSave'
 			},
 
 			/**
@@ -155,22 +156,27 @@ Example:
 
 			/**
 			 * save data from resource detail screen
-			 * TODO form submit이 아니라 ajax 호출로 변경 
 			 */
 			saveResourceForm: function() {
-				var form = this._getForm();
-				var originalAction = this.actionUrl;
+				var resourceSetter = this.$['member-resource'];
+				var originalAction = resourceSetter.action;
+				var originalContentType = resourceSetter.contentType;
 
 				if(this.resource.id) {
-					form.action = this.actionUrl.replace(':id', this.resource.id);
-					form.method ='POST';
+					resourceSetter.action = resourceSetter.action.replace(':id', this.resource.id);
+					resourceSetter.method ='PUT';
 				} else {
-					form.action = this.actionUrl.replace('/:id', '');
-					form.method ='POST';
+					resourceSetter.action = resourceSetter.action.replace('/:id', '');
+					resourceSetter.method ='POST';
 				}
 
-				this._submitForm();
-				this.actionUrl = originalAction;
+				var params = this._serializeForm();
+				params = this.filterResourceColumns(params);
+				resourceSetter.params = params;
+				resourceSetter.contentType = 'application/json';
+				resourceSetter.generateRequest();
+				resourceSetter.action = originalAction;
+				resourceSetter.contentType = originalContentType;
 			},
 
 			/**
@@ -201,8 +207,9 @@ Example:
 			 * find resource - ajax
 			 */
 			findResource: function(resourceId) {
-				var resourceGetter = this.$['get-resource'];
+				var resourceGetter = this.$['member-resource'];
 				var originalAction = resourceGetter.action;
+				resourceGetter.method = 'GET';
 				resourceGetter.action = resourceGetter.action.replace(':id', resourceId);
 				resourceGetter.generateRequest();
 				resourceGetter.action = originalAction;
@@ -242,15 +249,32 @@ Example:
 				}
 			},
 
-	    /**
-	     * iron-form에서 
-	     */
-	    preSubmitHandler: function(e) {
-	      var form = this._getForm();
-	      if(this.resource.id) {
-	      	form.request.method = 'PUT';
-	      }
-	    }
+			/**
+			 * save 전에 저장에 불필요한 컬럼들을 필터링한다.
+			 */
+			filterResourceColumns: function(params) {
+				for(var name in params) {
+					if(this.removeColumnsOnSave.includes(name)) {
+						delete params[name];
+					} else {
+						var value = params[name];
+						if(typeof(value) === 'undefined') {
+							delete params[name];
+						}
+					}
+				}
+
+				return params;
+			},
+
+			/**
+			 * After success save
+			 */
+			onSuccessSave: function(e) {
+				if(e.srcElement.method.toUpperCase() != 'GET') {
+					this.fire('resource-saved', true);
+				}
+			}
 
 		});
 	</script>
