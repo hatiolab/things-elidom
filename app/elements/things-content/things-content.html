@@ -98,7 +98,8 @@ Example:
 				title="Item Detail"
 				form-fields="[[resourceFormFields]]" 
 				input="{{selectedRow}}"
-				action="{{formSaveActionUrl}}">
+				action="{{formSaveActionUrl}}"
+				get-resource-url="{{getResourceUrl}}">
 			</things-resource-form>
 		</div>
 	</template>
@@ -144,8 +145,7 @@ Example:
 					type: Array
 				},
 				selectedRow: {
-					type: Object,
-					observer: '_onSelectedRowChange'
+					type: Object
 				}
 			},
 
@@ -153,32 +153,6 @@ Example:
 				'grid.on-detail-clicked': '_showResourceForm'
 			},			
 			
-			/**
-			 * Resource Form Field가 초기화 되지 않았다면 초기화 시켜준다.
-			 */
-			_onSelectedRowChange: function(selectedRow) {
-				/*if(this.selectedRow && !this.resourceFormFields) {
-					var view = [];
-					var keys = Object.keys(this.selectedRow);
-
-					for(index in keys) {
-						var element = {};
-						element.name = keys[index];
-						element.label = keys[index].charAt(0).toUpperCase() + keys[index].slice(1);
-						var data = this.selectedRow[keys[index]];
-						element.type = (typeof data) == 'undefined' ? 'string' : (typeof data);
-						element.type = element.type == 'string' ? 'text' : element.type;
-						view.push(element);
-					}
-					
-					if(view && view.length > 0) {
-						this.resourceFormFields = view;
-					}
-				}*/
-
-				console.log(selectedRow);
-			},
-
 			/**
 			 * open resource form dialog
 			 */

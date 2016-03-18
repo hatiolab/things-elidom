@@ -37,15 +37,7 @@ Example:
       height: 100%;
       width: 98%;
     }
-    
-    :host > h3 {
-      margin-top: 5px;
-    }
-    
-    :host::content img {
-      border-radius: 50%;
-    }
-    
+        
     :host paper-input {
       margin-left: auto;
       margin-right: auto;
@@ -62,13 +54,14 @@ Example:
       padding: 15px;
     }
 
-    :host .search{padding:5px 0 3px 5px;}
-    :host .search paper-button{
-      width:22px;height:22px;
-      margin-left:3px;
-      padding:1px;
+    :host .search {
+      padding:5px 0 3px 5px;
     }
 
+    :host .fields {
+      padding: 0px 10px 0px 0px;
+    }
+    
     </style>
 
     <paper-material elevation="1" class="flex" on-keypress="_keyPressHandler">
@@ -91,7 +84,7 @@ Example:
               last-response ="{{output}}">
 
           <div class="layout horizontal flex" >
-            <div id="leftFields" class="layout vertical flex"></div>
+            <div id="leftFields" class="layout vertical flex fields"></div>
             <div id="rightFields" class="layout vertical flex"></div>
           </div>
         </form>
@@ -126,7 +119,7 @@ Example:
     behaviors: [ ThingsFormBehavior ],
 
     listeners : {
-      'iron-form-presubmit' :'preSubmitHandler',
+      'iron-form-presubmit' :'preSubmitHandler'
     },    
 
     /**

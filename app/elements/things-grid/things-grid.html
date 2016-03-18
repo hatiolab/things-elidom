@@ -50,8 +50,9 @@ Example:
 				<things-button color="green" id="add-btn">Add</things-button>
 				<things-button color="pink" id="delete-btn">Delete</things-button>
 				<things-button color="indigo" id="save-btn" confirm=true title="Confirm" message="Are you sure to Save?">Save</things-button>
-			</div>				
+			</div>
 		</paper-toolbar>
+
 		<things-resource 
 			id="saveResource"
 			content-type="application/json"
@@ -59,6 +60,7 @@ Example:
 			method = "post"
 			params="{{saveRequest}}">
 		</things-resource>
+
 	</template>
 
 	<script src='../../../lib/grid/dataludi.lic.eval-1.2.0.min.js'></script>
