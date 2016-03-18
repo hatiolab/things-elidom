@@ -2,7 +2,7 @@
 <link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
 <link rel="import" href="../things-paginator/things-paginator.html">
 <link rel="import" href="../../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
-
+<link rel="import" href="../things-import-excel/things-import-excel-button.html">
 <!--
 A comment describing this element
 
@@ -50,7 +50,14 @@ Example:
 					page-start-idx="{{pageStartIdx}}">
 				</things-paginator>
 
-				<things-button color="green" id="import-btn">Import</things-button>
+				<things-import-excel-button 
+					color="green" 
+					id="import-btn"
+					sheet-name="Sheet1"
+					parsed-result ="{{input}}"
+					root-property="items"
+					total-property="total">Import
+				</things-import-excel-button>
 				<things-button color="green" id="export-btn">Export</things-button>
 				<things-button color="green" id="add-btn">Add</things-button>
 				<things-button color="pink" id="delete-btn">Delete</things-button>
@@ -144,7 +151,7 @@ Example:
 				 * @type Array
 				 */
 				input: {
-					type: Array,
+					type: Object,
 					observer: 'loadData'
 				},
 
@@ -395,10 +402,13 @@ Example:
 					
 					if(this.rootProperty && input) {
 						items = input[this.rootProperty];
+						console.log(this.rootProperty);
+						console.log(input);
+						console.log(input['items']);
 					} else {
 						items = input;
 					}
-					
+					console.log(items);
 					this.dataSet.setRows(items);
 
 					if(this.totalCount == 0) {

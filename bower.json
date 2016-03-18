@@ -17,7 +17,9 @@
     "paper-fullscreen-dialog": "^1.0.2",
     "jszip": "Stuk/jszip#^2.5.0",
     "Pdf-Viewer": "pdf-viewer#^1.0.3",
-    "js-xlsx": "^0.8.0"
+    "js-xlsx": "^0.8.0",
+    "file-upload": "^1.6.4",
+    "vaadin-upload": "^1.0.0-alpha2"
   },
   "devDependencies": {
     "test-fixture": "PolymerElements/test-fixture#1.0.x",
