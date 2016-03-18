@@ -14,6 +14,35 @@
 
 <link rel="import" href="./things-std-form-behavior.html">
 
+<!--
+`<things-std-search-form>` is an HTML `<form>` element that can search data by configure form fields dinamically.
+
+  Example
+
+    <things-resource 
+      auto
+      action="diy_services/ElidomSearchForm/query.json" 
+      output-data="{{formFields}}">
+    </things-resource>
+
+    <things-std-search-form 
+      id="search-form"
+      class="flex"
+      title="Sample Title"
+      form-fields="[[formFields]]" 
+      action-url="diy_services/DynamicScreen/query.json" 
+      use-pagination=true
+      page="{{page}}"
+      per-page="{{limit}}"
+      total-count="{{totalCount}}"
+      total-property="total"
+      root-property="items"
+      items="{{items}}">
+    </things-std-search-form>
+
+@demo ./things-form/demo/demo-things-std-search-form.html
+-->
+
 <dom-module id="things-std-search-form">
   <template>
     <style is="custom-style" include="iron-flex iron-flex-alignment">
@@ -56,21 +85,18 @@
     <paper-material elevation="1" class="flex" on-keypress="_keyPressHandler">
       <paper-toolbar>
         <paper-icon-button icon="menu"></paper-icon-button>
-        <span class="title">{{title}}</span>
-        <paper-icon-button icon="search" id="searchBtn" on-click="_submitForm"></paper-icon-button>
-        <paper-icon-button icon="refresh" id="resetBtn" on-click="_resetForm"></paper-icon-button>
-        <paper-tooltip for="searchBtn" offset="0">Search</paper-tooltip>
-        <paper-tooltip for="resetBtn" offset="0">Reset</paper-tooltip>
+        <span class="title">[[title]]</span>
+        <paper-icon-button icon="search" id="search-btn" on-click="submitMyForm"></paper-icon-button>
+        <paper-icon-button icon="refresh" id="reset-btn" on-click="resetMyForm"></paper-icon-button>
+        <paper-tooltip for="search-btn" offset="0">Search</paper-tooltip>
+        <paper-tooltip for="reset-btn" offset="0">Reset</paper-tooltip>
       </paper-toolbar>
 
       <div class="layout vertical flex">
-        <form is="iron-form" 
-              id="searchForm" 
-              action=[[actionUrl]]
-              headers="[[headers]]"
+        <form is="iron-form"
+              action="[[action]]"
               content-type="[[contentType]]"
-              method="[[method]]"
-              last-response ="{{output}}">
+              last-response ="{{lastResponse}}">
 
           <div class="layout horizontal flex" >
             <div id="leftFields" class="layout vertical flex fields"></div>
@@ -82,47 +108,95 @@
   </template>
 
   <script>
-/*
-`<things-std-search-form>` is an HTML `<form>` element that can search data by configure form fields dinamically.
-@demo ./things-form/demo/index.html
-*/  
+
   Polymer({
 
     is: 'things-std-search-form',
 
     properties: {
-      page : {
-        type: Number,
-        value: 1,
-        notify: true,
-        observer: 'pageChanged'
+      /**
+       * Toolbar에 표시할 화면 타이틀 
+       */
+      title: {
+        type: String
       },
 
-      limit: {
+      /**
+       * Pagination을 적용 할 것인지 여부
+       */
+      usePagination: {
+        type: Boolean,
+        value: true
+      },
+
+      /**
+       * Pagination을 위한 설정. 페이지에 표시할 데이터 개수
+       */
+      perPage: {
         type: Number,
         value: 50,
         notify: true
       },
 
+      /**
+       * Pagination을 위한 설정. 현재 페이지 수 
+       */
+      page : {
+        type: Number,
+        value: 1,
+        notify: true,
+        observer: '_pageChanged'
+      },
+
+      /**
+       * 검색 결과 중에서 리스트 데이터를 의미하는 프로퍼티 
+       */
+      rootProperty: {
+        type: String,
+        value: 'items'
+      },
+
+      /**
+      * 검색 결과 중에서 검색 조건에 해당하는 총 데이터 카운트를 의미하는 프로퍼티 
+      */
+      totalProperty: {
+        type: String,
+        value: 'total'
+      },
+
+      /**
+       * 검색 결과 최종 리스트 데이터 
+       * lastResponse가 Object {total : 100, items : [...]} 형태일 경우 items에 해당한다.
+       */
+      items: {
+        type: Array,
+        notify: true
+      },
+
+      /**
+       * 검색 조건에 맞는 총 데이터 개수 
+       */
       totalCount: {
-        type: Number
-      }
+        type: Number,
+        notify: true
+      }      
+
     },
     
     behaviors: [ Things.StdFormBehavior ],
 
     listeners : {
-      'iron-form-presubmit' :'preSubmitHandler'
+      'iron-form-presubmit' :'_preSubmitHandler'
     },    
 
     /**
-     * build form view - add child element dynamically
+     * 검색 폼 화면을 구성. formFields로 
      */
     reconfigureMyForm: function() {
       if(this.formFields.length > 0) {
         for(index in this.formFields) {
           var field = this.formFields[index];
-          var newElement = this._generateElement(field);
+          var newElement = this.createFormElement(field);
 
           if((index % 2) == 0) {
             this.$.leftFields.appendChild(newElement);
@@ -134,23 +208,68 @@
     },
 
     /**
-     * submit form 전에 파라미터 변경 ...
+     * Submit 전에 전처리
+     * @param {Event}
      */
-    preSubmitHandler: function(e) {
-      var form = this._getForm();
+    _preSubmitHandler: function(event) {
+      var form = this.getMyForm();
       form.request.params || {};
       form.request.params.page = this.page;
-      form.request.params.limit = this.limit;
+      form.request.params.limit = this.perPage;
     },
 
     /**
-     * refresh when current page changed
+     * 현재 페이지가 변경되었을 때 액션
+     * 페이지가 변경된 경우 해당 페이지로 다시 검색한다.
+     * @param {Number} page 현재 페이지 
      */
-    pageChanged: function(page) {
+    _pageChanged: function(page) {
       if(this.totalCount > 0 && page > 0) {
-        this._submitForm();
+        this.submitMyForm();
       }
-    }
+    },
+
+    /**
+    * Successful response handler After form submits.
+    * StdFormBehavior fires a 'things-std-form-response' in this function
+    * @param {Event} event Successful response event
+    */
+    _onSuccessResponse: function(event) {
+      this.stopSpinner();
+
+      if(this.usePagination) { 
+        this.items = event.detail.xhr.response[this.rootProperty];
+        this.totalCount = event.detail.xhr.response[this.totalProperty];
+      } {
+        this.items = event.detail.xhr.response;
+      }
+
+      this.fire('things-std-form-response', { items : this.items, total : this.totalCount } );
+    },
+
+    /**
+    * Error response handler After form submits.
+    * StdFormBehavior fires a 'things-std-form-error' in this function
+    * @param {Event} event Error response event
+    */
+    _onErrorResponse: function(event) {
+      this.stopSpinner();
+
+      var response = event.detail.request.xhr.response;
+      if(response && response.status == 401) {
+        this.handleUnauthorized();
+
+      } else {
+        if(response) {
+          this.openResponseError(response);
+        } else {
+          response = event.detail.request;
+          this.openUnkownError(response);
+        }
+      }
+
+      this.fire('things-std-form-error', response);
+    }    
 
   });
   </script>
