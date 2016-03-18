@@ -43,7 +43,12 @@ Example:
 
 		<paper-toolbar class="white">
 			<div class="bottom fit">
-				<things-paginator per-page="{{limit}}" current-page="{{page}}" total-count="{{totalCount}}"></things-paginator>
+				<things-paginator 
+					per-page="{{limit}}" 
+					current-page="{{page}}" 
+					total-count="{{totalCount}}"
+					page-start-idx="{{pageStartIdx}}">
+				</things-paginator>
 
 				<things-button color="green" id="import-btn">Import</things-button>
 				<things-button color="green" id="export-btn">Export</things-button>
@@ -201,13 +206,18 @@ Example:
 					readonly: true
 				},
 
-				exportFileName:{
-					type:String
+				exportFileName: {
+					type: String
 				},
 				
-				saveRequest:{
-					type:Array,
-					notify:true
+				saveRequest: {
+					type: Array,
+					notify: true
+				},
+
+				pageStartIdx: {
+					type: Number,
+					notify: true
 				}
 			},
 
@@ -258,10 +268,12 @@ Example:
 					}]);
 				}
 			},
-			onImport: function(){
+
+			onImport: function() {
 
 			},
-			onExport:function(){
+
+			onExport: function() {
 				var fileName = this.exportFileName;
 				new DataLudi.GridExcelExporter().export(this.grid, {
 					target: "local",
@@ -270,7 +282,8 @@ Example:
 					datetimeFormat: "yyyy.mm.dd"
 				});
 			},
-			onDelete:function(){
+
+			onDelete:function() {
 				var row = this.grid.focusedRow();
 				if (row && row.dataIndex() >= 0) {
 					if (this.dataSet.getRowState(row.dataIndex()) == 'created') {
@@ -280,11 +293,13 @@ Example:
 					}
 				}
 			},
-			onAdd:function(){
+
+			onAdd:function() {
 				var row = Math.max(this.grid.focusedDataIndex(), 0);
 				this.dataSet.insertRow(row, {});
 			},
-			onSave:function(){
+
+			onSave:function() {
 				var data = [];
 
 				var inserted = this.dataSet.getStateRows('created');
@@ -307,12 +322,15 @@ Example:
 					object.cud_flag_ = 'd';
 					data.push(object);
 				}
+
 				this.saveRequest = data;
 				this.$.saveResource.generateRequest();
 			},
-			onSuccessSave:function(){
+
+			onSuccessSave: function() {
 				this.fire('refresh-data',this.grid);
 			},
+
 			created: function() {
 				DataLudi.setRootContext('');
 				DataLudi.setAssetRoot('images/grid');
@@ -329,9 +347,7 @@ Example:
 
 			setFields: function(fields) {
 				if(fields && fields.length > 0 && this.grid) {
-					var cudField = {	
-						fieldName: "cud_flag_"
-					};
+					var cudField = { fieldName: "cud_flag_" };
 					fields.push(cudField);
 					this.dataSet.setFields(fields);
 					this.dataSet.setCheckStates(true);
@@ -360,11 +376,7 @@ Example:
 					columns.forEach(function(item) { cols.push(item); });
 					this.grid.setColumns(cols);
 					this.grid.rowIndicator().setStateVisible(true);
-					this.grid.setEditOptions({
-						deletable: true,
-						insertable: true,
-						appendable: true
-					});
+					this.grid.setEditOptions({ deletable: true, insertable: true, appendable: true });
 					this.grid.resetSize();
 					// this.grid.orderByFields (['ID'],DataLudi.SortDirection.DESCENDING);
 				}

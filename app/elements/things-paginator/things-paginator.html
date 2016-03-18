@@ -203,29 +203,32 @@ Example:
       }
     </style>
 
-    <ul id="paginationlist" class="pagination">
-      <template is="dom-if" if="{{showFirst}}">
-        <li><a on-tap="firstPage">First</a></li>
-      </template>
+    <template is="dom-if" if="{{showFlag}}">
+      <ul id="paginationlist" class="pagination">
+        <template is="dom-if" if="{{showFirst}}">
+          <li><a on-tap="firstPage">First</a></li>
+        </template>
 
-      <li class$='{{disablePrev}}'>
-        <a on-tap="prevPage">{{previous}}</a>
-      </li>
+        <li class$='{{disablePrev}}'>
+          <a on-tap="prevPage">{{previous}}</a>
+        </li>
 
-      <li><a>Page</a><li>
-      <paper-input type='number' value="{{currentPage}}" min="1" class="current"></paper-input>
-      <li><a>of   {{totalPage}}</a><li>
+        <li><a>Page</a><li>
+        <paper-input type='number' value="{{currentPage}}" min="1" class="current"></paper-input>
+        <li><a>of   {{totalPage}}</a><li>
 
-      <li class$='{{disableNext}}'>
-          <a on-tap="nextPage">{{next}}</a>
-      </li>
+        <li class$='{{disableNext}}'>
+            <a on-tap="nextPage">{{next}}</a>
+        </li>
 
-      <template is="dom-if" if="{{showLast}}">
-        <li><a on-tap="lastPage">Last</a></li>
-      </template>
+        <template is="dom-if" if="{{showLast}}">
+          <li><a on-tap="lastPage">Last</a></li>
+        </template>
 
-      <li><a>Total : {{totalCount}}</a></li>
-    </ul>
+        <li><a>Items {{pageStartIdx}} - {{pageEndIdx}} of Total : {{totalCount}}</a></li>
+      </ul>
+    </template>
+
   </template>
 
   <script>
@@ -236,6 +239,18 @@ Example:
       is: 'things-paginator',
 
       properties: {
+
+        /**
+         * The `showFlag` attribute defines if paginator display or not
+         *
+         * @attribute showFlag
+         * @type boolean
+         */
+        showFlag: {
+          type: Boolean,
+          value: false
+        },
+
         /**
          * The `perPage` attribute defines the number
          * of items to show per page
@@ -297,7 +312,7 @@ Example:
          */
         pageStartIdx: {
           type: Number,
-          value: 0,
+          value: 1,
           notify: true
         },
 
@@ -310,7 +325,7 @@ Example:
          */
         pageEndIdx: {
           type: Number,
-          value: 0,
+          value: 1,
           notify: true
         },
 
@@ -438,6 +453,14 @@ Example:
       },
 
       /**
+       * page start index와 page end index를 다시 설정 
+       */
+      setPageIndex: function() {
+        this.pageStartIdx = ((this.currentPage - 1) * this.perPage) + 1;
+        this.pageEndIdx = this.pageStartIdx + this.perPage - 1;
+      },
+
+      /**
        * Called when the current page changes
        *
        * @event pager-change
@@ -447,6 +470,8 @@ Example:
           page: currentPage,
           limit: this.perPage
         });
+
+        this.setPageIndex();
       },
 
       /**
@@ -454,7 +479,12 @@ Example:
        */
       _totalCountChanged: function(totalCount) {
         this.setTotalPage();
-        this.currentPage = 1;
+
+        if(this.currentPage > this.totalPage) {
+          this.currentPage = 1;
+        }
+
+        this.showFlag = totalCount > 0;
       }
 
     });
