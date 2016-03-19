@@ -459,6 +459,10 @@ Example:
       setPageIndex: function() {
         this.pageStartIdx = ((this.currentPage - 1) * this.perPage) + 1;
         this.pageEndIdx = this.pageStartIdx + this.perPage - 1;
+
+        if(this.pageEndIdx > this.totalCount) {
+          this.pageEndIdx = this.totalCount;
+        }
       },
 
       /**
