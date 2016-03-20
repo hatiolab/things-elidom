@@ -101,8 +101,8 @@
               last-response ="{{lastResponse}}">
 
           <div class="layout horizontal flex" >
-            <div id="leftFields" class="layout vertical flex fields"></div>
-            <div id="rightFields" class="layout vertical flex"></div>
+            <div id="left-fields" class="layout vertical flex fields"></div>
+            <div id="right-fields" class="layout vertical flex"></div>
           </div>
         </form>
       </div>
@@ -192,7 +192,7 @@
     },    
 
     /**
-     * 검색 폼 화면을 구성. formFields로 
+     * 검색 폼 화면을 구성. formFields 정보로 동적으로 폼 하위 엘리먼트를 생성하여 폼을 구성한다.
      */
     reconfigureMyForm: function() {
       if(this.formFields.length > 0) {
@@ -201,9 +201,9 @@
           var newElement = this.createFormElement(field);
 
           if((index % 2) == 0) {
-            this.$.leftFields.appendChild(newElement);
+            this.$['left-fields'].appendChild(newElement);
           } else {
-            this.$.rightFields.appendChild(newElement);
+            this.$['right-fields'].appendChild(newElement);
           }
         }
       }
@@ -237,7 +237,7 @@
     * StdFormBehavior fires a 'things-std-form-response' in this function
     * @param {Event} event Successful response event
     */
-    _onSuccessResponse: function(event) {
+    _successResponseHandler: function(event) {
       this.stopSpinner();
 
       if(this.usePagination) { 
@@ -255,7 +255,7 @@
     * StdFormBehavior fires a 'things-std-form-error' in this function
     * @param {Event} event Error response event
     */
-    _onErrorResponse: function(event) {
+    _errorResponseHandler: function(event) {
       this.stopSpinner();
 
       var response = event.detail.request.xhr.response;
@@ -272,7 +272,7 @@
       }
 
       this.fire('things-std-form-error', response);
-    }    
+    }
 
   });
   </script>
