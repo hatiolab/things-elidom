@@ -38,8 +38,9 @@ A comment describing this element
 -->
 
 <dom-module id="things-std-resource-form">
+
 	<template>
-		<style is="custom-style" include="iron-flex iron-flex-alignment">
+		<style is="custom-style" include="iron-flex iron-flex-alignment"></style>
 		<style>
 			:host {
 				display: block;
@@ -81,12 +82,6 @@ A comment describing this element
 					<div id="right-fields" class="layout vertical flex fields"></div>
 				</div>
 			</form>
-
-			<!--paper-toolbar>
-				<div class="bottom fit">
-				<paper-button affirmative dialog-confirm on-tap="saveResourceForm">Save</paper-button>
-				</div>
-			</paper-toolbar-->
 		</paper-fullscreen-dialog>
 
 		<things-resource 
@@ -95,7 +90,6 @@ A comment describing this element
 			method="GET"
 			output-data="{{resource}}">
 		</things-resource>
-
 	</template>
 
 	<script>
