@@ -298,7 +298,7 @@ A comment describing this element
 				this.stopSpinner();
 
 				if(event.srcElement.method.toUpperCase() != 'GET') {
-					this.fire('things-std-resource-form-saved', true);
+					this.fire('things-std-resource-form-saved', event.detail);
 				}
 			},
 

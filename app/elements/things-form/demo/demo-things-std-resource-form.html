@@ -73,7 +73,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
       <div>
         <things-resource 
           auto
-          action="diy_services/ElidomResourceForm/query.json" 
+          action="diy_services/ElidomResourceFormFields/query.json" 
           output-data="{{formFields}}">
         </things-resource>
 
@@ -87,7 +87,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
       </div>
 
       <div>
-        <paper-input value="{{response}}" label="Response"></paper-input>
+        <paper-textarea id="item-target" value="{{response}}" label="Response"></paper-input>
       </div>
     </template>
 
@@ -97,11 +97,11 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
         is: 'sample-resource-form',
 
         listeners: {
-          'resource-form.things-std-form-response': 'onItemsChanged'
+          'resource-form.things-std-resource-form-saved': 'onSaved'
         },
 
-        onItemsChanged: function(e) {
-          this.$['items-target'].value = JSON.stringify(e.detail.items, null, 4);
+        onSaved: function(e) {
+          this.$['item-target'].value = JSON.stringify(e.detail, null, 4);
         },
 
         open: function(evt) {
@@ -115,30 +115,24 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <template is="dom-bind">
     <section onclick="clickSetting(event)">
 
-      <h3>Setting</h3>
+      <h3>Dynamic Resource Form</h3>
 
       <paper-material class="Page-paper" elevation="1">
-
         <things-setting id="setting"></things-setting>
 
         <div class="buttons">
           <things-button color="green" target-id="setting">Setting</things-button>
         </div>
 
-        <paper-input id="data-id" value="{{dataId}}" label="Data ID"></paper-input>        
+        <paper-input id="data-id" value="{{dataId}}" label="Data ID"></paper-input>
 
         <div class="buttons">
-          <things-button color="indigo" target-id="form">Resource Form</things-button>
+          <things-button color="indigo" target-id="form">Open Form</things-button>
         </div>
+
+        <sample-resource-form id="form"></sample-resource-form>
+
       </paper-material>
-
-    </section>
-
-    <section>
-
-      <h3>Dynamic Resource Form</h3>
-
-      <sample-resource-form id="form"></sample-resource-form>
 
     </section>
   </template>

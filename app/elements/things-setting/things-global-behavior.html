@@ -50,8 +50,7 @@ Things.GlobalBehavior = {
   },
   
   detached: function() {
-    var i;
-    i = instances.indexOf(this);
+    var i = instances.indexOf(this);
     if (i >= 0) {
       instances.splice(i, 1);
     }
@@ -78,8 +77,10 @@ Things.GlobalBehavior = {
    * @param {string} msg 
    */
   showToastMsg: function(msg) {
-    app.$.toast.text = msg;
-    app.$.toast.open();
+    if(typeof(app) !== 'undefined') {
+      app.$.toast.text = msg;
+      app.$.toast.open();
+    }
   }
 
 };

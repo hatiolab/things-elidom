@@ -72,8 +72,10 @@ Things.MsgBoxBehavior = {
   },
 
   showToastMsg: function(msg) {
-    app.$.toast.text = msg;
-    app.$.toast.open();
+    if(typeof(app) !== 'undefined') {
+      app.$.toast.text = msg;
+      app.$.toast.open();
+    }
   }
 
 };
