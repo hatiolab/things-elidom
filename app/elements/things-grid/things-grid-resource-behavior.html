@@ -1,0 +1,144 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="./things-grid-basic-behavior.html">
+
+<script src='../../../bower_components/jszip/dist/jszip.min.js'></script>
+
+<script>
+
+window.Things = window.Things || {};
+
+/**
+ * var Things.GridResourceBehavior enables a custom element to be included in an things-grid-behavior
+ *
+ * @demo ./things-grid/demo/demo-things-resource-grid.html
+ */
+Things.GridResourceBehaviorImpl = {
+
+	properties: {
+		/**
+		 * write enabled or not
+		 */
+		writable: {
+			type: Boolean,
+			value: true
+		},
+		
+		/**
+		 * grid save action url
+		 */
+		gridSaveAction : {
+			type: String
+		},
+
+		/**
+		 * data to save
+		 */
+		writeData: {
+			type: Array,
+			notify: true
+		},
+
+		/**
+		 * file name to export
+		 */
+		exportFileName: {
+			type: String
+		},
+
+		/**
+		 * Excel Export시 Sheet Name
+		 */
+		exportSheetName : {
+			type: String
+		}		
+	},
+
+	listeners: {
+		'import-btn.tap' : 'importGridData',
+		'export-btn.tap' : 'exportGridData',
+		'add-btn.tap'    : 'addGridRow',
+		'delete-btn.tap' : 'removeGridRow',
+		'save-btn.confirm' :'saveGridData'
+	},
+
+	/**
+	 * grid 구성 후 추가 액션 
+	 */
+	afterGridConfigured: function() {
+		this.grid.rowIndicator().setStateVisible(true);
+		this.grid.setEditOptions({ deletable: true, insertable: true, appendable: true });
+	},
+
+	/**
+	 * import from excel
+	 */
+	importGridData: function() {
+		// TODO
+	},
+
+	/**
+	 * export to excel
+	 */
+	exportGridData: function() {
+		new DataLudi.GridExcelExporter().export(this.grid, {
+			target: "local",
+			fileName: this.exportFileName,
+			numberFormat: "#,##0.00",
+			datetimeFormat: "yyyy.mm.dd"
+		});
+	},
+
+	/**
+	 * remove grid row. 실제 삭제하지 않고 플래그 처리한 후 save시 서버에서 일괄 처리한다.
+	 */
+	removeGridRow: function() {
+		var row = this.grid.focusedRow();
+		if (row && row.dataIndex() >= 0) {
+			if (this.dataSet.getRowState(row.dataIndex()) == 'created') {
+				this.dataSet.setRowState(row.dataIndex(), 'createAndDeleted');
+			} else {
+				this.dataSet.setRowState(row.dataIndex(), 'deleted');
+			}
+		}
+	},
+
+	/**
+	 * add grid row
+	 */
+	addGridRow: function() {
+		var row = Math.max(this.grid.focusedDataIndex(), 0);
+		this.dataSet.insertRow(row, {});
+	},
+
+	/**
+	 * 그리드의 변경된 데이터를 감지하여 서버로 한꺼번에 Create/Update/Delete 요청을 한다.
+	 */
+	saveGridData: function() {
+		var changedDataList = [];
+		this._configureChangedData(changedDataList, 'created', 'c');
+		this._configureChangedData(changedDataList, 'updated', 'u');
+		this._configureChangedData(changedDataList, 'deleted', 'd');
+		this.writeData = changedDataList;
+		this._gridSaveAction();
+	},
+
+	/**
+	 * 변경 타입(created, updated, deleted)에 따라 변경데이터를 구성한다.
+	 */
+	_configureChangedData : function(changedData, changeType, changeFlag) {
+		var changed = this.dataSet.getStateRows(changeType);
+		for (var i = 0; i < changed.length; i++) {
+			var changedRow = this.dataSet.getRowObject(changed[i]);
+			changedRow.cud_flag_ = changeFlag;
+			changedData.push(changedRow);
+		}		
+	}
+};
+
+Things.GridResourceBehavior = [
+	Things.GridBasicBehavior,
+	Things.GridResourceBehaviorImpl
+];
+
+</script>

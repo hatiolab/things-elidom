@@ -10,15 +10,40 @@
 
 pagination을 지원하고 데이터를 표시한 후 저장이나 삭제 등의 트랜잭션 기능은 없다.
 
-Example:
+	Example:
 
-	<things-basic-grid></things-basic-grid>
+	  <things-resource 
+	    auto
+	    action="diy_services/ElidomGridModel/query.json" 
+	    output-data="{{gridModel}}">
+	  </things-resource>
 
-Example:
+	  <things-resource 
+	    auto
+	    action="diy_services/ElidomGridColumn/query.json" 
+	    output-data="{{gridColumns}}">
+	  </things-resource>
 
-	<things-basic-grid>
-	  <h2>Hello my-elem</h2>
-	</things-basic-grid>
+	  <things-resource 
+	    id="search-resource"
+	    action="terminologies" 
+	    method="GET"
+	    output-data="{{gridData}}">
+	  </things-resource>
+
+	  <things-basic-grid 
+	    id="grid"
+	    grid-model="[[gridModel]]" 
+	    columns="[[gridColumns]]" 
+	    read-data="[[gridData]]"
+	    page="{{page}}"
+	    limit="{{limit}}"
+	    root-property="items"
+	    total-property="total"
+	    selected-row-data="{{selectedRow}}"
+	    page-start-idx="{{pageStartIdx}}"
+	    page-end-idx="{{pageEndIdx}}">
+	  </things-basic-grid>
 
 @demo ./things-grid/demo/demo-things-basic-grid.html
 -->
@@ -59,6 +84,26 @@ Example:
 			],
 	
 			properties: {
+				/**
+				 * 핸들링하고자 하는 grid event를 설정한다. { grid event 명 : 'event handler 명' }
+				 */
+				gridEvents : {
+					type: Object,
+					value: {
+						onDataCellClicked : '_gridCellClicked'
+					}
+				}
+
+				/**
+				 * 그리드 Row Data가 선택되었을 경우 fire
+				 *
+				 * @event things-grid-row-data-select
+				 */
+				/**
+				 * 그리드 Cell Data가 선택되었을 경우 fire
+				 *
+				 * @event things-grid-cell-data-select
+				 */				
 			},
 
 			created: function() {
@@ -68,39 +113,28 @@ Example:
 
 			detached: function() {
 				this.clearGrid();
-			},			
-
-			/**
-			 * register grid event
-			 */
-			registerGridEvent: function() {
-				var me = this;
-
-				this.grid.onDataCellClicked = function (grid, indexObj) {
-					if (indexObj && indexObj.dataColumn() && indexObj.getDataIndex(grid) >= 0) {
-						var rowIndex = indexObj.getDataIndex(grid);
-						var colIndex = indexObj.dataField();
-						me._gridCellClicked(rowIndex, colIndex, indexObj);
-					}
-				};
 			},
 
 			/**
-			 * grid cell click handler
-			 * @event things-grid-detail-clicked
+			 * Dataludi grid cell click 이벤트 핸들러 
 			 */
-			_gridCellClicked: function(rowIndex, colIndex, indexObj) {
-				console.log(indexObj);
-				var row = this.grid.focusedRow();
-				if (row && row.dataIndex() >= 0) {
-					this.selectedRowData = row.getRowObject();
-				}
+			_gridCellClicked: function(grid, cellData) {
+				var thingsGrid = grid._container_;
 
-				if(this.enableDetailColumn && indexObj.dataField() < 0) {
-					this.onDetailClicked();
-					this.fire('things-grid-detail-clicked', this.selectedRowData);
-				} else {
-					this.selectedCellData = this.dataSet.getValue(rowIndex, colIndex);
+				if (cellData && cellData.dataColumn() && cellData.getDataIndex(grid) >= 0) {
+					var rowIndex = cellData.getDataIndex(grid);
+					var colIndex = cellData.dataField();
+					var row = grid.focusedRow();
+
+					if (row && row.dataIndex() >= 0) {
+						thingsGrid.selectedRowData = row.getRowObject();
+						thingsGrid.fire('things-grid-row-data-select', thingsGrid.selectedRowData);
+					}
+
+					if(cellData.dataField() >= 0) {
+						thingsGrid.selectedCellData = thingsGrid.dataSet.getValue(rowIndex, colIndex);
+						thingsGrid.fire('things-grid-cell-data-select', thingsGrid.selectedCellData);
+					}
 				}
 			}
 

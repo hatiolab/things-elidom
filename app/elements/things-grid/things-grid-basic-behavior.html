@@ -192,8 +192,12 @@ Things.GridBasicBehaviorImpl = {
 				this._setGridColumns(this.columns);
 			}
 
-			if(this.registerGridEvent) {
-				this.registerGridEvent();
+			// grid event 등록 
+			this.registerGridEvent();
+
+			// grid 구성 후 액션 
+			if(this.afterGridConfigured) {
+				this.afterGridConfigured();
 			}
 		}
 	},
@@ -233,7 +237,26 @@ Things.GridBasicBehaviorImpl = {
 		this.dataSet = null;
 		this.model = null;
 		this.columns = null;
+
+		if(this.grid != null && typeof(this.grid._container_) !== 'undefined') {
+			this.grid._container_ = null;
+		}
+
 		this.grid = null;
+	},
+
+	/**
+	 * Dataludi 그리드 이벤트를 추가한다.
+	 * attribute 중에 gridEvent 값이 설정되어 있다면 그것으로 이벤트 핸들러를 등록한다.
+	 */
+	registerGridEvent: function() {
+		if(typeof(this.gridEvent) !== 'undefined') {
+			this.grid._container_ = this;
+
+			for(var eventName in this.gridEvents) {
+				this.grid[eventName] = this[this.gridEvents[eventName]];
+			}
+		}
 	},
 
 	/**
@@ -321,7 +344,8 @@ Things.GridBasicBehaviorImpl = {
 Things.GridBasicBehavior = [
 	Things.GridBasicBehaviorImpl,
 	Polymer.IronResizableBehavior,
-	Things.MsgBoxBehavior
+	Things.MsgBoxBehavior,
+	Things.SpinnerBehavior
 ];
 
 </script>
