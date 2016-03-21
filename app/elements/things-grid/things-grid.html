@@ -399,17 +399,13 @@ Example:
 						this.totalCount = input[this.totalProperty];
 					}
 
-					var items = null;
-					
+					var items = null;					
 					if(this.rootProperty && input) {
 						items = input[this.rootProperty];
-						console.log(this.rootProperty);
-						console.log(input);
-						console.log(input['items']);
 					} else {
 						items = input;
 					}
-					console.log(items);
+
 					this.dataSet.setRows(items);
 
 					if(this.totalCount == 0) {

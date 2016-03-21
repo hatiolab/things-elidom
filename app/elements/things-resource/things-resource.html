@@ -19,7 +19,7 @@ Example:
 	<template>
 
 		<iron-ajax
-		    id="_ajax"
+		  id="_ajax"
 			auto="[[auto]]"
 			url="[[entityUrl]]"
 			handle-as="{{handleAs}}"
@@ -29,14 +29,14 @@ Example:
 			last-response="{{outputData}}"
 			on-response="_successResponse"
 			on-error="_failureResponse"
-			body="[[params]]"
+			body="{{params}}"
 			loading="{{loading}}"
 			on-loading-changed="_onLoadingChanged"
 			query-string="{{queryString}}"
 			with-credentials=[[withCredentials]]
 			timeout="[[timeout]]"
 			json-prefix="[[jsonPrefix]]">
-	    </iron-ajax>
+	  </iron-ajax>
 
 	</template>
 
@@ -73,7 +73,10 @@ Example:
 				 * request prameters
 				 * @type {[Object]}
 				 */
-				params : Object,
+				params : {
+					type: Object,
+					notify: true
+				},
 
 				/**
 				 * entity ID, when use findOne, Delete, Update, exists
@@ -265,6 +268,7 @@ Example:
 			},
 
 			generateRequest: function() {
+				this.$._ajax.params = this.params;
 				this.$._ajax.generateRequest();
 			},
 

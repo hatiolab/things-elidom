@@ -1,0 +1,327 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
+
+<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
+<link rel="import" href="../things-setting/things-global-behavior.html">
+<link rel="import" href="../things-spinner/things-spinner-behavior.html">
+
+<script src='../../../lib/grid/dataludi.lic.eval-1.2.0.min.js'></script>
+<script src='../../../lib/grid/dataludi.eval-1.2.1.min.js'></script>
+
+<script>
+
+window.Things = window.Things || {};
+
+/**
+ * var Things.GridBasicBehavior enables a custom element to be included in an things-grid-behavior
+ *
+ * @demo ./things-grid/demo/index.html
+ */
+Things.GridBasicBehaviorImpl = {
+
+	properties: {
+		/**
+		 * grid mode
+		 */
+		mode: {
+			type: String,
+			value: 'canvas'
+		},
+
+		/**
+		 * total record count
+		 */
+		totalCount: {
+			type: Number,
+			value: 0,
+			notify: true
+		},
+
+		/**
+		 * limit record count
+		 */
+		limit: {
+			type: Number,
+			value: 50,
+			notify: true
+		},
+
+		/**
+		 * use pagination or not
+		 */
+		paginatable: {
+			type: Boolean,
+			value: true
+		},
+
+		/**
+		 * page record count
+		 */
+		page: {
+			type: Number,
+			value: 1,
+			notify: true
+		},
+
+		/**
+		 * page start index
+		 */
+		pageStartIdx: {
+			type: Number
+		},
+
+		/**
+		 * page end index
+		 */
+		pageEndIdx: {
+			type: Number
+		},
+
+		/**
+		 * grid data model - array of fields
+		 */
+		gridModel: {
+			type: Array,
+			observer: '_setGridModel'
+		},
+
+		/**
+		 * grid view column
+		 */
+		columns: {
+			type: Array,
+			observer: '_setGridColumns'
+		},
+
+		/**
+		 * grid header menus
+		 */
+		headerMenus: {
+			type: Array
+		},
+
+		/**
+		 * root property of loaded data
+		 */
+		rootProperty: {
+			type: String,
+			value: ''
+		},
+
+		/**
+		 * total count property of loaded data
+		 */
+		totalProperty: {
+			type: String,
+			value: ''
+		},
+
+		/**
+		 * read data
+		 */
+		readData: {
+			type: Object,
+			observer: '_afterReadGridData'
+		},
+
+		/**
+		 * grid data set
+		 */
+		dataSet: {
+			type: Object,
+			value: function() {
+				return DataLudi.createGridDataSet();
+			}
+		},
+
+		/**
+		 * dataludi grid
+		 */
+		grid: {
+			type: Object
+		},
+
+		/**
+		 * enable detail column
+		 */
+		enableDetailColumn: {
+			type: Boolean,
+			value: true
+		},
+
+		/**
+		 * 선택된 row data
+		 */
+		selectedRowData: {
+			type: Object,
+			notify: true,
+			readonly: true
+		},
+
+		/**
+		 * 선택된 cell data
+		 */
+		selectedCellData: {
+			type: Object,
+			notify: true,
+			readonly: true
+		}
+	},
+
+	listeners: {
+		'iron-resize' : '_gridScreenResizeHandler'
+	},
+
+	/**
+	 * configure grid
+	 */
+	configureGrid: function() {
+		if(this.validateGridConfig() && this.grid == null) {
+			this.grid = DataLudi.createGridView('gridContainer', null, false);
+			this.grid.setDataSource(this.dataSet);
+			this.grid.body().setCellDynamicStyles([{
+				expression: 'row % 2',
+				styles: { background: '#20006060' }
+			}]);
+
+			if(this.gridModel && this.gridModel.length > 0) {
+				this._setGridModel(this.gridModel);
+			}
+
+			if(this.columns && this.columns.length > 0) {
+				this._setGridColumns(this.columns);
+			}
+
+			if(this.registerGridEvent) {
+				this.registerGridEvent();
+			}
+		}
+	},
+
+	/**
+	 * check valid grid configuration
+	 */
+	validateGridConfig: function() {
+		if(this.paginatable) {
+			if(!this.rootProperty) {
+				this.openInfoMsg({
+					type : 'error',
+					title : 'Invalid Grid Configuration!',
+					text : '[root-property] should not be empty if you want to use pagination'
+				});
+				return false;
+			}
+
+			if(!this.totalProperty) {
+				this.openInfoMsg({
+					type : 'error',
+					title : 'Invalid Grid Configuration!',
+					text : '[total-property] should not be empty if you want to use pagination'
+				});
+				return false;
+			}
+		}
+
+		return true;
+	},
+
+	/**
+	 * clear all grid informations
+	 */
+	clearGrid: function() {
+		this.readData = null;
+		this.dataSet = null;
+		this.model = null;
+		this.columns = null;
+		this.grid = null;
+	},
+
+	/**
+	 * parentNode 사이즈에 따라 그리드를 resize
+	 * @param parentNode
+	 * @param gridContainer
+	 */
+	resizeGrid: function(parentNode, gridContainer) {
+		gridContainer.style.width = parentNode.offsetWidth + 'px';
+		gridContainer.style.height = '300px';
+		this.grid.resetSize();
+	},
+
+	/**
+	 * resize handler
+	 */
+	_gridScreenResizeHandler: function(e) {
+		if(this.parentNode.offsetWidth > 0 && this.grid == null) {
+			this.configureGrid();
+		}
+
+		if(this.grid != null) {
+			this.resizeGrid(this.parentNode, this.$.gridContainer);
+		}
+	},
+
+	/**
+	 * set model fields to grid
+	 */
+	_setGridModel: function(gridModel) {
+		if(gridModel && gridModel.length > 0 && this.grid) {
+			this.dataSet.setFields(gridModel);
+			this.dataSet.setCheckStates(true);
+		}
+	},
+
+	/**
+	 * set grid column views to grid
+	 */
+	_setGridColumns: function(columns) {
+		if(columns && columns.length > 0 && this.grid) {
+			var cols = null;
+
+			if(this.enableDetailColumn) {
+				cols = [ {
+					'name': 'Detail',
+					'width': '25',
+					'imageList': 'images',
+					'renderer': {
+						'type': 'icon'
+					},
+					'styles': {
+						'textAlignment': 'center',
+						'iconIndex': 'iconDetail.png',
+						'iconLocation': 'center'
+					},
+					'header': {
+						'text': ' '
+					}
+				} ];
+
+				columns.forEach(function(item) { cols.push(item); });
+			}
+
+			this.grid.setColumns(cols);			
+			this.grid.rowIndicator().setStateVisible(true);
+			this.grid.resetSize();
+		}
+	},
+
+	/**
+	 * after read data
+	 * @param readData
+	 */
+	_afterReadGridData: function(readData) {
+		if(readData && this.dataSet) {
+			var items = this.paginatable ? readData[this.rootProperty] : readData;					
+			this.totalCount = this.paginatable ? readData[this.totalProperty] : (items ? items.length : 0);
+			this.dataSet.setRows(items);
+		}
+	}
+
+};
+
+Things.GridBasicBehavior = [
+	Things.GridBasicBehaviorImpl,
+	Polymer.IronResizableBehavior,
+	Things.MsgBoxBehavior
+];
+
+</script>
