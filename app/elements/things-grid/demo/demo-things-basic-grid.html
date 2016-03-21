@@ -82,13 +82,13 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
         <things-resource 
           auto
           action="diy_services/ElidomGridModel/query.json" 
-          output-data="{{gridModel}}">
+          last-response="{{gridModel}}">
         </things-resource>
 
         <things-resource 
           auto
           action="diy_services/ElidomGridColumn/query.json" 
-          output-data="{{gridColumns}}">
+          last-response="{{gridColumns}}">
         </things-resource>
 
         <things-basic-grid 
@@ -107,10 +107,11 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 
         <things-resource 
           id="search-resource"
-          action="terminologies" 
+          resource="terminologies"
+          action="" 
           method="GET"
           content-type="application/json"
-          output-data="{{gridData}}">
+          last-response="{{gridData}}">
         </things-resource>
       </section>
     </template>

@@ -5,15 +5,15 @@
 <link rel="import" href="../things-spinner/things-spinner-behavior.html">
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 
-<!--A comment describing this element
+<!--Restful Ajax
 
-Example:
+	Example:
 
-<things-resource>
-	<h2>Hello things-resource</h2>
-</things-resource>
+		<things-resource>
 
-@demo demo/index.html-->
+		</things-resource>
+
+@demo ./things-resource/demo/index.html-->
 
 <dom-module id="things-resource">
 	<template>
@@ -21,21 +21,19 @@ Example:
 		<iron-ajax
 		  id="_ajax"
 			auto="[[auto]]"
-			url="[[entityUrl]]"
-			handle-as="{{handleAs}}"
-			method="[[dynamicMethod]]"
+			url="[[resourceUrl]]"
+			handle-as="[[handleAs]]"
+			method="[[method]]"
 			content-type="[[contentType]]"
-			last-request="{{lastRequest}}"
-			last-response="{{outputData}}"
-			on-response="_successResponse"
-			on-error="_failureResponse"
-			body="{{params}}"
+			params="[[params]]"
 			loading="{{loading}}"
-			on-loading-changed="_onLoadingChanged"
-			query-string="{{queryString}}"
 			with-credentials=[[withCredentials]]
 			timeout="[[timeout]]"
-			json-prefix="[[jsonPrefix]]">
+			last-request="{{lastRequest}}"
+			last-response="{{lastResponse}}"			
+			on-response="_successAjaxHandler"
+			on-error="_errorAjaxHandler"
+			on-loading-changed="_loadingChangeHandler">
 	  </iron-ajax>
 
 	</template>
@@ -46,23 +44,21 @@ Example:
 	    
 			properties: {
 				/**
-				 * Resource Entity In Data Service
-				 * @type {[type]}
+				 * resource 대표 URL
 				 */
-				entity : String,
+				resource : {
+					type: String,
+					notify: true,
+					value: ''
+				},
 
 				/**
-				 * entity에 대항 엑세스 방법 정의
+				 * action 
 				 * 모든 리소스는 아래와 같은 일반 Action을 갖고 있다
 				 *
-				 * multi-data Actions : index, update_multiple,imports, export, create
-				 * single-data Actions : findOne, update, delete, isExist(url={id}/exist)
-				 * for single data actions must present entityId
-				 * 
-				 * 일반 액션을 벗어난 Action에 대하여서는 {globals.basicUrl}/{entity}/{action}
-				 * 이런 형태로 호출한다.
-				 * 
-				 * @type {[String]}
+				 * Collection actions : index, update_multiple, imports, export, create
+				 * Member Actions : findOne, update, delete(url = :resource/:id), isExist (url=:resource/:id/exist)
+				 * 기타 : 일반 액션을 벗어난 Action에 대하여서는 {globals.basicUrl}/{resource}/{action} 형태로 호출한다.				 
 				 */
 				action : {
 					type: String,
@@ -70,59 +66,38 @@ Example:
 				},
 
 				/**
+				 * 호출하고자 하는 Ajax Full URL
+				 */
+				resourceUrl: {
+					type: String,
+					computed : '_computeResourceUrl(globals.basicUrl, resource, action)'
+				},				
+
+				/**
 				 * request prameters
-				 * @type {[Object]}
 				 */
-				params : {
-					type: Object,
-					notify: true
-				},
-
-				/**
-				 * entity ID, when use findOne, Delete, Update, exists
-				 */
-				entityId: String,
-
-				/**
-				 * data have received on this transaction 
-				 * @type {[Object]}
-				 */
-				outputData: {
-					type: Object,
-					value: {},
-					notify : true
+				params: {
+					type: String
 				},
 
 				/**
 				 * When request sent and response not received loading will be true, 
 				 * after response received loading will be false.
-				 * @type {[Boolean]}
 				 */
-				loading:{
-					type:Boolean,
-					notify:true,
+				loading: {
+					type: Boolean,
+					notify: true,
 					readOnly : true
 				},
 
-				entityUrl:{
-					computed : '_prepareUrl(globals.basicUrl,action)'
+				method: {
+					type: String
 				},
 
-				method:{
-					type:String,
-					notify:true
+				auto: {
+					type: Boolean,
+					value: false
 				},
-
-				dynamicMethod:{
-					computed : '_prepareMethod(action,method)'
-				},
-
-				auto:{
-					type:Boolean,
-					value:false
-				},
-
-				rootProperty:String,
 
 				handleAs: {
 					type: String,
@@ -132,16 +107,6 @@ Example:
 				headers: {
 					type: Object,
 					value: {}
-				},
-
-				lastRequest: {
-					type: Object,
-					value: {}
-				},
-
-				jsonPrefix: {
-					type: String,
-					value: ''
 				},
 
 				contentType: {
@@ -154,15 +119,58 @@ Example:
 					value: true
 				},
 
-				queryString: {
-					type: String,
-					value: null
-				},
-				
 				timeout: {
 					type: Number,
 					value: 0
+				},				
+
+				lastRequest: {
+					type: Object,
+					value: {}
+				},
+
+				/**
+				 * data have received on this transaction 
+				 */
+				lastResponse: {
+					type: Object,
+					notify : true
+				},
+
+				/**
+				 * 각 action에 대해서 URL, Method, ContentType에 대한 정보를 매핑한다.
+				 */
+				actionMap: {
+					type: Array,
+					value: [
+						{ name: 'index', type: 'collection', method: 'GET', contentType: 'application/x-www-form-urlencoded' },
+						{ name: 'create', type: 'collection', method: 'POST', contentType: 'application/json' },
+						{ name : 'update', type: 'member', method: 'PUT', contentType: 'application/json' },
+						{ name : 'delete', type: 'member', method: 'POST', contentType: 'application/x-www-form-urlencoded' },
+						{ name : 'find', type: 'member', method: 'GET', contentType: 'application/x-www-form-urlencoded' },
+						{ name : 'exist', type: 'member', method: 'GET', contentType: 'application/x-www-form-urlencoded' },
+						{ name : 'show_by_name', type: 'etc', method: 'GET', contentType: 'application/x-www-form-urlencoded' },
+						{ name : 'update_multiple', type: 'etc', method: 'GET', contentType: 'application/json' },
+						{ name : 'imports', type: 'etc', method: 'POST', contentType: '' },
+						{ name : 'export', type: 'etc', method: 'GET', contentType: '' }
+					]
 				}
+
+				/**
+				 * ajax 요청이 성공한 경우 fire
+				 *
+				 * @event things-resource-ajax-success
+				 */
+				/**
+				 * ajax 요청이 실패한 경우 fire
+				 *
+				 * @event things-resource-ajax-error
+				 */
+				/**
+				 * ajax 요청한 경우 fire
+				 *
+				 * @event things-resource-ajax-request
+				 */
 			},
 
 			behaviors: [
@@ -172,77 +180,83 @@ Example:
 			],
 
 			listeners: {
-				'_ajax.request' : '_onAjaxRequest'
+				'_ajax.request' : '_ajaxRequestHandler'
 			},
 
 			/**
-			 * URL 생성
-			 * 
-			 * @param  {[type]} basicUrl [description]
-			 * @param  {[type]} action [description]
-			 * @return {[type]}          [description]
+			 * auto가 false인 경우 Ajax 요청 
 			 */
-			_prepareUrl : function(basicUrl, action) {
-				if(!action) return;
-
-				if(!this.entity) {
-					return [basicUrl, action].join('/');
-					
+			generateRequest: function() {
+				if(this.contentType && this.contentType.toLowerCase().indexOf('application/json') >= 0) {
+					this.$._ajax.body = this.params;
 				} else {
-					/**
-					 * multi-data Actions : index, updateMutiple, imports, export, create
-					 * single-data Actions : findOne, update, delete, isExist(url={id}/exist)
-					 */
-					var callByAction = ['update_multiple', 'imports', 'export'];
-					var singleDataActions =['update', 'delete', 'findOne', 'exist'];
-					var callByEntityName = ['index', 'create']
-
-					if(singleDataActions.indexOf(action) > 0) {
-						if(action !== 'exist') {
-							return [basicUrl, this.entity, this.entityId].join('/');
-						} else {
-							return [basicUrl, this.entity, this.entityId, this.action].join('/');
-						}
-					} else if(callByEntityName.indexOf(this.action) > 0) {
-						return [basicUrl, this.entity].join('/')
-					} else {
-						return [basicUrl, this.entity, this.action].join('/');
-					}
+					this.$._ajax.params = this.params;	
 				}
-			},
+				
+				this.$._ajax.generateRequest();
+			},			
 
-			_prepareMethod: function(action, method) {
-				if(method) {
-					return method
-				} else {
-					var postActions = ['update_multiple','create','import','replace'];
-					if(postActions.indexOf(action) > 0) {
-						return 'POST'
-					} else if(action==='update') {
-						return 'PUT'
-					} else if(action==='delete') {
-						return 'DELETE'
-					} else {
-						return 'GET'
-					}
-				}
-			},
-		
 			/**
-			* Fired when search button is clicked.
-			*
-			* @event request
-			*/
-			_successResponse: function(event) {
-				if(this.rootProperty) this.outputData = this.outputData[this.rootProperty];
-				this.fire('response', this.outputData);
+			 * 실제 Ajax 호출 URL 생성
+			 * 
+			 * @param  {String} basicUrl basic rest url
+			 * @param  {String} resource resource 대표 url
+			 * @param  {String} action basic rest url을 제외한 action url
+			 * @return {String} 실제 액션 URL
+			 */
+			_computeResourceUrl : function(basicUrl, resource, action) {
+				var mapping = this._actionMapping(action);
+
+				if(!mapping) {
+					return [basicUrl, resource, action].join('/');
+
+				} else {
+					this.method = mapping.method;
+					this.contentType = mapping.contentType;
+
+					if(mapping.type == 'collection') {
+						return [basicUrl, resource].join('/');
+
+					} else if(mapping.type == 'member') {
+						return [basicUrl, resource, ':id'].join('/');
+
+					} else {
+						return [basicUrl, resource, action].join('/');
+					}
+
+					return [basicUrl, resource, ((mapping.type == 'member') ? ':id' : '')].join('/');
+				}
+			},
+
+			/**
+			 * action mapping
+			 */
+			_actionMapping: function(action) {
+				for(var i = 0 ; i < this.actionMap.length ; i++) {
+					var actionInfo = this.actionMap[i];
+					if(actionInfo.name == action.toLowerCase()) {
+						return actionInfo;
+					}
+ 				}
+
+				return false;	
+			},
+
+			/**
+			 * ajax 호출 후 성공 시 핸들러
+			 */
+			_successAjaxHandler: function(event) {
+				this.fire('things-resource-ajax-success', this.lastResponse);
 
 				if(this.method && this.method != 'GET') {
 					this.showToastMsg('Success');
 				}
 			},
 
-			_failureResponse: function(event) {
+			/**
+			 * ajax 호출 후 실패 시 핸들러
+			 */
+			_errorAjaxHandler: function(event) {
 				if(event && event.detail && 
 				   event.detail.request && 
 				   event.detail.request.xhr && 
@@ -255,27 +269,25 @@ Example:
 						this.openResponseError(response);
 					}
 
-					this.fire('error', event.detail.request.xhr.response);
+					this.fire('things-resource-ajax-error', event.detail.request.xhr.response);
 
 				} else {
 					this.openUnkownError(response);
-					this.fire('error', event);
+					this.fire('things-resource-ajax-error', event);
 				}
 			},
 
-			_onAjaxRequest: function() {
-				this.fire('request', this.lastRequest);
-			},
-
-			generateRequest: function() {
-				this.$._ajax.params = this.params;
-				this.$._ajax.generateRequest();
+			/**
+  		 * ajax 호출 시 핸들러
+	  	 */
+			_ajaxRequestHandler: function() {
+				this.fire('things-rest-ajax-request', this.lastRequest);
 			},
 
 			/**
-			 * Loading change 시점에 spinner show/hide
+			 * Loading 정보가 변경시 핸들러 
 			 */
-			_onLoadingChanged: function(e) {
+			_loadingChangeHandler: function(e) {
 				if(e.detail) {
 					if(e.detail.value === false) {
 						this.stopSpinner();

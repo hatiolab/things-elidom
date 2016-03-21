@@ -27,6 +27,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </paper-material>
 
     <paper-material class="Page-paper" elevation="1">
+      <p class="paper-font-subhead"><a href="/elements/index.html" target="_blank">Component API & Demo</a></p>
+    </paper-material>    
+
+    <paper-material class="Page-paper" elevation="1">
       <p class="paper-font-subhead">Things Setting</p>
 
       <paper-input label="Base URL" value="{{globals.basicUrl}}"></paper-input>
@@ -224,8 +228,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'ws.onerror' : 'onWsMessageReceive',
           'ws.onopen' : 'onWsMessageReceive',
           'ws.onclose' : 'onWsMessageReceive',
-          'combo.value-changed' : 'onComboValueChanged',
-          'code-selector.value-changed' : 'onComboValueChanged'
+          'combo.things-combo-value-changed' : 'onComboValueChanged',
+          'code-selector.things-combo-value-changed' : 'onComboValueChanged'
         },
 
         onTapSetting: function(e) {

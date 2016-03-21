@@ -15,12 +15,12 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
 
-  <title>things-resource-grid demo</title>
+  <title>things-code-selector demo</title>
 
   <script src="../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
   
   <link rel="import" href="../../../bower_components/polymer/polymer.html">
-  <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+  <link rel="import" href="../../../bower_components/paper-input/paper-input.html">
   <link rel="import" href="../../../bower_components/paper-styles/color.html">
   <link rel="import" href="../../../bower_components/paper-styles/demo-pages.html">
   <link rel="import" href="../../../bower_components/paper-toast/paper-toast.html">
@@ -30,8 +30,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <link rel="import" href="../../things-spinner/things-spinner.html">
   <link rel="import" href="../../things-setting/things-setting.html">
 
-  <link rel="import" href="../things-grid-resource-behavior.html">
-  <link rel="import" href="../things-resource-grid.html">
+  <link rel="import" href="../things-code-selector.html">
 
   <link rel="stylesheet" href="../../../bower_components/paper-styles/demo.css">
 
@@ -72,65 +71,40 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 </head>
 <body unresolved>
 
-  <dom-module id="sample-resource-grid">
+  <dom-module id="sample-code-selector">
     <template>      
       <things-setting id="setting"></things-setting>
 
-      <things-button color="green" id="search">Search</things-button>
-
       <section>
-        <things-resource 
-          auto
-          action="diy_services/ElidomGridModel/query.json" 
-          last-response="{{gridModel}}">
-        </things-resource>
 
-        <things-resource 
-          auto
-          action="diy_services/ElidomGridColumn/query.json" 
-          last-response="{{gridColumns}}">
-        </things-resource>
+        <paper-input label="Selected Value" value="{{codeName}}"></paper-input>
 
-        <things-resource-grid 
-          id="grid"
-          grid-model="[[gridModel]]" 
-          columns="[[gridColumns]]" 
-          read-data="[[gridData]]"
-          page="{{page}}"
-          limit="{{limit}}"
-          root-property="items"
-          total-property="total"
-          grid-save-action="terminologies/update_multiple"
-          selected-row-data="{{selectedRow}}"
-          page-start-idx="{{pageStartIdx}}"
-          page-end-idx="{{pageEndIdx}}">
-        </things-resource-grid>
+        <paper-input label="Selected Description" value="{{codeDesc}}"></paper-input>      
 
-        <things-resource 
-          id="search-resource"
-          resource="terminologies"
-          action="" 
-          method="GET"
-          content-type="application/json"
-          last-response="{{gridData}}">
-        </things-resource>
+        <things-code-selector 
+          id="code-selector" 
+          label="Language" 
+          value="en-US" 
+          code-name="LOCALE" 
+          label-path="description" 
+          value-path="name">
+        </things-code-selector>
+
       </section>
     </template>
 
     <script>
       Polymer({
 
-        is: 'sample-resource-grid',
+        is: 'sample-code-selector',
 
         listeners: {
-          'search.tap' : 'search'
+          'code-selector.things-combo-value-changed' : 'valueChanged'
         },
 
-        search: function(e) {
-          var grid = this.$.grid;
-          var resource = this.$['search-resource'];
-          resource.params = { page : grid.page, limit : grid.limit };
-          resource.generateRequest();
+        valueChanged: function(e) {
+          this.codeName = e.detail.item.name;
+          this.codeDesc = e.detail.item.description;
         }
 
       });
@@ -140,9 +114,9 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <template is="dom-bind" id="app">
 
     <section>
-      <h4>Things Resource Grid</h4>
+      <h4>Things Code Selector</h4>
 
-      <sample-resource-grid></sample-resource-grid>
+      <sample-code-selector></sample-code-selector>
     </section>
 
     <things-spinner id="spinner" loading=false></things-spinner>

@@ -17,13 +17,13 @@
     <things-resource 
       auto
       action="diy_services/ElidomGridModel/query.json" 
-      output-data="{{gridModel}}">
+      last-response="{{gridModel}}">
     </things-resource>
 
     <things-resource 
       auto
       action="diy_services/ElidomGridColumn/query.json" 
-      output-data="{{gridColumns}}">
+      last-response="{{gridColumns}}">
     </things-resource>
 
     <things-resource 
@@ -31,7 +31,7 @@
       action="terminologies" 
       method="GET"
       content-type="application/json"
-      output-data="{{gridData}}">
+      last-response="{{gridData}}">
     </things-resource>
 
     <things-resource-grid 

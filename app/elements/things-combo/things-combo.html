@@ -36,12 +36,16 @@
         },
 
         listeners: {
-          'combo.value-changed' : 'onValueChanged'
+          'combo.value-changed' : '_valueChangeHandler'
         },
 
-        onValueChanged: function(e) {
-          if(e.detail.value && this.valuePath) {
-            this.fire('value-changed', { value : e.detail.value, item: this.$.combo.selectedItem});
+        _valueChangeHandler: function(e) {
+          if(this.valuePath) {
+            if(e.detail.value) {
+              this.fire('things-combo-value-changed', { value : e.detail.value, item : this.$.combo.selectedItem});
+            } else {
+              this.fire('things-combo-value-changed', { value : '', item : {} });
+            }
           }
         }
 
