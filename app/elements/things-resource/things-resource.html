@@ -227,7 +227,7 @@
 					}
 				}
 
-				return urlArr.filter(Boolean).join('/');
+				return urlArr.filter(function(e) { return e ? true : false }).join('/');
 			},
 
 			/**
