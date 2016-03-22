@@ -59,10 +59,14 @@ Things.MsgBoxBehavior = {
   },
 
   openResponseError: function(response) {
+    if(response.body) {
+      response = response.body;
+    }
+
     this.openInfoMsg({
       type : 'warning',
       title : 'Error (' + response.error_id + ')',
-      text : '<span>Code : ' + response.code + '<br/><span>Status</span> : ' + response.status + '<br/><p><span>Message</span> : ' + response.msg,
+      text : '<span>Code : ' + response.code + '<br/><br/><span>Status</span> : ' + response.status + '<br/><br/><p><span>Message</span> : ' + response.msg,
       html : true
     });
   },

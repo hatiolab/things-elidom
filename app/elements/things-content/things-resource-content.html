@@ -281,14 +281,12 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			_parseResourceFormFields: function(metaDataList) {
 				var resourceFormFields = [];
 				metaDataList.forEach(function(metaData) {
-					if(metaData.search_rank && metaData.search_rank > 0) {
-						var field = { name : metaData.name, label : metaData.name };
-						if(metaData.editor == 'code') {
-							field.type = 'code-combo';
-							field.codeName = metaData.ref_name;
-						}
-						resourceFormFields.push(field);
+					var field = { name : metaData.name, label : metaData.name };
+					if(metaData.editor == 'code') {
+						field.type = 'code-combo';
+						field.codeName = metaData.ref_name;
 					}
+					resourceFormFields.push(field);
 				});
 
 				return resourceFormFields;
@@ -302,7 +300,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			_parseGridModel: function(metaDataList) {
 				var gridModels = [];
 				metaDataList.forEach(function(metaData) {
-					if(metaData.list_rank && metaData.list_rank > 0) {
+					if(metaData.name == 'id' || (metaData.list_rank && metaData.list_rank > 0)) {
 						var field = { fieldName : metaData.name };
 						if(['integer', 'int', 'long', 'double', 'float'].includes(metaData.col_type)) {
 							field.dataType = 'number';
