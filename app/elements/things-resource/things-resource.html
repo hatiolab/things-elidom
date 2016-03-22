@@ -207,7 +207,7 @@
 			 */
 			_computeResourceUrl : function(basicUrl, resource, action) {
 				var mapping = this._actionMapping(action);
-				var urlArr = null;
+				var urlArr = [];
 
 				if(!mapping) {
 					urlArr = [basicUrl, resource, action];
@@ -217,16 +217,16 @@
 					this.contentType = mapping.contentType;
 
 					if(mapping.type == 'collection') {
-						urlArr = [basicUrl, resource].join('/');
+						urlArr = [basicUrl, resource];
 
 					} else if(mapping.type == 'member') {
-						urlArr = [basicUrl, resource, ':id'].join('/');
+						urlArr = [basicUrl, resource, ':id'];
 
 					} else {
-						urlArr = [basicUrl, resource, action].join('/');
+						urlArr = [basicUrl, resource, action];
 					}
 				}
-
+				console.log(urlArr);
 				return urlArr.filter(function(e) { return e ? true : false }).join('/');
 			},
 
