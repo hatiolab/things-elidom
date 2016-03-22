@@ -50,6 +50,14 @@ window.addEventListener('WebComponentsReady', () => {
     app.route = 'example';
   });
 
+  page('/example', scrollToTop, () => {
+    app.route = 'example';
+  });
+  page('/Terminology', scrollToTop, () => {
+    app.route = 'Terminology';
+  });
+
+
   page('*', function(attempted) {
     let url = window.location.href + attempted.path.substr(1);
     app.$.toastConfirm.text = `Can't find: ${url}. Redirected you to Home Page`;

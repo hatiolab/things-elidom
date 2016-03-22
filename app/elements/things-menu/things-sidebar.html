@@ -97,25 +97,17 @@
 			background: var(--paper-teal-700);
 		}
 		</style>
-<!--         <things-resource id="refresh" 
-				content-type="application/json" 
-				resource="menu" 
-				output-data="{{menu}}">
-		</things-resource> -->
 		<things-resource
 			auto=true
 			id="refresh"
 			content-type="application/json" 
-			action="menus.json" 
+			action="menus.json"
 			last-response="{{menu}}">
 		</things-resource>
 
 		<div class="brand">Menu</div>
 		<!-- Drawer Scroll Header Panel -->
 		<paper-scroll-header-panel id = "panel">
-<!--             <paper-toolbar >
-                <span>Menu</span>
-            </paper-toolbar> -->
 			<template is="dom-repeat" items="{{menuGroup}}" as=group>
 				<!-- {{item}} and {{index}} can be used in this binding scope -->
 				<paper-button aria-controls={{group.menuGroupId}} on-click="toggle">
@@ -214,7 +206,8 @@
 
 			onSelectedMenuChange: function(selectedMenu) {
 				var data = JSON.parse(this.selectedMenu.getAttribute("data"));
-				page('/demo');
+				console.log(data);
+				page('/'+data.name);
 			},
 
 			refreshmenu: function(e) {
