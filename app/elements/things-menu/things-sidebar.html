@@ -207,7 +207,7 @@
 			onSelectedMenuChange: function(selectedMenu) {
 				var data = JSON.parse(this.selectedMenu.getAttribute("data"));
 				console.log(data);
-				page('/'+data.name);
+				page(data.description);
 			},
 
 			refreshmenu: function(e) {

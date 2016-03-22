@@ -53,8 +53,8 @@ window.addEventListener('WebComponentsReady', () => {
   page('/example', scrollToTop, () => {
     app.route = 'example';
   });
-  page('/Terminology', scrollToTop, () => {
-    app.route = 'Terminology';
+  page('/terminology', scrollToTop, () => {
+    app.route = 'terminology';
   });
 
 
