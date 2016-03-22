@@ -33,8 +33,7 @@ Things.GridBasicBehaviorImpl = {
 		 */
 		totalCount: {
 			type: Number,
-			value: 0,
-			notify: true
+			value: 0
 		},
 
 		/**
@@ -51,7 +50,7 @@ Things.GridBasicBehaviorImpl = {
 		 */
 		paginatable: {
 			type: Boolean,
-			value: true
+			value: false
 		},
 
 		/**
@@ -250,7 +249,7 @@ Things.GridBasicBehaviorImpl = {
 	 * attribute 중에 gridEvent 값이 설정되어 있다면 그것으로 이벤트 핸들러를 등록한다.
 	 */
 	registerGridEvent: function() {
-		if(typeof(this.gridEvent) !== 'undefined') {
+		if(typeof(this.gridEvents) !== 'undefined') {
 			this.grid._container_ = this;
 
 			for(var eventName in this.gridEvents) {

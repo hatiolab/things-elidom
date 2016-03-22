@@ -284,9 +284,7 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			/**
 			 * 리소스 폼을 오픈한다.
 			 */
-			openResourceForm: function(event) {
-				var data = event.detail;
-
+			openResourceForm: function(data) {
 				if(this.$['left-fields'].childNodes.length == 0) {
 					this.reconfigureMyForm();
 				}
@@ -404,7 +402,7 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			_errorResponseHandler: function(event) {
 				this.stopSpinner();
 
-				var response = event.detail.request.xhr.response;
+				var response = (event.detail && !event.detail.request) ? event.detail : event.detail.request.xhr.response;
 				if(response && response.status == 401) {
 					this.handleUnauthorized();
 

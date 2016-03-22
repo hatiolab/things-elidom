@@ -9,11 +9,10 @@
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
 
 <link rel="import" href="../things-button/things-button.html">
-<link rel="import" href="../things-form/things-resource-form.html">
-<link rel="import" href="../things-form/things-search-form.html">
-<link rel="import" href="../things-grid/things-grid.html">
 <link rel="import" href="../things-resource/things-resource.html">
-<link rel="import" href="../things-paginator/things-paginator.html">
+<link rel="import" href="../things-grid/things-resource-grid.html">
+<link rel="import" href="../things-form/things-std-resource-form.html">
+<link rel="import" href="../things-form/things-std-search-form.html">
 
 <!--
 하나의 리소스에 대한 기본 액션 (List, Create, Find, Upate, Delete) 및 Import, Export 등의 기능을 제공하는 화면 셋 
@@ -43,7 +42,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				id="resource-mata"
 				auto
 				method="GET"
-				action="{{resourceMetaUrl}}"
+				action="[[resourceMetaUrl]]"
 				last-response="{{metaData}}">
 			</things-resource>
 
@@ -52,39 +51,34 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
         class="flex"
         title="[[title]]"
         form-fields="[[searchFormFields]]" 
-        action-url="{{resourceUrl}}" 
-        use-pagination=true
+        action-url="[[resourceUrl]]" 
         page="{{page}}"
-        per-page="{{perPage}}"
-        total-count="{{totalCount}}"
-        total-property="total"
-        root-property="items"
-        items="{{items}}">
+        per-page="[[perPage]]"
+        last-response="{{lastResponse}}">
       </things-std-search-form>
 
-      <!--things-resource-grid 
+      <things-resource-grid 
         id="grid"
         grid-model="[[gridModel]]" 
         columns="[[gridColumns]]" 
-        read-data="[[items]]"
+        paginatable
         page="{{page}}"
-        limit="{{limit}}"
-        root-property="items"
-        total-property="total"
-        grid-save-action="terminologies/update_multiple"
+        limit="{{perPage}}"
+        root-property="[[rootProperty]]"
+        total-property="[[totalProperty]]"
+        read-data="[[lastResponse]]"
+        grid-save-action="[[gridSaveUrl]]"
         selected-row-data="{{selectedRow}}"
-        page-start-idx="{{pageStartIdx}}"
-        page-end-idx="{{pageEndIdx}}">
+        export-sheet-name="[[title]]">
       </things-resource-grid>
 
 			<things-std-resource-form 
 				id="resource-form"
-				title="Item Detail"
+				title="[[title]] Detail"
+				resource-url="[[memberResourceUrl]]"
 				form-fields="[[resourceFormFields]]" 
-				input="{{selectedRow}}"
-				action="{{formSaveActionUrl}}"
-				get-resource-url="{{getResourceUrl}}">
-			</things-std-resource-form-->
+				input="{{selectedRow}}">
+			</things-std-resource-form>
 		</div>
 	</template>
 
@@ -143,87 +137,221 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				},
 
 				/**
-				 * search form fields
+				 * Search form fields
 				 */
 				searchFormFields: {
 					type: Array
 				},
 
 				/**
-				 * resource form fields
+				 * Resource form fields
 				 */
 				resourceFormFields: {
 					type: Array
 				},
 
-				/*searchFieldUrl: {
-					type: String
+				/**
+				 * Grid model
+				 */
+				gridModel: {
+					type: Array
 				},
-				searchActionUrl: {
-					type: String
-				},
-				formFieldUrl: {
-					type: String
-				},
-				formSaveActionUrl: {
-					type: String
-				},				
-				gridFieldUrl: {
-					type: String
-				},
-				gridColumnUrl: {
-					type: String
-				},
-				gridOuput: {
-					type: Object
-				},
+
+				/**
+				 * Grid columns
+				 */
 				gridColumns: {
 					type: Array
 				},
-				gridFields: {
-					type: Array
+
+				/**
+				 * grid save url
+				 */
+				gridSaveUrl: {
+					type: String,
+					computed: '_computeGridSaveUrl(resourceUrl)'
 				},
-				gridData: {
-					type: Array
+
+				/**
+				 * Search Form에서 검색 결과 Object 중에서 List를 나타내는 프로퍼티 
+				 */
+				rootProperty: {
+					type: String,
+					value: 'items'
 				},
+
+				/**
+				 * Search Form에서 검색 결과 Object 중에서 Total을 나타내는 프로퍼티 
+				 */
+				totalProperty: {
+					type: String,
+					value: 'total'
+				},
+
+				/**
+				 * Get/Update/Delete 등을 위한 {resourceUrl}/:id 형식 URL
+				 */
+				memberResourceUrl: {
+					type: String,
+					computed: '_computeMemberResourceUrl(resourceUrl)'
+				},
+
+				/**
+				 * 그리드에서 선택된 Row Data
+				 */
 				selectedRow: {
 					type: Object
-				}*/
+				}
 			},
 
-			/*listeners : {
-				'grid.on-detail-clicked': '_showResourceForm',
-				'grid.refresh-data': '_refreshGridData',
-				'resource-form.resource-saved' : '_refreshGridData'
-			},*/			
+			listeners : {
+				'grid.things-grid-row-data-select': '_showResourceForm',
+				'grid.things-grid-save-success': '_refreshGridData',
+				'resource-form.things-std-resource-form-saved' : '_refreshGridData'
+			},
 			
 			/**
 			 * resourceName으로 resource meta url을 생성
+			 * @param {String} resourceName
+			 * @return {String} resource meta get URL
 			 */
 			_computeResourceMetaUrl: function(resourceName) {
 				return 'entities/' + resourceName + '/resource_columns.json';
 			},
 
 			/**
-			 * meta data를 파싱한다.
+			 * resourceUrl로 grid save url을 생성
+			 * @param {String} resourceUrl
+			 * @return {String} grid save URL
 			 */
-			_parseMetaData: function(metaData) {
-				console.log(metaData);
+			_computeGridSaveUrl: function(resourceUrl) {
+				return resourceUrl + '/update_multiple.json';
+			},
 
-				// 1. Parse Form Fields
-				// 2. Parse Grid Models
-				// 3. Parse Grid Columns
+			/**
+			 * resourceUrl로 grid save url을 생성
+			 * @param {String} resourceUrl
+			 * @return {String} grid save URL
+			 */
+			_computeMemberResourceUrl: function(resourceUrl) {
+				return resourceUrl + '/:id';
+			},
+
+			/**
+			 * meta data를 파싱한다.
+			 * @param {Array} metaDataList
+			 */
+			_parseMetaData: function(metaDataList) {
+				// 1. Parse Search Form Fields
+				this.searchFormFields = this._parseSearchFormFields(metaDataList);
+				// 2. Parse Resource Form Fields
+				this.resourceFormFields = this._parseResourceFormFields(metaDataList);
+				// 3. Parse Grid Models
+				this.gridModel = this._parseGridModel(metaDataList);
+				// 4. Parse Grid Columns
+				this.gridColumns = this._parsetGridColumns(metaDataList);
+			},
+
+			/**
+			 * meta data로 부터 SearchFormField를 파싱한다.
+			 * @param {Array} metaDataList
+			 * @return {Array} searchFormFields
+			 */
+			_parseSearchFormFields: function(metaDataList) {
+				var searchFormFields = [];
+				metaDataList.forEach(function(metaData) {
+					if(metaData.search_rank && metaData.search_rank > 0) {
+						var field = { name : metaData.name, label : metaData.name };
+						if(metaData.editor == 'code') {
+							field.type = 'code-combo';
+							field.codeName = metaData.ref_name;
+						}
+						searchFormFields.push(field);
+					}
+				});
+
+				return searchFormFields;
+			},
+
+			/**
+			 * meta data로 부터 ResourceFormField를 파싱한다.
+			 * @param {Array} metaDataList
+			 * @return {Array} resourceFormFields
+			 */
+			_parseResourceFormFields: function(metaDataList) {
+				var resourceFormFields = [];
+				metaDataList.forEach(function(metaData) {
+					if(metaData.search_rank && metaData.search_rank > 0) {
+						var field = { name : metaData.name, label : metaData.name };
+						if(metaData.editor == 'code') {
+							field.type = 'code-combo';
+							field.codeName = metaData.ref_name;
+						}
+						resourceFormFields.push(field);
+					}
+				});
+
+				return resourceFormFields;
+			},
+
+			/**
+			 * meta data로 부터 GridModel을 파싱한다.
+			 * @param {Array} metaDataList
+			 * @return {Array} gridModel
+			 */
+			_parseGridModel: function(metaDataList) {
+				var gridModels = [];
+				metaDataList.forEach(function(metaData) {
+					if(metaData.list_rank && metaData.list_rank > 0) {
+						var field = { fieldName : metaData.name };
+						if(['integer', 'int', 'long', 'double', 'float'].includes(metaData.col_type)) {
+							field.dataType = 'number';
+						}
+						gridModels.push(field);
+					}
+				});
+
+				return gridModels;
+			},
+
+			/**
+			 * meta data로 부터 GridColumns를 파싱한다.
+			 * @param {Array} metaDataList
+			 * @return {Array} gridColumns
+			 */
+			_parsetGridColumns: function(metaDataList) {
+				var gridColumns = [];
+				metaDataList.forEach(function(metaData) {
+					if(metaData.list_rank && metaData.list_rank > 0) {
+						var field = { 
+							name: metaData.name, 
+							fieldName : metaData.name, 
+							width : metaData.width ? metaData.width : 100,
+							header : {
+								text: metaData.name
+							}
+						};
+
+						gridColumns.push(field);
+					}
+				});
+
+				return gridColumns;
 			},
 
 			/**
 			 * open resource form dialog
+			 * @param event 그리드에서 선택된 event
 			 */
-			_showResourceForm: function(row) {
-				this.$['resource-form'].openResourceForm(row);
+			_showResourceForm: function(event) {
+				this.$['resource-form'].openResourceForm(event.detail);
 			},
 
-			_refreshGridData:function(grid){
-				this.$['search-form']._getForm().submit();
+			/**
+			 * research form
+			 */
+			_refreshGridData: function(grid) {
+				this.$['search-form'].getMyForm().submit();
 			}
 		});
 	</script>

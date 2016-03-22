@@ -204,29 +204,29 @@ Example:
       }
     </style>
 
-    <template is="dom-if" if="{{showFlag}}">
+    <template is="dom-if" if="[[showFlag]]">
       <ul id="paginationlist" class="pagination">
-        <template is="dom-if" if="{{showFirst}}">
+        <template is="dom-if" if="[[showFirst]]">
           <li><a on-tap="firstPage">First</a></li>
         </template>
 
-        <li class$='{{disablePrev}}'>
-          <a on-tap="prevPage">{{previous}}</a>
+        <li class$='[[disablePrev]]'>
+          <a on-tap="prevPage">[[previous]]</a>
         </li>
 
         <li><a>Page</a><li>
         <paper-input type='number' value="{{currentPage}}" min="1" class="current"></paper-input>
-        <li><a>of   {{totalPage}}</a><li>
+        <li><a>of   [[totalPage]]</a><li>
 
-        <li class$='{{disableNext}}'>
-            <a on-tap="nextPage">{{next}}</a>
+        <li class$='[[disableNext]]'>
+            <a on-tap="nextPage">[[next]]</a>
         </li>
 
-        <template is="dom-if" if="{{showLast}}">
+        <template is="dom-if" if="[[showLast]]">
           <li><a on-tap="lastPage">Last</a></li>
         </template>
 
-        <li><a>Items {{pageStartIdx}} - {{pageEndIdx}} of Total : {{totalCount}}</a></li>
+        <li><a>Items [[pageStartIdx]] - [[pageEndIdx]] of Total : [[totalCount]]</a></li>
       </ul>
     </template>
 
@@ -287,8 +287,7 @@ Example:
          */
         totalCount: {
           type: Number,
-          value: 0,
-          notify: true
+          value: 0
         },
 
         /**
@@ -300,8 +299,7 @@ Example:
          */
         totalPage : {
           type: Number,
-          value: 0,
-          notify: true
+          value: 0
         },
 
         /**
@@ -313,8 +311,7 @@ Example:
          */
         pageStartIdx: {
           type: Number,
-          value: 1,
-          notify: true
+          value: 1
         },
 
         /**
@@ -326,8 +323,7 @@ Example:
          */
         pageEndIdx: {
           type: Number,
-          value: 1,
-          notify: true
+          value: 1
         },
 
         /**
@@ -485,9 +481,9 @@ Example:
       _totalCountChanged: function(totalCount) {
         this.setTotalPage();
 
-        if(this.currentPage > this.totalPage) {
+        /*if(this.currentPage > this.totalPage) {
           this.currentPage = 1;
-        }
+        }*/
 
         this.showFlag = totalCount > 0;
       }
