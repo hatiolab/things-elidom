@@ -8,174 +8,140 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
-
 <html lang="{$ lang $}">
 {% include "head.html" %}
+
 <body unresolved class="fullbleed vertical layout">
-  <span id="browser-sync-binding"></span>
-  <template is="dom-bind" id="app">
+    <span id="browser-sync-binding"></span>
+    <template is="dom-bind" id="app">
+        <paper-drawer-panel id="paperDrawerPanel" responsive-width="599px">
+            <things-sidebar drawer class="layout vertical"></things-sidebar>
+            <!-- Drawer Scroll Header Panel -->
+            <!-- <paper-scroll-header-panel class="Drawer" drawer fixed>
+                <paper-toolbar class="Drawer-header">
+                    <span class="Drawer-title">Menu</span>
+                </paper-toolbar>
+                <nav>
+                    <paper-menu class="Drawer-widget Navigation list" attr-for-selected="data-route" selected="[[route]]">
+                        <a class="Navigation-link" data-route="home" href="/" on-tap="onDataRouteClick">
+                            <iron-icon class="Navigation-icon" icon="home"></iron-icon>
+                            <span>Home</span>
+                        </a>
+                        <a class="Navigation-link" data-route="users" href="/users" on-tap="onDataRouteClick">
+                            <iron-icon class="Navigation-icon" icon="info"></iron-icon>
+                            <span>Users</span>
+                        </a>
+                        <a class="Navigation-link" data-route="contact" href="/contact" on-tap="onDataRouteClick">
+                            <iron-icon class="Navigation-icon" icon="mail"></iron-icon>
+                            <span>Contact</span>
+                        </a>
+                        <a class="Navigation-link" data-route="sidemenu" href="/sidemenu" on-tap="onDataRouteClick">
+                            <iron-icon class="Navigation-icon" icon="menu"></iron-icon>
+                            <span>SideMenu</span>
+                        </a>
+                        <a class="Navigation-link" data-route="demo" href="/demo" on-tap="onDataRouteClick">
+                            <iron-icon class="Navigation-icon" icon="menu"></iron-icon>
+                            <span>Elidom</span>
+                        </a>
+                        <a class="Navigation-link" data-route="example" href="/example" on-tap="onDataRouteClick">
+                            <iron-icon class="Navigation-icon" icon="menu"></iron-icon>
+                            <span>Example Field</span>
+                        </a>
+                    </paper-menu>
+                </nav>
+            </paper-scroll-header-panel> -->
+            <!-- Main Area -->
+            <paper-scroll-header-panel id="headerPanelMain" class="Main" main condenses keep-condensed-header>
+                <!-- Main Toolbar -->
+                <paper-toolbar class="Main-header tall">
+                    <paper-icon-button id="paperToggle" icon="menu" paper-drawer-toggle></paper-icon-button>
+                    <span class="flex"></span>
+                    <!-- Toolbar icons -->
+                    <paper-icon-button icon="refresh"></paper-icon-button>
+                    <paper-icon-button icon="search"></paper-icon-button>
+                    <!-- Application name -->
+                    <div class="Main-headerMiddleContent middle center horizontal layout">
+                        <h1 class="Main-headerTitle">Elidom</h1>
+                    </div>
+                    <!-- Application sub title -->
+                    <div class="Main-headerBottomContent bottom center horizontal layout">
+                        <div class="Main-headerSubTitle">The future of the web today</div>
+                    </div>
+                </paper-toolbar>
+                <!-- Main Content -->
+                <iron-pages class="Main-content" attr-for-selected="data-route" selected="{{route}}">
+                    <section class="Page" data-route="home">
+                        <paper-material class="Page-paper" elevation="1">
+                            <my-greeting></my-greeting>
+                            <p class="paper-font-subhead">You now have:</p>
+                            <my-list></my-list>
+                            <p class="paper-font-body2">Looking for more Web App layouts? Check out our <a href="https://github.com/PolymerElements/app-layout-templates">layouts</a> collection. You can also <a href="http://polymerelements.github.io/app-layout-templates/">preview</a> them live.</p>
+                        </paper-material>
+                        <paper-material class="Page-paper" elevation="1">
+                            <p class="paper-font-body2">This is another card.</p>
+                        </paper-material>
+                        <paper-material class="Page-paper" elevation="1">
+                            {% markdown "license.md" %}
+                        </paper-material>
+                    </section>
+                    <section class="Page" data-route="users">
+                        <paper-material class="Page-paper" elevation="1">
+                            <h2 class="Page-title">Users</h2>
+                            <p>This is the users section</p>
+                            <a href="/users/Rob">Rob</a>
+                        </paper-material>
+                    </section>
+                    <section class="Page" data-route="user-info">
+                        <paper-material class="Page-paper" elevation="1">
+                            <h2 class="Page-title">User: {{params.name}}</h2>
+                            <div>This is {{params.name}}'s section</div>
+                        </paper-material>
+                    </section>
+                    <section class="Page" data-route="contact">
+                        <paper-material class="Page-paper" elevation="1">
+                            <things-content title="Screen1" search-field-url="diy_services/ElidomSearchForm/query.json" search-action-url="diy_services/DynamicScreen/query.json" form-field-url="diy_services/ElidomResourceFormFields/query.json" form-save-action-url="terminologies/:id" get-resource-url="terminologies/:id" grid-field-url="diy_services/ElidomGridModel/query.json" grid-column-url="diy_services/ElidomGridColumn/query.json" layout="fullbleed layout vertical">
+                            </things-content>
+                        </paper-material>
+                    </section>
 
-    <paper-drawer-panel id="paperDrawerPanel" responsive-width="599px">
-      <!-- Drawer Scroll Header Panel -->
-      <paper-scroll-header-panel class="Drawer" drawer fixed>
-        <!-- Drawer Toolbar -->
-        <paper-toolbar class="Drawer-header">
-          <span class="Drawer-title">Menu</span>
-        </paper-toolbar>
+                    <section class="Page" data-route="sidemenu">
+                        <paper-material class="Page-paper" elevation="1">
+                            <things-sidebar drawer class="layout vertical" url="menu.json">
+                            </things-sidebar>
+                        </paper-material>
+                    </section>
 
-        <!-- Drawer Content -->
-        <!-- Navigation -->
-        <nav>
-        <paper-menu class="Drawer-widget Navigation list" attr-for-selected="data-route" selected="[[route]]">
-          <a class="Navigation-link" data-route="home" href="/" on-tap="onDataRouteClick">
-            <iron-icon class="Navigation-icon" icon="home"></iron-icon>
-            <span>Home</span>
-          </a>
-
-          <a class="Navigation-link" data-route="users" href="/users" on-tap="onDataRouteClick">
-            <iron-icon class="Navigation-icon" icon="info"></iron-icon>
-            <span>Users</span>
-          </a>
-
-          <a class="Navigation-link" data-route="contact" href="/contact" on-tap="onDataRouteClick">
-            <iron-icon class="Navigation-icon" icon="mail"></iron-icon>
-            <span>Contact</span>
-          </a>
-
-          <a class="Navigation-link" data-route="demo" href="/demo" on-tap="onDataRouteClick">
-            <iron-icon class="Navigation-icon" icon="menu"></iron-icon>
-            <span>Elidom</span>
-          </a>
-
-          <a class="Navigation-link" data-route="example" href="/example" on-tap="onDataRouteClick">
-            <iron-icon class="Navigation-icon" icon="menu"></iron-icon>
-            <span>Example Field</span>
-          </a>
-        </paper-menu>
-        </nav>
-      </paper-scroll-header-panel>
-
-      <!-- Main Area -->
-      <paper-scroll-header-panel id="headerPanelMain" class="Main" main condenses keep-condensed-header>
-
-        <!-- Main Toolbar -->
-        <paper-toolbar class="Main-header tall">
-          <paper-icon-button id="paperToggle" icon="menu" paper-drawer-toggle></paper-icon-button>
-          <span class="flex"></span>
-
-          <!-- Toolbar icons -->
-          <paper-icon-button icon="refresh"></paper-icon-button>
-          <paper-icon-button icon="search"></paper-icon-button>
-
-          <!-- Application name -->
-          <div class="Main-headerMiddleContent middle center horizontal layout">
-            <h1 class="Main-headerTitle">Elidom</h1>
-          </div>
-
-          <!-- Application sub title -->
-          <div class="Main-headerBottomContent bottom center horizontal layout">
-            <div class="Main-headerSubTitle">The future of the web today</div>
-          </div>
-
-        </paper-toolbar>
-
-        <!-- Main Content -->
-        <iron-pages class="Main-content" attr-for-selected="data-route" selected="{{route}}">
-
-          <section class="Page" data-route="home">
-            <paper-material class="Page-paper" elevation="1">
-              <my-greeting></my-greeting>
-
-              <p class="paper-font-subhead">You now have:</p>
-              <my-list></my-list>
-
-              <p class="paper-font-body2">Looking for more Web App layouts? Check out our <a href="https://github.com/PolymerElements/app-layout-templates">layouts</a> collection. You can also <a href="http://polymerelements.github.io/app-layout-templates/">preview</a> them live.</p>
-            </paper-material>
-            <paper-material class="Page-paper" elevation="1">
-              <p class="paper-font-body2">This is another card.</p>
-            </paper-material>
-
-            <paper-material class="Page-paper" elevation="1">
-              {% markdown "license.md" %}
-            </paper-material>
-          </section>
-
-          <section class="Page" data-route="users">
-            <paper-material class="Page-paper" elevation="1">
-              <h2 class="Page-title">Users</h2>
-              <p>This is the users section</p>
-              <a href="/users/Rob">Rob</a>
-            </paper-material>
-          </section>
-
-          <section class="Page" data-route="user-info">
-            <paper-material class="Page-paper" elevation="1">
-              <h2 class="Page-title">User: {{params.name}}</h2>
-              <div>This is {{params.name}}'s section</div>
-            </paper-material>
-          </section>
-
-          <section class="Page" data-route="contact">
-            <paper-material class="Page-paper" elevation="1">
-              <things-content 
-                title="Screen1"
-                search-field-url="diy_services/ElidomSearchForm/query.json"
-                search-action-url="diy_services/DynamicScreen/query.json"
-                form-field-url="diy_services/ElidomResourceFormFields/query.json"
-                form-save-action-url="terminologies/:id"
-                get-resource-url="terminologies/:id"
-                grid-field-url="diy_services/ElidomGridModel/query.json"
-                grid-column-url="diy_services/ElidomGridColumn/query.json"
-                layout="fullbleed layout vertical">
-              </things-content>
-            </paper-material>
-          </section>
-
-          <section class="Page" data-route="demo">
-            <paper-material class="Page-paper" elevation="1">
-              <things-demo title="Elidom Demo"></things-demo>
-            </paper-material>
-          </section>
-
-          <section class="Page" data-route="example">
-            <paper-material class="Page-paper" elevation="1">
-              <things-example title="Example Field"></things-example>
-            </paper-material>
-          </section>
-        </iron-pages>
-      </paper-scroll-header-panel>
-    </paper-drawer-panel>
-
-    <paper-toast id="toastConfirm" class="Toast" duration="10000">
-      <span class="Toast-button" role="button" tabindex="0" on-tap="onToastConfirmTap">OK</span>
-    </paper-toast>
-
-    <things-spinner id="spinner" loading=false></things-spinner>
-    
-    <paper-toast id="toast" class="Toast" duration="8000"></paper-toast>
-
-    <things-event-handler id="event-handler"></things-event-handler>
-
-    <!-- Service Worker support -->
-    <platinum-sw-register auto-register
-                          clients-claim
-                          skip-waiting
-                          on-service-worker-installed="displayInstalledToast">
-      
-      <platinum-sw-offline-analytics></platinum-sw-offline-analytics>
-      <platinum-sw-cache default-cache-strategy="fastest"
-                         cache-config-file="cache-config.json">
-      </platinum-sw-cache>
-    </platinum-sw-register>
-
-  </template>
-
-  <!-- build:js scripts/app.js -->
-  <script src="scripts/app.js"></script>
-  <!-- endbuild-->
-
-  <!-- Google Analytics code -->
-  <!--start-google-analytics-tracker code="UA-XXXXX-Y"></start-google-analytics-tracker-->
+                    <section class="Page" data-route="demo">
+                        <paper-material class="Page-paper" elevation="1">
+                            <things-demo title="Elidom Demo"></things-demo>
+                        </paper-material>
+                    </section>
+                    <section class="Page" data-route="example">
+                        <paper-material class="Page-paper" elevation="1">
+                            <things-example title="Example Field"></things-example>
+                        </paper-material>
+                    </section>
+                </iron-pages>
+            </paper-scroll-header-panel>
+        </paper-drawer-panel>
+        <paper-toast id="toastConfirm" class="Toast" duration="10000">
+            <span class="Toast-button" role="button" tabindex="0" on-tap="onToastConfirmTap">OK</span>
+        </paper-toast>
+        <things-spinner id="spinner" loading=false></things-spinner>
+        <paper-toast id="toast" class="Toast" duration="8000"></paper-toast>
+        <things-event-handler id="event-handler"></things-event-handler>
+        <!-- Service Worker support -->
+        <platinum-sw-register auto-register clients-claim skip-waiting on-service-worker-installed="displayInstalledToast">
+            <platinum-sw-offline-analytics></platinum-sw-offline-analytics>
+            <platinum-sw-cache default-cache-strategy="fastest" cache-config-file="cache-config.json">
+            </platinum-sw-cache>
+        </platinum-sw-register>
+    </template>
+    <!-- build:js scripts/app.js -->
+    <script src="scripts/app.js"></script>
+    <!-- endbuild-->
+    <!-- Google Analytics code -->
+    <!--start-google-analytics-tracker code="UA-XXXXX-Y"></start-google-analytics-tracker-->
 </body>
 
 </html>

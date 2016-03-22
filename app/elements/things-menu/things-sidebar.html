@@ -1,7 +1,11 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
 <link rel="import" href="../../../bower_components/paper-badge/paper-badge.html">
+<link rel="import" href="../../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
+<!-- <link rel="import" href="../../../bower_components/paper-item/paper-item.html"> -->	
 <link rel="import" href="../things-resource/things-resource.html">
+
 
 <dom-module id="things-sidebar">
 	<template>
@@ -47,8 +51,14 @@
 		:host iron-collapse {
 			background-color: rgba(0, 0, 0, .1);
 			border: 1px solid rgba(0, 0, 0, .05);
-			border-width: 1px 0;
-			border-left: 3px solid var(--paper-cyan-800);
+/*			border-width: 1px 0;
+			border-left: 3px solid var(--paper-cyan-800);*/
+		}
+		:host paper-listbox {
+			background-color: rgba(0, 0, 0, .1);
+			border: 1px solid rgba(0, 0, 0, .05);
+/*			border-width: 1px 0;
+			border-left: 3px solid var(--paper-cyan-800);*/
 		}
 		
 		:host iron-collapse paper-item {
@@ -92,28 +102,29 @@
 				resource="menu" 
 				output-data="{{menu}}">
 		</things-resource> -->
-		<things-resource 
+		<things-resource
+			auto=true
 			id="refresh"
 			content-type="application/json" 
 			action="menus.json" 
 			last-response="{{menu}}">
 		</things-resource>
 
-		<div class="brand">{{title}}</div>
+		<div class="brand">Menu</div>
 		<!-- Drawer Scroll Header Panel -->
-		<paper-scroll-header-panel>
-            <paper-toolbar class="Drawer-header">
-                <span class="Drawer-title">Menu</span>
-            </paper-toolbar>
+		<paper-scroll-header-panel id = "panel">
+<!--             <paper-toolbar >
+                <span>Menu</span>
+            </paper-toolbar> -->
 			<template is="dom-repeat" items="{{menuGroup}}" as=group>
 				<!-- {{item}} and {{index}} can be used in this binding scope -->
-				<paper-button aria-controls="group-list" on-click="toggle">
+				<paper-button aria-controls={{group.menuGroupId}} on-click="toggle">
 					<iron-icon icon="icons:folder-open"></iron-icon>{{group.name}}
 				</paper-button>
-				<iron-collapse id="group-list" tabindex="0">
-					<paper-listbox class="content">
+				<iron-collapse id="{{group.menuGroupId}}" tabindex="0">
+					<paper-listbox selected-item ="{{selectedMenu}}" class="content">
 						<template is="dom-repeat" items="{{group.child}}" as=item>
-							<paper-item data-group$="{{item.id}}">
+							<paper-item data$="{{item}}">
 								<iron-icon icon="icons:folder-open">
 								</iron-icon>{{item.name}}	
 							</paper-item>
@@ -143,16 +154,20 @@
 				menuGroup: {
 					type: Array,
 					notify: true
+				},
+				selectedMenu:{
+					type:Object
 				}
 			},
 
 			observers: [
 				'onChangeGroup(menuGroup)',
-				'onChangeMenu(menu)'
+				'onChangeMenu(menu)',
+				'onSelectedMenuChange(selectedMenu)'
 			],
 
 			listeners: {
-				// 'group-list.tap': 'onTapGroup'
+
 			},
 
 			onChangeMenu: function(menu) {
@@ -164,12 +179,12 @@
 					for (var index in items) {
 						if (items[index].menu_type === 'MENU') {
 							items[index].child = this.getChildMenu(items[index],items);
+							items[index].menuGroupId = 'group'+items[index].id;
 							group.push(items[index]);
 						}
 					};
 					this.menuGroup = group;
 				}
-				console.log(this.menuGroup);
 			},
 
 			getChildMenu: function(menuGroup,items) {
@@ -197,37 +212,17 @@
 				}
 			},
 
-			onTapGroup: function(e) {
-				var button = e.target;
-
-				while (!button.hasAttribute('data-group') && button !== document.body)
-					button = button.parentElement;
-
-				var group = button.getAttribute('data-group')
-
-				if (typeof(group) !== 'undefined') {
-					/* 같은 그룹이 선택되어도 강제로 변화를 일으켜주기 위한 꼼수 */
-					this.menuGroup = null
-					this.menuGroup = group
-				}
-			},
-
-			ready:function(){
-				console.log('ready');
-				this.refreshmenu();
-			},
-
-			attached: function() {
-				this.$.refresh.generateRequest();
+			onSelectedMenuChange: function(selectedMenu) {
+				var data = JSON.parse(this.selectedMenu.getAttribute("data"));
+				page('/demo');
 			},
 
 			refreshmenu: function(e) {
-				console.log('click');
 				this.$.refresh.generateRequest();
 			},
 
 			toggle: function(e) {
-				this.$[e.target.getAttribute('aria-controls')].toggle();
+				this.$$('#'+e.target.ariaControls).toggle();
 			}
 
 		});
