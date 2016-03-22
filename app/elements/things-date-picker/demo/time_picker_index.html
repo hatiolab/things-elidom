@@ -1,3 +1,15 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2016 The Things Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at https://github.com/hatiolab/things-elidom.git/LICENSE.txt
+The complete set of authors may be found at https://github.com/hatiolab/things-elidom.git/AUTHORS.txt
+The complete set of contributors may be found at https://github.com/hatiolab/things-elidom.git/CONTRIBUTORS.txt
+Code distributed by Hatiolab as part of the things project is also
+subject to an additional IP rights grant found at https://github.com/hatiolab/things-elidom.git/PATENTS.txt
+-->
+<html>
+
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
@@ -6,18 +18,9 @@
 <link rel="import" href="../../../bower_components/paper-time-picker/paper-time-picker.html">
 <link rel="import" href="../../../bower_components/paper-time-picker/paper-time-picker-dialog-style.html">
 
-<!--
-`<things-time-picker>` Things Time Picker
-
-  Example
-    
-    <things-time-picker label="placeholder value"></things-time-picker>
-
-@demo ./things-date-picker/demo/time_picker_index.html
--->
 <dom-module id="things-time-picker">
-	<template>
-    <input type="text" name="{{name}}" value="{{selectedTime}}" disabled=true placeholder="{{label}}">
+  <template>
+    <input type="text" name="{{name}}" value="{{selectedTime}}" readOnly placeholder="{{label}}">
     <paper-icon-button class="Navigation-icon" icon="info" on-tap="showTimePicker"></paper-icon-button>
     <paper-dialog id="timeDialog" modal class="paper-time-picker-dialog">
       <paper-time-picker id="timePicker" time="{{time}}"></paper-time-picker>
@@ -30,23 +33,21 @@
   </template>
 
   <script type='text/javascript'>
-  	(function() {
+    (function() {
       Polymer({
         is: 'things-time-picker',
-        /**
-         * 버튼 클릭시 Time picker를 dialog 타입으로 나타나게 한다.
-         */
+
         showTimePicker: function() {
           this.$.timeDialog.toggle();
         },
-        /**
-         * time picker에서 시간을 결정하면 해당 날짜를 selectedTime에 초기화 한다.
-         */
+
         selectTime: function() {
           this.selectedTime = this.time;
         }
 
       })
-  	})();
+    })();
   </script>
 </dom-module>
+
+<things-time-picker label="Time Picker"></things-time-picker>

@@ -1,3 +1,15 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2016 The Things Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at https://github.com/hatiolab/things-elidom.git/LICENSE.txt
+The complete set of authors may be found at https://github.com/hatiolab/things-elidom.git/AUTHORS.txt
+The complete set of contributors may be found at https://github.com/hatiolab/things-elidom.git/CONTRIBUTORS.txt
+Code distributed by Hatiolab as part of the things project is also
+subject to an additional IP rights grant found at https://github.com/hatiolab/things-elidom.git/PATENTS.txt
+-->
+<html>
+
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
@@ -6,15 +18,6 @@
 <link rel="import" href="../../../bower_components/paper-date-picker/paper-date-picker.html">
 <link rel="import" href="../../../bower_components/paper-date-picker/paper-date-picker-dialog-style.html">
 
-<!--
-`<things-date-picker>` Things Date Picker
-
-  Example
-    
-    <things-date-picker label="placeholder value" locale="ko" read-format="YYYY-MM-DD"></things-date-picker>
-
-@demo ./things-date-picker/demo/date_picker_index.html
--->
 <dom-module id="things-date-picker">
 	<template>
 		<input type="text" name="{{name}}" value={{selectedDate}} readOnly placeholder="{{label}}">
@@ -35,39 +38,28 @@
         is: 'things-date-picker',
 
         properties: {
-          /**
-           * Date picker의 기준이 되는 locale을 설정한다.
-           */
           locale: {
             type: String,
             notify: true,
             value: 'en'
           },
-          /**
-           * date의 읽기전용 format을 설정한다.
-           */
+
           readFormat: {
             type: String,
             notify: true,
             value: 'YYYY-MM-DD'
           },
-          /**
-           * date의 쓰기전용 format을 설정한다.
-           */
+
           writeFormat: {
             type: String,
             value: 'YYYY-MM-DD'
           }       
         },
-        /**
-         * 버튼 클릭시 Date picker를 dialog 타입으로 나타나게 한다.
-         */
+
         showDatePicker: function() {
           this.$.dateDialog.toggle();  
         },
-        /**
-         * date picker에서 날짜를 결정하면 해당 날짜를 selectedDate에 초기화 한다.
-         */
+
         selectDate: function() {
           // http://momentjs.com/
           //this.selectedDate = moment(this.date).locale('zh-cn').format('LL');
@@ -78,3 +70,5 @@
   	})();
   </script>
 </dom-module>
+
+<things-date-picker label="Date Picker" locale="ko" read-format="YYYY-MM-DD"></things-date-picker>
