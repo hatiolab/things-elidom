@@ -21,6 +21,15 @@ Things.GridBasicBehaviorImpl = {
 
 	properties: {
 		/**
+		 * grid container id
+		 * grid container id가 중복이 되면 grid가 다른 grid container에 생성될 수 있으므로 id는 자동 증가하도록 한다.
+		 */
+		gridContainerId: {
+			type: String,
+			value: 'gc' + new Date().getTime()
+		},
+
+		/**
 		 * grid mode
 		 */
 		mode: {
@@ -176,7 +185,7 @@ Things.GridBasicBehaviorImpl = {
 	 */
 	configureGrid: function() {
 		if(this.validateGridConfig() && this.grid == null) {
-			this.grid = DataLudi.createGridView('gridContainer', null, false);
+			this.grid = DataLudi.createGridView(this.gridContainerId, null, false);
 			this.grid.setDataSource(this.dataSet);
 			this.grid.body().setCellDynamicStyles([{
 				expression: 'row % 2',
@@ -277,8 +286,9 @@ Things.GridBasicBehaviorImpl = {
 			this.configureGrid();
 		}
 
-		if(this.grid != null) {
-			this.resizeGrid(this.parentNode, this.$.gridContainer);
+		if(this.grid != null && this.grid._container) {
+			//this.resizeGrid(this.parentNode, this.grid._container);
+			this.resizeGrid(this.parentNode, this.querySelector('div'));
 		}
 	},
 
