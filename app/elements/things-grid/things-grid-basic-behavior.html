@@ -319,9 +319,12 @@ Things.GridBasicBehaviorImpl = {
 				} ];
 
 				columns.forEach(function(item) { cols.push(item); });
+
+			} else {
+				cols = columns;
 			}
 
-			this.grid.setColumns(cols);			
+			this.grid.setColumns(cols);
 			this.grid.rowIndicator().setStateVisible(true);
 			this.grid.resetSize();
 		}

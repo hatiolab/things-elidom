@@ -187,6 +187,7 @@
 			 * auto가 false인 경우 Ajax 요청 
 			 */
 			generateRequest: function() {
+				// TODO :id --> 실제 아이디로 변환 
 				if(this.contentType && this.contentType.toLowerCase().indexOf('application/json') >= 0) {
 					this.$._ajax.body = this.params;
 				} else {
@@ -206,26 +207,27 @@
 			 */
 			_computeResourceUrl : function(basicUrl, resource, action) {
 				var mapping = this._actionMapping(action);
+				var urlArr = null;
 
 				if(!mapping) {
-					return [basicUrl, resource, action].join('/');
+					urlArr = [basicUrl, resource, action];
 
 				} else {
 					this.method = mapping.method;
 					this.contentType = mapping.contentType;
 
 					if(mapping.type == 'collection') {
-						return [basicUrl, resource].join('/');
+						urlArr = [basicUrl, resource].join('/');
 
 					} else if(mapping.type == 'member') {
-						return [basicUrl, resource, ':id'].join('/');
+						urlArr = [basicUrl, resource, ':id'].join('/');
 
 					} else {
-						return [basicUrl, resource, action].join('/');
+						urlArr = [basicUrl, resource, action].join('/');
 					}
-
-					return [basicUrl, resource, ((mapping.type == 'member') ? ':id' : '')].join('/');
 				}
+
+				return urlArr.filter(Boolean).join('/');
 			},
 
 			/**
