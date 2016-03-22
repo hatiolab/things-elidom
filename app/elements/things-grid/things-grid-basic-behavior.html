@@ -187,6 +187,14 @@ Things.GridBasicBehaviorImpl = {
 		if(this.validateGridConfig() && this.grid == null) {
 			this.grid = DataLudi.createGridView(this.gridContainerId, null, false);
 			this.grid.setDataSource(this.dataSet);
+			this.grid.registerImageList({
+				name: "images",
+				root: "images/grid/",
+				items: [
+					"iconDetail.png"
+				]
+			});
+			
 			this.grid.body().setCellDynamicStyles([{
 				expression: 'row % 2',
 				styles: { background: '#20006060' }
