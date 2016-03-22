@@ -37,6 +37,10 @@ window.addEventListener('WebComponentsReady', () => {
   page('/contact', scrollToTop, () => {
     app.route = 'contact';
   });
+  
+  page('/sidemenu', scrollToTop, () => {
+    app.route = 'sidemenu';
+  });
 
   page('/demo', scrollToTop, () => {
     app.route = 'demo';

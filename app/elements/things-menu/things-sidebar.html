@@ -1,0 +1,236 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
+<link rel="import" href="../../../bower_components/paper-badge/paper-badge.html">
+<link rel="import" href="../things-resource/things-resource.html">
+
+<dom-module id="things-sidebar">
+	<template>
+		<style>
+		:host {
+			display: block;
+			background-color: var(--paper-blue-grey-800);
+		}
+		
+		:host paper-scroll-header-panel {
+			height: 100%;
+		}
+		
+		:host paper-badge {
+			top: 8px !important;
+			left: 210px !important;
+		}
+		
+		:host paper-badge::shadow div.paper-badge {
+			background-color: rgba(0, 0, 0, .15) !important;
+			width: 30px !important;
+			border-radius: 5px;
+			padding: 0px 1px;
+		}
+		
+		:host paper-button {
+			display: block;
+			border-bottom: 1px solid rgba(0, 0, 0, .1);
+			margin: 0;
+			color: var(--paper-blue-grey-300);
+			font-size: 14px;
+			font-weight: 400;
+			text-align: left
+		}
+		
+		:host paper-button iron-icon {
+			width: 18px;
+			height: 18px;
+			margin-top: -2px;
+			margin-right: 4px
+		}
+		
+		:host iron-collapse {
+			background-color: rgba(0, 0, 0, .1);
+			border: 1px solid rgba(0, 0, 0, .05);
+			border-width: 1px 0;
+			border-left: 3px solid var(--paper-cyan-800);
+		}
+		
+		:host iron-collapse paper-item {
+			padding: 0 10px;
+			display: block !important;
+			min-height: 30px !important;
+			border-bottom: 1px solid rgba(0, 0, 0, .1);
+			font-size: 12px !important;
+			color: var(--paper-blue-grey-100);
+			line-height: 2.5 !important
+		}
+		
+		:host iron-collapse paper-item:hover,
+		[selected] {
+			background-color: teal;
+		}
+		
+		:host iron-collapse paper-item iron-icon {
+			width: 13px;
+			height: 13px;
+			margin-right: 4px;
+		}
+		
+		:host .group-btnline paper-icon-button {
+			color: var(--paper-blue-grey-400);
+		}
+		
+		:host .brand {
+			background: var(--paper-blue-grey-700);
+			color: var(--paper-blue-grey-100);
+			padding: 7px 10px 5px 10px;
+			text-transform: capitalize;
+		}
+		
+		:host .brand iron-icon {
+			background: var(--paper-teal-700);
+		}
+		</style>
+<!--         <things-resource id="refresh" 
+				content-type="application/json" 
+				resource="menu" 
+				output-data="{{menu}}">
+		</things-resource> -->
+		<things-resource 
+			id="refresh"
+			content-type="application/json" 
+			action="menus.json" 
+			last-response="{{menu}}">
+		</things-resource>
+
+		<div class="brand">{{title}}</div>
+		<!-- Drawer Scroll Header Panel -->
+		<paper-scroll-header-panel>
+            <paper-toolbar class="Drawer-header">
+                <span class="Drawer-title">Menu</span>
+            </paper-toolbar>
+			<template is="dom-repeat" items="{{menuGroup}}" as=group>
+				<!-- {{item}} and {{index}} can be used in this binding scope -->
+				<paper-button aria-controls="group-list" on-click="toggle">
+					<iron-icon icon="icons:folder-open"></iron-icon>{{group.name}}
+				</paper-button>
+				<iron-collapse id="group-list" tabindex="0">
+					<paper-listbox class="content">
+						<template is="dom-repeat" items="{{group.child}}" as=item>
+							<paper-item data-group$="{{item.id}}">
+								<iron-icon icon="icons:folder-open">
+								</iron-icon>{{item.name}}	
+							</paper-item>
+						</template>
+					</paper-listbox>
+				</iron-collapse>
+			</template>
+		</paper-scroll-header-panel>
+		<div class="group-btnline">
+			<paper-icon-button icon="icons:refresh" id="refresh-button" on-tap="refreshmenu"></paper-icon-button>
+		</div>
+	</template>
+	<script>
+	(function() {
+		'use strict';
+
+		Polymer({
+			is: 'things-sidebar',
+
+			properties: {
+				title: String,
+				url: String,
+				menu: {
+					type: Object,
+					notify: true
+				},
+				menuGroup: {
+					type: Array,
+					notify: true
+				}
+			},
+
+			observers: [
+				'onChangeGroup(menuGroup)',
+				'onChangeMenu(menu)'
+			],
+
+			listeners: {
+				// 'group-list.tap': 'onTapGroup'
+			},
+
+			onChangeMenu: function(menu) {
+				var group = [];
+
+				if(menu&&menu.items.length>0){
+					var items = menu.items;
+
+					for (var index in items) {
+						if (items[index].menu_type === 'MENU') {
+							items[index].child = this.getChildMenu(items[index],items);
+							group.push(items[index]);
+						}
+					};
+					this.menuGroup = group;
+				}
+				console.log(this.menuGroup);
+			},
+
+			getChildMenu: function(menuGroup,items) {
+				var groupItem = [];
+				for ( var index in items) {
+					var item = items[index];
+
+					if (item && item.menu_type === "SCREEN" &&
+						item.parent && item.parent.id === menuGroup.id) {
+						groupItem.push(item);
+					}
+				}
+				return groupItem;
+			},
+
+			onChangeGroup: function(menuGroup) {
+				var old = this.$$('[selected]')
+				if (old)
+					old.removeAttribute('selected')
+
+				if (menuGroup) {
+					let element = this.$$(`[data-group='${menuGroup}']`)
+					if (element)
+						element.setAttribute('selected', true)
+				}
+			},
+
+			onTapGroup: function(e) {
+				var button = e.target;
+
+				while (!button.hasAttribute('data-group') && button !== document.body)
+					button = button.parentElement;
+
+				var group = button.getAttribute('data-group')
+
+				if (typeof(group) !== 'undefined') {
+					/* 같은 그룹이 선택되어도 강제로 변화를 일으켜주기 위한 꼼수 */
+					this.menuGroup = null
+					this.menuGroup = group
+				}
+			},
+
+			ready:function(){
+				console.log('ready');
+				this.refreshmenu();
+			},
+
+			attached: function() {
+				this.$.refresh.generateRequest();
+			},
+
+			refreshmenu: function(e) {
+				console.log('click');
+				this.$.refresh.generateRequest();
+			},
+
+			toggle: function(e) {
+				this.$[e.target.getAttribute('aria-controls')].toggle();
+			}
+
+		});
+	})();
+	</script>
+</dom-module>
