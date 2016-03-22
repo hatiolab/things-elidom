@@ -1,0 +1,134 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2016 The Things Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at https://github.com/hatiolab/things-elidom.git/LICENSE.txt
+The complete set of authors may be found at https://github.com/hatiolab/things-elidom.git/AUTHORS.txt
+The complete set of contributors may be found at https://github.com/hatiolab/things-elidom.git/CONTRIBUTORS.txt
+Code distributed by Hatiolab as part of the things project is also
+subject to an additional IP rights grant found at https://github.com/hatiolab/things-elidom.git/PATENTS.txt
+-->
+<html>
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+  <title>things-button demo</title>
+
+  <script src="../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+
+  <link rel="import" href="../../../bower_components/polymer/polymer.html">
+  <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+  <link rel="import" href="../../../bower_components/paper-behaviors/paper-button-behavior.html">
+  
+  <link rel="import" href="../../things-msg-box/things-msgbox-behavior.html">
+  <link rel="import" href="../../things-setting/things-global-behavior.html">
+
+  <link rel="import" href="../things-button.html">
+
+  <style>
+    paper-button.custom {
+      --paper-button-ink-color: var(--paper-pink-a200);
+      /* These could also be individually defined for each of the
+        specific css classes, but we'll just do it once as an example */
+      --paper-button-flat-keyboard-focus: {
+        background-color: var(--paper-pink-a200);
+        color: white !important;
+      };
+      --paper-button-raised-keyboard-focus: {
+        background-color: var(--paper-pink-a200) !important;
+        color: white !important;
+      };
+    }
+    
+    paper-button.custom:hover {
+      background-color: var(--paper-indigo-100);
+    }
+
+    paper-button.indigo {
+      background-color: var(--paper-indigo-500);
+      color: white;
+      --paper-button-raised-keyboard-focus: {
+        background-color: var(--paper-pink-a200) !important;
+        color: white !important;
+      };
+    }
+
+    paper-button.pink {
+      background-color: var(--paper-pink-500);
+      color: white;
+    }
+
+    paper-button.green {
+      background-color: var(--paper-green-500);
+      color: white;
+    }
+    
+    paper-button.green[active] {
+      background-color: var(--paper-red-500);
+    }
+
+  </style>
+</head>
+
+<body unresolved>
+  
+  <dom-module id="sample-things-button">
+    
+    <template>
+      <paper-input  name="buttonAction" 
+                    type="text" 
+                    label="Button Action" 
+                    value="{{thingsButtonMessage}}">
+      </paper-input>
+
+      <div class="buttons">
+        <things-button color="green" id="button-demo-1">Search Button</things-button>
+        <things-button id="button-demo-2" color="indigo" confirm=true title="Demo Title" message="Demo Message">Save Button</things-button>
+      </div>
+    </template>
+
+    <script>
+      Polymer({
+        is: 'sample-things-button',
+
+        behaviors: [
+          Things.MsgBoxBehavior, 
+          Things.GlobalBehavior
+        ],
+
+        listeners: {
+          'button-demo-1.tap' : 'onTapThingsButton1',
+          'button-demo-2.confirm' : 'onConfirmMsgBox',
+        },
+
+        onTapThingsButton1: function(e) {
+          this.thingsButtonMessage = 'Search Button Pressed';
+        },
+
+        onConfirmMsgBox: function(e) {
+          if(e.detail == 'ok') {
+            this.thingsButtonMessage = e.detail + ' pressed';
+          } else {
+            this.thingsButtonMessage = e.detail + ' pressed';
+          }
+        }
+      });
+    </script>  
+
+  </dom-module>
+
+  <template is="dom-bind" id="app">
+
+    <section>
+      <h4>Things buttons</h4>
+
+      <sample-things-button></sample-things-button>
+    </section>
+
+  </template>
+
+</body>
+</html>

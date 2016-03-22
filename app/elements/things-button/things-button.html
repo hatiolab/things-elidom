@@ -7,6 +7,14 @@
 
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 
+<!--
+
+  Example
+    
+    <things-button id="button-id" color="indigo" confirm=true title="Confirm" message="This is message field">Button name</things-button>
+    
+@demo ./things-button/demo/index.html
+-->
 <dom-module id="things-button">
   <template>
 
@@ -71,21 +79,30 @@
         ],
 
         properties: {
+          /**
+           *  button color
+           */
           color: {
             type: String,
             value: ''
           },
-
+          /**
+           *  Confirm process를 포함 할지 여부
+           */
           confirm: {
             type: Boolean,
             value: false
           },
-
+          /**
+           *  Confirm process에서 출력할 title
+           */
           title: {
             type: String,
             value: 'Confirm'
           },
-
+          /**
+           *  Confirm process에서 출력할 message
+           */
           message: {
             type: String,
             value: ''
