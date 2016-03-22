@@ -97,22 +97,26 @@
 			background: var(--paper-teal-700);
 		}
 		</style>
+
 		<things-resource
 			auto=true
 			id="refresh"
 			content-type="application/json" 
-			action="menus.json"
+			action="{{action}}"
 			last-response="{{menu}}">
 		</things-resource>
 
 		<div class="brand">Menu</div>
+
 		<!-- Drawer Scroll Header Panel -->
 		<paper-scroll-header-panel id = "panel">
 			<template is="dom-repeat" items="{{menuGroup}}" as=group>
+				
 				<!-- {{item}} and {{index}} can be used in this binding scope -->
 				<paper-button aria-controls={{group.menuGroupId}} on-click="toggle">
 					<iron-icon icon="icons:folder-open"></iron-icon>{{group.name}}
 				</paper-button>
+
 				<iron-collapse id="{{group.menuGroupId}}" tabindex="0">
 					<paper-listbox selected-item ="{{selectedMenu}}" class="content">
 						<template is="dom-repeat" items="{{group.child}}" as=item>
@@ -123,12 +127,15 @@
 						</template>
 					</paper-listbox>
 				</iron-collapse>
+
 			</template>
 		</paper-scroll-header-panel>
+
 		<div class="group-btnline">
 			<paper-icon-button icon="icons:refresh" id="refresh-button" on-tap="refreshmenu"></paper-icon-button>
 		</div>
 	</template>
+
 	<script>
 	(function() {
 		'use strict';
@@ -137,18 +144,31 @@
 			is: 'things-sidebar',
 
 			properties: {
-				title: String,
-				url: String,
+				title: {
+					type: String
+				},
+
+				action: {
+					type: String
+				},
+
 				menu: {
 					type: Object,
 					notify: true
 				},
+				
 				menuGroup: {
 					type: Array,
 					notify: true
 				},
-				selectedMenu:{
-					type:Object
+
+				screens: {
+					type: Array,
+					notify: true
+				},
+				
+				selectedMenu: {
+					type: Object
 				}
 			},
 
@@ -158,38 +178,34 @@
 				'onSelectedMenuChange(selectedMenu)'
 			],
 
-			listeners: {
-
-			},
-
 			onChangeMenu: function(menu) {
-				var group = [];
+				if(menu && menu.items.length > 0) {
+					var groups = [], screens = [];
+					var me = this;
 
-				if(menu&&menu.items.length>0){
-					var items = menu.items;
+					menu.items.forEach(function(item) {
+						if (item.menu_type === 'MENU') {
+							item.child = me.getChildMenu(item, menu.items);
+							item.menuGroupId = 'group' + item.id;
+							groups.push(item);
 
-					for (var index in items) {
-						if (items[index].menu_type === 'MENU') {
-							items[index].child = this.getChildMenu(items[index],items);
-							items[index].menuGroupId = 'group'+items[index].id;
-							group.push(items[index]);
+						} else if(item.menu_type === 'SCREEN') {
+							screens.push(item);
 						}
-					};
-					this.menuGroup = group;
+					});
+
+					// ** Routing 초기화 **
+					Things.routings.init(screens);
+
+					this.menuGroup = groups;
+					this.screens = screens;					
 				}
 			},
 
-			getChildMenu: function(menuGroup,items) {
-				var groupItem = [];
-				for ( var index in items) {
-					var item = items[index];
-
-					if (item && item.menu_type === "SCREEN" &&
-						item.parent && item.parent.id === menuGroup.id) {
-						groupItem.push(item);
-					}
-				}
-				return groupItem;
+			getChildMenu: function(menuGroup, items) {
+				return items.filter(function(item) {
+					return (item && item.menu_type === "SCREEN" && item.parent && item.parent_id === menuGroup.id);
+				});
 			},
 
 			onChangeGroup: function(menuGroup) {
@@ -205,9 +221,11 @@
 			},
 
 			onSelectedMenuChange: function(selectedMenu) {
-				var data = JSON.parse(this.selectedMenu.getAttribute("data"));
-				console.log(data);
-				page(data.description);
+				if(selectedMenu) {
+					var data = JSON.parse(this.selectedMenu.getAttribute("data"));
+					var url = '/' + (data.description ? data.description : '');
+					page(url);
+				}
 			},
 
 			refreshmenu: function(e) {
@@ -215,7 +233,7 @@
 			},
 
 			toggle: function(e) {
-				this.$$('#'+e.target.ariaControls).toggle();
+				this.$$('#' + e.target.ariaControls).toggle();
 			}
 
 		});

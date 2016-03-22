@@ -258,6 +258,8 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 * @return {Array} searchFormFields
 			 */
 			_parseSearchFormFields: function(metaDataList) {
+				if(!metaDataList) return;
+
 				var searchFormFields = [];
 				metaDataList.forEach(function(metaData) {
 					if(metaData.search_rank && metaData.search_rank > 0) {
@@ -279,6 +281,8 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 * @return {Array} resourceFormFields
 			 */
 			_parseResourceFormFields: function(metaDataList) {
+				if(!metaDataList) return;
+
 				var resourceFormFields = [];
 				metaDataList.forEach(function(metaData) {
 					var field = { name : metaData.name, label : metaData.name };
@@ -298,6 +302,8 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 * @return {Array} gridModel
 			 */
 			_parseGridModel: function(metaDataList) {
+				if(!metaDataList) return;
+
 				var gridModels = [];
 				metaDataList.forEach(function(metaData) {
 					if(metaData.name == 'id' || (metaData.list_rank && metaData.list_rank > 0)) {
@@ -318,6 +324,8 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 * @return {Array} gridColumns
 			 */
 			_parsetGridColumns: function(metaDataList) {
+				if(!metaDataList) return;
+				
 				var gridColumns = [];
 				metaDataList.forEach(function(metaData) {
 					if(metaData.list_rank && metaData.list_rank > 0) {

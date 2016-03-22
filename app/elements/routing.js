@@ -8,7 +8,7 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 */
 
-window.addEventListener('WebComponentsReady', () => {
+/*window.addEventListener('WebComponentsReady', () => {
 
   // We use Page.js for routing. This is a Micro
   // client-side router inspired by the Express router
@@ -53,10 +53,10 @@ window.addEventListener('WebComponentsReady', () => {
   page('/example', scrollToTop, () => {
     app.route = 'example';
   });
-  page('/terminology', scrollToTop, () => {
-    app.route = 'terminology';
-  });
 
+  page('/terminologies', scrollToTop, () => {
+    app.route = 'terminologies';
+  });
 
   page('*', function(attempted) {
     let url = window.location.href + attempted.path.substr(1);
@@ -72,4 +72,65 @@ window.addEventListener('WebComponentsReady', () => {
     hashbang: false
   });
 
-});
+});*/
+
+window.Things = window.Things || {};
+
+Things.routings = {
+
+  /**
+   * initialize routings
+   */
+  init: function(screens) {
+    var me = this;
+    this.addDefaultRouting();
+
+    screens.forEach(function(screen) {
+      var route = screen.description;
+      if(route) {
+        page('/' + screen.description, me.scrollToTop, () => {
+          app.route = screen.description;
+        });
+      }
+    });
+
+    this.addLastRouting();
+  },
+
+  /**
+   * move screen scroll to top
+   */
+  scrollToTop: function(ctx, next) {
+    app.scrollPageToTop();
+    next();
+  },
+
+  /**
+   * add default routing
+   */
+  addDefaultRouting: function() {
+    page('/', this.scrollToTop, () => {
+      app.route = 'home';
+    });
+  },
+
+  /**
+   * add last routing
+   */
+  addLastRouting: function() {
+    page('*', function(attempted) {
+      let url = window.location.href + attempted.path.substr(1);
+      app.$.toastConfirm.text = `Can't find: ${url}. Redirected you to Home Page`;
+      app.$.toastConfirm.show();
+      page.redirect('/');
+    });
+
+    // add #! before urls
+    // https://developers.google.com/webmasters/ajax-crawling/docs/learn-more
+    page({
+      // Disable for Firebase or GAE
+      hashbang: true
+    });
+  }
+
+};
