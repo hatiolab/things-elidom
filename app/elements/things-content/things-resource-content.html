@@ -362,7 +362,8 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 						fieldName: metaData.name, 
 						width: metaData.width ? metaData.width : 100,
 						header: { text: metaData.name },
-						styles: {}
+						styles: {},
+						validations: []
 					};
 
 					if(metaData.align) {
@@ -388,6 +389,14 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 							field.styles.datetimeFormat = metaData.format ? metaData.format : 'yyyy-MM-dd';
 							field.styles.textAlignment = 'center';
 						}
+					}
+
+					if(metaData.name != 'id' && !metaData.nullable) {
+						field.validations.push({expression : 'value is not empty', level: 'error', message: '(' + metaData.name + ') should not be empty!'});
+					}
+
+					if(metaData.col_size && metaData.col_size > 0 && metaData.col_type == 'string') {
+						field.validations.push({expression : 'len value < ' + metaData.col_size, level: 'error', message: 'Maximum (' + metaData.name + ') length is (' + metaData.col_size + ')'});
 					}
 
 					return field;
