@@ -354,6 +354,11 @@ Things.GridBasicBehaviorImpl = {
 	 */
 	_afterReadGridData: function(readData) {
 		if(readData && this.dataSet) {
+			if(!this.grid) {
+				this.configureGrid();
+				this.resizeGrid(this.parentNode, this.querySelector('div'));
+			}
+			
 			var items = this.paginatable ? readData[this.rootProperty] : readData;					
 			this.totalCount = this.paginatable ? readData[this.totalProperty] : (items ? items.length : 0);
 			this.dataSet.setRows(items);

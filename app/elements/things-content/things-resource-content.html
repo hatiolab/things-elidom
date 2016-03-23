@@ -270,7 +270,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 						if(metaData.editor == 'code-combo') {
 							field.codeName = metaData.ref_name;
 						}
-						
+
 						searchFormFields.push(field);
 					}
 				});
@@ -288,11 +288,11 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 
 				var resourceFormFields = [];
 				metaDataList.forEach(function(metaData) {
-					var field = { name : metaData.name, label : metaData.name };
-					if(metaData.editor == 'code') {
-						field.type = 'code-combo';
+					var field = { name : metaData.name, label : metaData.name, type : metaData.editor };
+					if(metaData.editor == 'code-combo') {
 						field.codeName = metaData.ref_name;
 					}
+					
 					resourceFormFields.push(field);
 				});
 
