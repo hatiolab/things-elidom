@@ -262,6 +262,10 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				this.gridModel = this._parseGridModel(metaDataList);
 				// 4. Parse Grid Columns
 				this.gridColumns = this._parseGridColumns(metaDataList);
+
+				if(this.title == 'Terminology') {
+					console.log(this.gridColumns);
+				}
 			},
 
 			/**
@@ -272,27 +276,25 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			_parseSearchFormFields: function(metaDataList) {
 				if(!metaDataList) return;
 
-				var searchFormFields = [];
+				var searchMetaList = metaDataList.filter(function(metaData) { 
+					return metaData.search_rank && metaData.search_rank > 0; 
+				});
 
-				metaDataList.forEach(function(metaData) {
-					if(!metaData.search_rank || metaData.search_rank <= 0) return
+				this._sortMetaData(searchMetaList, 'search_rank');
 
+				return searchMetaList.map(function(metaData) {
 					var field = { 
-						rank : metaData.search_rank, 
 						name : metaData.name, 
 						label : metaData.name, 
 						type : metaData.editor 
 					};
 						
-					if(metaData.editor == 'code-combo') {
+					if(metaData.editor && ('code-combo' == metaData.editor)) {
 						field.codeName = metaData.ref_name;
 					}
 
-					searchFormFields.push(field);
+					return field;
 				});
-
-				this._sortMetaData(searchFormFields, 'rank');
-				return searchFormFields;
 			},
 
 			/**
@@ -303,17 +305,14 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			_parseResourceFormFields: function(metaDataList) {
 				if(!metaDataList) return;
 
-				var resourceFormFields = [];
-				metaDataList.forEach(function(metaData) {
+				return metaDataList.map(function(metaData) {
 					var field = { name : metaData.name, label : metaData.name, type : metaData.editor };
-					if(metaData.editor == 'code-combo') {
+					if(metaData.editor && ('code-combo' == metaData.editor)) {
 						field.codeName = metaData.ref_name;
 					}
 
-					resourceFormFields.push(field);
-				});
-
-				return resourceFormFields;
+					return field;
+				});				
 			},
 
 			/**
@@ -323,19 +322,19 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 */
 			_parseGridModel: function(metaDataList) {
 				if(!metaDataList) return;
-
-				var gridModels = [];
-				metaDataList.forEach(function(metaData) {
-					if(metaData.name == 'id' || (metaData.list_rank && metaData.list_rank > 0)) {
-						var field = { fieldName : metaData.name };
-						if(['integer', 'int', 'long', 'double', 'float'].includes(metaData.col_type)) {
-							field.dataType = 'number';
-						}
-						gridModels.push(field);
-					}
+				
+				var gridModelMetaList = metaDataList.filter(function(metaData) { 
+					return (metaData.name == 'id' || (metaData.list_rank && metaData.list_rank > 0));
 				});
 
-				return gridModels;
+				return gridModelMetaList.map(function(metaData) {
+					var field = { fieldName : metaData.name };
+					if(['integer', 'int', 'long', 'double', 'float'].includes(metaData.col_type)) {
+						field.dataType = 'number';
+					}
+
+					return field;
+				});
 			},
 
 			/**
@@ -346,26 +345,40 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			_parseGridColumns: function(metaDataList) {
 				if(!metaDataList) return;
 				
-				var gridColumns = [];
+				var gridColumnMetaList = metaDataList.filter(function(metaData) { 
+					return (metaData.name == 'id' || (metaData.list_rank && metaData.list_rank > 0));
+				});
 
-				metaDataList.forEach(function(metaData) {
-					if(!metaData.list_rank || metaData.list_rank <= 0) return;
+				this._sortMetaData(gridColumnMetaList, 'list_rank');
 
+				return gridColumnMetaList.map(function(metaData) {
 					var field = { 
 						rank: metaData.list_rank,
 						name: metaData.name, 
-						fieldName : metaData.name, 
-						width : metaData.width ? metaData.width : 100,
-						header : {
+						fieldName: metaData.name, 
+						width: metaData.width ? metaData.width : 100,
+						header: {
 							text: metaData.name
 						}
 					};
 
-					gridColumns.push(field);
-				});
+					if(metaData.editor) {
+						if(('code-combo' == metaData.editor) && metaData.code_list && metaData.code_list.length > 0) {
+							field.editor = { type: 'list', domainOnly: true };
+							field.lookupDisplay = true;
+							field.lookupValues = metaData.code_list.map(function(code) { return code.name });
+	    				field.lookupLabels = metaData.code_list.map(function(code) { return code.description });
 
-				this._sortMetaData(gridColumns, 'rank');
-				return gridColumns;
+						} else if(metaData.editor == 'checkbox') {
+							field.renderer = { type: 'check', editable: true, threeStates: false, trueValues: 'true', falseValues: 'false' };
+
+						} else if(metaData.editor == 'number') {
+							field.editor = { type: 'number' };
+						}
+					}
+
+					return field;
+				});
 			},
 
 			/**
