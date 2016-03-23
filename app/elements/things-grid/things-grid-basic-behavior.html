@@ -1,6 +1,7 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
 
+<link rel="import" href="../things-id/things-guid-behavior.html">
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 <link rel="import" href="../things-setting/things-global-behavior.html">
 <link rel="import" href="../things-spinner/things-spinner-behavior.html">
@@ -25,8 +26,7 @@ Things.GridBasicBehaviorImpl = {
 		 * grid container id가 중복이 되면 grid가 다른 grid container에 생성될 수 있으므로 id는 자동 증가하도록 한다.
 		 */
 		gridContainerId: {
-			type: String,
-			value: 'gc' + new Date().getTime()
+			type: String
 		},
 
 		/**
@@ -185,6 +185,7 @@ Things.GridBasicBehaviorImpl = {
 	 */
 	configureGrid: function() {
 		if(this.validateGridConfig() && this.grid == null) {
+			this.gridContainerId = this.generateGuid();
 			this.grid = DataLudi.createGridView(this.gridContainerId, null, false);
 			this.grid.setDataSource(this.dataSet);
 			this.grid.registerImageList({
@@ -365,7 +366,8 @@ Things.GridBasicBehavior = [
 	Things.GridBasicBehaviorImpl,
 	Polymer.IronResizableBehavior,
 	Things.MsgBoxBehavior,
-	Things.SpinnerBehavior
+	Things.SpinnerBehavior,
+	Things.GUIDBehavior
 ];
 
 </script>

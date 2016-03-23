@@ -1,0 +1,41 @@
+<script>
+
+window.Things = window.Things || {};
+
+Things.GUIDBehavior = {
+  
+  _padLeft: function (paddingString, width, replacementChar) {
+    return paddingString.length >= width ? paddingString : this._padLeft(replacementChar + paddingString, width, replacementChar || ' ');
+  },
+
+  _s4: function (number) {
+    var hexadecimalResult = number.toString(16);
+    return this._padLeft(hexadecimalResult, 4, '0');
+  },
+
+  _cryptoGuid: function () {
+    var buffer = new window.Uint16Array(8);
+    window.crypto.getRandomValues(buffer);
+    return [this._s4(buffer[0]) + this._s4(buffer[1]), this._s4(buffer[2]), this._s4(buffer[3]), this._s4(buffer[4]), this._s4(buffer[5]) + this._s4(buffer[6]) + this._s4(buffer[7])].join('-');
+  },
+
+  _guid: function () {
+    var currentDateMilliseconds = new Date().getTime();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (currentChar) {
+        var randomChar = (currentDateMilliseconds + Math.random() * 16) % 16 | 0;
+        currentDateMilliseconds = Math.floor(currentDateMilliseconds / 16);
+        return (currentChar === 'x' ? randomChar : (randomChar & 0x7 | 0x8)).toString(16);
+    });
+  },
+
+  /**
+   * GUID 생성 
+   */
+  generateGuid: function () {
+    var hasCrypto = typeof (window.crypto) != 'undefined',
+        hasRandomValues = typeof (window.crypto.getRandomValues) != 'undefined';
+    return (hasCrypto && hasRandomValues) ? this._cryptoGuid() : this._guid();
+  }
+
+};
+</script>
