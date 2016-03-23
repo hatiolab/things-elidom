@@ -20,7 +20,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	  <things-setting id="setting"></things-setting>
 
 	  <!-- Main Menu -->
-	  <things-sidebar drawer class="layout vertical" title="MENU" selected-menu =1 screens="{{screens}}" action="menus.json"></things-sidebar>
+	  <things-sidebar drawer class="layout vertical" title="MENU" selected-menu=1 screens="{{screens}}" action="menus.json?mode=auth"></things-sidebar>
 
 	  <!-- Main Area -->
 	  <paper-scroll-header-panel id="headerPanelMain" class="Main" main condenses keep-condensed-header>
@@ -49,13 +49,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		<iron-pages class="Main-content" attr-for-selected="data-route" selected="{{route}}">
 
 			<template is="dom-repeat" items="{{screens}}" as=screen filter="isDynamic">
-				<section class="Page" data-route="{{screen.description}}">
+				<section class="Page" data-route="{{screen.routing}}">
 
 				  <things-resource-content 
-					title="{{screen.name}}"
-					resource-name="{{screen.name}}"
-					resource-url="{{screen.description}}"
-					layout="fullbleed layout vertical">
+						title="{{screen.name}}"
+						current-route="[[route]]"
+						resource-name="{{screen.name}}"
+						resource-url="{{screen.routing}}"
+						layout="fullbleed layout vertical">
 				  </things-resource-content>
 
 				</section>

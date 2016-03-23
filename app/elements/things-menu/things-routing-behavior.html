@@ -20,10 +20,10 @@ Things.RoutingBehavior = {
         this.addDefaultRouting(defaultRouting);
 
         screens.forEach(function(screen) {
-            var route = screen.description;
+            var route = screen.routing;
             if (route) {
-                page('/' + screen.description, me.scrollToTop, () => {
-                    app.route = screen.description;
+                page('/' + screen.routing, me.scrollToTop, () => {
+                    app.route = screen.routing;
                 });
             }
         });

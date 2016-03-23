@@ -120,6 +120,13 @@
       },
 
       /**
+       * form이 active 상태인지 여부. active 상태인 경우에만 form submit이 가능하다.
+       */
+      active: {
+        type: Boolean
+      },
+
+      /**
        * Pagination을 위한 설정. 페이지에 표시할 데이터 개수
        */
       perPage: {
@@ -225,12 +232,8 @@
      * @param {Number} page 현재 페이지 
      */
     _pageChanged: function(page) {
-      if(page > 0) {
-        try {
-          this.submitMyForm();
-        } catch(e) {
-          console.log(e);
-        }
+      if(this.active && page > 0) {
+        this.submitMyForm();
       }
     },
 

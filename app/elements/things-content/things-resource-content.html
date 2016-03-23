@@ -43,7 +43,6 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 		<div class="[[layout]]">
 			<things-resource 
 				id="resource-mata"
-				auto
 				method="GET"
 				action="[[resourceMetaUrl]]"
 				last-response="{{metaData}}">
@@ -52,6 +51,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			<things-std-search-form 
 				id="search-form"
 				class="flex"
+				active="[[active]]"
 				title="[[title]]"
 				form-fields="[[searchFormFields]]" 
 				action-url="[[resourceUrl]]" 
@@ -205,6 +205,27 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				 */
 				selectedRow: {
 					type: Object
+				},
+
+				/**
+				 * 현재 메뉴에서 선택된 라우팅
+				 */
+				currentRoute: {
+					type: String,
+					observer : '_currentRouteChange'
+				},
+
+				/**
+				 * 화면이 액티브 상태인지 여부 
+				 */
+				active: {
+					type: Boolean,
+					notify: true
+				},
+
+				isConfigured: {
+					type: Boolean,
+					value: false
 				}
 			},
 
@@ -212,6 +233,17 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				'grid.things-grid-detail-tap': '_showResourceForm',
 				'grid.things-grid-save-success': '_refreshGridData',
 				'resource-form.things-std-resource-form-saved' : '_refreshGridData'
+			},
+
+			/**
+			 * 현재 선택된 routing이 자신인지 체크하여 자신이 선택되었다면 메타 데이터를 조회하여 화면을 구
+			 */
+			_currentRouteChange: function(currentRoute) {
+				this.active = (this.resourceUrl == currentRoute);
+				if(this.active && !this.isConfigured) {
+					this.$['resource-mata'].generateRequest();
+					this.isConfigured = true;
+				} 
 			},
 			
 			/**
