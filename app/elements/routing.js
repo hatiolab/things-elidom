@@ -74,63 +74,63 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 });*/
 
-window.Things = window.Things || {};
+// window.Things = window.Things || {};
 
-Things.routings = {
+// Things.routings = {
 
-  /**
-   * initialize routings
-   */
-  init: function(screens) {
-    var me = this;
-    this.addDefaultRouting();
+//   /**
+//    * initialize routings
+//    */
+//   init: function(screens) {
+//     var me = this;
+//     this.addDefaultRouting();
 
-    screens.forEach(function(screen) {
-      var route = screen.description;
-      if(route) {
-        page('/' + screen.description, me.scrollToTop, () => {
-          app.route = screen.description;
-        });
-      }
-    });
+//     screens.forEach(function(screen) {
+//       var route = screen.description;
+//       if(route) {
+//         page('/' + screen.description, me.scrollToTop, () => {
+//           app.route = screen.description;
+//         });
+//       }
+//     });
 
-    this.addLastRouting();
-  },
+//     this.addLastRouting();
+//   },
 
-  /**
-   * move screen scroll to top
-   */
-  scrollToTop: function(ctx, next) {
-    app.scrollPageToTop();
-    next();
-  },
+//   /**
+//    * move screen scroll to top
+//    */
+//   scrollToTop: function(ctx, next) {
+//     app.scrollPageToTop();
+//     next();
+//   },
 
-  /**
-   * add default routing
-   */
-  addDefaultRouting: function() {
-    page('/', this.scrollToTop, () => {
-      app.route = 'home';
-    });
-  },
+//   /**
+//    * add default routing
+//    */
+//   addDefaultRouting: function() {
+//     page('/', this.scrollToTop, () => {
+//       app.route = 'home';
+//     });
+//   },
 
-  /**
-   * add last routing
-   */
-  addLastRouting: function() {
-    page('*', function(attempted) {
-      let url = window.location.href + attempted.path.substr(1);
-      app.$.toastConfirm.text = `Can't find: ${url}. Redirected you to Home Page`;
-      app.$.toastConfirm.show();
-      page.redirect('/');
-    });
+//   /**
+//    * add last routing
+//    */
+//   addLastRouting: function() {
+//     page('*', function(attempted) {
+//       let url = window.location.href + attempted.path.substr(1);
+//       app.$.toastConfirm.text = `Can't find: ${url}. Redirected you to Home Page`;
+//       app.$.toastConfirm.show();
+//       page.redirect('/');
+//     });
 
-    // add #! before urls
-    // https://developers.google.com/webmasters/ajax-crawling/docs/learn-more
-    page({
-      // Disable for Firebase or GAE
-      hashbang: true
-    });
-  }
+//     // add #! before urls
+//     // https://developers.google.com/webmasters/ajax-crawling/docs/learn-more
+//     page({
+//       // Disable for Firebase or GAE
+//       hashbang: true
+//     });
+//   }
 
-};
+// };

@@ -3,9 +3,22 @@
 <link rel="import" href="../../../bower_components/paper-badge/paper-badge.html">
 <link rel="import" href="../../../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
-<!-- <link rel="import" href="../../../bower_components/paper-item/paper-item.html"> -->	
+<link rel="import" href="../../../bower_components/paper-item/paper-item.html">	
 <link rel="import" href="../things-resource/things-resource.html">
+<link rel="import" href="../things-menu/things-routing-behavior.html">
 
+<!--
+해당 Element는 
+	1.things-routing-behavior.html를 사용하여 Routing 등록 및 설정을 수행한다.
+	2.action에서 제공하는 Url로 Menu를 검색하여 Routing 등록 및 화면 좌측에 메뉴로 제공한다.
+	3.메뉴성이기에 Drawer Attribute가 꼭 필요하다.
+
+	Example:
+	    <things-sidebar drawer class="layout vertical" 
+	    	title="MENU" screens="{{screens}}" action="menus.json">
+	    </things-sidebar>
+
+-->
 
 <dom-module id="things-sidebar">
 	<template>
@@ -51,14 +64,14 @@
 		:host iron-collapse {
 			background-color: rgba(0, 0, 0, .1);
 			border: 1px solid rgba(0, 0, 0, .05);
-/*			border-width: 1px 0;
-			border-left: 3px solid var(--paper-cyan-800);*/
+			border-width: 1px 0;
+			border-left: 3px solid var(--paper-cyan-800);
 		}
 		:host paper-listbox {
 			background-color: rgba(0, 0, 0, .1);
 			border: 1px solid rgba(0, 0, 0, .05);
-/*			border-width: 1px 0;
-			border-left: 3px solid var(--paper-cyan-800);*/
+			border-width: 1px 0;
+			border-left: 3px solid var(--paper-cyan-800);
 		}
 		
 		:host iron-collapse paper-item {
@@ -106,7 +119,7 @@
 			last-response="{{menu}}">
 		</things-resource>
 
-		<div class="brand">Menu</div>
+		<div class="brand">{{title}}</div>
 
 		<!-- Drawer Scroll Header Panel -->
 		<paper-scroll-header-panel id = "panel">
@@ -118,7 +131,7 @@
 				</paper-button>
 
 				<iron-collapse id="{{group.menuGroupId}}" tabindex="0">
-					<paper-listbox selected-item ="{{selectedMenu}}" class="content">
+					<paper-listbox selected-item ="{{_selectedMenu}}" class="content">
 						<template is="dom-repeat" items="{{group.child}}" as=item>
 							<paper-item data$="{{item}}">
 								<iron-icon icon="icons:folder-open">
@@ -142,50 +155,74 @@
 
 		Polymer({
 			is: 'things-sidebar',
-
 			properties: {
+				/**
+				 * Brand title that will be show on top of menu
+				 */
 				title: {
 					type: String
 				},
-
+				/**
+				 * url that where the menu data get from
+				 */
 				action: {
 					type: String
 				},
-
-				menu: {
-					type: Object,
-					notify: true
-				},
-				
+				/**
+				 * menu group returns menu tree as Array
+				 * [
+				 * 	parent1{
+				 * 		child:[
+				 * 			...
+				 * 		]
+				 * 	},
+				 * 	parent2{
+				 * 		...
+				 * 	}
+				 * ]
+				 */
 				menuGroup: {
 					type: Array,
 					notify: true
 				},
-
+				/**
+				 * menu_type =="SCREEN"인 Menu정보를 Array로 반환한다.
+				 */
 				screens: {
 					type: Array,
 					notify: true
 				},
 				
-				selectedMenu: {
+				_selectedMenu: {
 					type: Object
 				}
 			},
 
 			observers: [
-				'onChangeGroup(menuGroup)',
-				'onChangeMenu(menu)',
-				'onSelectedMenuChange(selectedMenu)'
+				'_onChangeMenu(menu)',
+				'_onSelectedMenuChange(_selectedMenu)'
 			],
 
-			onChangeMenu: function(menu) {
+			behaviors: [
+				Things.RoutingBehavior
+			],
+
+			/**
+			 * When last response data recieved this function will be called
+			 * then convert these data to menu tree and set to menuGroup
+			 * also convert to screen array and set to screens.
+			 * 
+			 * @param  {Array}
+			 * @return {null}
+			 */
+			_onChangeMenu: function(menu) {
 				if(menu && menu.items.length > 0) {
 					var groups = [], screens = [];
 					var me = this;
 
 					menu.items.forEach(function(item) {
 						if (item.menu_type === 'MENU') {
-							item.child = me.getChildMenu(item, menu.items);
+							item.child = me._getChildMenu(item, menu.items);
 							item.menuGroupId = 'group' + item.id;
 							groups.push(item);
 
@@ -195,43 +232,50 @@
 					});
 
 					// ** Routing 초기화 **
-					Things.routings.init(screens);
+					this.init(screens);
 
 					this.menuGroup = groups;
 					this.screens = screens;					
 				}
 			},
 
-			getChildMenu: function(menuGroup, items) {
+			/**
+			 * filter child menu and return it
+			 * @param  {Array} parent group id
+			 * @param  {Array} all menu list
+			 * @return {Array} child screen array
+			 */
+			_getChildMenu: function(menuGroup, items) {
 				return items.filter(function(item) {
 					return (item && item.menu_type === "SCREEN" && item.parent && item.parent_id === menuGroup.id);
 				});
 			},
 
-			onChangeGroup: function(menuGroup) {
-				var old = this.$$('[selected]')
-				if (old)
-					old.removeAttribute('selected')
-
-				if (menuGroup) {
-					let element = this.$$(`[data-group='${menuGroup}']`)
-					if (element)
-						element.setAttribute('selected', true)
-				}
-			},
-
-			onSelectedMenuChange: function(selectedMenu) {
+			/**
+			 * when selected menu changed route screen to the menu screen
+			 * @param  {String}
+			 * @return {null}
+			 */
+			_onSelectedMenuChange: function(selectedMenu) {
 				if(selectedMenu) {
-					var data = JSON.parse(this.selectedMenu.getAttribute("data"));
+					var data = JSON.parse(selectedMenu.getAttribute("data"));
 					var url = '/' + (data.description ? data.description : '');
 					page(url);
 				}
 			},
-
+			/**
+			 * refresh menu content
+			 * @param  {event}
+			 * @return {null}
+			 */
 			refreshmenu: function(e) {
 				this.$.refresh.generateRequest();
 			},
-
+			/**
+			 * toggle menu group box
+			 * @param  {event}
+			 * @return {null}
+			 */
 			toggle: function(e) {
 				this.$$('#' + e.target.ariaControls).toggle();
 			}
