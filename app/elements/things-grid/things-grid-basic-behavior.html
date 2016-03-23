@@ -28,7 +28,6 @@ Things.GridBasicBehaviorImpl = {
 		gridContainerId: {
 			type: String
 		},
-
 		/**
 		 * grid mode
 		 */
@@ -53,7 +52,13 @@ Things.GridBasicBehaviorImpl = {
 			value: 50,
 			notify: true
 		},
-
+		/**
+		 * use infinite pagenation or not
+		 */
+		infinitable:{
+			type:Boolean,
+			value:false
+		},
 		/**
 		 * use pagination or not
 		 */
@@ -223,7 +228,7 @@ Things.GridBasicBehaviorImpl = {
 	 * check valid grid configuration
 	 */
 	validateGridConfig: function() {
-		if(this.paginatable) {
+		if(this.paginatable||this.infinitable) {
 			if(!this.rootProperty) {
 				this.openInfoMsg({
 					type : 'error',
@@ -282,7 +287,7 @@ Things.GridBasicBehaviorImpl = {
 	 * @param gridContainer
 	 */
 	resizeGrid: function(parentNode, gridContainer) {
-		gridContainer.style.width = parentNode.offsetWidth + 'px';
+		gridContainer.style.width = (parentNode.offsetWidth - 20) + 'px';
 		gridContainer.style.height = '300px';
 		this.grid.resetSize();
 	},
@@ -359,9 +364,15 @@ Things.GridBasicBehaviorImpl = {
 				this.resizeGrid(this.parentNode, this.querySelector('div'));
 			}
 			
-			var items = this.paginatable ? readData[this.rootProperty] : readData;					
-			this.totalCount = this.paginatable ? readData[this.totalProperty] : (items ? items.length : 0);
-			this.dataSet.setRows(items);
+			var items = (this.paginatable||this.infinitable) ? readData[this.rootProperty] : readData;					
+			this.totalCount = (this.paginatable||this.infinitable) ? readData[this.totalProperty] : (items ? items.length : 0);
+			
+			if(this.infinitable){
+				this.dataSet.appendRows(items,0,-1,false);
+				this.dataSet.clearRowStates();
+			}else{
+				this.dataSet.setRows(items);
+			}
 		}
 	}
 

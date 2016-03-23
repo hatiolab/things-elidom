@@ -21,12 +21,12 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 
 	Example:
 
-    <things-resource-content 
-      title="Terminology"
-      resource-name="Terminology"
-      resource-url="terminologies"
-      layout="fullbleed layout vertical">
-    </things-resource-content>
+	<things-resource-content 
+	  title="Terminology"
+	  resource-name="Terminology"
+	  resource-url="terminologies"
+	  layout="fullbleed layout vertical">
+	</things-resource-content>
 
 @demo ./things-content/demo/index.html
 -->
@@ -49,31 +49,32 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				last-response="{{metaData}}">
 			</things-resource>
 
-      <things-std-search-form 
-        id="search-form"
-        class="flex"
-        title="[[title]]"
-        form-fields="[[searchFormFields]]" 
-        action-url="[[resourceUrl]]" 
-        page="{{page}}"
-        per-page="[[perPage]]"
-        last-response="{{lastResponse}}">
-      </things-std-search-form>
+			<things-std-search-form 
+				id="search-form"
+				class="flex"
+				title="[[title]]"
+				form-fields="[[searchFormFields]]" 
+				action-url="[[resourceUrl]]" 
+				page="{{page}}"
+				per-page="[[perPage]]"
+				last-response="{{lastResponse}}">
+			</things-std-search-form>
 
-      <things-resource-grid 
-        id="grid"
-        grid-model="[[gridModel]]" 
-        columns="[[gridColumns]]" 
-        paginatable
-        page="{{page}}"
-        limit="{{perPage}}"
-        root-property="[[rootProperty]]"
-        total-property="[[totalProperty]]"
-        read-data="[[lastResponse]]"
-        grid-save-action="[[gridSaveUrl]]"
-        selected-row-data="{{selectedRow}}"
-        export-sheet-name="[[title]]">
-      </things-resource-grid>
+			<things-resource-grid 
+				id="grid"
+				grid-model="[[gridModel]]" 
+				columns="[[gridColumns]]"
+				infinitable
+				paginatable
+				page="{{page}}"
+				limit="{{perPage}}"
+				root-property="[[rootProperty]]"
+				total-property="[[totalProperty]]"
+				read-data="[[lastResponse]]"
+				grid-save-action="[[gridSaveUrl]]"
+				selected-row-data="{{selectedRow}}"
+				export-sheet-name="[[title]]">
+			</things-resource-grid>
 
 			<things-std-resource-form 
 				id="resource-form"
@@ -208,7 +209,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			},
 
 			listeners : {
-				'grid.things-grid-row-data-select': '_showResourceForm',
+				'grid.things-grid-detail-tap': '_showResourceForm',
 				'grid.things-grid-save-success': '_refreshGridData',
 				'resource-form.things-std-resource-form-saved' : '_refreshGridData'
 			},
