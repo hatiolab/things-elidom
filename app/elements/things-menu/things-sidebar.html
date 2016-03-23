@@ -14,9 +14,9 @@
 	3.메뉴성이기에 Drawer Attribute가 꼭 필요하다.
 
 	Example:
-	    <things-sidebar drawer class="layout vertical" 
-	    	title="MENU" screens="{{screens}}" action="menus.json">
-	    </things-sidebar>
+    <things-sidebar drawer class="layout vertical" 
+    	title="MENU" screens="{{screens}}" action="menus.json?mode=auth">
+    </things-sidebar>
 
 -->
 
@@ -112,7 +112,7 @@
 		</style>
 
 		<things-resource
-			auto=true
+			auto
 			id="refresh"
 			content-type="application/json" 
 			action="{{action}}"
@@ -155,6 +155,7 @@
 
 		Polymer({
 			is: 'things-sidebar',
+
 			properties: {
 				/**
 				 * Brand title that will be show on top of menu
@@ -162,12 +163,14 @@
 				title: {
 					type: String
 				},
+
 				/**
 				 * url that where the menu data get from
 				 */
 				action: {
 					type: String
 				},
+				
 				/**
 				 * menu group returns menu tree as Array
 				 * [
@@ -185,14 +188,19 @@
 					type: Array,
 					notify: true
 				},
+
 				/**
-				 * menu_type =="SCREEN"인 Menu정보를 Array로 반환한다.
+				 * 메뉴 리스트 중에 App 안에 나타날 실제 화면 (menu_type이 'SCREEN') 정보.
+				 * 화면 정보들만 라우팅에 추가된다.
 				 */
 				screens: {
 					type: Array,
 					notify: true
 				},
 				
+				/**
+				 * 현재 선택된 메뉴 정보 
+				 */
 				_selectedMenu: {
 					type: Object
 				}
@@ -212,8 +220,7 @@
 			 * then convert these data to menu tree and set to menuGroup
 			 * also convert to screen array and set to screens.
 			 * 
-			 * @param  {Array}
-			 * @return {null}
+			 * @param {Object} 메뉴 정보 menu.total : 총 메뉴 개수, menu.items : 메뉴 리스트 
 			 */
 			_onChangeMenu: function(menu) {
 				if(menu && menu.items.length > 0) {
@@ -233,6 +240,7 @@
 
 					// ** Routing 초기화 **
 					this.init(screens);
+					// ******************
 
 					this.menuGroup = groups;
 					this.screens = screens;					
@@ -263,14 +271,17 @@
 					page(url);
 				}
 			},
+
 			/**
 			 * refresh menu content
 			 * @param  {event}
 			 * @return {null}
 			 */
 			refreshmenu: function(e) {
+				// TODO Check 메뉴를 리프레쉬하면 라우팅도 중복되어 추가될 듯 한데 체크 필요 
 				this.$.refresh.generateRequest();
 			},
+			
 			/**
 			 * toggle menu group box
 			 * @param  {event}
