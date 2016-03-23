@@ -48,7 +48,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <!-- Main Content -->
         <iron-pages class="Main-content" attr-for-selected="data-route" selected="{{route}}">
 
-          <template is="dom-repeat" items="{{screens}}" as=screen>
+          <template is="dom-repeat" items="{{screens}}" as=screen filter="isDynamic">
             <section class="Page" data-route="{{screen.description}}">
 
               <things-resource-content 
@@ -60,6 +60,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             </section>
           </template>
+<!--           <section class="Page" data-route="Demo">
+
+            <things-resource-content 
+              title="{{screen.name}}"
+              resource-name="{{screen.name}}"
+              resource-url="{{screen.description}}"
+              layout="fullbleed layout vertical">
+            </things-resource-content>
+
+          </section> -->
 
         </iron-pages>
       </paper-scroll-header-panel>
@@ -87,6 +97,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     
   <!-- build:js scripts/app.js -->
   <script src="scripts/app.js"></script>
+  <script>
+
+    var app = document.querySelector('#app');
+
+    app.isDynamic = function(screen) {
+      if (!screen) return false;
+      console.log(screen.name!='ApiDoc'&&screen.name!='Demo'&&screen.name!='Grid');
+      return screen.name && (screen.name!='ApiDoc'&&screen.name!='Demo'&&screen.name!='Grid')
+    };
+  </script>
   <!-- endbuild-->
   <!-- Google Analytics code -->
   <!--start-google-analytics-tracker code="UA-XXXXX-Y"></start-google-analytics-tracker-->
