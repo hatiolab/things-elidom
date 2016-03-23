@@ -329,8 +329,12 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 
 				return gridModelMetaList.map(function(metaData) {
 					var field = { fieldName : metaData.name };
+
 					if(['integer', 'int', 'long', 'double', 'float'].includes(metaData.col_type)) {
 						field.dataType = 'number';
+					} else if(['date', 'time'].includes(metaData.col_type)) {
+						field.dataType = 'datetime';
+						field.datetimeFormat = metaData.format? metaData.format : 'yyyy-MM-dd';
 					}
 
 					return field;
@@ -353,14 +357,16 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 
 				return gridColumnMetaList.map(function(metaData) {
 					var field = { 
-						rank: metaData.list_rank,
 						name: metaData.name, 
 						fieldName: metaData.name, 
 						width: metaData.width ? metaData.width : 100,
-						header: {
-							text: metaData.name
-						}
+						header: { text: metaData.name },
+						styles: {}
 					};
+
+					if(metaData.align) {
+						field.styles.textAlignment = metaData.align;
+					}
 
 					if(metaData.editor) {
 						if(('code-combo' == metaData.editor) && metaData.code_list && metaData.code_list.length > 0) {
@@ -374,6 +380,12 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 
 						} else if(metaData.editor == 'number') {
 							field.editor = { type: 'number' };
+							field.styles.numberFormat = metaData.format ? metaData.format : '0,000';
+
+						} else if(metaData.editor == 'date' || metaData.editor == 'time') {
+							field.editor = { type: 'date' };
+							field.styles.datetimeFormat = metaData.format ? metaData.format : 'yyyy-MM-dd';
+							field.styles.textAlignment = 'center';
 						}
 					}
 
