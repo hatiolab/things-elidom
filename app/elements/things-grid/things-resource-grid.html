@@ -64,7 +64,7 @@
 	
 		<div id="{{gridContainerId}}"></div>
 
-		<paper-toolbar class="white">
+		<paper-toolbar id="_gridToolbar" class="white" hidden$="{{infinitable}}">
 			<div class="bottom fit">
 				<things-paginator 
 					per-page="{{limit}}" 
@@ -115,7 +115,8 @@
 				gridEvents : {
 					type: Object,
 					value: {
-						onDataCellClicked : '_gridCellClicked'
+						onDataCellClicked : '_gridCellClicked',
+						onScrollToBottom :'_gridScrollToBottom'
 					}
 				}				
 				/**
@@ -137,6 +138,10 @@
 				 * 그리드 데이터 Save(저장/삭제/추가) 액션시 에러가 발생 했을 경우 fire
 				 *
 				 * @event things-grid-save-error
+				 */
+				/**
+				 * 그리드 detail이 클릭 되었을 경우 
+				 * @event things-grid-detail-tap
 				 */
 			},
 
@@ -174,9 +179,21 @@
 						thingsGrid.selectedCellData = thingsGrid.dataSet.getValue(rowIndex, colIndex);
 						thingsGrid.fire('things-grid-cell-data-select', thingsGrid.selectedCellData);
 					}
+					
+					if (cellData.dataField() < 0) {
+						thingsGrid.selectedRowData = row.getRowObject();
+						thingsGrid.fire('things-grid-detail-tap', thingsGrid.selectedRowData);
+					}
 				}
 			},
-
+			/**
+			 * Dataludi grid scroll to bottom event handller 
+			 * @return {null}
+			 */
+			_gridScrollToBottom:function(grid){
+				var thingsGrid = grid._container_;
+				thingsGrid.page +=1;
+			},
 			/**
 			 * grid save action
 			 */
