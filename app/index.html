@@ -15,97 +15,87 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <span id="browser-sync-binding"></span>
 
   <template is="dom-bind" id="app">
-    <paper-drawer-panel id="paperDrawerPanel" responsive-width="599px">
+	<paper-drawer-panel id="paperDrawerPanel" responsive-width="599px">
 
-      <things-setting id="setting"></things-setting>
+	  <things-setting id="setting"></things-setting>
 
-      <!-- Main Menu -->
-      <things-sidebar drawer class="layout vertical" title="MENU" selected-menu =1 screens="{{screens}}" action="menus.json"></things-sidebar>
+	  <!-- Main Menu -->
+	  <things-sidebar drawer class="layout vertical" title="MENU" selected-menu =1 screens="{{screens}}" action="menus.json"></things-sidebar>
 
-      <!-- Main Area -->
-      <paper-scroll-header-panel id="headerPanelMain" class="Main" main condenses keep-condensed-header>
+	  <!-- Main Area -->
+	  <paper-scroll-header-panel id="headerPanelMain" class="Main" main condenses keep-condensed-header>
 
-        <!-- Main Toolbar -->
-        <paper-toolbar class="Main-header tall">
-          <paper-icon-button id="paperToggle" icon="menu" paper-drawer-toggle></paper-icon-button>
-          <span class="flex"></span>
+		<!-- Main Toolbar -->
+		<paper-toolbar class="Main-header tall">
+		  <paper-icon-button id="paperToggle" icon="menu" paper-drawer-toggle></paper-icon-button>
+		  <span class="flex"></span>
 
-          <!-- Toolbar icons -->
-          <paper-icon-button icon="refresh"></paper-icon-button>
-          <paper-icon-button icon="search"></paper-icon-button>
-          
-          <!-- Application name -->
-          <div class="Main-headerMiddleContent middle center horizontal layout">
-            <h1 class="Main-headerTitle">Elidom</h1>
-          </div>
-        
-          <!-- Application sub title -->
-          <div class="Main-headerBottomContent bottom center horizontal layout">
-            <div class="Main-headerSubTitle">The future of the web today</div>
-          </div>
-        </paper-toolbar>
+		  <!-- Toolbar icons -->
+		  <paper-icon-button icon="refresh"></paper-icon-button>
+		  <paper-icon-button icon="search"></paper-icon-button>
+		  
+		  <!-- Application name -->
+		  <div class="Main-headerMiddleContent middle center horizontal layout">
+			<h1 class="Main-headerTitle">Elidom</h1>
+		  </div>
+		
+		  <!-- Application sub title -->
+		  <div class="Main-headerBottomContent bottom center horizontal layout">
+			<div class="Main-headerSubTitle">The future of the web today</div>
+		  </div>
+		</paper-toolbar>
 
-        <!-- Main Content -->
-        <iron-pages class="Main-content" attr-for-selected="data-route" selected="{{route}}">
+		<!-- Main Content -->
+		<iron-pages class="Main-content" attr-for-selected="data-route" selected="{{route}}">
 
-          <template is="dom-repeat" items="{{screens}}" as=screen filter="isDynamic">
-            <section class="Page" data-route="{{screen.description}}">
+			<template is="dom-repeat" items="{{screens}}" as=screen filter="isDynamic">
+				<section class="Page" data-route="{{screen.description}}">
 
-              <things-resource-content 
-                title="{{screen.name}}"
-                resource-name="{{screen.name}}"
-                resource-url="{{screen.description}}"
-                layout="fullbleed layout vertical">
-              </things-resource-content>
+				  <things-resource-content 
+					title="{{screen.name}}"
+					resource-name="{{screen.name}}"
+					resource-url="{{screen.description}}"
+					layout="fullbleed layout vertical">
+				  </things-resource-content>
 
-            </section>
-          </template>
-<!--           <section class="Page" data-route="Demo">
+				</section>
+			</template>
+			<things-pages></things-pages>
+		</iron-pages>
+	  </paper-scroll-header-panel>
 
-            <things-resource-content 
-              title="{{screen.name}}"
-              resource-name="{{screen.name}}"
-              resource-url="{{screen.description}}"
-              layout="fullbleed layout vertical">
-            </things-resource-content>
+	</paper-drawer-panel>
 
-          </section> -->
+	<paper-toast id="toastConfirm" class="Toast" duration="10000">
+	  <span class="Toast-button" role="button" tabindex="0" on-tap="onToastConfirmTap">OK</span>
+	</paper-toast>
 
-        </iron-pages>
-      </paper-scroll-header-panel>
+	<things-spinner id="spinner" loading=false></things-spinner>
 
-    </paper-drawer-panel>
+	<paper-toast id="toast" class="Toast" duration="8000"></paper-toast>
 
-    <paper-toast id="toastConfirm" class="Toast" duration="10000">
-      <span class="Toast-button" role="button" tabindex="0" on-tap="onToastConfirmTap">OK</span>
-    </paper-toast>
+	<things-event-handler id="event-handler"></things-event-handler>
 
-    <things-spinner id="spinner" loading=false></things-spinner>
-
-    <paper-toast id="toast" class="Toast" duration="8000"></paper-toast>
-
-    <things-event-handler id="event-handler"></things-event-handler>
-
-    <!-- Service Worker support -->
-    <platinum-sw-register auto-register clients-claim skip-waiting on-service-worker-installed="displayInstalledToast">
-      <platinum-sw-offline-analytics></platinum-sw-offline-analytics>
-      <platinum-sw-cache default-cache-strategy="fastest" cache-config-file="cache-config.json">
-      </platinum-sw-cache>
-    </platinum-sw-register>
+	<!-- Service Worker support -->
+	<platinum-sw-register auto-register clients-claim skip-waiting on-service-worker-installed="displayInstalledToast">
+	  <platinum-sw-offline-analytics></platinum-sw-offline-analytics>
+	  <platinum-sw-cache default-cache-strategy="fastest" cache-config-file="cache-config.json">
+	  </platinum-sw-cache>
+	</platinum-sw-register>
 
   </template>
-    
+	
   <!-- build:js scripts/app.js -->
   <script src="scripts/app.js"></script>
   <script>
 
-    var app = document.querySelector('#app');
+	var app = document.querySelector('#app');
 
-    app.isDynamic = function(screen) {
-      if (!screen) return false;
-      console.log(screen.name!='ApiDoc'&&screen.name!='Demo'&&screen.name!='Grid');
-      return screen.name && (screen.name!='ApiDoc'&&screen.name!='Demo'&&screen.name!='Grid')
-    };
+	app.isDynamic = function(screen) {
+	  if (!screen) return false;
+	  console.log(screen.name!='ApiDoc'&&screen.name!='Demo'&&screen.name!='Grid');
+	  return screen.name && (screen.name!='ApiDoc'&&screen.name!='Demo'&&screen.name!='Grid')
+	};
   </script>
   <!-- endbuild-->
   <!-- Google Analytics code -->
