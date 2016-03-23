@@ -21,8 +21,11 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 
 	Example:
 
-    <things-resource-content>
-      <h2>Hello my-elem</h2>
+    <things-resource-content 
+      title="Terminology"
+      resource-name="Terminology"
+      resource-url="terminologies"
+      layout="fullbleed layout vertical">
     </things-resource-content>
 
 @demo ./things-content/demo/index.html
@@ -263,11 +266,11 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				var searchFormFields = [];
 				metaDataList.forEach(function(metaData) {
 					if(metaData.search_rank && metaData.search_rank > 0) {
-						var field = { name : metaData.name, label : metaData.name };
-						if(metaData.editor == 'code') {
-							field.type = 'code-combo';
+						var field = { name : metaData.name, label : metaData.name, type : metaData.editor };
+						if(metaData.editor == 'code-combo') {
 							field.codeName = metaData.ref_name;
 						}
+						
 						searchFormFields.push(field);
 					}
 				});
