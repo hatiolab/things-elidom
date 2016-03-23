@@ -143,6 +143,14 @@
       lastResponse: {
         type: Object,
         notify: true
+      },
+
+      /**
+       * 값이 필요없는 operator
+       */
+      nonValueOpers: {
+        type: Array,
+        value: ['is_null', 'is_not_null', 'is_true', 'is_false', 'is_present', 'is_blank']
       }
 
     },
@@ -179,8 +187,36 @@
     _preSubmitHandler: function(event) {
       var form = this.getMyForm();
       form.request.params || {};
+      form.request.params = this._handleSubmitParams(form.request.params);
       form.request.params.page = this.page;
       form.request.params.limit = this.perPage;
+    },
+
+    /**
+     * handle submit params 
+     * 서버에 보낼 파라미터를 재구성한다.
+     */
+    _handleSubmitParams: function(params) {
+      var newParams = { select : this.selectFields ? this.selectFields : '' };
+      if(this.sortFields) {
+        newParams.sort = JSON.stringify(this.sortFields);
+      }
+
+      var queries = [];
+
+      for(prop in params) {
+        if(params[prop]) {
+          var fieldModel = this.formFields.filter(function(formField) { return formField.name == prop })[0];
+          var q = { name : prop, operator : fieldModel.op };
+          if(!this.nonValueOpers.includes(fieldModel.op)) {
+            q.value = params[prop]; 
+          }
+          queries.push(q);
+        }
+      }
+
+      if(queries.length > 0) newParams.query = JSON.stringify(queries);
+      return newParams;
     },
 
     /**
@@ -206,7 +242,7 @@
     _successResponseHandler: function(event) {
       this.stopSpinner();
       this.lastResponse = event.detail.xhr.response;
-      this.fire('things-std-form-response', this.lastResponse );
+      this.fire('things-std-form-response', this.lastResponse);
     },
 
     /**

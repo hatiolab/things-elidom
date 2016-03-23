@@ -263,10 +263,6 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				this.gridModel = this._parseGridModel(metaDataList);
 				// 4. Parse Grid Columns
 				this.gridColumns = this._parseGridColumns(metaDataList);
-
-				if(this.title == 'Terminology') {
-					console.log(this.gridColumns);
-				}
 			},
 
 			/**
@@ -287,7 +283,8 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 					var field = { 
 						name : metaData.name, 
 						label : metaData.name, 
-						type : metaData.editor 
+						type : metaData.editor,
+						op : metaData.operator ? metaData.operator : 'eq'
 					};
 						
 					if(metaData.editor && ('code-combo' == metaData.editor)) {

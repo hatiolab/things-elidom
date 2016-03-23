@@ -76,6 +76,20 @@ Things.StdFormBehaviorImpl = {
 			type: String,
 			computed: '_computeAction(globals.basicUrl,actionUrl)'
 		},
+
+		/**
+		 * select fields
+		 */
+		selectFields: {
+			type: String
+		},
+
+		/**
+		 * sort fields - [{ field : 'fieldName1', ascending : true }, { field : 'fieldName2', ascending : false }]
+		 */
+		sortFields: {
+			type: Array
+		},
 		
 		/**
 		 * HTTP Method for submit.
@@ -202,16 +216,17 @@ Things.StdFormBehaviorImpl = {
 
 	/**
 	 * Submits form
-	 * After form submits, StdFormBehavior fires a 'submit'
 	 */
 	submitMyForm: function() {
 		this.startSpinner();
 
-		if(this.getAttribute('on-submit')) {
+		/*if(this.getAttribute('on-submit')) {
 			this.fire('things-std-form-submit', this.serializeMyForm());
 		} else {
 			this.getMyForm().submit();
-		}
+		}*/
+
+		this.getMyForm().submit();
 	},
 
 	/**
