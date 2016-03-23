@@ -60,6 +60,14 @@ Things.GridBasicBehaviorImpl = {
 			value:false
 		},
 		/**
+		 * data-fill-mode : 'set', 'append'
+		 * @type {Object}
+		 */
+		dataFillMode:{
+			type:String,
+			value:'set'
+		},
+		/**
 		 * use pagination or not
 		 */
 		paginatable: {
@@ -367,9 +375,10 @@ Things.GridBasicBehaviorImpl = {
 			var items = (this.paginatable||this.infinitable) ? readData[this.rootProperty] : readData;					
 			this.totalCount = (this.paginatable||this.infinitable) ? readData[this.totalProperty] : (items ? items.length : 0);
 			
-			if(this.infinitable){
+			if(this.dataFillMode=='append'){
 				this.dataSet.appendRows(items,0,-1,false);
 				this.dataSet.clearRowStates();
+				this.dataFillMode='set';
 			}else{
 				this.dataSet.setRows(items);
 			}

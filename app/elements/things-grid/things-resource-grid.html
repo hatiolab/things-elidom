@@ -136,7 +136,7 @@
 						onDataCellClicked : '_gridCellClicked',
 						onScrollToBottom :'_gridScrollToBottom'
 					}
-				}				
+				}
 				/**
 				 * 그리드 Row Data가 선택되었을 경우 fire
 				 *
@@ -206,12 +206,13 @@
 			},
 			/**
 			 * Dataludi grid scroll to bottom event handller 
-			 * @return {null}
 			 */
 			_gridScrollToBottom:function(grid){
 				var thingsGrid = grid._container_;
 				thingsGrid.page +=1;
+				thingsGrid.dataFillMode='append';
 			},
+
 			/**
 			 * grid save action
 			 */

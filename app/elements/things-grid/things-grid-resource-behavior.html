@@ -1,11 +1,8 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-
 <link rel="import" href="./things-grid-basic-behavior.html">
-
+<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 <script src='../../../bower_components/jszip/dist/jszip.min.js'></script>
-
 <script>
-
 window.Things = window.Things || {};
 
 /**
@@ -23,11 +20,11 @@ Things.GridResourceBehaviorImpl = {
 			type: Boolean,
 			value: true
 		},
-		
+
 		/**
 		 * grid save action url
 		 */
-		gridSaveAction : {
+		gridSaveAction: {
 			type: String
 		},
 
@@ -49,17 +46,17 @@ Things.GridResourceBehaviorImpl = {
 		/**
 		 * Excel Export시 Sheet Name
 		 */
-		exportSheetName : {
+		exportSheetName: {
 			type: String
-		}		
+		}
 	},
 
 	listeners: {
-		'import-btn.tap' : 'importGridData',
-		'export-btn.tap' : 'exportGridData',
-		'add-btn.tap'    : 'addGridRow',
-		'delete-btn.tap' : 'removeGridRow',
-		'save-btn.confirm' :'saveGridData'
+		'import-btn.tap': 'importGridData',
+		'export-btn.tap': 'exportGridData',
+		'add-btn.tap': 'addGridRow',
+		'delete-btn.tap': 'removeGridRow',
+		'save-btn.confirm': 'saveGridData'
 	},
 
 	/**
@@ -67,7 +64,14 @@ Things.GridResourceBehaviorImpl = {
 	 */
 	afterGridConfigured: function() {
 		this.grid.rowIndicator().setStateVisible(true);
-		this.grid.setEditOptions({ deletable: true, insertable: true, appendable: true });
+		this.grid.setEditOptions({
+			deletable: true,
+			insertable: true,
+			appendable: true,
+			updateByCell: true,
+			enterToNextRow: true
+		});
+		// this.grid.editOptions().setUpdateByCell(true);
 	},
 
 	/**
@@ -108,7 +112,7 @@ Things.GridResourceBehaviorImpl = {
 	 */
 	addGridRow: function() {
 		var row = Math.max(this.grid.focusedDataIndex(), 0);
-		this.dataSet.insertRow(row, {});
+		this.grid.insert(row);
 	},
 
 	/**
@@ -116,23 +120,36 @@ Things.GridResourceBehaviorImpl = {
 	 */
 	saveGridData: function() {
 		var changedDataList = [];
-		this._configureChangedData(changedDataList, 'created', 'c');
-		this._configureChangedData(changedDataList, 'updated', 'u');
-		this._configureChangedData(changedDataList, 'deleted', 'd');
-		this.writeData = changedDataList;
-		this._gridSaveAction();
+		try {
+			this.grid.commit();
+			this._configureChangedData(changedDataList, 'created', 'c');
+			this._configureChangedData(changedDataList, 'updated', 'u');
+			this._configureChangedData(changedDataList, 'deleted', 'd');
+			this.writeData = changedDataList;
+			this._gridSaveAction();
+		} catch (err) {
+			console.log(err);
+			// this.openInfoMsg({
+			// 	type : 'warning',
+			// 	title : 'Validation Error',
+			// 	text : err.message,
+			// 	html : false
+			// });
+			this.showToastMsg(err.message);
+		}
+
 	},
 
 	/**
 	 * 변경 타입(created, updated, deleted)에 따라 변경데이터를 구성한다.
 	 */
-	_configureChangedData : function(changedData, changeType, changeFlag) {
+	_configureChangedData: function(changedData, changeType, changeFlag) {
 		var changed = this.dataSet.getStateRows(changeType);
 		for (var i = 0; i < changed.length; i++) {
 			var changedRow = this.dataSet.getRowObject(changed[i]);
 			changedRow.cud_flag_ = changeFlag;
 			changedData.push(changedRow);
-		}		
+		}
 	}
 };
 
@@ -140,5 +157,4 @@ Things.GridResourceBehavior = [
 	Things.GridBasicBehavior,
 	Things.GridResourceBehaviorImpl
 ];
-
 </script>
