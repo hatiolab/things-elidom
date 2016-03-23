@@ -241,6 +241,15 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			},
 
 			/**
+			 * list sorting
+			 */
+			_sortMetaData: function(list, sortField) {
+				list.sort(function(a, b) {
+					return (a[sortField] > b[sortField]) ? 1 : ((b[sortField] > a[sortField]) ? -1 : 0);
+				});
+			},
+
+			/**
 			 * meta data를 파싱한다.
 			 * @param {Array} metaDataList
 			 */
@@ -252,7 +261,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				// 3. Parse Grid Models
 				this.gridModel = this._parseGridModel(metaDataList);
 				// 4. Parse Grid Columns
-				this.gridColumns = this._parsetGridColumns(metaDataList);
+				this.gridColumns = this._parseGridColumns(metaDataList);
 			},
 
 			/**
@@ -264,17 +273,25 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				if(!metaDataList) return;
 
 				var searchFormFields = [];
-				metaDataList.forEach(function(metaData) {
-					if(metaData.search_rank && metaData.search_rank > 0) {
-						var field = { name : metaData.name, label : metaData.name, type : metaData.editor };
-						if(metaData.editor == 'code-combo') {
-							field.codeName = metaData.ref_name;
-						}
 
-						searchFormFields.push(field);
+				metaDataList.forEach(function(metaData) {
+					if(!metaData.search_rank || metaData.search_rank <= 0) return
+
+					var field = { 
+						rank : metaData.search_rank, 
+						name : metaData.name, 
+						label : metaData.name, 
+						type : metaData.editor 
+					};
+						
+					if(metaData.editor == 'code-combo') {
+						field.codeName = metaData.ref_name;
 					}
+
+					searchFormFields.push(field);
 				});
 
+				this._sortMetaData(searchFormFields, 'rank');
 				return searchFormFields;
 			},
 
@@ -292,7 +309,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 					if(metaData.editor == 'code-combo') {
 						field.codeName = metaData.ref_name;
 					}
-					
+
 					resourceFormFields.push(field);
 				});
 
@@ -326,25 +343,28 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 * @param {Array} metaDataList
 			 * @return {Array} gridColumns
 			 */
-			_parsetGridColumns: function(metaDataList) {
+			_parseGridColumns: function(metaDataList) {
 				if(!metaDataList) return;
 				
 				var gridColumns = [];
-				metaDataList.forEach(function(metaData) {
-					if(metaData.list_rank && metaData.list_rank > 0) {
-						var field = { 
-							name: metaData.name, 
-							fieldName : metaData.name, 
-							width : metaData.width ? metaData.width : 100,
-							header : {
-								text: metaData.name
-							}
-						};
 
-						gridColumns.push(field);
-					}
+				metaDataList.forEach(function(metaData) {
+					if(!metaData.list_rank || metaData.list_rank <= 0) return;
+
+					var field = { 
+						rank: metaData.list_rank,
+						name: metaData.name, 
+						fieldName : metaData.name, 
+						width : metaData.width ? metaData.width : 100,
+						header : {
+							text: metaData.name
+						}
+					};
+
+					gridColumns.push(field);
 				});
 
+				this._sortMetaData(gridColumns, 'rank');
 				return gridColumns;
 			},
 
