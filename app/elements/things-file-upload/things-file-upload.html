@@ -1,0 +1,311 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-demo-helpers/demo-pages-shared-styles.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
+<link rel="import" href="../../../bower_components/paper-styles/default-theme.html">
+<link rel="import" href="../../../bower_components/vaadin-upload/vaadin-upload.html">
+<!-- <script src="../../../bower_components/elements-demo-resources/ga.js"></script>
+<script src="../../../bower_components/mock-http-request/lib/mock.js"></script> -->
+
+<link rel="import" href="../things-setting/things-global-behavior.html">
+<link rel="import" href="../things-spinner/things-spinner-behavior.html">
+<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
+<!--
+A comment describing this element
+
+Example:
+
+	<my-elem></my-elem>
+
+Example:
+
+	<my-elem>
+	  <h2>Hello my-elem</h2>
+	</my-elem>
+
+@demo demo/index.html
+-->
+<dom-module id="things-file-upload">
+	<template>
+		<style is="custom-style" include="demo-pages-shared-styles">
+		:root {
+			--primary-color: #00B4F0;
+			--light-primary-color: #7CD8F7;
+			--dark-primary-color: #0078A0;
+			--error-color: #E61E6E;
+		}
+		
+		nav {
+			display: block;
+		}
+		
+		nav.vertical-section {
+			margin-left: 0;
+			margin-right: 0;
+			padding-top: 8px;
+			padding-bottom: 0;
+		}
+		
+		nav > ul {
+			padding: 0;
+		}
+		
+		nav > ul > li {
+			padding: 0 24px 8px 0;
+			list-style: none;
+		}
+		
+		nav a,
+		nav b {
+			@apply(--paper-font-button);
+		}
+		
+		nav a {
+			color: var(--primary-color);
+			text-decoration: none;
+		}
+		
+		nav b {
+			color: var(--secondary-text-color);
+		}
+		
+		.centered {
+			max-width: 800px;
+		}
+		</style>
+		<style>
+		:host {
+			display: block;
+		}
+		</style>
+
+		<vaadin-upload  accept="[[accept]]" 
+						headers="[[headers]]" 
+						i18n="[[i18n]]" 
+						maxFiles=[[maxFiles]]
+						maxFileSize=[[maxFileSize]]
+						method=[[method]]
+						nodrop=[[nodrop]]
+						nomultiple=[[nomultiple]]
+						showCancelAll=[[showCancelAll]]
+						target=[[target]]
+						timeout=[[timeout]]
+						id="fileUpload">
+				<content></content>
+		</vaadin-upload>
+		<h4>Files List</h4>
+		<ul id="customFilesList"></ul>
+
+	</template>
+	<script>
+	Polymer({
+		is: 'things-file-upload',
+		properties: {
+			/**
+			 * Specifies the types of files that the server accepts. 
+			 * Syntax: file_extension|audio/|video/|image/*|media_type
+			 */
+			accept: {
+				type: String
+			},
+			/**
+			 * Key-Value map to send to the server.
+			 */
+			headers: {
+				type: Object
+			},
+			/**
+			 * The object used to localize this component.
+			 *  Default: {
+					"dropFiles": {
+						"one": Drop file here...,
+						"many": Drop files here...
+					},
+					"addFiles": {
+						"one": Select File,
+						"many": Add Files
+					},
+					"cancel": Cancel,
+					"cancelAll": Cancel All,
+					"error": {
+						"tooManyFiles": Too Many Files.,
+						"fileIsTooBig": File is Too Big.,
+						"incorrectFileType": Incorrect File Type.
+					},
+					"uploading": {
+						"status": {
+							"connecting": Connecting...,
+							"stalled": Stalled.,
+							"processing": Processing File...
+						},
+						"remainingTime": {
+							"prefix": remaining time: ,
+							"unknown": unknown remaining time
+						},
+						"error": {
+							"serverUnavailable": Server Unavailable,
+							"unexpectedServerError": Unexpected Server Error,
+							"forbidden": Forbidden
+						}
+					},
+					"units": {
+						"size": [B, kB, MB, GB, TB, PB, EB, ZB, YB]
+					}
+				}
+			 */
+			i18n: {
+				type: Object
+			},
+			/**
+			 * Limit of files to upload, by default it is unlimited. If the value is one, 
+			 * nomultiple is true.
+			 */
+			maxFiles: {
+				type: Number,
+				value:Infinity
+			},
+			/**
+			 * Specifies the maximum file size allowed to upload. Default is unlimited.
+			 */
+			maxFileSize: {
+				type: Number,
+				value:Infinity
+			},
+			/**
+			 * HTTP Method used to send the files.
+			 */
+			method: {
+				type: String,
+				value:'POST'
+			},
+			/**
+			 * Define whether the element supports drop files on it for uploading. 
+			 * By default it's enabled in desktop and disabled in touch devices 
+			 * because almost mobile devices do not support drag events.
+			 */
+			nodrop: {
+				type: Boolean,
+				value:false
+			},
+			/**
+			 * Specifies whether the file selection popup is configured to select multiple files.
+			 */
+			nomultiple: {
+				type: Boolean,
+				value:false
+			},
+			/**
+			 * Specifies if the cancel-all button is visible.
+			 */
+			showCancelAll: {
+				type: Boolean,
+				value:false
+			},
+			/**
+			 * Server URL.
+			 */
+			target: {
+				type: String
+			},
+			/**
+			 * Max time for the upload process, if exceeded XHR will be aborted.
+			 */
+			timeout: {
+				type: Number,
+				value: 0
+			},
+			_basicUrl:{
+				computed:'_getBasicUrl(globals.basicUrl)'
+			}
+		},
+		listeners: {
+			'fileUpload.file-add': '_fileAdd',
+			'fileUpload.file-remove': '_fileRemove',
+			'fileUpload.upload-before': '_uploadBefore',
+			'fileUpload.upload-start': '_updateListItem',
+			'fileUpload.upload-request': '_uploadRequest',
+			'fileUpload.upload-progress': '_updateListItem',
+			'fileUpload.upload-response': '_uploadResponse',
+			'fileUpload.upload-success': '_updateListItem',
+			'fileUpload.upload-error': '_updateListItem',
+			'fileUpload.upload-abort':'_uploadAbort'
+		},
+		behaviors: [
+			Things.GlobalBehavior,
+			Things.SpinnerBehavior,
+			Things.MsgBoxBehavior
+		],
+		_getBasicUrl:function(basicUrl){
+			return basicUrl;
+		},
+		_updateListItem: function(event) {
+			var file = event.detail.file;
+			if (file.listItem) {
+				file.listItem.querySelector('strong').textContent = file.name;
+
+				var status = file.listItem.querySelector('span');
+				switch (event.type) {
+					case 'upload-success':
+						status.textContent = 'Uploaded.';
+						break;
+					case 'upload-error':
+						status.textContent = file.error;
+						break;
+					default:
+						status.textContent = file.status;
+						break;
+				}
+			}
+		},
+
+		_fileAdd: function(event) {
+			var file = event.detail.file;
+			var li = document.createElement('li');
+			li.innerHTML = '<strong></strong><br/> <span></span>';
+			file.listItem = li;
+			this.$.customFilesList.appendChild(li);
+			this._updateListItem(event);
+		},
+
+		_fileRemove: function(event) {
+			console.log('_fileRemove');
+			var file = event.detail.file;
+			if (file.listItem) {
+				this.$.customFilesList.removeChild(file.listItem);
+			}
+		},
+		_fileRemove: function(event) {
+			console.log('_fileRemove');
+			var file = event.detail.file;
+			if (file.listItem) {
+				this.$.customFilesList.removeChild(file.listItem);
+			}
+		},
+		_uploadBefore:function(event){
+			console.log('upload xhr before open: ', event.detail.xhr);
+
+			// Prevent the upload request:
+			// event.preventDefault();
+
+			// Custom upload request url for file
+			var file = event.detail.file;
+			var target = this.$.fileUpload.target
+			file.uploadTarget = [this._basicUrl, target].join('/');
+
+		},
+		_uploadRequest:function(event){
+			console.log('upload xhr after open: ', event.detail.xhr);
+
+			// event.detail.xhr.setRequestHeader('X-File-Name', event.detail.file.name);
+		},
+		_uploadResponse:function(event){
+
+		},
+		_uploadAbort:function(event){
+			
+		}
+
+	});
+	</script>
+</dom-module>

@@ -12,320 +12,324 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 <link rel="import" href="../things-setting/things-global-behavior.html">
 <link rel="import" href="../things-spinner/things-spinner-behavior.html">
+<link rel="import" href="../things-file-upload/things-file-upload.html">
 
 <dom-module id="things-demo">
   <template>
-    <style include="shared-styles"></style>
-    <style>
-      @import "things-demo";
-    </style>
-    
-    <paper-material class="Page-paper" elevation="1">
-      <h2 class="Page-title">[[title]]</h2>
+	<style include="shared-styles"></style>
+	<style>
+	  @import "things-demo";
+	</style>
+	
+	<paper-material class="Page-paper" elevation="1">
+	  <h2 class="Page-title">[[title]]</h2>
 
-      <p class="paper-font-subhead">Things Components Demo</p>
-    </paper-material>
+	  <p class="paper-font-subhead">Things Components Demo</p>
+	</paper-material>
 
-    <paper-material class="Page-paper" elevation="1">
-      <p class="paper-font-subhead"><a href="/elements/index.html" target="_blank">Component API & Demo</a></p>
-    </paper-material>    
+	<paper-material class="Page-paper" elevation="1">
+	  <p class="paper-font-subhead"><a href="/elements/index.html" target="_blank">Component API & Demo</a></p>
+	</paper-material>
 
-    <paper-material class="Page-paper" elevation="1">
-      <p class="paper-font-subhead">Things Setting</p>
+	<things-file-upload target="upload" method="POST" timeout="300000" ></things-file-upload>
 
-      <paper-input label="Base URL" value="{{globals.basicUrl}}"></paper-input>
+	<paper-material class="Page-paper" elevation="1">
+	  <p class="paper-font-subhead">Things Setting</p>
 
-      <things-setting id="setting"></things-setting>
+	  <paper-input label="Base URL" value="{{globals.basicUrl}}"></paper-input>
 
-      <div class="buttons">
-        <things-button color="green" id="setting-btn">Setting</things-button>
-      </div>
-    </paper-material>
+	  <things-setting id="setting"></things-setting>
 
-    <paper-material class="Page-paper" elevation="1">
-      <p class="paper-font-subhead">Things Profile</p>
+	  <div class="buttons">
+		<things-button color="green" id="setting-btn">Setting</things-button>
+	  </div>
+	</paper-material>
 
-      <things-profile name="elidom" email="elidom@example.com" img="../../images/profile.png"></things-profile>
-    </paper-material>
+	<paper-material class="Page-paper" elevation="1">
+	  <p class="paper-font-subhead">Things Profile</p>
 
-    <paper-material class="Page-paper" elevation="1">
-      <p class="paper-font-subhead">Things Button</p>
+	  <things-profile name="elidom" email="elidom@example.com" img="../../images/profile.png"></things-profile>
+	</paper-material>
 
-      <paper-input  name="buttonAction" 
-                    type="text" 
-                    label="Button Action" 
-                    value="{{thingsButtonMessage}}">
-      </paper-input>
+	<paper-material class="Page-paper" elevation="1">
+	  <p class="paper-font-subhead">Things Button</p>
 
-      <div class="buttons">
-        <things-button color="green" id="things-btn-1">Search Button</things-button>
+	  <paper-input  name="buttonAction" 
+					type="text" 
+					label="Button Action" 
+					value="{{thingsButtonMessage}}">
+	  </paper-input>
 
-        <things-button id="things-btn-2" color="indigo" confirm=true title="Confirm" message="Are you sure to save?">Save Button</things-button>
+	  <div class="buttons">
+		<things-button color="green" id="things-btn-1">Search Button</things-button>
 
-        <things-button id="things-btn-3" color="pink" confirm=true title="Confirm" message="Are you sure to delete?">Delete Button</things-button>
-      </div>
-    </paper-material>
+		<things-button id="things-btn-2" color="indigo" confirm=true title="Confirm" message="Are you sure to save?">Save Button</things-button>
 
-    <paper-material class="Page-paper" elevation="1">
-      <p class="paper-font-subhead">Things Message Box / Spinner</p>
+		<things-button id="things-btn-3" color="pink" confirm=true title="Confirm" message="Are you sure to delete?">Delete Button</things-button>
+	  </div>
+	</paper-material>
 
-      <div class="buttons">
-        <paper-button raised id="msg-button">Message Box</paper-button>
-        <paper-button raised id="confirm-button">Confirm Box</paper-button>
-        <paper-button raised id="prompt-button">Prompt Box</paper-button>
-        <paper-button raised id="spn-button">Spinner</paper-button>
-      </div>      
-    </paper-material>
+	<paper-material class="Page-paper" elevation="1">
+	  <p class="paper-font-subhead">Things Message Box / Spinner</p>
 
-    <paper-material class="Page-paper" elevation="1">
-      <p class="paper-font-subhead">Things Event Handler</p>
+	  <div class="buttons">
+		<paper-button raised id="msg-button">Message Box</paper-button>
+		<paper-button raised id="confirm-button">Confirm Box</paper-button>
+		<paper-button raised id="prompt-button">Prompt Box</paper-button>
+		<paper-button raised id="spn-button">Spinner</paper-button>
+	  </div>      
+	</paper-material>
 
-      <div class="buttons">
-        <paper-button raised id="evt-button">Fire Event</paper-button>
-      </div>
-    </paper-material>
+	<paper-material class="Page-paper" elevation="1">
+	  <p class="paper-font-subhead">Things Event Handler</p>
 
-    <paper-material class="Page-paper" elevation="1">
-      <p class="paper-font-subhead">Web Socket</p>
+	  <div class="buttons">
+		<paper-button raised id="evt-button">Fire Event</paper-button>
+	  </div>
+	</paper-material>
 
-        <paper-input  name="wsurl" 
-                      type="text" 
-                      label="Web Socket URL" 
-                      value="{{wsUrl}}">
-        </paper-input>
+	<paper-material class="Page-paper" elevation="1">
+	  <p class="paper-font-subhead">Web Socket</p>
 
-        <paper-input  name="status" 
-                      type="text" 
-                      label="Web Socket Status" 
-                      value="{{wsStatus}}">
-        </paper-input>
+		<paper-input  name="wsurl" 
+					  type="text" 
+					  label="Web Socket URL" 
+					  value="{{wsUrl}}">
+		</paper-input>
 
-        <paper-input  name="message" 
-                      type="text" 
-                      label="Message To Send" 
-                      value="{{wsSendMessage}}">
-        </paper-input>
+		<paper-input  name="status" 
+					  type="text" 
+					  label="Web Socket Status" 
+					  value="{{wsStatus}}">
+		</paper-input>
 
-        <paper-input  name="returnMessage" 
-                      type="text" 
-                      label="Received Message" 
-                      value="[[wsReceiveMessage]]">
-        </paper-input>
+		<paper-input  name="message" 
+					  type="text" 
+					  label="Message To Send" 
+					  value="{{wsSendMessage}}">
+		</paper-input>
 
-        <div class="buttons">
-          <paper-button raised id="ws-open-button">Open</paper-button>
-          <paper-button raised id="ws-send-button">Send Message</paper-button>
-          <paper-button raised id="ws-close-button">Close</paper-button>
-        </div>
-    </paper-material>
+		<paper-input  name="returnMessage" 
+					  type="text" 
+					  label="Received Message" 
+					  value="[[wsReceiveMessage]]">
+		</paper-input>
 
-    <paper-material class="Page-paper" elevation="1">
-      <p class="paper-font-subhead">Things Alarm</p>
+		<div class="buttons">
+		  <paper-button raised id="ws-open-button">Open</paper-button>
+		  <paper-button raised id="ws-send-button">Send Message</paper-button>
+		  <paper-button raised id="ws-close-button">Close</paper-button>
+		</div>
+	</paper-material>
 
-      <things-alarm-badge count="3"></things-alarm-badge>
+	<paper-material class="Page-paper" elevation="1">
+	  <p class="paper-font-subhead">Things Alarm</p>
 
-      <div class="buttons">
-        <paper-button raised id="alarm-button">Alarm Badge Click</paper-button>
-      </div>
-    </paper-material>
+	  <things-alarm-badge count="3"></things-alarm-badge>
 
-    <paper-material class="Page-paper" elevation="1">
-      <p class="paper-font-subhead">Things Combo</p>
+	  <div class="buttons">
+		<paper-button raised id="alarm-button">Alarm Badge Click</paper-button>
+	  </div>
+	</paper-material>
 
-      <paper-input label="Selected Value" value="{{codeName}}"></paper-input>
+	<paper-material class="Page-paper" elevation="1">
+	  <p class="paper-font-subhead">Things Combo</p>
 
-      <paper-input label="Selected Description" value="{{codeDesc}}"></paper-input>
+	  <paper-input label="Selected Value" value="{{codeName}}"></paper-input>
 
-      <things-combo 
-        id="combo" 
-        label="Language" 
-        value="en-US" 
-        items="{{comboItems}}" 
-        label-path="description" 
-        value-path="name">
-      </things-combo>
+	  <paper-input label="Selected Description" value="{{codeDesc}}"></paper-input>
 
-      <things-code-selector 
-        id="code-selector" 
-        label="Language" 
-        value="en-US" 
-        code-name="LOCALE" 
-        label-path="description" 
-        value-path="name">
-      </things-code-selector>
+	  <things-combo 
+		id="combo" 
+		label="Language" 
+		value="en-US" 
+		items="{{comboItems}}" 
+		label-path="description" 
+		value-path="name">
+	  </things-combo>
 
-    </paper-material>
+	  <things-code-selector 
+		id="code-selector" 
+		label="Language" 
+		value="en-US" 
+		code-name="LOCALE" 
+		label-path="description" 
+		value-path="name">
+	  </things-code-selector>
 
-    <paper-material class="Page-paper" elevation="1">
-      <p class="paper-font-subhead">Date Picker</p>
-      <things-date-picker label="Date Picker" locale="ko" read-format="YYYY-MM-DD"></things-date-picker>
-    </paper-material>
+	</paper-material>
 
-    <paper-material class="Page-paper" elevation="1">
-      <p class="paper-font-subhead">Time Picker</p>
-      <things-time-picker label="Time Picker"></things-time-picker>
-    </paper-material>
+	<paper-material class="Page-paper" elevation="1">
+	  <p class="paper-font-subhead">Date Picker</p>
+	  <things-date-picker label="Date Picker" locale="ko" read-format="YYYY-MM-DD"></things-date-picker>
+	</paper-material>
 
-    <things-msg-box id="msg-box" title="Things Message Box" message="This is Message Box"></things-msg-box>
+	<paper-material class="Page-paper" elevation="1">
+	  <p class="paper-font-subhead">Time Picker</p>
+	  <things-time-picker label="Time Picker"></things-time-picker>
+	</paper-material>
 
-    <things-websocket id="ws" url="{{wsUrl}}"></things-websocket>
+	<things-msg-box id="msg-box" title="Things Message Box" message="This is Message Box"></things-msg-box>
+
+	<things-websocket id="ws" url="{{wsUrl}}"></things-websocket>
+
 
   </template>
 
   <!--script src="things-demo.js"></script-->
 
   <script>
-    (function() {
-      'use strict';
+	(function() {
+	  'use strict';
 
-      Polymer({
-        is: 'things-demo',
+	  Polymer({
+		is: 'things-demo',
 
-        properties: {
-          title: {
-            value: 'Title'
-          },
-          wsUrl: {
-            value: 'ws://localhost:9004/ws'
-          },
-          wsStatus: {
-            value: 'disconnected'
-          },
-          comboItems: {
-            type: Array,
-            value: [{
-              name : 'ko-KR', description: '한글'
-            }, {
-              name : 'en-US', description: 'English'
-            }, {
-              name : 'zh-CN', description: 'Chinese'
-            }],
-            notify: true
-          }
-        },
+		properties: {
+		  title: {
+			value: 'Title'
+		  },
+		  wsUrl: {
+			value: 'ws://localhost:9004/ws'
+		  },
+		  wsStatus: {
+			value: 'disconnected'
+		  },
+		  comboItems: {
+			type: Array,
+			value: [{
+			  name : 'ko-KR', description: '한글'
+			}, {
+			  name : 'en-US', description: 'English'
+			}, {
+			  name : 'zh-CN', description: 'Chinese'
+			}],
+			notify: true
+		  }
+		},
 
-        behaviors : [
-          Things.MsgBoxBehavior, 
-          Things.GlobalBehavior,
-          Things.SpinnerBehavior,
-        ],
+		behaviors : [
+		  Things.MsgBoxBehavior, 
+		  Things.GlobalBehavior,
+		  Things.SpinnerBehavior,
+		],
 
-        listeners: {
-          'setting-btn.tap' : 'onTapSetting',
-          'things-btn-1.tap' : 'onTapThingsButton1',
-          'things-btn-2.confirm' : 'onConfirmMsgBox',
-          'things-btn-3.confirm' : 'onConfirmMsgBox',
-          'msg-button.tap' : 'onTapMsgButton',
-          'confirm-button.tap' : 'onTapConfirmButton',
-          'prompt-button.tap' : 'onTapPromptButton',
-          'spn-button.tap' : 'onTapSpnButton',
-          'evt-button.tap' : 'onTapEvtButton',
-          'ws-open-button.tap' : 'onTapWsOpenButton',
-          'ws-send-button.tap' : 'onTapWsSendButton',
-          'ws-close-button.tap' : 'onTapWsCloseButton',
-          'msg-box.confirm' : 'onConfirmMsgBox',
-          'ws.onmessage' : 'onWsMessageReceive',
-          'ws.onerror' : 'onWsMessageReceive',
-          'ws.onopen' : 'onWsMessageReceive',
-          'ws.onclose' : 'onWsMessageReceive',
-          'combo.things-combo-value-changed' : 'onComboValueChanged',
-          'code-selector.things-combo-value-changed' : 'onComboValueChanged'
-        },
+		listeners: {
+		  'setting-btn.tap' : 'onTapSetting',
+		  'things-btn-1.tap' : 'onTapThingsButton1',
+		  'things-btn-2.confirm' : 'onConfirmMsgBox',
+		  'things-btn-3.confirm' : 'onConfirmMsgBox',
+		  'msg-button.tap' : 'onTapMsgButton',
+		  'confirm-button.tap' : 'onTapConfirmButton',
+		  'prompt-button.tap' : 'onTapPromptButton',
+		  'spn-button.tap' : 'onTapSpnButton',
+		  'evt-button.tap' : 'onTapEvtButton',
+		  'ws-open-button.tap' : 'onTapWsOpenButton',
+		  'ws-send-button.tap' : 'onTapWsSendButton',
+		  'ws-close-button.tap' : 'onTapWsCloseButton',
+		  'msg-box.confirm' : 'onConfirmMsgBox',
+		  'ws.onmessage' : 'onWsMessageReceive',
+		  'ws.onerror' : 'onWsMessageReceive',
+		  'ws.onopen' : 'onWsMessageReceive',
+		  'ws.onclose' : 'onWsMessageReceive',
+		  'combo.things-combo-value-changed' : 'onComboValueChanged',
+		  'code-selector.things-combo-value-changed' : 'onComboValueChanged'
+		},
 
-        onTapSetting: function(e) {
-          this.$.setting.open();
-        },
+		onTapSetting: function(e) {
+		  this.$.setting.open();
+		},
 
-        onTapThingsButton1: function(e) {
-          this.thingsButtonMessage = 'Search Button Pressesd';
-        },
+		onTapThingsButton1: function(e) {
+		  this.thingsButtonMessage = 'Search Button Pressesd';
+		},
 
-        onTapMsgButton: function(e) {
-          this.openInfoMsg({ title : 'Info Title', text : 'Info Message', type : 'info', timer : 3000 });
-        },
+		onTapMsgButton: function(e) {
+		  this.openInfoMsg({ title : 'Info Title', text : 'Info Message', type : 'info', timer : 3000 });
+		},
 
-        onTapConfirmButton: function(e) {
-          this.openConfirmMsg( { title: 'Are you sure?',
-                          text: 'You will not be able to recover this imaginary file!',
-                          type: 'warning',
-                          showCancelButton: true,
-                          confirmButtonColor: '#DD6B55',
-                          confirmButtonText: 'Yes, delete it!',
-                          cancelButtonText: 'No, cancel plx!',
-                          closeOnConfirm: false,
-                          closeOnCancel: false }, this.okCallback, this.cancelCallback);
-        },
+		onTapConfirmButton: function(e) {
+		  this.openConfirmMsg( { title: 'Are you sure?',
+						  text: 'You will not be able to recover this imaginary file!',
+						  type: 'warning',
+						  showCancelButton: true,
+						  confirmButtonColor: '#DD6B55',
+						  confirmButtonText: 'Yes, delete it!',
+						  cancelButtonText: 'No, cancel plx!',
+						  closeOnConfirm: false,
+						  closeOnCancel: false }, this.okCallback, this.cancelCallback);
+		},
 
-        okCallback: function() {
-          swal('Deleted!', 'Your imaginary file has been deleted', 'success');
-        },
+		okCallback: function() {
+		  swal('Deleted!', 'Your imaginary file has been deleted', 'success');
+		},
 
-        cancelCallback: function() {
-          swal('Cancelled', 'Your imaginary file is safe.', 'error');
-        },
+		cancelCallback: function() {
+		  swal('Cancelled', 'Your imaginary file is safe.', 'error');
+		},
 
-        onTapPromptButton: function(e) {
-          this.openPromptMsg( { title : 'An input!',
-                         text : 'Write something interesting!',
-                         type : 'input',
-                         showCancelButton: true,
-                         closeOnConfirm : false,
-                         animation : 'slide-from-too',
-                         inputPlaceholder : 'Write Something' }, this.promptCallback);
-        },
+		onTapPromptButton: function(e) {
+		  this.openPromptMsg( { title : 'An input!',
+						 text : 'Write something interesting!',
+						 type : 'input',
+						 showCancelButton: true,
+						 closeOnConfirm : false,
+						 animation : 'slide-from-too',
+						 inputPlaceholder : 'Write Something' }, this.promptCallback);
+		},
 
-        promptCallback: function(inputValue) {
-          swal("Nice!", "You wrote: " + inputValue, "success");
-        },
+		promptCallback: function(inputValue) {
+		  swal("Nice!", "You wrote: " + inputValue, "success");
+		},
 
-        onTapSpnButton: function(e) {
-          this.toggleSpinner();
-        },
+		onTapSpnButton: function(e) {
+		  this.toggleSpinner();
+		},
 
-        onTapEvtButton: function(e) {
-          // index.html에 event-handler 추가
-          app.$['event-handler'].fire('showMessage', { title : 'This is Title', message : 'This is Message!' });
-        },
+		onTapEvtButton: function(e) {
+		  // index.html에 event-handler 추가
+		  app.$['event-handler'].fire('showMessage', { title : 'This is Title', message : 'This is Message!' });
+		},
 
-        onTapWsOpenButton: function(e) {
-          this.$.ws.open();
-        },
+		onTapWsOpenButton: function(e) {
+		  this.$.ws.open();
+		},
 
-        onTapWsSendButton: function(e) {
-          this.$.ws.send(this.wsSendMessage);
-        },
+		onTapWsSendButton: function(e) {
+		  this.$.ws.send(this.wsSendMessage);
+		},
 
-        onTapWsCloseButton: function(e) {
-          this.wsSendMessage = '';
-          this.$.ws.close();  
-        },
+		onTapWsCloseButton: function(e) {
+		  this.wsSendMessage = '';
+		  this.$.ws.close();  
+		},
 
-        onConfirmMsgBox: function(e) {
-          if(e.detail == 'ok') {
-            this.thingsButtonMessage = e.detail + ' pressed';
-          } else {
-            this.thingsButtonMessage = e.detail + ' pressed';
-          }
-        },
+		onConfirmMsgBox: function(e) {
+		  if(e.detail == 'ok') {
+			this.thingsButtonMessage = e.detail + ' pressed';
+		  } else {
+			this.thingsButtonMessage = e.detail + ' pressed';
+		  }
+		},
 
-        onWsMessageReceive: function(e) {
-          if(typeof(e.detail) == "string") {
-            this.wsReceiveMessage = e.detail;  
-          } else {
-            this.wsReceiveMessage = e.type;
-            this.wsStatus = this.$.ws.status();
-          }
-        },
+		onWsMessageReceive: function(e) {
+		  if(typeof(e.detail) == "string") {
+			this.wsReceiveMessage = e.detail;  
+		  } else {
+			this.wsReceiveMessage = e.type;
+			this.wsStatus = this.$.ws.status();
+		  }
+		},
 
-        onComboValueChanged: function(e) {
-          if(e.detail) {
-            this.codeName = e.detail.value;
-            this.codeDesc = e.detail.item ? e.detail.item.description : '';
-          }
-        }
+		onComboValueChanged: function(e) {
+		  if(e.detail) {
+			this.codeName = e.detail.value;
+			this.codeDesc = e.detail.item ? e.detail.item.description : '';
+		  }
+		}
 
-      });
-    })();
+	  });
+	})();
   </script>  
 
 </dom-module>
