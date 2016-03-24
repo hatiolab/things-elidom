@@ -215,6 +215,15 @@ Example:
 				type: Number,
 				value: 0
 			},
+			resourceType:{
+				type:String
+			},
+			resourceId:{
+				type:String
+			},
+			resouceTag:{
+				type:String
+			},
 			_basicUrl:{
 				computed:'_getBasicUrl(globals.basicUrl)'
 			}
@@ -303,7 +312,7 @@ Example:
 
 		},
 		_uploadAbort:function(event){
-			
+
 		}
 
 	});
