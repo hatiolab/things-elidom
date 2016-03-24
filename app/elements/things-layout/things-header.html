@@ -1,7 +1,7 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-
-<link rel="import" href="../things-login/things-logout.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../things-setting/things-global-behavior.html">
+<link rel="import" href="../things-login/things-logout.html">
 
 <dom-module id="things-header">
   <template>
@@ -64,22 +64,26 @@
         <paper-icon-button icon="icons:menu" id="sidebar-toggler"></paper-icon-button>
       </div>
 
-      <div class="search pull-left">
+      <!--div class="search pull-left">
         <input type="text"/><paper-icon-button icon="icons:search"></paper-icon-button>
       </div>
 
-      <!--div class="user-menu pull-right">
+      <div class="user-menu pull-right">
         <things-logout url="logout" icon="exit-to-app"></things-logout>
       </div>
 
       <div class="user-menu pull-right" id="setting">
         <paper-icon-button icon="icons:settings"></paper-icon-button>
-      </div>      
+      </div>
 
       <div class="user-menu pull-right" id="user">
         <iron-icon icon="icons:account-circle">
         </iron-icon>{{ globals.user.name }}
       </div-->
+
+      <div class="user-menu pull-right" id="setting">
+        <paper-icon-button icon="icons:search"></paper-icon-button>
+      </div>      
     </div>
 
   </template>
@@ -94,6 +98,16 @@
         behaviors: [ Things.GlobalBehavior ],
 
         properties: {
+          /**
+           * drawer id
+           */
+          drawerId: {
+            type: String
+          },
+
+          /**
+           * signed-in user object
+           */
           user: {
             type: Object,
             value: {
@@ -105,33 +119,23 @@
 
         listeners: {
           'sidebar-toggler.tap': 'toggleSidebar',
-          //'user.tap': 'showUserInfo',
-          //'setting.tap': 'openSettingDialog'
+          'setting.tap': 'openSettingDialog'
+          //'user.tap': 'showUserInfo'
         },
 
         /**
          * 로그인 이후에만 toggle이 적용됨 
          */
         toggleSidebar: function(e) {
-          /*if(this.isSignedIn()) {
-            if(app.$.drawer.forceNarrow) {
-              app.$.drawer.forceNarrow = false
-            } else if(!app.$.drawer.narrow) {
-              app.$.drawer.forceNarrow = true
-            } else {
-              app.$.drawer.togglePanel();
-            }
-          }*/
+          //if(this.isSignedIn()) {
+            var drawer = app.$[this.drawerId];
 
-          //if(if(this.isSignedIn()) {
-            var drawerPanel = app.$.paperDrawerPanel;
-
-            if(drawerPanel.forceNarrow) {
-              drawerPanel.forceNarrow = false
-            } else if(!drawerPanel.narrow) {
-              drawerPanel.forceNarrow = true
+            if(drawer.forceNarrow) {
+              drawer.forceNarrow = false
+            } else if(!drawer.narrow) {
+              drawer.forceNarrow = true
             } else {
-              drawerPanel.togglePanel();
+              drawer.togglePanel();
             }
           //}
         },

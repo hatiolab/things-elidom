@@ -13,11 +13,12 @@ Things.RoutingBehavior = {
   /**
    * initialize routings
    * @param {Array} Menu screen array
-   * @param {String} Defualt routing name  
+   * @param {String} Defualt routing name
+   * @param {String} Login routing name  
    */
-  init: function(screens, defaultRouting) {
+  init: function(screens, defaultRouting, loginRouting) {
     var me = this;
-    this.addDefaultRouting(defaultRouting);
+    this.addDefaultRouting(defaultRouting, loginRouting);
 
     screens.forEach(function(screen) {
       var route = screen.routing;
@@ -35,7 +36,7 @@ Things.RoutingBehavior = {
    * move screen scroll to top
    */
   scrollToTop: function(ctx, next) {
-    app.scrollPageToTop();
+    //app.scrollPageToTop();
     next();
   },
 
@@ -43,9 +44,13 @@ Things.RoutingBehavior = {
    *  add default routing
    *  @param {String} Default routing name
    */
-  addDefaultRouting: function(routingName) {
+  addDefaultRouting: function(defaultRouting, loginRouting) {
     page('/', this.scrollToTop, () => {
-      app.route = routingName;
+      app.route = defaultRouting;
+    });
+
+    page('/login', this.scrollToTop, () => {
+      app.route = loginRouting;
     });
   },
 

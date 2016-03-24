@@ -1,13 +1,32 @@
+<!-- login page -->
+<things-login data-route="login"
+              route ="{{route}}"
+              title="Elidom"
+              login-path="login"
+              content-type="application/x-www-form-urlencoded"
+              success-route="home"
+              username-input-label="ID"
+              password-input-label="Password"
+              submit-label ="Submit"
+              Reset-label = "Reset">
+  <img avatar src="https://maps.gstatic.com/tactile/pane/default_geocode-1x.png"/>
+</things-login>
+
+<!-- demo page -->
 <section class="Page" data-route="demo">
     <paper-material class="Page-paper" elevation="1">
         <things-demo title="Elidom Demo"></things-demo>
     </paper-material>
 </section>
+
+<!-- sample page -->
 <section class="Page" data-route="contact">
     <paper-material class="Page-paper" elevation="1">
     	
     </paper-material>
 </section>
+
+<!-- API Document page -->
 <section class="Page" data-route="apidoc">
     <paper-material class="Page-paper" elevation="1">
     	<a href="http://localhost:3000/elements/index.html">apiDoc</a>

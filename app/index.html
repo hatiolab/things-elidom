@@ -24,7 +24,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			<!-- Layout Sidebar -->
 			<things-sidebar drawer 
 				class="layout vertical" 
-				title="MENU" 
+				title="Elidom Framework" 
 				selected-menu=1 
 				screens="{{screens}}" 
 				action="menus.json?mode=auth">
@@ -33,29 +33,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			<!-- Main Area -->
 			<paper-scroll-header-panel id="headerPanelMain" class="Main" main condenses keep-condensed-header>
 				<!-- Layout Header -->
-				<things-header></things-header>
+				<things-header drawer-id='paperDrawerPanel'></things-header>
 
 				<!-- Main Content -->
-				<iron-pages attr-for-selected="data-route" selected="{{route}}">
+				<iron-pages attr-for-selected="data-route" selected="{{route}}" class="content">
 					<!-- Dynamic Menu Page -->
-					<template is="dom-repeat" items="{{screens}}" as=screen filter="isDynamic">
-						<section class="Page" data-route="{{screen.routing}}">
+					<template is="dom-repeat" items="{{screens}}" as=screen filter="isDynamicScreen">
 						<!-- Dynamic Screen -->
-						  <things-resource-content 
-								title="{{screen.name}}"
-								current-route="[[route]]"
-								resource-name="{{screen.name}}"
-								resource-url="{{screen.routing}}"
-								layout="fullbleed layout vertical">
-						  </things-resource-content>
-						</section>
+					  <things-resource-content 
+							data-route="{{screen.routing}}"
+							title="{{screen.name}}"
+							current-route="[[route]]"
+							resource-name="{{screen.name}}"
+							resource-url="{{screen.routing}}"
+							layout="fullbleed layout vertical">
+					  </things-resource-content>
 					</template>
 
 					<!-- Static Menu Page -->
 					{% include "things-pages.html" %}
-
 				</iron-pages>
-		  </paper-scroll-header-panel>
+			</paper-scroll-header-panel>
 		</paper-drawer-panel>
 
 		<!-- Toast Confirm -->
@@ -86,9 +84,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	<script>
 		var app = document.querySelector('#app');
 
-		app.isDynamic = function(screen) {
-			if (!screen) return false;
-			return screen.routing_type != 'STATIC';
+		app.isDynamicScreen = function(screen) {
+			return screen.isDynamic;
 		};
   </script>
   <!-- endbuild-->
