@@ -1,0 +1,59 @@
+<link rel="import" href="../../../bower_components/iron-ajax/iron-ajax.html">
+
+<link rel="import" href="../things-setting/things-global-behavior.html">
+
+<script>
+
+window.Things = window.Things || {};
+
+Things.AuthBehaviorImpl = {
+
+  properties: {
+    signoutAjax: {
+      type: Object,
+      value: {}
+    }
+  },
+
+  ready: function() {
+    this.signoutAjax = document.createElement('iron-ajax');
+    this.signoutAjax.id = 'signout';
+    this.listen(this.signoutAjax, 'response', '_signoutSuccess');
+    this.listen(this.signoutAjax, 'error', '_signoutFailure');
+  },
+
+  detached: function() {
+    this.unlisten(this.signoutAjax, 'response', '_signoutSuccess');
+    this.unlisten(this.signoutAjax, 'error', '_signoutFailure');
+  },
+
+  signout: function() {
+    // TODO 로그아웃 URL global에서 관리 
+    this.signoutAjax.url = 'http://192.168.35.229:9004/rest/logout';
+    this.signoutAjax.method = 'POST';
+    this.signoutAjax.withCredentials = true;
+    this.signoutAjax.generateRequest();
+  },
+
+  _signoutSuccess: function(event) {
+    this.showToast('Succeeded to Logout');
+    this.set('globals.user', null);
+    page('/login');
+  },
+
+  _signoutFailure: function(event) {
+    if(event && event.detail && event.detail.error && event.detail.error.target && event.detail.error.target.statusText) {
+      this.showToast(event.detail.error.target.statusText);
+    } else {
+      this.showToast('Failed to Logout');
+    }
+  }
+
+};
+
+Things.AuthBehavior = [ 
+  Things.GlobalBehavior, 
+  Things.AuthBehaviorImpl 
+];
+
+</script>

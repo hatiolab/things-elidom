@@ -1,0 +1,59 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../things-setting/things-global-behavior.html">
+<link rel="import" href="./things-auth-behavior.html">
+
+<dom-module id="things-logout">
+  <template>
+    <paper-icon-button id="logout" icon="{{icon}}"></paper-icon-button>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'things-logout',
+
+        behaviors: [ 
+          Things.GlobalBehavior, 
+          Things.AuthBehavior 
+        ],
+
+        properties: {
+          url: {
+            type: String,
+            value: '',
+            notify: true
+          },
+
+          logoutUrl: {
+            type: String,
+            computed: '_computeLogoutUrl(globals.basicUrl, url)'
+          },
+
+          icon: {
+            type: String,
+            value: 'exit-to-app',
+            notify: true
+          }
+        },
+
+        listeners: {
+          'logout.tap' : 'logout'
+        },
+
+        _computeLogoutUrl: function(basicUrl, url) {
+          return basicUrl + '/' + url;
+        },
+
+        logout: function(e) {
+          if(this.isSignedIn()) {
+            this.signout();
+          }
+        }
+
+      });
+    })();
+  </script>
+</dom-module>

@@ -1,0 +1,355 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../../bower_components/gold-email-input/gold-email-input.html">
+<link rel="import" href="../things-setting/things-global-behavior.html">
+
+<!--
+A things login form asking for login and password.
+
+Example:
+
+<things-login data-route="login" 
+              route ="{{route}}"
+              title="Things Label Management" 
+              login-path="login"
+              content-type="application/x-www-form-urlencoded"
+              success-route="list"
+              username-input-label="ID"
+              password-input-label="Password"
+              submit-label ="Submit"
+              Reset-label = "Reset">
+  <img avatar src="https://maps.gstatic.com/tactile/pane/default_geocode-1x.png"/>
+</things-login>
+
+@demo demo/index.html
+-->
+<dom-module id="things-login">
+  <template>
+    <style>
+    :host {
+      display: block;
+      box-sizing: border-box;
+      text-align: center;
+      margin: 0 auto;
+      height: 100%;
+      width: 98%;
+    }
+    
+    :host > h3 {
+      margin-top: 5px;
+    }
+    
+    :host::content img {
+      border-radius: 50%;
+    }
+    
+    :host paper-input {
+      margin-left: auto;
+      margin-right: auto;
+      width: 90%;
+    }
+    
+    :host paper-material {
+      padding: 15px;
+    }
+    
+    #resetbutton {
+      margin-top: 10px;
+      width: 90%;
+      background: #4285f4;
+      color: white;
+    }
+
+    #submitButton {
+      margin-top: 10px;
+      width: 90%;
+      background: #ff8c00;
+      color: white;
+    }
+    </style>
+
+    <paper-material elevation="[[elevation]]" on-keypress="keypressHandler">
+      <h3>[[title]]</h3>
+
+      <content select="[avatar]"></content>
+
+      <form is="iron-form" 
+            id="loginForm" 
+            headers="[[headers]]"
+            login-path="[[loginPath]]"
+            action="{{action}}" 
+            content-type="[[contentType]]" 
+            method="[[method]]"
+            with-credentials=true>
+
+        <paper-input  id="username"
+                      name="email" 
+                      type="text" 
+                      label="[[usernameInputLabel]]" 
+                      value="{{username}}" 
+                      pattern="[[usernameValidationPattern]]" 
+                      error-message="[[usernameErrorMessage]]"
+                      required
+                      auto-validate>
+        </paper-input>
+
+        <paper-input  id="password"
+                      name="password"
+                      type="password" 
+                      label="[[passwordInputLabel]]"
+                      value="{{password}}" 
+                      pattern="[[passwordValidationPattern]]" 
+                      error-message="[[passwordErrorMessage]]"
+                      required
+                      auto-validate>
+        </paper-input>
+
+        <paper-button id="submitButton" raised disabled on-click="submitHandler">
+          <paper-spinner id="spinner" hidden></paper-spinner>[[submitLabel]]
+        </paper-button>
+
+        <paper-button id="resetbutton" raised on-click="resetHandler">
+          [[resetLabel]]
+        </paper-button>
+
+      </form>
+    </paper-material>
+  </template>
+
+  <script>
+  Polymer({
+    is: 'things-login',
+    properties: {
+      /**
+       * [elevation(음영높이) for login form]
+       * @type {Number}
+       */
+      elevation: {
+        type: Number,
+        value: 4
+      },
+
+      /**
+       * Label for the title
+       * @type {string}
+       * @default Login
+       */
+      title: {
+        type: String,
+        value: 'Login'
+      },
+
+      /**
+       * successRoute when login success will routing to the page
+       * @type {String}
+       */
+      successRoute: {
+        type: String,
+        value: '/'
+      },
+
+      /**
+       * Label for the username input.
+       * @type {string}
+       */
+      usernameInputLabel: {
+        type: String,
+        value: 'Username'
+      },
+
+      /**
+       * Pattern used to validate username,  ex: '^[a-zA-Z0-9]+$'
+       * @type {string}
+       */
+      usernameValidationPattern: String,
+
+      /**
+       * Error message displayed if `usernameValidationPattern` is not matched.
+       * @type {string}
+       */
+      usernameErrorMessage: {
+        type: String,
+        value: 'letters and numbers only'
+      },
+
+      /**
+       * Label for the password input.
+       * @type {string}
+       */
+      passwordInputLabel: {
+        type: String,
+        value: 'Password'
+      },
+
+      /**
+       * Pattern used to validate password, ex: '^[a-zA-Z0-9]+$'
+       * @type {string}
+       */
+      passwordValidationPattern: String,
+
+      /**
+       * Error message displayed if `passwordValidationPattern` is not matched.
+       * @type {string}
+       */
+      passwordErrorMessage: {
+        type: Object,
+        value :'letters and numbers only'
+      },
+
+      /**
+       * [headers description]
+       * @type {Object}
+       */
+      headers: {
+        type: Object,
+        value: ""
+      },
+
+      /**
+       * [action description]
+       * @type {Object}
+       */
+      loginPath: {
+        type: String,
+        notify: true
+      },
+
+      /**
+       * [action description]
+       * @type {Object}
+       */
+      action: {
+        type: String,
+        computed: '_computeActionUrl(globals.basicUrl, loginPath)'
+      },
+
+      /**
+       * [contentType description]
+       * @type {Object}
+       */
+      contentType: {
+        type: String,
+        value: 'application/x-www-form-urlencoded'
+      },
+      
+      /**
+       * 
+       */
+      method: {
+        type: String,
+        value: 'POST'
+      },
+
+      /**
+       * Label for the submit button
+       * @type {string}
+       * @default Submit
+       */
+      submitLabel: {
+        type: String,
+        value: 'Submit'
+      },
+
+      /**
+       * Cancel for the login form
+       * @type {Object}
+       * @default Cancel
+       */
+      resetLabel: {
+        type: String,
+        value: 'Reset'
+      }
+    },
+
+    // Element Lifecycle
+
+    ready: function() {},
+
+    attached: function() {},
+
+    detached: function() {},
+
+    // Element Behavior
+    behaviors: [
+      Things.GlobalBehavior
+    ],
+
+    // Event listener
+    listeners : {
+      'change' : 'onFormChange',
+      'iron-form-submit': '_afterFormSubmit',
+      'iron-form-response' :'_successResponse',
+      'iron-form-error' : '_failureResponse'
+    },
+
+    onFormChange: function(event) {
+      // Validate the entire form to see if we should enable the `Submit` button.
+      submitButton.disabled = !loginForm.validate();
+    },
+
+    submitHandler: function (event) {
+      spinner.active = true;
+      spinner.hidden = false;
+      submitButton.disabled = true;
+      loginForm.submit();
+    },
+    
+    resetHandler: function (event) {
+      loginForm.reset();
+    },
+
+    keypressHandler: function(event, detail, sender) {
+        var code = event.keyCode;
+        if(code == 13) {
+          this.submitHandler(event);
+        }
+    },
+
+    _computeActionUrl: function(basicUrl, url) {
+      return basicUrl + '/' + url;
+    },
+
+    _afterFormSubmit: function(event) {
+      spinner.active = false;
+      spinner.hidden = true;
+      submitButton.disabled = false;
+    },
+
+    _successResponse: function(event) {
+      var user = event.detail.__data__.response;
+      delete user['encryptedPassword'];
+      delete user['creator'];
+      delete user['updater'];
+      delete user['creatorId'];
+      delete user['createdAt'];
+      delete user['updaterId'];
+      delete user['updatedAt'];
+
+      // 1. save user information
+      this.set('globals.user', user);
+      this.showToast('Welcome to Things System.');
+
+      // 2. reset login form
+      loginForm.reset();      
+
+      // 3. refresh group list
+      var oriBasicUrl = this.get('globals.basicUrl');
+      this.set('globals.basicUrl', '');
+      this.set('globals.basicUrl', oriBasicUrl);
+
+      // 4. move to page
+      page(this.successRoute);
+    },
+
+    _failureResponse: function(event) {
+      this.showToast('Login failure.');
+    }
+
+  });
+  </script>
+</dom-module>
+

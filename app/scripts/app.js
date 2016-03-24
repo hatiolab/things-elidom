@@ -68,7 +68,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   // Scroll page to top and expand header
   app.scrollPageToTop = () => { 
-    //app.$.headerPanelMain.scrollToTop(true) 
+    app.$.headerPanelMain.scrollToTop(true) 
   };
 
 })(document);
