@@ -12,92 +12,87 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 {% include "head.html" %}
 
 <body unresolved class="fullbleed vertical layout">
+
   <span id="browser-sync-binding"></span>
 
   <template is="dom-bind" id="app">
-	<paper-drawer-panel id="paperDrawerPanel" responsive-width="599px">
 
-	  <things-setting id="setting"></things-setting>
+		<paper-drawer-panel id="paperDrawerPanel" responsive-width="599px">
+			<!-- Client Setting -->
+			<things-setting id="setting"></things-setting>
 
-	  <!-- Main Menu -->
-	  <things-sidebar drawer class="layout vertical" title="MENU" selected-menu=1 screens="{{screens}}" action="menus.json?mode=auth"></things-sidebar>
+			<!-- Layout Sidebar -->
+			<things-sidebar drawer 
+				class="layout vertical" 
+				title="MENU" 
+				selected-menu=1 
+				screens="{{screens}}" 
+				action="menus.json?mode=auth">
+			</things-sidebar>
 
-	  <!-- Main Area -->
-	  <paper-scroll-header-panel id="headerPanelMain" class="Main" main condenses keep-condensed-header>
+			<!-- Main Area -->
+			<paper-scroll-header-panel id="headerPanelMain" class="Main" main condenses keep-condensed-header>
+				<!-- Layout Header -->
+				<things-header></things-header>
 
-		<!-- Main Toolbar -->
-		<paper-toolbar class="Main-header tall">
-		  <paper-icon-button id="paperToggle" icon="menu" paper-drawer-toggle></paper-icon-button>
-		  <span class="flex"></span>
+				<!-- Main Content -->
+				<iron-pages attr-for-selected="data-route" selected="{{route}}">
+					<!-- Dynamic Menu Page -->
+					<template is="dom-repeat" items="{{screens}}" as=screen filter="isDynamic">
+						<section class="Page" data-route="{{screen.routing}}">
+						<!-- Dynamic Screen -->
+						  <things-resource-content 
+								title="{{screen.name}}"
+								current-route="[[route]]"
+								resource-name="{{screen.name}}"
+								resource-url="{{screen.routing}}"
+								layout="fullbleed layout vertical">
+						  </things-resource-content>
+						</section>
+					</template>
 
-		  <!-- Toolbar icons -->
-		  <paper-icon-button icon="refresh"></paper-icon-button>
-		  <paper-icon-button icon="search"></paper-icon-button>
-		  
-		  <!-- Application name -->
-		  <div class="Main-headerMiddleContent middle center horizontal layout">
-			<h1 class="Main-headerTitle">Elidom</h1>
-		  </div>
-		
-		  <!-- Application sub title -->
-		  <div class="Main-headerBottomContent bottom center horizontal layout">
-			<div class="Main-headerSubTitle">The future of the web today</div>
-		  </div>
-		</paper-toolbar>
+					<!-- Static Menu Page -->
+					{% include "things-pages.html" %}
 
-		<!-- Main Content -->
-		<iron-pages class="Main-content" attr-for-selected="data-route" selected="{{route}}">
+				</iron-pages>
+		  </paper-scroll-header-panel>
+		</paper-drawer-panel>
 
-			<template is="dom-repeat" items="{{screens}}" as=screen filter="isDynamic">
-				<section class="Page" data-route="{{screen.routing}}">
+		<!-- Toast Confirm -->
+		<paper-toast id="toastConfirm" class="Toast" duration="10000">
+			<span class="Toast-button" role="button" tabindex="0" on-tap="onToastConfirmTap">OK</span>
+		</paper-toast>
 
-				  <things-resource-content 
-						title="{{screen.name}}"
-						current-route="[[route]]"
-						resource-name="{{screen.name}}"
-						resource-url="{{screen.routing}}"
-						layout="fullbleed layout vertical">
-				  </things-resource-content>
+		<!-- Global Spinner -->
+		<things-spinner id="spinner" loading=false></things-spinner>
 
-				</section>
-			</template>
-			{% include "things-pages.html" %}
-		</iron-pages>
-	  </paper-scroll-header-panel>
+		<!-- Global Toast -->
+		<paper-toast id="toast" class="Toast" duration="8000"></paper-toast>
 
-	</paper-drawer-panel>
+		<things-event-handler id="event-handler"></things-event-handler>
 
-	<paper-toast id="toastConfirm" class="Toast" duration="10000">
-	  <span class="Toast-button" role="button" tabindex="0" on-tap="onToastConfirmTap">OK</span>
-	</paper-toast>
+		<!-- Service Worker support -->
+		<platinum-sw-register auto-register clients-claim skip-waiting on-service-worker-installed="displayInstalledToast">
+			<platinum-sw-offline-analytics></platinum-sw-offline-analytics>
+			<platinum-sw-cache default-cache-strategy="fastest" cache-config-file="cache-config.json">
+			</platinum-sw-cache>
+		</platinum-sw-register>
 
-	<things-spinner id="spinner" loading=false></things-spinner>
-
-	<paper-toast id="toast" class="Toast" duration="8000"></paper-toast>
-
-	<things-event-handler id="event-handler"></things-event-handler>
-
-	<!-- Service Worker support -->
-	<platinum-sw-register auto-register clients-claim skip-waiting on-service-worker-installed="displayInstalledToast">
-	  <platinum-sw-offline-analytics></platinum-sw-offline-analytics>
-	  <platinum-sw-cache default-cache-strategy="fastest" cache-config-file="cache-config.json">
-	  </platinum-sw-cache>
-	</platinum-sw-register>
-
-  </template>
+	</template>
 	
-  <!-- build:js scripts/app.js -->
-  <script src="scripts/app.js"></script>
-  <script>
+	<!-- build:js scripts/app.js -->
+	<script src="scripts/app.js"></script>
 
-	var app = document.querySelector('#app');
+	<script>
+		var app = document.querySelector('#app');
 
-	app.isDynamic = function(screen) {
-	  if (!screen) return false;
-	  return screen.routing_type!='STATIC';
-	};
+		app.isDynamic = function(screen) {
+			if (!screen) return false;
+			return screen.routing_type != 'STATIC';
+		};
   </script>
   <!-- endbuild-->
+
   <!-- Google Analytics code -->
   <!--start-google-analytics-tracker code="UA-XXXXX-Y"></start-google-analytics-tracker-->
 

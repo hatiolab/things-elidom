@@ -1,0 +1,138 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<!--link rel="import" href="../things-login/things-logout.html"-->
+<link rel="import" href="../things-setting/things-global-behavior.html">
+
+<dom-module id="things-header">
+  <template>
+    <style>
+      :host {
+        display: block;
+        background-color:var(--paper-blue-grey-800);
+        color:#fff;
+      }
+      :host iron-icon{
+        width:15px;height:15px;
+        margin-right:4px;
+      }
+      :host .side-toggle{background-color:var(--paper-teal-700);}
+      :host .side-toggle paper-icon-button{
+        width:31px;height:31px;
+        margin-left:3px;
+        padding:0 4px 0 2px;
+      }
+      :host .user-menu{
+        padding:7px 5px 0 0;
+        color:var(--paper-blue-grey-400);
+        font-size:13px;
+      }
+      :host .user-menu paper-icon-button{
+        width:18px;height:18px;
+        position:relative;
+        top:-1px;
+        margin-left:5px;
+        padding:1px;
+        color:var(--paper-blue-grey-200);
+      }
+      :host .user-menu things-logout::shadow paper-icon-button{
+        width:18px;height:18px;
+        position:relative;
+        top:-1px;
+        margin-left:1px;
+        padding:0px;
+        color:var(--paper-blue-grey-200);
+      }
+      :host .search{padding:5px 0 3px 5px;}
+      :host .search input{
+        background-color:rgba(255,255,255,.1);
+        border-radius:3px;
+        border:1px solid rgba(255,255,255,.15);
+        padding:1px 3px;
+        max-width:120px;
+        color:#fff;
+        font-size:13px;
+      }
+      :host .search paper-icon-button{
+        width:22px;height:22px;
+        margin-left:3px;
+        padding:1px;
+      }
+    </style>
+
+    <div>
+      <div class="side-toggle pull-left">
+        <paper-icon-button icon="icons:menu" id="sidebar-toggler"></paper-icon-button>
+      </div>
+
+      <div class="search pull-left">
+        <input type="text"/><paper-icon-button icon="icons:search"></paper-icon-button>
+      </div>
+
+      <!--div class="user-menu pull-right">
+        <things-logout url="logout" icon="exit-to-app"></things-logout>
+      </div>
+
+      <div class="user-menu pull-right" id="setting">
+        <paper-icon-button icon="icons:settings"></paper-icon-button>
+      </div>      
+
+      <div class="user-menu pull-right" id="user">
+        <iron-icon icon="icons:account-circle">
+        </iron-icon>{{ globals.user.name }}
+      </div-->
+    </div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'things-header',
+
+        behaviors: [ Things.GlobalBehavior ],
+
+        properties: {
+          user: {
+            type: Object,
+            value: {
+              name: '',
+              id: ''
+            }
+          }
+        },
+
+        /*listeners: {
+          'sidebar-toggler.tap': 'toggleSidebar',
+          'user.tap': 'showUserInfo',
+          'setting.tap': 'openSettingDialog'
+        },*/
+
+        /**
+         * 로그인 이후에만 toggle이 적용됨 
+         */
+        toggleSidebar: function(e) {
+          if(this.isSignedIn()) {
+            if(app.$.drawer.forceNarrow) {
+              app.$.drawer.forceNarrow = false
+            } else if(!app.$.drawer.narrow) {
+              app.$.drawer.forceNarrow = true
+            } else {
+              app.$.drawer.togglePanel()
+            }
+          }
+        },
+
+        showUserInfo: function(e) {
+          app.$.profile.open();
+        },
+
+        openSettingDialog: function(e) {
+          app.$.setting.open()
+        }
+
+      });
+    })();
+  </script>
+</dom-module>
