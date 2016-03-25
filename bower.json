@@ -20,7 +20,8 @@
     "js-xlsx": "^0.8.0",
     "file-upload": "^1.6.4",
     "vaadin-upload": "^1.0.0-alpha2",
-    "MockHttpRequest": "philikon/MockHttpRequest#master"
+    "MockHttpRequest": "philikon/MockHttpRequest#master",
+    "paper-fab-transitions": "^0.1.0"
   },
   "devDependencies": {
     "test-fixture": "PolymerElements/test-fixture#1.0.x",

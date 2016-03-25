@@ -1,0 +1,456 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../../bower_components/iron-iconset/iron-iconset.html">
+<link rel="import" href="../../../bower_components/iron-iconset-svg/iron-iconset-svg.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="../things-button/things-button.html">
+<link rel="import" href="../things-resource/things-resource.html">
+<link rel="import" href="../things-grid/things-resource-grid.html">
+<link rel="import" href="../things-form/things-resource-form.html">
+<link rel="import" href="../things-form/things-search-form.html">
+
+<!--
+첨부파일 리스트와 첨부파일 업로드 기능을 제공하는 화면 셋 
+
+things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본으로 표시되고 첨부파일에 대하여 다운로드와 업로드가 가능하다.
+
+	Example:
+
+	<things-attach-content 
+	  title="Terminology"
+	  resource-name="Terminology"
+	  resource-url="terminologies"
+	  layout="fullbleed layout vertical">
+	</things-attach-content>
+
+@demo ./things-content/demo/demo-things-attach-content.html
+-->
+
+<dom-module id="things-attach-content">
+	<template>
+		<style>
+			:host {
+				display: block;
+				height: 100%;
+			}
+		</style>
+
+		<div class="[[layout]]">
+			<things-resource 
+				id="resource-mata"
+				method="GET"
+				action="[[resourceMetaUrl]]"
+				last-response="{{metaData}}">
+			</things-resource>
+
+			<things-search-form 
+				id="search-form"
+				class="flex"
+				active="[[active]]"
+				title="[[title]]"
+				form-fields="[[searchFormFields]]" 
+				action-url="[[resourceUrl]]" 
+				page="{{page}}"
+				per-page="[[perPage]]"
+				last-response="{{lastResponse}}">
+			</things-search-form>
+
+			<things-resource-grid 
+				id="grid"
+				grid-model="[[gridModel]]" 
+				columns="[[gridColumns]]"
+				infinitable
+				paginatable
+				page="{{page}}"
+				limit="{{perPage}}"
+				root-property="[[rootProperty]]"
+				total-property="[[totalProperty]]"
+				read-data="[[lastResponse]]"
+				grid-save-action="[[gridSaveUrl]]"
+				selected-row-data="{{selectedRow}}"
+				export-file-name="[[title]]"
+				export-sheet-name="[[title]]">
+			</things-resource-grid>
+
+			<things-resource-form 
+				id="resource-form"
+				title="[[title]] Detail"
+				resource-url="[[memberResourceUrl]]"
+				form-fields="[[resourceFormFields]]" 
+				input="{{selectedRow}}">
+			</things-resource-form>
+		</div>
+	</template>
+
+	<script>
+		Polymer({
+			is: 'things-attach-content',
+
+			behaviors: [ Things.GlobalBehavior ],
+			
+			properties: {
+				/**
+				 * Screen layout
+				 */
+				layout: {
+					type: String
+				},
+
+				/**
+				 * Screen title
+				 */
+				title: {
+					type: String
+				},
+
+				/**
+				 * resource에 대한 대표 URL
+				 * ex) User resource라고 하면 users
+				 */
+				resourceMetaUrl: {
+					type: String,
+					computed: '_computeResourceMetaUrl(resourceName)'
+				},
+
+				/**
+				 * resource 이름
+				 * ex) User resource라고 하면 User
+				 */
+				resourceName: {
+					type: String
+				},
+
+				/**
+				 * resource meta data
+				 * resource metaData로 fromFields, gridModel, gridColumns를 파싱한다. 
+				 */
+				metaData: {
+					type: Array,
+					observer: '_parseMetaData'
+				},
+
+				/**
+				 * resource 대표 url
+				 */
+				resourceUrl: {
+					type: String
+				},
+
+				/**
+				 * Search form fields
+				 */
+				searchFormFields: {
+					type: Array
+				},
+
+				/**
+				 * Resource form fields
+				 */
+				resourceFormFields: {
+					type: Array
+				},
+
+				/**
+				 * Grid model
+				 */
+				gridModel: {
+					type: Array
+				},
+
+				/**
+				 * Grid columns
+				 */
+				gridColumns: {
+					type: Array
+				},
+
+				/**
+				 * grid save url
+				 */
+				gridSaveUrl: {
+					type: String,
+					computed: '_computeGridSaveUrl(resourceUrl)'
+				},
+
+				/**
+				 * Search Form에서 검색 결과 Object 중에서 List를 나타내는 프로퍼티 
+				 */
+				rootProperty: {
+					type: String,
+					value: 'items'
+				},
+
+				/**
+				 * Search Form에서 검색 결과 Object 중에서 Total을 나타내는 프로퍼티 
+				 */
+				totalProperty: {
+					type: String,
+					value: 'total'
+				},
+
+				/**
+				 * Get/Update/Delete 등을 위한 {resourceUrl}/:id 형식 URL
+				 */
+				memberResourceUrl: {
+					type: String,
+					computed: '_computeMemberResourceUrl(resourceUrl)'
+				},
+
+				/**
+				 * 그리드에서 선택된 Row Data
+				 */
+				selectedRow: {
+					type: Object
+				},
+
+				/**
+				 * 현재 메뉴에서 선택된 라우팅
+				 */
+				currentRoute: {
+					type: String,
+					observer : '_currentRouteChange'
+				},
+
+				/**
+				 * 화면이 액티브 상태인지 여부 
+				 */
+				active: {
+					type: Boolean,
+					notify: true
+				},
+
+				/**
+				 * 메타 데이터를 가져와서 화면 구성이 완료되었는지 여부.
+				 * 한 번 화면 구성이 완료되면 다시 구성하지 않는다.
+				 */
+				isConfigured: {
+					type: Boolean,
+					value: false
+				}
+			},
+
+			listeners : {
+				'grid.things-grid-detail-tap': '_showResourceForm',
+				'grid.things-grid-save-success': '_refreshGridData',
+				'resource-form.things-resource-form-saved' : '_refreshGridData'
+			},
+
+			/**
+			 * 현재 선택된 routing이 자신인지 체크하여 자신이 선택되었다면 메타 데이터를 조회하여 화면을 구
+			 */
+			_currentRouteChange: function(currentRoute) {
+				this.active = (this.resourceUrl == currentRoute);
+				if(this.active && !this.isConfigured) {
+					this.$['resource-mata'].generateRequest();
+					this.isConfigured = true;
+				} 
+			},
+			
+			/**
+			 * resourceName으로 resource meta url을 생성
+			 * @param {String} resourceName
+			 * @return {String} resource meta get URL
+			 */
+			_computeResourceMetaUrl: function(resourceName) {
+				return 'entities/' + resourceName + '/resource_columns.json';
+			},
+
+			/**
+			 * resourceUrl로 grid save url을 생성
+			 * @param {String} resourceUrl
+			 * @return {String} grid save URL
+			 */
+			_computeGridSaveUrl: function(resourceUrl) {
+				return resourceUrl + '/update_multiple.json';
+			},
+
+			/**
+			 * resourceUrl로 grid save url을 생성
+			 * @param {String} resourceUrl
+			 * @return {String} grid save URL
+			 */
+			_computeMemberResourceUrl: function(resourceUrl) {
+				return resourceUrl + '/:id';
+			},
+
+			/**
+			 * list sorting
+			 */
+			_sortMetaData: function(list, sortField) {
+				list.sort(function(a, b) {
+					return (a[sortField] > b[sortField]) ? 1 : ((b[sortField] > a[sortField]) ? -1 : 0);
+				});
+			},
+
+			/**
+			 * meta data를 파싱한다.
+			 * @param {Array} metaDataList
+			 */
+			_parseMetaData: function(metaDataList) {
+				// 1. Parse Search Form Fields
+				this.searchFormFields = this._parseSearchFormFields(metaDataList);
+				// 2. Parse Resource Form Fields
+				this.resourceFormFields = this._parseResourceFormFields(metaDataList);
+				// 3. Parse Grid Models
+				this.gridModel = this._parseGridModel(metaDataList);
+				// 4. Parse Grid Columns
+				this.gridColumns = this._parseGridColumns(metaDataList);
+			},
+
+			/**
+			 * meta data로 부터 SearchFormField를 파싱한다.
+			 * @param {Array} metaDataList
+			 * @return {Array} searchFormFields
+			 */
+			_parseSearchFormFields: function(metaDataList) {
+				if(!metaDataList) return;
+
+				var searchMetaList = metaDataList.filter(function(metaData) { 
+					return metaData.search_rank && metaData.search_rank > 0; 
+				});
+
+				this._sortMetaData(searchMetaList, 'search_rank');
+
+				return searchMetaList.map(function(metaData) {
+					var field = { 
+						name : metaData.name, 
+						label : metaData.name, 
+						type : metaData.editor,
+						op : metaData.operator ? metaData.operator : 'eq'
+					};
+						
+					if(metaData.editor && ('code-combo' == metaData.editor)) {
+						field.codeName = metaData.ref_name;
+					}
+
+					return field;
+				});
+			},
+
+			/**
+			 * meta data로 부터 ResourceFormField를 파싱한다.
+			 * @param {Array} metaDataList
+			 * @return {Array} resourceFormFields
+			 */
+			_parseResourceFormFields: function(metaDataList) {
+				if(!metaDataList) return;
+
+				return metaDataList.map(function(metaData) {
+					var field = { name : metaData.name, label : metaData.name, type : metaData.editor };
+					if(metaData.editor && ('code-combo' == metaData.editor)) {
+						field.codeName = metaData.ref_name;
+					}
+
+					return field;
+				});				
+			},
+
+			/**
+			 * meta data로 부터 GridModel을 파싱한다.
+			 * @param {Array} metaDataList
+			 * @return {Array} gridModel
+			 */
+			_parseGridModel: function(metaDataList) {
+				if(!metaDataList) return;
+				
+				var gridModelMetaList = metaDataList.filter(function(metaData) { 
+					return (metaData.name == 'id' || (metaData.list_rank && metaData.list_rank > 0));
+				});
+
+				return gridModelMetaList.map(function(metaData) {
+					var field = { fieldName : metaData.name };
+
+					if(['integer', 'int', 'long', 'double', 'float'].includes(metaData.col_type)) {
+						field.dataType = 'number';
+					} else if(['date', 'time'].includes(metaData.col_type)) {
+						field.dataType = 'datetime';
+						field.datetimeFormat = metaData.format? metaData.format : 'yyyy-MM-dd';
+					}
+
+					return field;
+				});
+			},
+
+			/**
+			 * meta data로 부터 GridColumns를 파싱한다.
+			 * @param {Array} metaDataList
+			 * @return {Array} gridColumns
+			 */
+			_parseGridColumns: function(metaDataList) {
+				if(!metaDataList) return;
+				
+				var gridColumnMetaList = metaDataList.filter(function(metaData) { 
+					return (metaData.name == 'id' || (metaData.list_rank && metaData.list_rank > 0));
+				});
+
+				this._sortMetaData(gridColumnMetaList, 'list_rank');
+
+				return gridColumnMetaList.map(function(metaData) {
+					var field = { 
+						name: metaData.name, 
+						fieldName: metaData.name, 
+						width: metaData.width ? metaData.width : 100,
+						header: { text: metaData.name },
+						styles: {},
+						validations: []
+					};
+
+					if(metaData.align) {
+						field.styles.textAlignment = metaData.align;
+					}
+
+					if(metaData.editor) {
+						if(('code-combo' == metaData.editor) && metaData.code_list && metaData.code_list.length > 0) {
+							field.editor = { type: 'list', domainOnly: true };
+							field.lookupDisplay = true;
+							field.lookupValues = metaData.code_list.map(function(code) { return code.name });
+	    				field.lookupLabels = metaData.code_list.map(function(code) { return code.description });
+
+						} else if(metaData.editor == 'checkbox') {
+							field.renderer = { type: 'check', editable: true, threeStates: false, trueValues: 'true', falseValues: 'false' };
+
+						} else if(metaData.editor == 'number') {
+							field.editor = { type: 'number' };
+							field.styles.numberFormat = metaData.format ? metaData.format : '0,000';
+
+						} else if(metaData.editor == 'date' || metaData.editor == 'time') {
+							field.editor = { type: 'date' };
+							field.styles.datetimeFormat = metaData.format ? metaData.format : 'yyyy-MM-dd';
+							field.styles.textAlignment = 'center';
+						}
+					}
+
+					if(metaData.name != 'id' && !metaData.nullable) {
+						field.validations.push({expression : 'value is not empty', level: 'error', message: '(' + metaData.name + ') should not be empty!'});
+					}
+
+					if(metaData.col_size && metaData.col_size > 0 && metaData.col_type == 'string') {
+						field.validations.push({expression : 'len value < ' + metaData.col_size, level: 'error', message: 'Maximum (' + metaData.name + ') length is (' + metaData.col_size + ')'});
+					}
+
+					return field;
+				});
+			},
+
+			/**
+			 * open resource form dialog
+			 * @param event 그리드에서 선택된 event
+			 */
+			_showResourceForm: function(event) {
+				this.$['resource-form'].openResourceForm(event.detail);
+			},
+
+			/**
+			 * research form
+			 */
+			_refreshGridData: function(grid) {
+				this.$['search-form'].getMyForm().submit();
+			}
+		});
+	</script>
+</dom-module>
