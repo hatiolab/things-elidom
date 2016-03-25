@@ -14,17 +14,56 @@
 <!--
 A comment describing this element
 
-Example:
+	Example:
 
-	<my-elem></my-elem>
+		<things-file-upload target="upload" method="POST" timeout="300000" ></things-file-upload>
 
-Example:
+	Example :
 
-	<my-elem>
-	  <h2>Hello my-elem</h2>
-	</my-elem>
+		var i18n = {
+            dropFiles: {
+              one: '파일을 이곳에 넣으세요',
+              many: '파일들을 이곳에 넣으세요'
+            },
+            addFiles: {
+              one: '파일을 선택하세요',
+              many: '파일들을 선택하세요'
+            },
+            cancel: '취소',
+            cancelAll: '전부취소',
+            error: {
+              tooManyFiles: '파일이 너무 많습니다.',
+              fileIsTooBig: '파일이 너무 큽니다.',
+              incorrectFileType: '파일 타입이 잘못되었습니다.'
+            },
+            uploading: {
+              status: {
+                connecting: '서버 연결중',
+                stalled: '지작 중.',
+                processing: '업로드 중...'
+              },
+              remainingTime: {
+                prefix: '남은 시간 :  ',
+                unknown: '남은 시간 확인 불가 합니다.'
+              },
+              error: {
+                serverUnavailable: '서버연결 실패하였습니다.',
+                unexpectedServerError: '예상치않은 서버 에러.',
+                forbidden: '거절되었습니다.'
+              }
+            },
+            units: {
+              "size": [B, kB, MB, GB, TB, PB, EB, ZB, YB]
+            }
+          };
 
-@demo demo/index.html
+		<things-file-upload target="upload" i18n ="{{i18n}}" method="POST" timeout="300000" ></things-file-upload>
+
+	Example :
+
+		<things-file-upload target="upload" nodrop method="POST" timeout="300000" ></things-file-upload>
+
+@demo ./things-file-upload/demo/index.html
 -->
 <dom-module id="things-file-upload">
 	<template>
@@ -215,15 +254,27 @@ Example:
 				type: Number,
 				value: 0
 			},
+			/**
+			 * file resource entity type
+			 */
 			resourceType:{
 				type:String
 			},
+			/**
+			 * resource Id
+			 */
 			resourceId:{
 				type:String
 			},
+			/**
+			 * resouce Tag
+			 */
 			resouceTag:{
 				type:String
 			},
+			/**
+			 * compute basic url for reuqest generation
+			 */
 			_basicUrl:{
 				computed:'_getBasicUrl(globals.basicUrl)'
 			}
@@ -245,9 +296,15 @@ Example:
 			Things.SpinnerBehavior,
 			Things.MsgBoxBehavior
 		],
+		/**
+		 * compute basic url
+		 */
 		_getBasicUrl:function(basicUrl){
 			return basicUrl;
 		},
+		/**
+		 * when upload process this function will update list status
+		 */
 		_updateListItem: function(event) {
 			var file = event.detail.file;
 			if (file.listItem) {
@@ -267,7 +324,9 @@ Example:
 				}
 			}
 		},
-
+		/**
+		 * when add file add file infomation on outer
+		 */
 		_fileAdd: function(event) {
 			var file = event.detail.file;
 			var li = document.createElement('li');
@@ -276,7 +335,9 @@ Example:
 			this.$.customFilesList.appendChild(li);
 			this._updateListItem(event);
 		},
-
+		/**
+		 * when file removed remove html tag
+		 */
 		_fileRemove: function(event) {
 			console.log('_fileRemove');
 			var file = event.detail.file;
@@ -284,16 +345,10 @@ Example:
 				this.$.customFilesList.removeChild(file.listItem);
 			}
 		},
-		_fileRemove: function(event) {
-			console.log('_fileRemove');
-			var file = event.detail.file;
-			if (file.listItem) {
-				this.$.customFilesList.removeChild(file.listItem);
-			}
-		},
+		/**
+		 * before send request make request url
+		 */
 		_uploadBefore:function(event){
-			console.log('upload xhr before open: ', event.detail.xhr);
-
 			// Prevent the upload request:
 			// event.preventDefault();
 
@@ -303,14 +358,21 @@ Example:
 			file.uploadTarget = [this._basicUrl, target].join('/');
 
 		},
+		/**
+		 * when upload request sent this function will be worked
+		 */
 		_uploadRequest:function(event){
-			console.log('upload xhr after open: ', event.detail.xhr);
-
-			// event.detail.xhr.setRequestHeader('X-File-Name', event.detail.file.name);
+			
 		},
+		/**
+		 * when upload result come in this function will be worked
+		 */
 		_uploadResponse:function(event){
 
 		},
+		/**
+		 * when upload aborted this function will be worked
+		 */
 		_uploadAbort:function(event){
 
 		}
