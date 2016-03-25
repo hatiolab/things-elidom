@@ -15,24 +15,24 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
 
-  <title>things-button-group demo</title>
+  <title>things-button-bar demo</title>
 
   <script src="../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
   <link rel="import" href="../../../bower_components/polymer/polymer.html">
   <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
-  <link rel="import" href="../../../bower_components/paper-behaviors/paper-button-behavior.html">
   <link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+  <link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
   
-  <link rel="import" href="../things-button-group.html">
+  <link rel="import" href="../things-button-bar.html">
 
 </head>
 
 <body unresolved>
   
-  <dom-module id="sample-things-button-group">
+  <dom-module id="sample-things-button-bar">
     
     <template>
-      <things-button-group id="button-group" buttons="{{buttons}}"></things-button-group>
+      <things-button-bar id="button-bar" buttons="{{buttons}}"></things-button-bar>
 
       <paper-input id="target" label="Which Button Clicked"></paper-input>
 
@@ -41,7 +41,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 
     <script>
       Polymer({
-        is: 'sample-things-button-group',
+        is: 'sample-things-button-bar',
 
         properties: {
           buttons: {
@@ -49,29 +49,34 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
             value : [{
               id: 'import',
               text: 'Import',
-              icon: 'icons:import'
+              icon: 'icons:import',
+              color: 'green'
             }, {
               id: 'export',
               text: 'Export',
-              icon: 'icons:export'
+              icon: 'icons:export',
+              color: 'green'
             }, {
               id: 'add',
-              text: 'Add',
-              icon: 'icons:add'
+              text: 'add',
+              icon: 'icons:add',
+              color: 'green'
             }, {
               id: 'delete',
               text: 'Delete',
-              icon: 'icons:delete'
+              icon: 'icons:delete',
+              color: 'pink'
             }, {
               id: 'save',
               text: 'Save',
-              icon: 'icons:save'
+              icon: 'icons:save',
+              color: 'indigo'
             }]
           }
         },
 
         listeners: {
-          'button-group.things-button-tap' : 'onTapButton'
+          'button-bar.things-button-tap' : 'onTapButton'
         },
 
         onTapButton: function(e) {
@@ -86,9 +91,9 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <template is="dom-bind" id="app">
 
     <section>
-      <h4>Things button group</h4>
+      <h4>Things button bar</h4>
 
-      <sample-things-button-group></sample-things-button-group>
+      <sample-things-button-bar></sample-things-button-bar>
     </section>
 
   </template>
