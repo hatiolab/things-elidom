@@ -22,7 +22,26 @@
 <!-- sample page -->
 <section class="Page" data-route="contact">
     <paper-material class="Page-paper" elevation="1">
-    	
+      <things-resource
+        auto
+        id="refresh"
+        content-type="application/json"
+        action="storage_infos"
+        query-condition='{"query":"[{\"name\":\"category\",\"value\":\"image\"}]"}'
+        last-response="{{storage}}">
+      </things-resource>
+
+      <things-resource
+        auto
+        id="refresh"
+        content-type="application/json" 
+        action="attachments"
+        query-object ="{{storage.items}}"
+        query-condition='[{"name":"id"},{"name","description"}]'
+        last-response="{{cardItems}}">
+      </things-resource>
+
+      <things-card-list items="[[cardItems.items]]" ></things-card-list>
     </paper-material>
 </section>
 

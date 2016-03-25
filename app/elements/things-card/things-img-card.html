@@ -1,0 +1,170 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/communication-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/hardware-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+
+<link rel="import" href="../things-setting/things-global-behavior.html">
+<link rel="import" href="../things-spinner/things-spinner-behavior.html">
+<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
+
+
+<dom-module id="things-img-card">
+	<template>
+		<style>
+			:host paper-card{
+				background-color:#fff;
+				width:22.5%;
+				margin:10px 1%;
+				border-radius:4px;
+				-webkit-box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.2);
+				-moz-box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.2);
+				box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.2);
+			}
+			:host paper-card:last-child{margin-right:0;}
+			:host paper-card::shadow iron-image img{height:105px !important;}
+			:host paper-card .card-info{
+				padding:0 7px 7px 7px;
+				font-size:11px;
+				color:green;
+			}
+			:host paper-card .card-info span{float:right;}
+			:host paper-card::shadow .header .title-text{
+				position:relative !important;
+				border-top:1px dotted rgba(0,0,0,.09);
+				padding:5px 7px 0 7px !important;
+				font-size:14px !important
+			}
+			:host paper-card .card-actions{
+				padding:1px 7px !important;
+				@apply(--layout-horizontal);
+				@apply(--layout-around-justified);
+			}
+			:host paper-card .card-actions paper-icon-button{
+				width:25px;height:25px;
+				padding:4px;
+				color:rgba(0,0,0,.5);
+			}
+			:host paper-card .card-actions paper-icon-button:hover{color:rgba(0,0,0,.8);}
+
+		</style>
+
+		<paper-card id="things-card" 
+					heading="[[card.name]]" 
+					image="[[image]]" 
+					elevation="[[elevation]]" 
+					animated-shadow="[[animatedShadow]]"
+					preload-image ="preloadImage"
+					fade-image="fadeImage"
+					>
+				<div class="card-content">
+					<content select=".card-content"></content>
+				</div>
+				<div class="card-actions">
+					<content select=".card-actions"></content>
+					<paper-icon-button 
+						icon="hardware:keyboard-arrow-up" 
+						title="more info" 
+						on-tap="_toggle"
+						style="float:right;">
+					</paper-icon-button>
+					<iron-collapse id="things-card-detail" style="width:100%;">
+						<span>ID:</span><span>[[card.id]]</span><br>
+						<span>Description:</span><span>[[card.description]]</span><br>
+						<span>Resouce Type:</span><span>[[card.resource_type]]</span><br>
+						<span>Resource ID:</span><span>[[card.resource_id]]</span><br>
+						<span>Resource Tag:</span> <span>[[card.tag]]</span><br>
+						<span>Update By:</span><span>[[card.update_by]]</span><br>
+						<span>Update At:</span><span>[[card.update_at]]</span><br>
+					</iron-collapse>
+				</div>
+		</paper-card>
+
+	</template>
+
+	<script>
+		(function() {
+			'use strict';
+
+			Polymer({
+				is: 'things-img-card',
+
+				properties: {
+					/**
+					 * image file objects
+					 * @type {Object}
+					 */
+					card: {
+						type: Object
+					},
+					/**
+					 * The title of the card.
+					 */
+					heading: {
+					  type: String,
+					  value: ''
+					},
+					/**
+					 * The url of the title image of the card.
+					 */
+					image: {
+					  type: String,
+					  computed:'_onCardChange(globals.basicUrl, card.id)'
+					},
+					/**
+					 * When `true`, any change to the image url property will cause the
+					 * `placeholder` image to be shown until the image is fully rendered.
+					 */
+					preloadImage: {
+					  type: Boolean,
+					  value: false
+					},
+					/**
+					 * When `preloadImage` is true, setting `fadeImage` to true will cause the
+					 * image to fade into place.
+					 */
+					fadeImage: {
+					  type: Boolean,
+					  value: false
+					},
+					/**
+					 * The z-depth of the card, from 0-5.
+					 */
+					elevation: {
+					  type: Number,
+					  value: 1,
+					  reflectToAttribute: true
+					},
+					/**
+					 * Set this to true to animate the card shadow when setting a new
+					 * `z` value.
+					 */
+					animatedShadow: {
+					  type: Boolean,
+					  value: false
+					}
+				},
+				behaviors: [
+					Things.GlobalBehavior,
+					Things.SpinnerBehavior,
+					Things.MsgBoxBehavior
+				],
+
+				_toggle :function(){
+					var moreInfo = this.$['things-card-detail'];
+					var iconButton = Polymer.dom(event).localTarget;
+					iconButton.icon = moreInfo.opened ? 'hardware:keyboard-arrow-up'
+													  : 'hardware:keyboard-arrow-down';
+					moreInfo.toggle();
+				},
+				_onCardChange:function(basicUrl, cardId){
+					return [basicUrl,'download',cardId].join('/');
+				}
+			});
+		})();
+	</script>
+</dom-module>

@@ -1,0 +1,117 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<!-- 
+A comment describing this element
+
+Example:
+
+    <things-card-list></things-card-list>
+
+@demo ./things-card/demo/index.html
+-->
+<dom-module id="things-card-list">
+	<template>
+		<style>
+		:host {
+			display: block;
+			background-color:rgba(0,0,0,.05);
+		},
+
+		.img-selector[selected],
+		.img-selector[selected]:hover {
+		  border-color: var(--selected-color);
+		}
+		.img-selector:before {
+		  content: '';
+		  display: block;
+
+		  position: absolute;
+		  z-index: 1;
+		  bottom: 0;
+		  right: 0;
+		  width: 0;
+		  height: 0;
+		  border-style: solid;
+		  border-width: 0;
+		  border-color: transparent transparent var(--selected-color) transparent;
+
+		  -webkit-transition: all 0.2s ease-in-out;
+		  -moz-transition: all 0.2s ease-in-out;
+		  -o-transition: all 0.2s ease-in-out;
+		  transition: all 0.2s ease-in-out;
+		}
+		.img-selector[selected]:before {
+		  border-left-width: 25px;
+		  border-bottom-width: 25px;
+		}
+
+		.img-selector:after {
+		  content: "";
+		  background-color: transparent;
+		  position: absolute;
+		  z-index:2;
+		  right: 4px;
+		  bottom: 4px;
+		  width: 0;
+		  height: 0;
+		  border-bottom: 0 solid #fff;
+		  border-right: 0 solid #fff;
+		  transform: rotate(45deg);
+		  -o-transform: rotate(45deg);
+		  -ms-transform: rotate(45deg);
+		  -webkit-transform: rotate(45deg);
+		  -webkit-transition: all 0.2s ease-in-out;
+		  -moz-transition: all 0.2s ease-in-out;
+		  -o-transition: all 0.2s ease-in-out;
+		  transition: all 0.2s ease-in-out;
+		}
+
+		.img-selector[selected]:after {
+		  border-width: 3px;
+		  width: 3px;
+		  height: 7px;
+		}
+		</style>
+
+		<template is="dom-repeat" id="imageRepeat" items="[[items]]" as=cardItem>
+			<things-img-card class="white img-selector" 
+							 card = "[[cardItem]]" 
+							 selected$="{{cardItem.selected}}" 
+							 on-tap="_onCardSelect">
+				<content class="card-content" select=".card-content"></content>
+				<content class="card-actions" select=".card-actions"></content>
+			</things-img-card>
+		</template>
+		
+		<!-- <array-selector id="selector" items="{{items}}" selected="{{selected}}"></array-selector> -->
+
+	</template>
+
+	<script>
+		(function() {
+			'use strict';
+
+			Polymer({
+				is: 'things-card-list',
+
+				properties: {
+					/**
+					 * items need to list
+					 */
+					items: {
+						type: Object,
+						notify: true,
+						observer:'_onItemsChange'
+					}
+				},
+				/**
+				 * when card selected show check image on card
+				 */
+				_onItemsChange:function(){
+					// console.log(items);
+				}
+			});
+		})();
+	</script>
+</dom-module>
+
