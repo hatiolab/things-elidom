@@ -40,6 +40,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 					<!-- Dynamic Menu Page -->
 					<template is="dom-repeat" items="{{screens}}" as=screen filter="isDynamicScreen">
 						<!-- Dynamic Screen -->
+					  
+					  <!--things-attachment-content -->
 					  <things-resource-content 
 							data-route="{{screen.routing}}"
 							title="{{screen.name}}"
@@ -47,7 +49,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 							resource-name="{{screen.name}}"
 							resource-url="{{screen.routing}}"
 							layout="fullbleed layout vertical">
-					  </things-resource-content>
+						</things-resource-content>
+					  <!--/things-attachment-content-->
+					  
 					</template>
 
 					<!-- Static Menu Page -->

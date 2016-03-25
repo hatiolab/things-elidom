@@ -24,20 +24,11 @@
     <paper-material class="Page-paper" elevation="1">
       <things-resource
         auto
-        id="refresh"
         content-type="application/json"
-        action="storage_infos"
-        query-condition='{"query":"[{\"name\":\"category\",\"value\":\"image\"}]"}'
-        last-response="{{storage}}">
-      </things-resource>
-
-      <things-resource
-        auto
-        id="refresh"
-        content-type="application/json" 
-        action="attachments"
-        query-object ="{{storage.items}}"
-        query-condition='[{"name":"id"},{"name","description"}]'
+        resource="attachments"
+        action="list/image"
+        method="get"
+        select-fields="id,name"
         last-response="{{cardItems}}">
       </things-resource>
 
@@ -48,6 +39,6 @@
 <!-- API Document page -->
 <section class="Page" data-route="apidoc">
     <paper-material class="Page-paper" elevation="1">
-    	<a href="http://localhost:3000/elements/index.html">apiDoc</a>
+    	<a href="elements/index.html">apiDoc</a>
     </paper-material>
 </section>

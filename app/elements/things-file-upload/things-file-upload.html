@@ -123,8 +123,8 @@ A comment describing this element
 		}
 		</style>
 
-		<!--template is="dom-if" if="{{active}}"-->
-			<vaadin-upload  
+		<div hidden="{{hidden}}">
+			<vaadin-upload
 							accept="[[accept]]" 
 							headers="[[headers]]" 
 							i18n="[[i18n]]" 
@@ -145,7 +145,7 @@ A comment describing this element
 
 			<h4>Files List</h4>
 			<ul id="customFilesList"></ul>
-		<!--/template-->
+		</div>
 
 	</template>
 
@@ -158,9 +158,9 @@ A comment describing this element
 			/**
 			 * 화면에 표시할 지 여부 
 			 */
-			active: {
+			hidden: {
 				type: Boolean,
-				value: false
+				value: true
 			},
 			
 			/**
@@ -402,7 +402,7 @@ A comment describing this element
 		 * when upload request sent this function will be worked
 		 */
 		_uploadRequest:function(event){
-			
+			console.log(event);
 		},
 		/**
 		 * when upload result come in this function will be worked

@@ -1,0 +1,91 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<script>
+
+window.Things = window.Things || {};
+
+/**
+ * Things.ResourceSearchBehavior 리소스 검색시에 필요한 select fields, sort fields, query fields를 설정하고 서버에서 원하는 포맷에 맞춰 변경한다.
+ *
+ * @demo demo/index.html
+ */
+Things.ResourceSearchBehavior = {
+
+	properties: {
+		/**
+		 * 검색하고자 하는 필드명을 구분자 ','로 구분하여 설정 
+		 *
+		 * select fields - 'id,name,description,category'
+		 */
+		selectFields: {
+			type: String
+		},
+
+		/**
+		 * 소팅하고자 하는 필드명과 ascending 여부, ascending인 경우 true, descending인 경우 false
+		 *
+		 * sort fields - [{ field : 'fieldName1', ascending : true }, { field : 'fieldName2', ascending : false }]
+		 */
+		sortFields: {
+			type: Array
+		},
+		
+		/**
+		 * 검색 조건 필드명과 조건 그리고 값 오브젝트에 대한 Array
+		 *
+		 * query fields - [{ name : 'name', operator : 'like', value : 'hatio' }, { field : 'active_field', value : true }]
+		 */
+		queryFields: {
+			type: Array
+		},
+
+		/**
+		 * 현재 페이지 
+		 */
+		page: {
+			type: Number
+		},
+
+		/**
+		 * 한 페이지에 표시될 페이지 수 
+		 */
+		limit: {
+			type: Number
+		}
+	},
+
+  /**
+   * 서버에 보낼 파라미터를 재구성한다.
+   * @param reqParams Ajax 요청 파라미터 
+   */
+  handleRequestParams: function(reqParams) {
+		var newReqParams = { select : this.selectFields ? this.selectFields : '' };
+
+		if(this.sortFields && this.sortFields.length > 0) {
+			newReqParams.sort = JSON.stringify(this.sortFields);
+		}
+
+		if(this.queryFields && this.queryFields.length > 0) {
+			newReqParams.query = JSON.stringify(this.queryFields);
+
+		} else if(reqParams) {
+			var queries = [];
+
+			for(prop in reqParams) {
+				var val = reqParams[prop];
+				if(val) queryFields.push({ name : prop, value : val });
+			}
+
+			if(queries.length > 0) {
+				newReqParams.query = JSON.stringify(queries);
+			}
+		}
+
+		if(this.page) newReqParams.page = this.page;
+		if(this.limit) newReqParams.limit = this.limit;
+		return newReqParams;
+  }
+
+};
+
+</script>

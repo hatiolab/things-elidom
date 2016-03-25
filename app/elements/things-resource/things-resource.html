@@ -5,6 +5,8 @@
 <link rel="import" href="../things-spinner/things-spinner-behavior.html">
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 
+<link rel="import" href="./things-resource-search-behavior.html">
+
 <!--Restful Ajax
 
 	Example:
@@ -19,7 +21,7 @@
 	<template>
 
 		<iron-ajax
-		  id="_ajax"
+			id="_ajax"
 			auto="[[auto]]"
 			url="[[resourceUrl]]"
 			handle-as="[[handleAs]]"
@@ -41,7 +43,7 @@
 	<script>
 		Polymer({
 			is: 'things-resource',
-	    
+
 			properties: {
 				/**
 				 * resource 대표 URL
@@ -174,6 +176,7 @@
 			},
 
 			behaviors: [
+				Things.ResourceSearchBehavior,
 				Things.GlobalBehavior,
 				Things.SpinnerBehavior,
 				Things.MsgBoxBehavior
@@ -186,14 +189,7 @@
 			/**
 			 * auto가 false인 경우 Ajax 요청 
 			 */
-			generateRequest: function() {
-				// TODO :id --> 실제 아이디로 변환 
-				if(this.contentType && this.contentType.toLowerCase().indexOf('application/json') >= 0) {
-					this.$._ajax.body = this.params;
-				} else {
-					this.$._ajax.params = this.params;	
-				}
-				
+			generateRequest: function() {				
 				this.$._ajax.generateRequest();
 			},			
 
@@ -282,11 +278,28 @@
   		 * ajax 호출 시 핸들러
 	  	 */
 			_ajaxRequestHandler: function() {
-				this.fire('things-rest-ajax-request', this.lastRequest);
+				var newParams = null;
+
+				if((!this.method || this.method.toLowerCase() == 'get') && (!this.action || this.action == 'index')) {
+					newParams = this.handleRequestParams(this.params);
+				} else {
+					newParams = this.params;
+				} 
+
+				if(this.contentType && this.contentType.toLowerCase().indexOf('application/json') >= 0) {
+					this.$._ajax.body = newParams;
+				} else {
+					this.$._ajax.params = newParams;
+				}
+
+				// :id 실제 id로 변환 
+				if(this.$._ajax.url.indexOf(':id') >= 0) {
+					this.$._ajax.url = this.$._ajax.url.replace(':id', this.params.id);
+				}
 			},
 
 			/**
-			 * Loading 정보가 변경시 핸들러 
+			 * Loading 정보 변경시 핸들러 
 			 */
 			_loadingChangeHandler: function(e) {
 				if(e.detail) {

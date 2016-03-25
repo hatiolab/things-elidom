@@ -36,6 +36,8 @@
     <things-resource
       id="storage" 
       resource="storage_infos"
+      select-fields="id,name,description"
+      sort-fields="[[sortFields]]"
       method="GET">
     </things-resource>
 
@@ -90,11 +92,12 @@
             notify: true
           },
 
-          /**
-           * Storage 파라미터 
-           */
-          params: {
-            type: Object
+          sortFields: {
+            type: Array,
+            value: [{
+              field: 'name',
+              ascending: true
+            }]
           }
         },
 
