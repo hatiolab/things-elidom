@@ -1,0 +1,126 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../things-combo/things-combo.html">
+<link rel="import" href="../things-resource/things-resource.html">
+
+<!--
+코드 셀렉터. 서버에 저장되어 있는 코드 정보를 조회하여 콤보로 표시하는 컴포넌트 
+
+  Example:
+
+    <things-code-selector 
+      id="code-selector" 
+      label="Language" 
+      value="en-US" 
+      code-name="LOCALE" 
+      label-path="description" 
+      value-path="name">
+    </things-code-selector>
+
+
+@demo ./things-combo/demo/index.html
+-->
+<dom-module id="things-storage-selector">
+	<template>
+
+    <things-combo 
+      id="combo" 
+      name="{{name}}" 
+      label="Select Storage" 
+      value="{{value}}" 
+      items="{{items}}" 
+      label-path="description" 
+      value-path="name">
+    </things-combo>
+
+    <things-resource
+      id="storage" 
+      resource="storage_infos"
+      method="GET">
+    </things-resource>
+
+	</template>
+
+  <script type="text/javascript">
+  	(function() {
+      Polymer({
+        is: "things-storage-selector",
+
+        properties: {
+          /**
+           * element name, Form 안에 들어가는 경우 Ajax 요청시 name : value 형식으로 서버에 요청된다.
+           */
+          name : {
+            type: String
+          },
+
+          /**
+           * element에 표시할 라벨 
+           */
+          label: {
+            type: String
+          },
+
+          /**
+           * element value, Form 안에 들어가는 경우 Ajax 요청시 name : value 형식으로 서버에 요청된다.
+           */
+          value: {
+            type: String
+          },
+
+          /**
+           * 코드 데이터 중에서 Code Selector에 표시할 데이터 패스.
+           */
+          labelPath: {
+            type: String
+          },
+
+          /**
+           * 코드 데이터 중에서 Code Selector가 가질 값에 대한 데이터 패스.
+           */
+          valuePath: {
+            type: String
+          },
+
+          /**
+           * 검색 결과 
+           */
+          items: {
+            type: Array,
+            notify: true
+          },
+
+          /**
+           * Storage 파라미터 
+           */
+          params: {
+            type: Object
+          }
+        },
+
+        listeners: {
+          'combo.vaadin-dropdown-opened' : '_dropdownOpenHandler',
+          'storage.things-resource-ajax-success' : '_responseHandler'
+        },
+
+        /**
+         * 드롭다운을 클릭했을 때 Storage 정보를 가져온다.
+         */
+        _dropdownOpenHandler: function(e) {
+          if(!this.items || this.items.length == 0) {
+            this.$.storage.action='index';
+            this.$.storage.generateRequest();
+          }
+        },
+
+        /**
+         * Storage 정보 결과 도착시 ...
+         */
+        _responseHandler: function(e) {
+          this.items = e.detail.items;
+        }
+
+      })
+  	})();
+  </script>
+</dom-module>

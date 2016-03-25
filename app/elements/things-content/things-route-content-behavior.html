@@ -1,0 +1,62 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../things-setting/things-global-behavior.html">
+
+<script>
+
+window.Things = window.Things || {};
+
+/**
+ * 메뉴를 통해 라우팅된 화면의 동작을 정의하는 Behavior
+ * 메뉴가 선택이 되는 순간 자신의 라우팅 정보와 메뉴에서 선택된 라우팅이 일치하는지 체크하여 화면 초기화를 진행한다.
+ * Things.RouteContentBehavior를 상속하는 컴포넌트에서는 반드시 this.getMyRoute()와 initializeContent() 함수를 구현해야 한다.
+ * getMyRoute() 함수는 자신의 route 정보를 리턴해야 하고 initializeContent() 함수는 화면 초기화를 진행하는 함수이다.
+ *
+ * @demo ./things-content/demo/demo-things-route-content-behavior.html
+ */
+Things.RouteContentBehavior = {
+
+	properties: {
+		/**
+		 * 현재 메뉴에서 선택된 라우팅
+		 */
+		currentRoute: {
+			type: String,
+			observer : '_currentRouteChange'
+		},
+
+		/**
+		 * 화면이 액티브 상태인지 여부 
+		 */
+		active: {
+			type: Boolean,
+			notify: true
+		},
+
+		/**
+		 * 메타 데이터를 가져와서 화면 구성이 완료되었는지 여부.
+		 * 한 번 화면 구성이 완료되면 다시 구성하지 않는다.
+		 */
+		isConfigured: {
+			type: Boolean,
+			value: false
+		}
+	},
+
+	/**
+	 * 현재 선택된 routing이 자신인지 체크하여 자신이 선택되었다면 메타 데이터를 조회하여 화면을 구성한다. 
+	 * 이미 초기화가 된 화면은 다시 초기화하지 않는다.
+	 */
+	_currentRouteChange: function(currentRoute) {
+		var myRoute = this.getMyRoute();
+		this.active = (myRoute == currentRoute);
+
+		if(this.active && !this.isConfigured) {
+			this.initializeContent();
+			this.isConfigured = true;
+		} 
+	}
+
+};
+
+</script>

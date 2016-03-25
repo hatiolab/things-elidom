@@ -1,0 +1,97 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2016 The Things Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at https://github.com/hatiolab/things-elidom.git/LICENSE.txt
+The complete set of authors may be found at https://github.com/hatiolab/things-elidom.git/AUTHORS.txt
+The complete set of contributors may be found at https://github.com/hatiolab/things-elidom.git/CONTRIBUTORS.txt
+Code distributed by Hatiolab as part of the things project is also
+subject to an additional IP rights grant found at https://github.com/hatiolab/things-elidom.git/PATENTS.txt
+-->
+<html>
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+  <title>things-button-group demo</title>
+
+  <script src="../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../../bower_components/polymer/polymer.html">
+  <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+  <link rel="import" href="../../../bower_components/paper-behaviors/paper-button-behavior.html">
+  <link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+  
+  <link rel="import" href="../things-button-group.html">
+
+</head>
+
+<body unresolved>
+  
+  <dom-module id="sample-things-button-group">
+    
+    <template>
+      <things-button-group id="button-group" buttons="{{buttons}}"></things-button-group>
+
+      <paper-input id="target" label="Which Button Clicked"></paper-input>
+
+      <paper-input id="button-info" label="Event"></paper-input>
+    </template>
+
+    <script>
+      Polymer({
+        is: 'sample-things-button-group',
+
+        properties: {
+          buttons: {
+            type: Array,
+            value : [{
+              id: 'import',
+              text: 'Import',
+              icon: 'icons:import'
+            }, {
+              id: 'export',
+              text: 'Export',
+              icon: 'icons:export'
+            }, {
+              id: 'add',
+              text: 'Add',
+              icon: 'icons:add'
+            }, {
+              id: 'delete',
+              text: 'Delete',
+              icon: 'icons:delete'
+            }, {
+              id: 'save',
+              text: 'Save',
+              icon: 'icons:save'
+            }]
+          }
+        },
+
+        listeners: {
+          'button-group.things-button-tap' : 'onTapButton'
+        },
+
+        onTapButton: function(e) {
+          this.$.target.value = 'Button (' + e.detail.id + ') clicked!';
+          this.$['button-info'].value = JSON.stringify(e.detail);
+        }
+      });
+    </script>  
+
+  </dom-module>
+
+  <template is="dom-bind" id="app">
+
+    <section>
+      <h4>Things button group</h4>
+
+      <sample-things-button-group></sample-things-button-group>
+    </section>
+
+  </template>
+
+</body>
+</html>

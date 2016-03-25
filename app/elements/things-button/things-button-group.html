@@ -1,0 +1,169 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../../bower_components/paper-fab-transitions/paper-fab-speed-dial.html">
+
+<!--
+  버튼 그룹 
+
+  Example
+
+    var buttons = [{
+      id: 'import',
+      text: 'Import',
+      icon: 'icons:import'
+    }, {
+      id: 'export',
+      text: 'Export',
+      icon: 'icons:export'
+    }, {
+      id: 'add',
+      text: 'add',
+      icon: 'icons:add'
+    }, {
+      id: 'delete',
+      text: 'Delete',
+      icon: 'icons:delete'
+    }, {
+      id: 'save',
+      text: 'Save',
+      icon: 'icons:save'
+    }];
+
+    ...
+
+    <things-button-group id="btn-group" buttons="[[buttons]]"></things-button-group>
+
+    ...
+
+    listeners: {
+      'btn-group.things-button-tap' : 'onTapButton'
+    }, 
+    ...
+
+    onTapButton: function(e) {
+      console.log(e);
+    }    
+    
+@demo ./things-button/demo/demo-things-button-group.html
+-->
+
+<dom-module id="things-button-group">
+  <template>
+    <style>
+      :host {
+        display: block;
+        background-color:rgba(84,110,122,.12);
+      }
+      .fab-wrap{
+        float:right;
+        width:56px;height:56pxpx;
+        margin-right:15px;
+      }
+
+      paper-fab-speed-dial {
+        background-color:transparent;
+        z-index:10000;
+        position:absolute;
+        bottom:15px;
+      }
+      
+      .fab-wrap .fab-text{
+        position:absolute;
+        margin-top:-35px;margin-left:-55px;
+        padding:2px 3px;
+        width:45px;
+        background-color:rgba(0,0,0,.5);
+        -moz-border-radius:3px;-webkit-border-radius:3px;border-radius:3px;
+        color:#fff;
+        font-size:11px;
+        text-align:center;
+        -webkit-box-shadow: 0px 2px 1px 0px rgba(0,0,0,0.2);
+        -moz-box-shadow: 0px 2px 1px 0px rgba(0,0,0,0.2);
+        box-shadow: 0px 2px 1px 0px rgba(0,0,0,0.2);
+      }
+      
+      .fab-wrap .fab-text:after{
+        content:"";
+        position: absolute;
+        left: 100%;
+        top: 5px;
+        width: 0;
+        height: 0;
+        border-top: 3px solid transparent;border-left: 4px solid rgba(0,0,0,.5);border-bottom: 3px solid transparent;
+      }
+    </style>
+
+    <div class="fab-wrap">
+      <paper-fab-speed-dial direction="top">
+        <paper-fab icon="add" class="dropdown-trigger"></paper-fab>
+        <div class="dropdown-content">
+
+          <template is="dom-repeat" items="[[buttons]]" as=button>
+            <paper-fab mini icon="{{button.icon}}" id="{{button.id}}" on-tap="_onTabButton"></paper-fab>
+            <div class="fab-text">{{button.text}}</div>
+          </template>
+
+        </div>
+      </paper-fab-speed-dial>
+    </div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'things-button-group',
+
+        properties: {
+          /**
+           * button 정보 리스트. 
+           *
+           * (example) :
+           *
+           * [{
+                id: 'import',
+                text: 'Import',
+                icon: 'icons:import'
+              }, {
+                id: 'export',
+                text: 'Export',
+                icon: 'icons:export'
+              }, {
+                id: 'add',
+                text: 'add',
+                icon: 'icons:add'
+              }, {
+                id: 'delete',
+                text: 'Delete',
+                icon: 'icons:delete'
+              }, {
+                id: 'save',
+                text: 'Save',
+                icon: 'icons:save'
+              }]
+           */
+          buttons : {
+            type: Array
+          }
+
+          /**
+           * 버튼이 클릭되면 things-button-tap 이벤트가 발생한다. 이 때 buttons에 설정한 버튼 정보가 파라미터로 날아간다.
+           *
+           * @event things-button-tap
+           */
+        },
+
+        /**
+         * 버튼이 클릭되면 things-button-tap 이벤트가 발생한다. 이 때 buttons에 설정한 버튼 정보가 파라미터로 날아간다. 
+         */
+        _onTabButton: function(e) {
+          this.fire('things-button-tap', e.model._config.button);
+        }
+
+      });
+    })();
+  </script>
+</dom-module>
