@@ -88,6 +88,8 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 				form-fields="[[resourceFormFields]]" 
 				input="{{selectedRow}}">
 			</things-resource-form>
+
+			<things-file-upload id="file-upload" target="upload" method="POST" timeout="300000" ></things-file-upload>			
 		</div>
 	</template>
 
@@ -233,7 +235,7 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 			 * Upload 버튼이 클릭되었을 경우 
 			 */
 			_onTapUpload: function(e) {
-				console.log(e);
+				this.$['file-upload'].active = !this.$['file-upload'].active;
 			},
 
 			/**
