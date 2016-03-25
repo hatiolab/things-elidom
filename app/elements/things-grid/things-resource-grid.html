@@ -94,7 +94,7 @@
 					<things-import-excel-button 
 						color="green" 
 						id="import-btn"
-						sheet-name="[[exportSheetName]]"
+						sheet-name="Sheet1"
 						parsed-result="{{input}}"
 						root-property="[[rootProperty]]"
 						total-property="[[totalProperty]]">Import
@@ -209,8 +209,8 @@
 			 */
 			_gridScrollToBottom:function(grid){
 				var thingsGrid = grid._container_;
-				thingsGrid.page +=1;
-				thingsGrid.dataFillMode='append';
+				thingsGrid.page += 1;
+				thingsGrid.dataFillMode = 'append';
 			},
 
 			/**

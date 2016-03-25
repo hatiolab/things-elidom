@@ -5,44 +5,111 @@
 <link rel="import" href="../../../bower_components/iron-input/iron-input.html">
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../../../bower_components/iron-icons/social-icons.html">
-<link rel="import" href="../../../bower_components/iron-icons/maps-icons.html">
 <link rel="import" href="../../../bower_components/iron-iconset/iron-iconset.html">
-<link rel="import" href="../../../bower_components/iron-iconset-svg/iron-iconset-svg.html">
 <link rel="import" href="../../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
 
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="../../../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../../bower_components/paper-fullscreen-dialog/paper-fullscreen-dialog.html">
 <link rel="import" href="../../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
-<link rel="import" href="../../../bower_components/paper-fullscreen-dialog/paper-fullscreen-dialog.html">
 
 <link rel="import" href="./things-form-behavior.html">
 
 <!--
-A comment describing this element
+Resource Form Element. 
 
-	Example:
+설정한 form-fields를 바탕으로 리소스 폼을 생성해주고 설정한 resource-url로 데이터를 조회/수정한다.
 
-		<things-resource-form></things-resource-form>
+form-fields는 Form의 child element들을 구성하기 위한 meta data이고 field 명, 표시를 위한 label, element(view) type 그리고 element view가 추가로 필요한 attribute로 구성된다. form-fields는 다음과 같은 형식으로 설정하거나 서버로 부터 조회한다.
 
-	Example:
+	Form Fields Example:
 
-		<things-resource-form>
-	  	<h2>Hello my-elem</h2>
-		</things-resource-form>
+		[ {
+		  "name" : "id",
+		  "label" : "ID",
+		  "type" : "number"
+		}, {
+		  "name" : "name",
+		  "label" : "Name",
+		  "type" : "text"
+		}, {
+		  "name" : "display",
+		  "label" : "Display",
+		  "type" : "text"
+		}, {
+		  "name" : "description",
+		  "label" : "Description",
+		  "type" : "text"
+		}, {
+		  "name" : "locale",
+		  "label" : "Locale",
+		  "type" : "code-combo",
+		  "codeName" : "LOCALE"
+		}, {
+		  "name" : "category",
+		  "label" : "Category",
+		  "type" : "code-combo",
+		  "codeName" : "TERMS_CATEGORY"
+		}, {
+		  "name" : "creator_id",
+		  "label" : "Created By",
+		  "type" : "text"
+		}, {
+		  "name" : "updater_id",
+		  "label" : "Updated By",
+		  "type" : "text"
+		}, {
+		  "name" : "created_at",
+		  "label" : "Created At",
+		  "type" : "text"
+		}, {
+		  "name" : "updated_at",
+		  "label" : "Updated At",
+		  "type" : "text"
+		} ]
 
-@demo ./things-form/demo/index.html
+아래 Example은 서버로 부터 form-fields meta data를 조회해서 동적으로 리소스 폼을 구성하는 샘플이다.
+things-resource로 부터 위와 같은 형식의 form-fields meta data를 조회하여 things-resource-form으로 바인딩한다.
+
+폼 데이터를 조회할 때는 url : terminologies/:id, method : get 으로,
+폼 데이터를 업데이트할 때는  url : terminologies/:id, method : put 으로 한다.
+업데이트 후에는 last-response로 결과를 얻을 수 있다.
+
+폼이 오픈될 때 things-resource-form-opened 이벤트가 발생하고 
+조회 things-resource-form-read 이벤트가, 업데이트 성공시 things-resource-form-saved 에러 발생시 things-resource-form-error가 발생되므로 성공/실패시 custom action을 구성할 수 있다.
+
+	Resource Form Example:
+
+    <things-resource 
+      auto
+      action="diy_services/ElidomResourceFormFields/query.json" 
+      last-response="{{formFields}}">
+    </things-resource>
+
+    <things-resource-form 
+      id="resource-form"
+      title="Item Detail"
+      form-fields="[[formFields]]" 
+      resource-url="terminologies/:id"
+      last-response="{{lastResponse}}">
+    </things-resource-form>
+
+
+@demo ./things-form/demo/demo-things-resource-form.html
 -->
 
 <dom-module id="things-resource-form">
+
 	<template>
-		<style is="custom-style" include="iron-flex iron-flex-alignment">
+		<style is="custom-style" include="iron-flex iron-flex-alignment"></style>
 		<style>
 			:host {
 				display: block;
@@ -53,7 +120,7 @@ A comment describing this element
 				width: 90%;
 			}
 
-			:host .resourceForm {
+			:host .resource-form {
 				padding: 10px 15px 10px 15px;
 			}
 
@@ -63,43 +130,41 @@ A comment describing this element
 		</style>
 
 		<paper-fullscreen-dialog
-			id="resourceDialog"
+			id="resource-dialog"
 			modal="true"
 			dismiss-icon="close">
 
 			<h2>{{title}}</h2>
 			
-			<!--paper-button affirmative dialog-confirm on-tap="saveResourceForm">Save</paper-button-->
+			<paper-button affirmative dialog-confirm on-tap="saveResourceForm">Save</paper-button>
 			
+			<paper-tabs selected="0">
+  			<paper-tab>Basic</paper-tab>
+  			<paper-tab>ITEM TWO</paper-tab>
+  			<paper-tab>ITEM THREE</paper-tab>
+			</paper-tabs>
+
 			<form
 					is="iron-form" 
-					id="resourceForm" 
-					class="resourceForm"
+					id="resource-form" 
 					action=[[action]]
 					headers="[[headers]]"
 					content-type="application/json"
 					method="[[method]]"
-					last-response ="{{output}}">
-				<div class="layout horizontal flex" >
-					<div id="leftFields" class="layout vertical flex fields"></div>
-					<div id="rightFields" class="layout vertical flex fields"></div>
+					last-response="{{lastResponse}}">
+				<div class="layout horizontal flex">
+					<div id="left-fields" class="layout vertical flex fields"></div>
+					<div id="right-fields" class="layout vertical flex fields"></div>
 				</div>
 			</form>
-
-			<paper-toolbar>
-				<div class="bottom fit">
-				<paper-button affirmative dialog-confirm on-tap="saveResourceForm">Save</paper-button>
-				</div>
-			</paper-toolbar>			
 		</paper-fullscreen-dialog>
 
 		<things-resource 
 			id="member-resource"
-			action="{{getResourceUrl}}" 
-			method="get"
+			action="{{resourceUrl}}" 
+			method="GET"
 			last-response="{{resource}}">
 		</things-resource>
-
 	</template>
 
 	<script>
@@ -107,42 +172,38 @@ A comment describing this element
 			is: 'things-resource-form',
 			
 			properties: {
+				/**
+				 * 폼 타이틀 
+				 */
 				title: {
 					type: String
 				},
 
-				getResourceUrl: {
+				/**
+				 * Resource Get/Update를 하기 위한 URL.
+				 * 이 속성으로 아이디로 레코드를 조회하거나 레코드를 업데이트 혹은 생성하는데 사용된다.
+				 * Resource URL은 보통 {복수 entity 명}/{:id} 형식이다. 
+				 * ex) users/:id
+				 */
+				resourceUrl: {
 					type: String
 				},
 
-				saveResourceUrl: {
-					type: String
-				},
-
+				/**
+				 * 폼에 채우기 위한 리소스
+				 * 최초 폼이 실행되는 시점에 서버에 요청하여 리턴받은 데이터
+				 */
 				resource: {
 					type: Object,
-					observer: 'resourceChanged'
+					observer: '_resourceChanged'
 				},
 
-				removeColumnsOnSave: {
+				/**
+				 * Save 하기 전에 폼에는 있지만 Save하는데 필요 없는 필드를 삭제하기 위한 필드명
+				 */
+				removeFieldsOnSave: {
 					type: Array,
 					value: ['creator', 'updater', 'creator_id', 'updater_id', 'created_at', 'updated_at']
-				}
-			},
-
-			/**
-			 * view atrribute observer, add view to form
-			 */
-			buildFormView: function() {
-				for(index in this.formFields) {
-					var field = this.formFields[index];
-					var newElement = this._generateElement(field);
-
-					if((index % 2) == 0) {
-						this.$.leftFields.appendChild(newElement);
-					} else {
-						this.$.rightFields.appendChild(newElement);
-					}
 				}
 			},
 
@@ -151,73 +212,99 @@ A comment describing this element
 				Polymer.IronResizableBehavior
 			],
 
+			/**
+			 * 폼이 오픈된 후 fire
+			 *
+			 * @event things-resource-form-opened
+			 */
+			/**
+			 * 리소스 조회 후 fire
+			 *
+			 * @event things-resource-form-read
+			 */
+			/**
+			 * 리소스 업데이트 후 fire
+			 *
+			 * @event things-resource-form-saved
+			 */
+			/**
+			 * 생성 후 fire
+			 *
+			 * @event things-resource-form-created
+			 */
+			 /**
+			  * 조회/생성/업데이트 후 fire
+			  *
+			  * @event things-resource-form-error
+			  */
+
 			listeners : {
-				'iron-form-presubmit' :'preSubmitHandler',
-				'resourceDialog.iron-overlay-closed': 'clearResourceForm',
-				'resourceDialog.iron-overlay-canceled': 'clearResourceForm',
-				'resourceDialog.iron-overlay-opened': 'onOpenResourceForm',
-				'iron-resize': 'onIronResize',
-				'member-resource.response' : 'onSuccessSave'
+				'iron-resize': '_screenResizeHandler',
+				'iron-form-presubmit' :'_preSubmitHandler',
+				'member-resource.things-resource-ajax-success' : '_successResponseHandler',
+				'member-resource.things-resource-ajax-error' : '_errorResponseHandler',
+				'resource-dialog.iron-overlay-closed': 'clearResourceForm',
+				'resource-dialog.iron-overlay-canceled': 'clearResourceForm',
+				'resource-dialog.iron-overlay-opened': '_resourceFormOpenHandler'				
 			},
 
 			/**
-			 * resize handler 
+			 * 리소스 폼 화면을 구성. formFields 정보로 동적으로 폼 하위 엘리먼트를 생성하여 폼을 구성한다. 
 			 */
-			onIronResize: function() {
-				this._getForm().style.width = this.parentNode.offsetWidth + 'px';
-			},
+			reconfigureMyForm: function() {
+				for(index in this.formFields) {
+					var field = this.formFields[index];
+					var newElement = this.createFormElement(field);
+
+					if((index % 2) == 0) {
+						this.$['left-fields'].appendChild(newElement);
+					} else {
+						this.$['right-fields'].appendChild(newElement);
+					}
+				}
+			},			
 
 			/**
 			 * save data from resource detail screen
 			 */
 			saveResourceForm: function() {
-				var resourceSetter = this.$['member-resource'];
-				var originalAction = resourceSetter.action;
-				var originalContentType = resourceSetter.contentType;
+				var resourceSaver = this.$['member-resource'];
+				var originalAction = resourceSaver.action;
+				var originalContentType = resourceSaver.contentType;
 
 				if(this.resource.id) {
-					resourceSetter.action = resourceSetter.action.replace(':id', this.resource.id);
-					resourceSetter.method ='PUT';
+					resourceSaver.action = resourceSaver.action.replace(':id', this.resource.id);
+					resourceSaver.method ='PUT';
 				} else {
-					resourceSetter.action = resourceSetter.action.replace('/:id', '');
-					resourceSetter.method ='POST';
+					resourceSaver.action = resourceSaver.action.replace('/:id', '');
+					resourceSaver.method ='POST';
 				}
 
-				var params = this._serializeForm();
-				params = this.filterResourceColumns(params);
-				resourceSetter.params = params;
-				resourceSetter.contentType = 'application/json';
-				resourceSetter.generateRequest();
-				resourceSetter.action = originalAction;
-				resourceSetter.contentType = originalContentType;
+				var params = this.serializeMyForm();
+				params = this._filterResourceColumns(params);
+				resourceSaver.params = params;
+				resourceSaver.contentType = 'application/json';
+				resourceSaver.generateRequest();
+				resourceSaver.action = originalAction;
+				resourceSaver.contentType = originalContentType;
 			},
 
 			/**
-			 * after resource opened
+			 * 리소스 폼을 오픈한다.
+			 * @param {Object} data 리소스 데이터 
 			 */
-			onOpenResourceForm: function(e) {
-				if(e.srcElement.id == 'resourceDialog') {
-					this.$.resourceDialog.refit();
-					this.fire('resource-form-opened', this.$.resourceForm, this.$.resourceDialog);
-				}
-			},
-
-			/**
-			 * open resource form dialog
-			 */
-			openResourceForm: function(e) {
-				var data = e.detail;
-
-				if(this.$.leftFields.childNodes.length == 0) {
-					this.buildFormView();
+			openResourceForm: function(data) {
+				if(this.$['left-fields'].childNodes.length == 0) {
+					this.reconfigureMyForm();
 				}
 
 				this.findResource(data.id);
-				this.$.resourceDialog.toggle();
+				this.$['resource-dialog'].toggle();
 			},
 
 			/**
-			 * find resource - ajax
+			 * 리소스 아이디로 서버에 리소스를 조회 요청한다.
+			 * @param {Object} resourceId
 			 */
 			findResource: function(resourceId) {
 				var resourceGetter = this.$['member-resource'];
@@ -229,15 +316,52 @@ A comment describing this element
 			},
 
 			/**
-			 * action after resource changed
+			 * 리소스 폼 내부의 모든 엘리먼트들을 클리어한다.
 			 */
-			resourceChanged: function(resource) {
-				this._bindData(this.$.leftFields.childNodes, resource);
-				this._bindData(this.$.rightFields.childNodes, resource);
+			clearResourceForm: function(event) {
+				if(event.srcElement.id == 'resource-dialog') {
+					while(this.$['left-fields'].childNodes.length > 0 || this.$['right-fields'].childNodes.length > 0) {
+						if(this.$['left-fields'].childNodes[0]) {
+							this.$['left-fields'].removeChild(this.$['left-fields'].childNodes[0]);
+						}
+
+						if(this.$['right-fields'].childNodes[0]) {
+							this.$['right-fields'].removeChild(this.$['right-fields'].childNodes[0]);
+						}
+					}
+				}
 			},
 
 			/**
-			 * data binding...
+			 * resize handler. 화면 크기가 변할 때 폼 사이즈도 함께 변경 
+			 */
+			_screenResizeHandler: function(event) {
+				this.getMyForm().style.width = this.parentNode.offsetWidth + 'px';
+			},
+
+			/**
+			 * Resource Form이 오픈 된 후 처리 
+			 */
+			_resourceFormOpenHandler: function(event) {
+				if(event.srcElement.id == 'resource-dialog') {
+					this.$['resource-dialog'].refit();
+					this.fire('things-resource-form-opened', this.$['resource-form'], this.$['resource-dialog']);
+				}
+			},
+
+			/**
+			 * Resource가 변경될 때 
+			 * @param {Object} 리소스 
+			 */
+			_resourceChanged: function(resource) {
+				this._bindData(this.$['left-fields'].childNodes, resource);
+				this._bindData(this.$['right-fields'].childNodes, resource);
+			},
+
+			/**
+			 * resource로 elements에 각각 바인딩한다.
+			 * @param {Array} elements
+			 * @param {Object} resource
 			 */
 			_bindData: function(elements, resource) {
 				for(var i = 0 ; i < elements.length ; i++) {
@@ -246,28 +370,12 @@ A comment describing this element
 			},
 
 			/**
-			 * clear resource form
+			 * 서버에 저장 요청할 파라미터 중에서 Save 전에 저장에 불필요한 컬럼들을 필터링한다.
+			 * @param params 서버에 저장 요청할 파라미터 
 			 */
-			clearResourceForm: function(e) {
-				if(e.srcElement.id == 'resourceDialog') {
-					var i = 0;
-
-					while(this.$.leftFields.childNodes.length > 0 ||this.$.rightFields.childNodes.length > 0) {
-						if(this.$.leftFields.childNodes[0])
-							this.$.leftFields.removeChild(this.$.leftFields.childNodes[0]);
-
-						if(this.$.rightFields.childNodes[0])
-							this.$.rightFields.removeChild(this.$.rightFields.childNodes[0]);
-					}
-				}
-			},
-
-			/**
-			 * save 전에 저장에 불필요한 컬럼들을 필터링한다.
-			 */
-			filterResourceColumns: function(params) {
+			_filterResourceColumns: function(params) {
 				for(var name in params) {
-					if(this.removeColumnsOnSave.includes(name)) {
+					if(this.removeFieldsOnSave.includes(name)) {
 						delete params[name];
 					} else {
 						var value = params[name];
@@ -281,13 +389,43 @@ A comment describing this element
 			},
 
 			/**
-			 * After success save
+			 * Save 액션 성공 후 후처리 things-resource-form-saved 이벤트가 fire된다.
 			 */
-			onSuccessSave: function(e) {
-				if(e.srcElement.method.toUpperCase() != 'GET') {
-					this.fire('resource-saved', true);
+			_successResponseHandler: function(event) {
+				this.stopSpinner();
+
+				var method = event.srcElement.method.toUpperCase();
+				if(method == 'GET') {
+					this.fire('things-resource-form-read', event.detail);
+				} else if(method == 'PUT') {
+					this.fire('things-resource-form-saved', event.detail);
+				} else if(method == 'POST') {
+					this.fire('things-resource-form-created', event.detail);
 				}
-			}
+			},
+
+			/**
+			* Error response handler After form submits.
+			* Fires a 'things-resource-form-error' in this function
+			*/
+			_errorResponseHandler: function(event) {
+				this.stopSpinner();
+
+				var response = (event.detail && !event.detail.request) ? event.detail : event.detail.request.xhr.response;
+				if(response && response.status == 401) {
+					this.handleUnauthorized();
+
+				} else {
+					if(response) {
+						this.openResponseError(response);
+					} else {
+						response = event.detail.request;
+						this.openUnkownError(response);
+					}
+				}
+
+				this.fire('things-resource-form-error', response);
+			}			
 
 		});
 	</script>

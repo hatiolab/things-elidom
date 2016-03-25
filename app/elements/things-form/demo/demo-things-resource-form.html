@@ -15,7 +15,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
 
-  <title>things-std-search-form demo</title>
+  <title>things-search-form demo</title>
 
   <script src="../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
   
@@ -25,9 +25,9 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <link rel="import" href="../../things-spinner/things-spinner.html">
   <link rel="import" href="../../things-setting/things-setting.html">
   <link rel="import" href="../../things-button/things-button.html">
-  <link rel="import" href="../things-std-form-behavior.html">
-  <link rel="import" href="../things-std-resource-form.html">
-  <link rel="import" href="../things-std-search-form.html">
+  <link rel="import" href="../things-form-behavior.html">
+  <link rel="import" href="../things-resource-form.html">
+  <link rel="import" href="../things-search-form.html">
 
   <link rel="stylesheet" href="../../../bower_components/paper-styles/demo.css">
 
@@ -77,13 +77,13 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
           last-response="{{formFields}}">
         </things-resource>
 
-        <things-std-resource-form 
+        <things-resource-form 
           id="resource-form"
           title="Item Detail"
           form-fields="[[formFields]]" 
           resource-url="terminologies/:id"
           last-response="{{lastResponse}}">
-        </things-std-resource-form>
+        </things-resource-form>
       </div>
 
       <div>
@@ -97,7 +97,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
         is: 'sample-resource-form',
 
         listeners: {
-          'resource-form.things-std-resource-form-saved': 'onSaved'
+          'resource-form.things-resource-form-saved': 'onSaved'
         },
 
         onSaved: function(e) {

@@ -11,8 +11,8 @@
 <link rel="import" href="../things-button/things-button.html">
 <link rel="import" href="../things-resource/things-resource.html">
 <link rel="import" href="../things-grid/things-resource-grid.html">
-<link rel="import" href="../things-form/things-std-resource-form.html">
-<link rel="import" href="../things-form/things-std-search-form.html">
+<link rel="import" href="../things-form/things-resource-form.html">
+<link rel="import" href="../things-form/things-search-form.html">
 
 <!--
 하나의 리소스에 대한 기본 액션 (List, Create, Find, Upate, Delete) 및 Import, Export 등의 기능을 제공하는 화면 셋 
@@ -48,7 +48,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				last-response="{{metaData}}">
 			</things-resource>
 
-			<things-std-search-form 
+			<things-search-form 
 				id="search-form"
 				class="flex"
 				active="[[active]]"
@@ -58,7 +58,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				page="{{page}}"
 				per-page="[[perPage]]"
 				last-response="{{lastResponse}}">
-			</things-std-search-form>
+			</things-search-form>
 
 			<things-resource-grid 
 				id="grid"
@@ -73,16 +73,17 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				read-data="[[lastResponse]]"
 				grid-save-action="[[gridSaveUrl]]"
 				selected-row-data="{{selectedRow}}"
+				export-file-name="[[title]]"
 				export-sheet-name="[[title]]">
 			</things-resource-grid>
 
-			<things-std-resource-form 
+			<things-resource-form 
 				id="resource-form"
 				title="[[title]] Detail"
 				resource-url="[[memberResourceUrl]]"
 				form-fields="[[resourceFormFields]]" 
 				input="{{selectedRow}}">
-			</things-std-resource-form>
+			</things-resource-form>
 		</div>
 	</template>
 
@@ -236,7 +237,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			listeners : {
 				'grid.things-grid-detail-tap': '_showResourceForm',
 				'grid.things-grid-save-success': '_refreshGridData',
-				'resource-form.things-std-resource-form-saved' : '_refreshGridData'
+				'resource-form.things-resource-form-saved' : '_refreshGridData'
 			},
 
 			/**

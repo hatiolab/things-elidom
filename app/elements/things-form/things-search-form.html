@@ -1,30 +1,44 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../../../bower_components/iron-form/iron-form.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import" href="../../../bower_components/iron-form/iron-form.html">
-<link rel="import" href="../../../bower_components/iron-input/iron-input.html">
-
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="../../../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="../../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
 <link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
 
 <link rel="import" href="./things-form-behavior.html">
 
 <!--
-A things login form asking for login and password.
+`<things-search-form>` is an HTML `<form>` element that can search data by configure form fields dinamically.
 
-Example:
+  Example
 
-<things-form data-route="form">
-</things-form>
+    <things-resource 
+      auto
+      action="diy_services/ElidomSearchForm/query.json" 
+      last-response="{{formFields}}">
+    </things-resource>
 
-@demo ./things-form/demo/index.html
+    <things-search-form 
+      id="search-form"
+      class="flex"
+      title="Sample Title"
+      form-fields="[[formFields]]" 
+      action-url="diy_services/DynamicScreen/query.json" 
+      page="{{page}}"
+      per-page="{{limit}}"
+      last-response="{{lastResponse}}">
+    </things-search-form>
+
+@demo ./things-form/demo/demo-things-search-form.html
 -->
 
 <dom-module id="things-search-form">
@@ -53,7 +67,7 @@ Example:
     }    
     
     :host paper-material {
-      padding: 15px;
+      padding: 10px;
     }
 
     :host .search {
@@ -69,25 +83,22 @@ Example:
     <paper-material elevation="1" class="flex" on-keypress="_keyPressHandler">
       <paper-toolbar>
         <paper-icon-button icon="menu"></paper-icon-button>
-        <span class="title">{{title}}</span>
-        <paper-icon-button icon="search" id="searchBtn" on-click="_submitForm"></paper-icon-button>
-        <paper-icon-button icon="refresh" id="resetBtn" on-click="_resetForm"></paper-icon-button>
-        <paper-tooltip for="searchBtn" offset="0">Search</paper-tooltip>
-        <paper-tooltip for="resetBtn" offset="0">Reset</paper-tooltip>
+        <span class="title">[[title]]</span>
+        <paper-icon-button icon="search" id="search-btn" on-click="submitMyForm"></paper-icon-button>
+        <paper-icon-button icon="refresh" id="reset-btn" on-click="resetMyForm"></paper-icon-button>
+        <paper-tooltip for="search-btn" offset="0">Search</paper-tooltip>
+        <paper-tooltip for="reset-btn" offset="0">Reset</paper-tooltip>
       </paper-toolbar>
 
       <div class="layout vertical flex">
-        <form is="iron-form" 
-              id="searchForm" 
-              action=[[actionUrl]]
-              headers="[[headers]]"
+        <form is="iron-form"
+              action="[[action]]"
               content-type="[[contentType]]"
-              method="[[method]]"
-              last-response ="{{output}}">
+              last-response ="{{lastResponse}}">
 
           <div class="layout horizontal flex" >
-            <div id="leftFields" class="layout vertical flex fields"></div>
-            <div id="rightFields" class="layout vertical flex"></div>
+            <div id="left-fields" class="layout vertical flex fields"></div>
+            <div id="right-fields" class="layout vertical flex"></div>
           </div>
         </form>
       </div>
@@ -95,70 +106,180 @@ Example:
   </template>
 
   <script>
+
   Polymer({
 
     is: 'things-search-form',
 
     properties: {
+      /**
+       * Toolbar에 표시할 화면 타이틀 
+       */
+      title: {
+        type: String
+      },
+
+      /**
+       * form이 active 상태인지 여부. active 상태인 경우에만 form submit이 가능하다.
+       */
+      active: {
+        type: Boolean
+      },
+
+      /**
+       * Pagination을 위한 설정. 페이지에 표시할 데이터 개수
+       */
+      perPage: {
+        type: Number,
+        value: 50
+      },
+
+      /**
+       * Pagination을 위한 설정. 현재 페이지 수 
+       */
       page : {
         type: Number,
         value: 1,
         notify: true,
-        observer: 'pageChanged'
+        observer: '_pageChanged'
       },
 
-      limit: {
-        type: Number,
-        value: 50,
+      /**
+       * 조회 결과 
+       */
+      lastResponse: {
+        type: Object,
         notify: true
       },
 
-      totalCount: {
-        type: Number
+      /**
+       * 값이 필요없는 operator
+       */
+      nonValueOpers: {
+        type: Array,
+        value: ['is_null', 'is_not_null', 'is_true', 'is_false', 'is_present', 'is_blank']
       }
+
+      /**
+       * Fired when the successful response is arrived after submit
+       *
+       * @event things-form-submit-success
+       */
+      /**
+       * Fired when the error response is arrived after submit
+       *
+       * @event things-form-submit-error
+       */
     },
     
     behaviors: [ Things.FormBehavior ],
 
     listeners : {
-      'iron-form-presubmit' :'preSubmitHandler'
+      'iron-form-presubmit' :'_preSubmitHandler'
     },    
 
     /**
-     * build form view - add child element dynamically
+     * 검색 폼 화면을 구성. formFields 정보로 동적으로 폼 하위 엘리먼트를 생성하여 폼을 구성한다.
      */
-    buildFormView: function() {
+    reconfigureMyForm: function() {
       if(this.formFields.length > 0) {
         for(index in this.formFields) {
           var field = this.formFields[index];
-          var newElement = this._generateElement(field);
+          var newElement = this.createFormElement(field);
 
           if((index % 2) == 0) {
-            this.$.leftFields.appendChild(newElement);
+            this.$['left-fields'].appendChild(newElement);
           } else {
-            this.$.rightFields.appendChild(newElement);
+            this.$['right-fields'].appendChild(newElement);
           }
         }
       }
     },
 
     /**
-     * submit form 전에 파라미터 변경 ...
+     * Submit 전에 전처리. 
+     * Pagination을 사용하는 경우에 currentPage, perPage 정보를 파라미터에 추가한다.
+     * @param {Event}
      */
-    preSubmitHandler: function(e) {
-      var form = this._getForm();
+    _preSubmitHandler: function(event) {
+      var form = this.getMyForm();
       form.request.params || {};
+      form.request.params = this._handleSubmitParams(form.request.params);
       form.request.params.page = this.page;
-      form.request.params.limit = this.limit;
+      form.request.params.limit = this.perPage;
     },
 
     /**
-     * refresh when current page changed
+     * handle submit params 
+     * 서버에 보낼 파라미터를 재구성한다.
      */
-    pageChanged: function(page) {
-      if(this.totalCount > 0 && page > 0) {
-        this._submitForm();
+    _handleSubmitParams: function(params) {
+      var newParams = { select : this.selectFields ? this.selectFields : '' };
+      if(this.sortFields) {
+        newParams.sort = JSON.stringify(this.sortFields);
       }
+
+      var queries = [];
+
+      for(prop in params) {
+        if(params[prop]) {
+          var fieldModel = this.formFields.filter(function(formField) { return formField.name == prop })[0];
+          var q = { name : prop, operator : fieldModel.op };
+          if(!this.nonValueOpers.includes(fieldModel.op)) {
+            q.value = params[prop]; 
+          }
+          queries.push(q);
+        }
+      }
+
+      if(queries.length > 0) newParams.query = JSON.stringify(queries);
+      return newParams;
+    },
+
+    /**
+     * 현재 페이지가 변경되었을 때 액션
+     * 페이지가 변경된 경우 해당 페이지로 다시 검색한다.
+     * @param {Number} page 현재 페이지 
+     */
+    _pageChanged: function(page) {
+      if(this.active && page > 0) {
+        this.submitMyForm();
+      }
+    },
+
+    /**
+    * Successful response handler After form submits.
+    * StdFormBehavior fires a 'things-form-submit-success' in this function
+    * @param {Event} event Successful response event
+    */
+    _successResponseHandler: function(event) {
+      this.stopSpinner();
+      this.lastResponse = event.detail.xhr.response;
+      this.fire('things-form-submit-success', this.lastResponse);
+    },
+
+    /**
+    * Error response handler After form submits.
+    * StdFormBehavior fires a 'things-form-submit-error' in this function
+    * @param {Event} event Error response event
+    */
+    _errorResponseHandler: function(event) {
+      this.stopSpinner();
+
+      var response = event.detail.request.xhr.response;
+      if(response && response.status == 401) {
+        this.handleUnauthorized();
+
+      } else {
+        if(response) {
+          this.openResponseError(response);
+        } else {
+          response = event.detail.request;
+          this.openUnkownError(response);
+        }
+      }
+
+      this.fire('things-form-submit-error', response);
     }
 
   });

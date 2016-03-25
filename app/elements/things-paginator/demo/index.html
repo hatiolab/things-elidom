@@ -17,12 +17,10 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 
   <title>things-paginator demo</title>
 
-  <script src="../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
-  
   <link rel="import" href="../../../bower_components/polymer/polymer.html">
+  <link rel="import" href="../../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
   <link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
   <link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
-  <link rel="import" href="../../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
 
   <link rel="import" href="../../things-resource/things-resource.html">
   <link rel="import" href="../../things-spinner/things-spinner.html">
@@ -30,8 +28,8 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <link rel="import" href="../../things-setting/things-setting-dialog.html">
   <link rel="import" href="../../things-setting/things-global-behavior.html">
   <link rel="import" href="../../things-button/things-button.html">
-  <link rel="import" href="../../things-form/things-std-form-behavior.html">
-  <link rel="import" href="../../things-form/things-std-search-form.html">
+  <link rel="import" href="../../things-form/things-form-behavior.html">
+  <link rel="import" href="../../things-form/things-search-form.html">
   <link rel="import" href="../../things-spinner/things-spinner-behavior.html">
   <link rel="import" href="../../things-msg-box/things-msgbox-behavior.html">
 
@@ -93,7 +91,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
           last-response="{{formFields}}">
         </things-resource>
 
-        <things-std-search-form 
+        <things-search-form 
           id="search-form"
           class="flex"
           title="Sample Title"
@@ -106,7 +104,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
           total-property="total"
           root-property="items"
           items="{{items}}">
-        </things-std-search-form>
+        </things-search-form>
 
         <paper-toolbar class="white">
           <div class="bottom fit">
@@ -132,7 +130,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
         is: 'sample-paginator',
 
         listeners: {
-          'search-form.things-std-form-response': 'onItemsChanged'
+          'search-form.things-form-submit-success': 'onItemsChanged'
         },
 
         onItemsChanged: function(e) {
