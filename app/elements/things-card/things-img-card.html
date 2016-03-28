@@ -96,6 +96,13 @@
 
 				properties: {
 					/**
+					 * when card taped fire event on-card-clicked with card information
+					 * 
+					 * @event on-card-clicked
+					 */
+					
+					
+					/**
 					 * image file objects
 					 * @type {Object}
 					 */
@@ -155,7 +162,9 @@
 					Things.SpinnerBehavior,
 					Things.MsgBoxBehavior
 				],
-
+				/**
+				 * toggle detail informations
+				 */
 				_toggle :function(){
 					var moreInfo = this.$['things-card-detail'];
 					var iconButton = Polymer.dom(event).localTarget;
@@ -163,10 +172,15 @@
 													  : 'hardware:keyboard-arrow-down';
 					moreInfo.toggle();
 				},
+				/**
+				 * when image changed calculate image url and set to screen
+				 */
 				_onCardChange:function(basicUrl, cardId){
 					return [basicUrl,'download',cardId].join('/');
 				},
-
+				/**
+				 * when card taped fire event on-card-clicked with card information
+				 */
 				_onCardTap:function(event){
 					this.fire('on-card-clicked',this.card)
 				}
