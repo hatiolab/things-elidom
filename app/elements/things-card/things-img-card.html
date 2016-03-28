@@ -60,6 +60,7 @@
 					animated-shadow="[[animatedShadow]]"
 					preload-image ="preloadImage"
 					fade-image="fadeImage"
+					on-tap="_onCardTap"
 					>
 				<div class="card-content">
 					<content select=".card-content"></content>
@@ -99,7 +100,8 @@
 					 * @type {Object}
 					 */
 					card: {
-						type: Object
+						type: Object,
+						notify:true
 					},
 					/**
 					 * The title of the card.
@@ -163,6 +165,10 @@
 				},
 				_onCardChange:function(basicUrl, cardId){
 					return [basicUrl,'download',cardId].join('/');
+				},
+
+				_onCardTap:function(event){
+					this.fire('on-card-clicked',this.card)
 				}
 			});
 		})();

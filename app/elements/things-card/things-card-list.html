@@ -73,17 +73,17 @@ Example:
 		}
 		</style>
 
-		<template is="dom-repeat" id="imageRepeat" items="[[items]]" as=cardItem>
-			<things-img-card class="white img-selector" 
-							 card = "[[cardItem]]" 
-							 selected$="{{cardItem.selected}}" 
-							 on-tap="_onCardSelect">
+		<template is="dom-repeat" id="imageRepeat" items="[[items]]" as="cardItem">
+			<things-img-card id="[[cardItem.id]]"
+							 class="img-selector" 
+							 card = "{{cardItem}}" 
+							 selected$="{{cardItem.selected}}">
 				<content class="card-content" select=".card-content"></content>
 				<content class="card-actions" select=".card-actions"></content>
 			</things-img-card>
 		</template>
 		
-		<!-- <array-selector id="selector" items="{{items}}" selected="{{selected}}"></array-selector> -->
+		<array-selector id="selector" items="{{items}}" selected="{{selected}}"></array-selector>
 
 	</template>
 
@@ -100,15 +100,25 @@ Example:
 					 */
 					items: {
 						type: Object,
-						notify: true,
-						observer:'_onItemsChange'
+						notify: true
 					}
+				},
+				listeners : {
+					'on-card-clicked' :'_onCardSelect'
 				},
 				/**
 				 * when card selected show check image on card
 				 */
-				_onItemsChange:function(){
-					// console.log(items);
+				_onCardSelect:function(event){
+					var item = this.$.imageRepeat.itemForElement(event.target);
+					//select one file
+					if(item == this.selected) return;
+
+					this.set('items.'+this.SelectedOld+'.selected', false);
+					this.set('items.'+item+'.selected', true);
+
+					this.$.selector.select(item);
+					this.SelectedOld = item;
 				}
 			});
 		})();
