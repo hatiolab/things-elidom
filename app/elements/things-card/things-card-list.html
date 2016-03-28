@@ -75,7 +75,7 @@ Example:
 
 		<template is="dom-repeat" id="imageRepeat" items="[[items]]" as="cardItem">
 			<things-img-card id="[[cardItem.id]]"
-							 class="img-selector" 
+							 class="white img-selector" 
 							 card = "{{cardItem}}" 
 							 selected$="{{cardItem.selected}}">
 				<content class="card-content" select=".card-content"></content>
@@ -101,7 +101,15 @@ Example:
 					items: {
 						type: Object,
 						notify: true
+					},
+					/**
+					 * item selected
+					 */
+					selected:{
+						type:Object,
+						notify:true
 					}
+
 				},
 				listeners : {
 					'on-card-clicked' :'_onCardSelect'
@@ -111,13 +119,16 @@ Example:
 				 */
 				_onCardSelect:function(event){
 					var item = this.$.imageRepeat.itemForElement(event.target);
-					//select one file
+					console.log(item);
 					if(item == this.selected) return;
 
-					this.set('items.'+this.Selected+'.selected', false);
-					this.set('items.'+item+'.selected', true);
+					var index = this.$.imageRepeat.indexForElement(event.target);
+
+					this.set('items.'+this.indexSelectedOld+'.selected', false);
+					this.set('items.'+index+'.selected', true);
 
 					this.$.selector.select(item);
+					this.indexSelectedOld = index;
 				}
 			});
 		})();
