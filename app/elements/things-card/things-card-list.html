@@ -114,11 +114,10 @@ Example:
 					//select one file
 					if(item == this.selected) return;
 
-					this.set('items.'+this.SelectedOld+'.selected', false);
+					this.set('items.'+this.Selected+'.selected', false);
 					this.set('items.'+item+'.selected', true);
 
 					this.$.selector.select(item);
-					this.SelectedOld = item;
 				}
 			});
 		})();
