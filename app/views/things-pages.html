@@ -46,40 +46,46 @@
 <!-- Resouce Selector Sample page -->
 <section class="Page" data-route="resource_selector">
     <paper-material class="Page-paper" elevation="1">
-        <paper-input label="dialog-seletor" 
-                    data-selector ="resouceDialogSelector" 
-                    on-tap="open"
-                    value = "{{selectedRow.id}}">
-        </paper-input>
-        <input is="iron-input" bind-value="{{selectedRow.id}}">
-
-        <things-resource-dialog-selector
-            id="resouceDialogSelector"
-            grid-model = "[[gridModel]]" 
-            grid-columns ="[[gridColumns]]"
-            resource="terminologies" 
-            action="" 
-            selected-row = "{{selectedRow}}">
-        </things-resource-dialog-selector>
-        <span>{{selectedRow.id}}</span>
-
         <paper-input label="dropdown-seletor" 
                       data-selector ="resouceDropSelector" 
                       on-tap="open"
                       value = "{{dropSelectedRow.id}}">
 
         </paper-input>
-        <input is="iron-input" bind-value="{{dropSelectedRow.id}}">
+
+        <input is="iron-input" 
+                bind-value="{{dropSelectedRow.id}}"
+                data-selector ="resouceDropSelector" 
+                on-tap="open">
 
         <things-resource-dropdown-selector
             id="resouceDropSelector"
-            grid-model = "[[gridModel]]" 
-            grid-columns ="[[gridColumns]]"
+            grid-fields-url ="diy_services/ElidomGridModel/query.json"
+            grid-columns-url ="diy_services/ElidomGridColumn/query.json"
             resource="terminologies" 
             action="" 
             selected-row = "{{dropSelectedRow}}">
         </things-resource-dropdown-selector>
-        <span>{{dropSelectedRow.id}}</span>
+
+
+        <paper-input label="dialog-seletor" 
+                    data-selector ="resouceDialogSelector" 
+                    on-tap="open"
+                    value = "{{selectedRow.id}}">
+        </paper-input>
+        <input is="iron-input" 
+                bind-value="{{selectedRow.id}}"
+                data-selector ="resouceDialogSelector" 
+                on-tap="open">
+
+        <things-resource-dialog-selector
+            id="resouceDialogSelector"
+            grid-fields-url ="diy_services/ElidomGridModel/query.json"
+            grid-columns-url ="diy_services/ElidomGridColumn/query.json"
+            resource="terminologies" 
+            action="" 
+            selected-row = "{{selectedRow}}">
+        </things-resource-dialog-selector>
 
     </paper-material>
 </section>

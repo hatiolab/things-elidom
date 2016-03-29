@@ -43,7 +43,6 @@ Example:
 	Polymer({
 		is: 'things-dropdown-selector',
 		properties: {
-			mode :String,
 			verticalAlign: String,
 			horizontalAlign: String,
 			disabled: Boolean,
@@ -78,7 +77,7 @@ Example:
 			}
 		},
 		open: function() {
-			this.mode == this.$.dropdown.open();
+			this.$.dropdown.open();
 		}
 	});
 	</script>

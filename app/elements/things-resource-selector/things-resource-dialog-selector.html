@@ -71,15 +71,15 @@ Example:
 		    }
 		</style>
 
-		<things-resource 
+        <things-resource 
           auto
-          action="diy_services/ElidomGridModel/query.json" 
+          action="[[gridFieldsUrl]]" 
           last-response="{{gridModel}}">
         </things-resource>
 
         <things-resource 
           auto
-          action="diy_services/ElidomGridColumn/query.json" 
+          action="[[gridColumnsUrl]]" 
           last-response="{{gridColumns}}">
         </things-resource>
 
@@ -120,6 +120,19 @@ Example:
 		Polymer({
 			is: 'things-resource-dialog-selector',
 			properties:{
+				/**
+				 * 그리드 모델 URL
+				 * @type {[type]}
+				 */
+				gridFieldsUrl:String,
+				/**
+				 * 그리드 칼럼 URL
+				 * @type {[type]}
+				 */
+				gridColumnsUrl:String,
+				/**
+				 * resouce 대표 URL
+				 */
 				resouce:{
 					type:Object
 				},
@@ -190,9 +203,11 @@ Example:
 					value:false
 				}
 			},
-			// listeners:{
-			// 	'dropdownTrigger.tap' :'_dropdownTriggerOnTap'
-			// },
+			/**
+			 * selectedRow가 변경 되었을때 resource-item-selected 발생
+			 * 
+			 * @event resource-item-selected
+			 */
 			observers:[
 				'_onItemSelected(selectedRow)'
 			],
@@ -200,7 +215,6 @@ Example:
 			 * when item selected set item to selected value
 			 */
 			_onItemSelected :function(selectedRow){
-				console.log(this.selectedRow);
 				this.fire('resource-item-selected',selectedRow);
 			},
 			/**
@@ -209,6 +223,9 @@ Example:
 			_computeListItems:function(gridData){
 				return gridData.items;
 			},
+			/**
+			 * dropdown Open
+			 */
 			open:function(){
 				this.$.search.generateRequest();
 				this.$.thingsSelector.open();
