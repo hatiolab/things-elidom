@@ -1,0 +1,221 @@
+
+<link rel="import" href="things-dropdown-selector.html">
+<!--
+A comment describing this element
+
+Example:
+
+	<things-resource-selector></things-resource-selector>
+
+Example:
+
+	<things-resource-selector>
+	</things-resource-selector>
+
+@demo demo/index.html
+-->
+
+<dom-module id="things-resource-dropdown-selector">
+	<template>
+		<style>
+			:host {
+				display: block;
+			}
+		    .dropdown-content {
+		      background-color: white;
+		      line-height: 20px;
+		      border-radius: 3px;
+		      box-shadow: 0px 2px 6px #ccc;
+		    }
+		    .random-content {
+		      padding: 1.5em 2em;
+		      min-width: 600px;
+		      max-width: 600px;
+		    }
+		    button {
+		      border: 1px solid #ccc;
+		      background-color: #eee;
+		      padding: 1em;
+		      border-radius: 3px;
+		      cursor: pointer;
+		    }
+		    button:focus {
+		      outline: none;
+		      border-color: blue;
+		    }
+		    ul {
+		      margin: 0;
+		      padding: 0;
+		    }
+		    li {
+		      display: block;
+		      position: relative;
+		      margin: 0;
+		      padding: 0;
+		    }
+		    a {
+		      display: block;
+		      position: relative;
+		      padding: 1em;
+		      text-decoration: none;
+		    }
+		    li:not(:last-of-type) {
+		      border-bottom: 1px solid #eee;
+		    }
+		    a:hover {
+		      text-decoration: underline;
+		    }
+		    iron-image {
+		      padding: 1em;
+		      background-color: #fff;
+		      box-shadow: 0px 2px 6px #ccc;
+		      border-radius: 3px;
+		    }
+		</style>
+
+		<!-- <paper-input label="seletor" on-tap="open"></paper-input> -->
+		<things-resource 
+          auto
+          action="diy_services/ElidomGridModel/query.json" 
+          last-response="{{gridModel}}">
+        </things-resource>
+
+        <things-resource 
+          auto
+          action="diy_services/ElidomGridColumn/query.json" 
+          last-response="{{gridColumns}}">
+        </things-resource>
+
+		<things-dropdown-selector id ="thingsSelector">
+			<div class="dropdown-content random-content">
+				<things-basic-grid 
+				  id="grid"
+				  grid-model="[[gridModel]]" 
+				  columns="[[gridColumns]]" 
+				  read-data="[[gridData]]"
+				  page="{{page}}"
+				  limit="{{limit}}"
+				  root-property="items"
+				  total-property="total"
+				  infinitable
+				  paginatable
+				  enable-check-box = "[[enableCheckBox]]"
+				  selected-row-data="{{selectedRow}}"
+				  page-start-idx="{{pageStartIdx}}"
+				  page-end-idx="{{pageEndIdx}}">
+				</things-basic-grid>
+
+				<things-resource 
+				  id="search"
+				  resource="[[resource]]"
+				  action="[[action]]"
+				  selectFields ="[[selectFields]]"
+				  sortFields ="[[sortFields]]"
+				  queryFields ="[[queryFields]]"
+				  method="GET"
+				  content-type="application/json"
+				  last-response="{{gridData}}">
+				</things-resource>
+			</div>
+		</things-dropdown-selector>
+	</template>
+	<script>
+		Polymer({
+			is: 'things-resource-dropdown-selector',
+			properties:{
+				resouce:{
+					type:Object
+				},
+				/**
+				 * action for search codes
+				 */
+				action:{
+					type:String
+				},
+
+				/**
+				 * query result
+				 */
+				listItems:{
+					type:Object,
+					computed:'_computeListItems(gridData)'
+				},
+				/**
+				 * 검색하고자 하는 필드명을 구분자 ','로 구분하여 설정 
+				 *
+				 * select fields - 'id,name,description,category'
+				 */
+				selectFields: {
+					type: String
+				},
+
+				/**
+				 * 소팅하고자 하는 필드명과 ascending 여부, ascending인 경우 true, descending인 경우 false
+				 *
+				 * sort fields - [{ field : 'fieldName1', ascending : true }, { field : 'fieldName2', ascending : false }]
+				 */
+				sortFields: {
+					type: Array
+				},
+				
+				/**
+				 * 검색 조건 필드명과 조건 그리고 값 오브젝트에 대한 Array
+				 *
+				 * query fields - [{ name : 'name', operator : 'like', value : 'hatio' }, { field : 'active_field', value : true }]
+				 */
+				queryFields: {
+					type: Array
+				},
+				/**
+				 * 그리드 구성을 위한 데이타 모델
+				 */
+				gridModel:{
+					type:Object
+				},
+				/**
+				 * 그리드의 Column Configuration
+				 */
+				gridColumns:{
+					type:Object
+				},
+				/**
+				 * 선택된 데이타의 오브젝트
+				 */
+				selectedRow:{
+					type: Object,
+					notify:true
+				},
+				/**
+				 * enable check box or not
+				 */
+				enableCheckBox:{
+					type:Boolean,
+					value:false
+				}
+			},
+			// listeners:{
+			// 	'dropdownTrigger.tap' :'_dropdownTriggerOnTap'
+			// },
+			observers:[
+				'_onItemSelected(selectedRow)'
+			],
+			/**
+			 * when item selected set item to selected value
+			 */
+			_onItemSelected :function(selectedRow){
+				console.log(this.selectedRow);
+				this.fire('resource-item-selected',selectedRow);
+			},
+			/**
+			 * notify list items
+			 */
+			_computeListItems:function(gridData){
+				return gridData.items;
+			},
+			open:function(){
+				this.$.search.generateRequest();
+				this.$.thingsSelector.open();
+			}
+		});
+	</script>
+</dom-module>

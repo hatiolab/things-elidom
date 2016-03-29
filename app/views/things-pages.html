@@ -42,3 +42,63 @@
     	<a href="elements/index.html">apiDoc</a>
     </paper-material>
 </section>
+
+<!-- Resouce Selector Sample page -->
+<section class="Page" data-route="resource_selector">
+    <paper-material class="Page-paper" elevation="1">
+        <paper-input label="dialog-seletor" 
+                    data-selector ="resouceDialogSelector" 
+                    on-tap="open"
+                    value = "{{selectedRow.id}}">
+        </paper-input>
+        <input is="iron-input" bind-value="{{selectedRow.id}}">
+
+        <things-resource-dialog-selector
+            id="resouceDialogSelector"
+            grid-model = "[[gridModel]]" 
+            grid-columns ="[[gridColumns]]"
+            resource="terminologies" 
+            action="" 
+            selected-row = "{{selectedRow}}">
+        </things-resource-dialog-selector>
+        <span>{{selectedRow.id}}</span>
+
+        <paper-input label="dropdown-seletor" 
+                      data-selector ="resouceDropSelector" 
+                      on-tap="open"
+                      value = "{{dropSelectedRow.id}}">
+
+        </paper-input>
+        <input is="iron-input" bind-value="{{dropSelectedRow.id}}">
+
+        <things-resource-dropdown-selector
+            id="resouceDropSelector"
+            grid-model = "[[gridModel]]" 
+            grid-columns ="[[gridColumns]]"
+            resource="terminologies" 
+            action="" 
+            selected-row = "{{dropSelectedRow}}">
+        </things-resource-dropdown-selector>
+        <span>{{dropSelectedRow.id}}</span>
+
+    </paper-material>
+</section>
+
+<script type="text/javascript">
+    var app = document.querySelector('#app');
+
+    app.open = function(e) {
+      var input = e.target;
+      while (!input.hasAttribute('data-selector') && input !== document.body) {
+        input = input.parentElement;
+      }
+      if (!input.hasAttribute('data-selector')) {
+        return;
+      }
+      var id = input.getAttribute('data-selector');
+      var el = document.getElementById(id);
+      if (el) {
+        el.open();
+      }
+    };
+</script>

@@ -293,7 +293,7 @@
 				}
 
 				// :id 실제 id로 변환 
-				if(this.$._ajax.url.indexOf(':id') >= 0) {
+				if(this.$._ajax.url&&this.$._ajax.url.indexOf(':id') >= 0) {
 					this.$._ajax.url = this.$._ajax.url.replace(':id', this.params.id);
 				}
 			},

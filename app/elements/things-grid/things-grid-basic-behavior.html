@@ -186,6 +186,14 @@ Things.GridBasicBehaviorImpl = {
 			type: Object,
 			notify: true,
 			readonly: true
+		},
+		/**
+		 * enable check box or not in grid
+		 */
+		enableCheckBox:{
+			type:Boolean,
+			notify:true,
+			value:true
 		}
 	},
 
@@ -354,7 +362,7 @@ Things.GridBasicBehaviorImpl = {
 			} else {
 				cols = columns;
 			}
-
+			this.grid.checkBar().setVisible(this.enableCheckBox);
 			this.grid.setColumns(cols);
 			this.grid.rowIndicator().setStateVisible(true);
 			this.grid.resetSize();
@@ -374,7 +382,8 @@ Things.GridBasicBehaviorImpl = {
 			
 			var items = (this.paginatable||this.infinitable) ? readData[this.rootProperty] : readData;					
 			this.totalCount = (this.paginatable||this.infinitable) ? readData[this.totalProperty] : (items ? items.length : 0);
-			
+
+					
 			if(this.dataFillMode=='append'){
 				this.dataSet.appendRows(items,0,-1,false);
 				this.dataSet.clearRowStates();
