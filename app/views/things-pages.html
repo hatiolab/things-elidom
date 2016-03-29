@@ -49,12 +49,12 @@
         <paper-input label="dropdown-seletor" 
                       data-selector ="resouceDropSelector" 
                       on-tap="open"
-                      value = "{{dropSelectedRow.id}}">
+                      value = "{{dropSelectedRow.name}}">
 
         </paper-input>
 
         <input is="iron-input" 
-                bind-value="{{dropSelectedRow.id}}"
+                bind-value="{{dropSelectedRow.name}}"
                 data-selector ="resouceDropSelector" 
                 on-tap="open">
 
@@ -71,10 +71,10 @@
         <paper-input label="dialog-seletor" 
                     data-selector ="resouceDialogSelector" 
                     on-tap="open"
-                    value = "{{selectedRow.id}}">
+                    value = "{{selectedRow.name}}">
         </paper-input>
         <input is="iron-input" 
-                bind-value="{{selectedRow.id}}"
+                bind-value="{{selectedRow.name}}"
                 data-selector ="resouceDialogSelector" 
                 on-tap="open">
 
