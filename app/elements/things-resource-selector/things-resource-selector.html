@@ -1,0 +1,80 @@
+<!--
+A comment describing this element
+
+Example:
+
+    <things-resource-selector></things-resource-selector>
+
+Example:
+
+    <things-resource-selector>
+    </things-resource-selector>
+
+@demo demo/index.html
+-->
+
+<dom-module id="things-resource-selector">
+	<template>
+		<style>
+			:host {
+				display: block;
+			}
+		</style>
+		
+	</template>
+	<script>
+		Polymer({
+			is: 'things-resource-selector',
+			properties:{
+				/**
+				 * resource 대표 URL
+				 */
+				resource : {
+					type: String,
+					value: ''
+				},
+				/**
+				 * request prameters
+				 */
+				params: {
+					type: String
+				},
+				/**
+				 * selected items
+				 */
+				selected:{
+					type:Object,
+					notify:true
+				},
+				/**
+				 * query result
+				 */
+				items:{
+					type:Object,
+					notify:true
+				}
+			},
+			listeners:{
+
+			},
+			/**
+			 * toggle selector dialog
+			 */
+			toggle :function(){
+				
+			},
+			/**
+			 * when item selected set item to selected value
+			 */
+			_onItemSelected :function(){
+
+			},
+			/**
+			 * when data query success set response data to items
+			 */
+			 _onResponse:function(){
+
+			 }
+		});
+	</script>
+</dom-module>

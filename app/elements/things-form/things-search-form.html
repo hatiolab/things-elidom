@@ -84,7 +84,7 @@
       <paper-toolbar>
         <paper-icon-button icon="menu"></paper-icon-button>
         <span class="title">[[title]]</span>
-        <paper-icon-button icon="search" id="search-btn" on-click="submitMyForm"></paper-icon-button>
+        <paper-icon-button icon="search" id="search-btn" on-click="_onSearchBtnClicked"></paper-icon-button>
         <paper-icon-button icon="refresh" id="reset-btn" on-click="resetMyForm"></paper-icon-button>
         <paper-tooltip for="search-btn" offset="0">Search</paper-tooltip>
         <paper-tooltip for="reset-btn" offset="0">Reset</paper-tooltip>
@@ -195,7 +195,10 @@
         }
       }
     },
-
+    _onSearchBtnClicked :function(){
+      if(this.page>1) this.page = 1;
+      else this.submitMyForm();
+    },
     /**
      * Submit 전에 전처리. 
      * Pagination을 사용하는 경우에 currentPage, perPage 정보를 파라미터에 추가한다.
