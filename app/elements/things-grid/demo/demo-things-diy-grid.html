@@ -82,19 +82,14 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
           id="grid"
           resource-meta-url="diy_grids/1.json"
           read-data="[[gridData]]"
-          page="{{page}}"
-          limit="{{limit}}"
-          root-property="items"
-          total-property="total"
-          selected-row-data="{{selectedRow}}"
-          page-start-idx="{{pageStartIdx}}"
-          page-end-idx="{{pageEndIdx}}">
+          enable-detail-column = "false"
+          selected-row-data="{{selectedRow}}">
         </things-diy-grid>
 
         <things-resource 
           id="search-resource"
-          resource="terminologies"
-          action="" 
+          resource="rests"
+          action=""
           method="GET"
           content-type="application/json"
           last-response="{{gridData}}">
