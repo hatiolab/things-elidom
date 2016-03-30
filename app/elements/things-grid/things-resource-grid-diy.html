@@ -8,8 +8,8 @@
 <link rel="import" href="../things-import-excel/things-import-excel-button.html">
 <link rel="import" href="../things-paginator/things-paginator.html">
 
-<link rel="import" href="./things-grid-basic-behavior.html">
-<link rel="import" href="./things-grid-resource-behavior.html">
+<link rel="import" href="./things-grid-diy-behavior.html">
+<link rel="import" href="./things-grid-resource-diy-behavior.html">
 
 <!--
 기본 라소스 그리드. Pagination을 지원하고 import, export, add, delete, save가 가능한 그리드
@@ -53,7 +53,7 @@
 @demo ./things-grid/demo/demo-things-resource-grid.html
 -->
 
-<dom-module id="things-resource-grid">
+<dom-module id="things-resource-grid-diy">
 	<template>
 		<style>
 			:host {
@@ -121,10 +121,10 @@
 
 	<script>
 		Polymer({
-			is: 'things-resource-grid',
+			is: 'things-resource-grid-diy',
 
 			behaviors: [
-				Things.GridResourceBehavior
+				Things.GridResourceDiyBehavior
 			],
 	
 			properties: {

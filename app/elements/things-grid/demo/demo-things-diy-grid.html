@@ -1,0 +1,140 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2016 The Things Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at https://github.com/hatiolab/things-elidom.git/LICENSE.txt
+The complete set of authors may be found at https://github.com/hatiolab/things-elidom.git/AUTHORS.txt
+The complete set of contributors may be found at https://github.com/hatiolab/things-elidom.git/CONTRIBUTORS.txt
+Code distributed by Hatiolab as part of the things project is also
+subject to an additional IP rights grant found at https://github.com/hatiolab/things-elidom.git/PATENTS.txt
+-->
+<html>
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+  <title>things-diy-grid demo</title>
+
+  <script src="../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  
+  <link rel="import" href="../../../bower_components/polymer/polymer.html">
+  <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+  <link rel="import" href="../../../bower_components/paper-styles/color.html">
+  <link rel="import" href="../../../bower_components/paper-styles/demo-pages.html">
+  <link rel="import" href="../../../bower_components/paper-toast/paper-toast.html">
+  
+  <link rel="import" href="../../things-button/things-button.html">
+  <link rel="import" href="../../things-resource/things-resource.html">
+  <link rel="import" href="../../things-spinner/things-spinner.html">
+  <link rel="import" href="../../things-setting/things-setting.html">
+
+  <link rel="import" href="../things-diy-grid.html">
+
+  <link rel="stylesheet" href="../../../bower_components/paper-styles/demo.css">
+
+  <style is="custom-style">
+
+    .output {
+      margin-top: 20px;
+      word-wrap: break-word;
+      @apply(--paper-font-common-code);
+    }
+    form > paper-button {
+      width: 45%;
+      margin-top: 20px;
+    }
+    form > paper-button:not([disabled]) {
+      background: var(--paper-light-blue-500);
+      color: white;
+    }
+    button {
+      margin-top: 20px;
+    }
+    paper-spinner {
+      width: 14px;
+      height: 14px;
+      margin-right: 20px;
+    }
+    paper-dropdown-menu {
+      display: block;
+    }
+    demo-snippet {
+      --demo-snippet-code: {
+        max-height: 300px;
+      };
+    }
+
+  </style>
+
+</head>
+<body unresolved>
+
+  <dom-module id="sample-diy-grid">
+    <template>      
+      <things-setting id="setting"></things-setting>
+
+      <things-button color="green" id="search">Search</things-button>
+
+      <section>
+        <things-diy-grid 
+          id="grid"
+          resource-meta-url="diy_grids/1.json"
+          read-data="[[gridData]]"
+          page="{{page}}"
+          limit="{{limit}}"
+          root-property="items"
+          total-property="total"
+          selected-row-data="{{selectedRow}}"
+          page-start-idx="{{pageStartIdx}}"
+          page-end-idx="{{pageEndIdx}}">
+        </things-diy-grid>
+
+        <things-resource 
+          id="search-resource"
+          resource="terminologies"
+          action="" 
+          method="GET"
+          content-type="application/json"
+          last-response="{{gridData}}">
+        </things-resource>
+      </section>
+    </template>
+
+    <script>
+      Polymer({
+
+        is: 'sample-diy-grid',
+
+        listeners: {
+          'search.tap' : 'search'
+        },
+
+        search: function(e) {
+          var grid = this.$.grid;
+          var resource = this.$['search-resource'];
+          resource.params = { page : grid.page, limit : grid.limit };
+          resource.generateRequest();
+        }
+
+      });
+    </script>
+  </dom-module>
+
+  <template is="dom-bind" id="app">
+
+    <section>
+      <h4>Things diy Grid</h4>
+
+      <sample-diy-grid></sample-diy-grid>
+    </section>
+
+    <things-spinner id="spinner" loading=false></things-spinner>
+    
+    <paper-toast id="toast" class="Toast" duration="8000"></paper-toast>
+
+  </template>
+
+</body>
+</html>
