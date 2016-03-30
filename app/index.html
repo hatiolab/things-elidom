@@ -39,7 +39,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 				<iron-pages attr-for-selected="data-route" selected="{{route}}" class="content">
 					<!-- Dynamic Menu Page -->
 					<template is="dom-repeat" items="{{screens}}" as=screen filter="isDynamicScreen">
-						<!-- Dynamic Screen -->
+						<!-- Dynamic Resource Screen -->
 					  
 					  <!--things-attachment-content -->
 					  <things-resource-content 
@@ -53,6 +53,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 					  <!--/things-attachment-content-->
 					  
 					</template>
+
+					<template is="dom-repeat" items="{{screens}}" as=screen filter="isDiyScreen">
+						<!-- Dynamic Diy Screen -->
+					  
+					  <things-diy-content 
+							data-route="{{screen.routing}}"
+							menu-id="{{screen.id}}"
+							resource-url="[[screen.routing]]"
+							current-route="[[route]]"
+							layout="fullbleed layout vertical">
+						</things-diy-content>
+					  
+					</template>					
 
 					<!-- Static Menu Page -->
 					{% include "things-pages.html" %}
@@ -89,8 +102,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		var app = document.querySelector('#app');
 
 		app.isDynamicScreen = function(screen) {
-			return screen.isDynamic;
+			return screen.routing_type == 'RESOURCE';
 		};
+
+		app.isDiyScreen = function(screen) {
+			return screen.routing_type == 'DIY';
+		};		
   </script>
   <!-- endbuild-->
 

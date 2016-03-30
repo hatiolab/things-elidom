@@ -1,0 +1,199 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
+
+<script>
+
+window.Things = window.Things || {};
+
+/**
+ * 구성하고자 하는 리소스 화면 구성을 위해 모델 정보를 제공하는 Behavior
+ * 리소스의 메타 데이터를 조회하는 URL 구성과 메타 데이터를 받은 후 검색 폼, 그리드, 디테일 폼에 필요한 모델 정보를 제공한다.
+ *
+ * @demo ./things-content/demo/demo-things-diy-meta-behavior.html
+ */
+Things.DiyMetaBehaviorImpl = {
+
+	properties: {
+		/**
+		 * menu id
+		 */
+		menuId: {
+			notify: true
+		},
+
+		/**
+		 * resource에 대한 대표 URL
+		 * ex) User resource라고 하면 users
+		 */
+		resourceMetaUrl: {
+			type: String,
+			computed: '_computeDiyMeta(menuId)'
+		},
+
+		/**
+		 * resource 대표 url
+		 */
+		resourceUrl: {
+			type: String
+		},
+
+		/**
+		 * Screen layout
+		 */
+		layout: {
+			type: String
+		},
+
+		/**
+		 * 화면 타이틀 
+		 */
+		title: {
+			type: String
+		},
+
+		/**
+		 * resource meta data
+		 * resource metaData로 fromFields, gridModel, gridColumns를 파싱한다. 
+		 */
+		metaData: {
+			type: Array,
+			observer: 'parseMetaData'
+		},
+
+		/**
+		 * Search form fields
+		 */
+		searchFormFields: {
+			type: Array
+		},
+
+		/**
+		 * Resource form fields
+		 */
+		resourceFormFields: {
+			type: Array
+		},
+
+		/**
+		 * Grid Configurations
+		 */
+		gridConfigs: {
+			type: Object
+		},
+
+		/**
+		 * Grid model
+		 */
+		gridModel: {
+			type: Array
+		},
+
+		/**
+		 * Grid columns
+		 */
+		gridColumns: {
+			type: Array
+		}
+	},
+
+	/**
+	 * menuId로 menu meta url을 생성
+	 * @param {String} menuId
+	 * @return {String} get menu meta URL
+	 */
+	_computeDiyMeta: function(menuId) {
+		return 'menus/' + menuId + '/meta.json';
+	},
+
+	/**
+	 * meta data를 파싱한다.
+	 * @param {Array} metaData
+	 */
+	parseMetaData: function(metaData) {
+		if(!metaData) return;
+		
+		if(!metaData.form) {
+			this.openInfoMsg({ title : 'Invalid Form Meta Data', text : 'Form configurations of this menu are not set!', type : 'error', timer : 5000 });
+			return;
+		}
+
+		if(!metaData.grid) {
+			this.openInfoMsg({ title : 'Invalid Grid Meta Data', text : 'Grid configurations of this menu are not set!', type : 'error', timer : 5000 });
+			return;
+		}
+
+		// 0. Parse Form Meta Data
+		this.resourceUrl = metaData.form.url;
+		this.layout = metaData.form.layout;
+		this.title = metaData.form.title;
+		// 1. Parse Search Form Fields
+		this.searchFormFields = this._parseSearchFormFields(metaData.form);
+		// 2. Parse Resource Form Fields
+		this.resourceFormFields = this._parseResourceFormFields(metaData.form);
+		// 3. Parse Grid Configs
+		this.gridConfigs = this._parseGridConfigs(metaData.grid);		
+		// 3. Parse Grid Models
+		this.gridModel = this._parseGridModel(metaData.grid);
+		// 4. Parse Grid Columns
+		this.gridColumns = this._parseGridColumns(metaData.grid);
+	},
+
+	/**
+	 * meta data로 부터 SearchFormField를 파싱한다.
+	 * @param {Array} formMeta
+	 * @return {Array} searchFormFields
+	 */
+	_parseSearchFormFields: function(formMeta) {
+		if(!formMeta.searchs) return;
+		return JSON.parse(formMeta.searchs);
+	},
+
+	/**
+	 * meta data로 부터 ResourceFormField를 파싱한다.
+	 * @param {Array} formMeta
+	 * @return {Array} resourceFormFields
+	 */
+	_parseResourceFormFields: function(formMeta) {
+		if(!formMeta.details) return;
+		return JSON.parse(formMeta.details);
+	},
+
+	/**
+	 * meta data로 부터 Grid Configs를 파싱한다.
+	 * @param {Array} gridMeta
+	 * @return {Array} gridConfigs
+	 */
+	_parseGridConfigs: function(gridMeta) {
+		if(!gridMeta.config) return;
+		return JSON.parse(gridMeta.config);
+	},
+
+	/**
+	 * meta data로 부터 GridModel을 파싱한다.
+	 * @param {Array} gridMeta
+	 * @return {Array} gridModel
+	 */
+	_parseGridModel: function(gridMeta) {
+		if(!gridMeta.fields) return;
+		return JSON.parse(gridMeta.fields);
+	},
+
+	/**
+	 * meta data로 부터 GridColumns를 파싱한다.
+	 * @param {Array} gridMeta
+	 * @return {Array} gridColumns
+	 */
+	_parseGridColumns: function(gridMeta) {
+		if(!gridMeta.columns) return;
+		return JSON.parse(gridMeta.columns);
+	}
+
+};
+
+Things.DiyMetaBehavior = [
+	Things.DiyMetaBehaviorImpl,
+	Things.MsgBoxBehavior
+];
+
+</script>

@@ -235,7 +235,8 @@
 							groups.push(item);
 
 						} else if(item.menu_type === 'SCREEN') {
-							item.isDynamic = (item.routing_type && item.routing_type != 'STATIC');
+							// item.isDynamic = (item.routing_type && item.routing_type == 'RESOURCE');
+							// item.isDiy = (item.routing_type && item.routing_type != 'DIY');
 							screens.push(item);
 						}
 					});
