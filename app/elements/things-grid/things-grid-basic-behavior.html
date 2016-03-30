@@ -389,7 +389,7 @@ Things.GridBasicBehaviorImpl = {
             } else {
                 cols = columns;
             }
-            this.grid.checkBar().setVisible(this.enableCheckBox);
+            // this.grid.checkBar().setVisible(this.enableCheckBox);
             this.grid.setColumns(cols);
             this.grid.rowIndicator().setStateVisible(true);
             this.grid.resetSize();
@@ -406,7 +406,7 @@ Things.GridBasicBehaviorImpl = {
             config = JSON.parse(config);
         }
 
-        if(config && config.length > 0 && this.grid){
+        if(config && this.grid){
 			Object.keys(config).forEach(function(objectKey) {
 	            switch (objectKey) {
 	                case 'body':
@@ -449,6 +449,23 @@ Things.GridBasicBehaviorImpl = {
 	                default: break;
 	            }
 	        });
+        }
+
+        if((typeof config == "undefined" || config == null)&&this.grid){
+            if(this.readonly){
+                this.grid.setEditOptions({
+                    readOnly : true
+                });
+
+            }else{
+                this.grid.setEditOptions({
+                    deletable: true,
+                    insertable: true,
+                    appendable: true,
+                    updateByCell: true,
+                    enterToNextRow: true
+                });
+            }
         }
 
     },
