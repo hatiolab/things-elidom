@@ -14,8 +14,7 @@
 <link rel="import" href="../things-form/things-resource-form.html">
 <link rel="import" href="../things-form/things-search-form.html">
 
-<link rel="import" href="./things-resource-meta-behavior.html">
-<link rel="import" href="./things-route-content-behavior.html">
+<link rel="import" href="../things-content/things-resource-meta-behavior.html">
 
 <!--
 하나의 리소스에 대한 기본 액션 (List, Create, Find, Upate, Delete) 및 Import, Export 등의 기능을 제공하는 화면 셋 
@@ -24,17 +23,17 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 
 	Example:
 
-	<things-resource-content 
+	<things-selector-content 
 	  title="Terminology"
 	  resource-name="Terminology"
 	  resource-url="terminologies"
 	  layout="fullbleed layout vertical">
-	</things-resource-content>
+	</things-selector-content>
 
 @demo ./things-content/demo/index.html
 -->
 
-<dom-module id="things-resource-content">
+<dom-module id="things-selector-content">
 	<template>
 		<style>
 			:host {
@@ -45,6 +44,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 
 		<div class="[[layout]]">
 			<things-resource 
+				auto
 				id="resource-meta"
 				method="GET"
 				action="[[resourceMetaUrl]]"
@@ -81,24 +81,15 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				readonly = "[[readonly]]"
 				enable-check-box ="[[enableCheckBox]]">
 			</things-resource-grid>
-
-			<things-resource-form 
-				id="resource-form"
-				title="[[title]] Detail"
-				resource-url="[[memberResourceUrl]]"
-				form-fields="[[resourceFormFields]]" 
-				input="{{selectedRow}}">
-			</things-resource-form>
 		</div>
 	</template>
 
 	<script>
 		Polymer({
-			is: 'things-resource-content',
+			is: 'things-selector-content',
 
 			behaviors: [ 
-				Things.ResourceMetaBehavior,
-				Things.RouteContentBehavior
+				Things.ResourceMetaBehavior
 			],
 			
 			properties: {
@@ -114,14 +105,6 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				 */
 				title: {
 					type: String
-				},
-
-				/**
-				 * 그리드 저장 (Multiple Save) URL
-				 */
-				gridSaveUrl: {
-					type: String,
-					computed: '_computeGridSaveUrl(resourceUrl)'
 				},
 
 				/**
@@ -159,18 +142,9 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			},
 
 			listeners : {
-				'grid.things-grid-detail-tap': '_showResourceForm',
-				'grid.things-grid-save-success': '_refreshGridData',
-				'resource-form.things-resource-form-saved' : '_refreshGridData'
-			},
-
-			/**
-			 * resourceUrl로 grid save url을 생성
-			 * @param {String} resourceUrl
-			 * @return {String} grid save URL
-			 */
-			_computeGridSaveUrl: function(resourceUrl) {
-				return resourceUrl + '/update_multiple.json';
+				// 'grid.things-grid-detail-tap': '_showResourceForm',
+				// 'grid.things-grid-save-success': '_refreshGridData',
+				// 'resource-form.things-resource-form-saved' : '_refreshGridData'
 			},
 
 			/**
@@ -182,35 +156,35 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				return resourceUrl + '/:id';
 			},
 
-			/**
-			 * open resource form dialog
-			 * @param event 그리드에서 선택된 event
-			 */
-			_showResourceForm: function(event) {
-				this.$['resource-form'].openResourceForm(event.detail);
-			},
+			// /**
+			//  * open resource form dialog
+			//  * @param event 그리드에서 선택된 event
+			//  */
+			// _showResourceForm: function(event) {
+			// 	this.$['resource-form'].openResourceForm(event.detail);
+			// },
 
 			/**
 			 * research form
 			 */
-			_refreshGridData: function(grid) {
+			refreshGridData: function(grid) {
 				this.$['search-form'].getMyForm().submit();
-			},
-
-			/**
-			 * 메뉴에 등록된 자신의 routing 정보를 리턴한다.
-			 */
-			getMyRoute: function() {
-				return this.resourceUrl;
-			},
-
-			/**
-			 * 화면 초기화 함수 
-			 * 메타 데이터를 서버로 요청하여 화면을 구성한다.
-			 */
-			initializeContent: function() {
-				this.$['resource-meta'].generateRequest();
 			}
+
+			// /**
+			//  * 메뉴에 등록된 자신의 routing 정보를 리턴한다.
+			//  */
+			// getMyRoute: function() {
+			// 	return this.resourceUrl;
+			// },
+
+			// /**
+			//  * 화면 초기화 함수 
+			//  * 메타 데이터를 서버로 요청하여 화면을 구성한다.
+			//  */
+			// initializeContent: function() {
+			// 	this.$['resource-meta'].generateRequest();
+			// }
 
 		});
 	</script>

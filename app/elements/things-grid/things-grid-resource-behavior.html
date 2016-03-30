@@ -56,13 +56,22 @@ Things.GridResourceBehaviorImpl = {
 	 */
 	afterGridConfigured: function() {
 		this.grid.rowIndicator().setStateVisible(true);
-		this.grid.setEditOptions({
-			deletable: true,
-			insertable: true,
-			appendable: true,
-			updateByCell: true,
-			enterToNextRow: true
-		});
+		
+		if(this.readonly){
+
+			this.grid.setEditOptions({
+				readOnly : true
+			});
+
+		}else{
+			this.grid.setEditOptions({
+				deletable: true,
+				insertable: true,
+				appendable: true,
+				updateByCell: true,
+				enterToNextRow: true
+			});
+		}
 		// this.grid.editOptions().setUpdateByCell(true);
 	},
 

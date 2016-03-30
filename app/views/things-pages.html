@@ -60,10 +60,12 @@
 
         <things-resource-dropdown-selector
             id="resouceDropSelector"
-            grid-fields-url ="diy_services/ElidomGridModel/query.json"
-            grid-columns-url ="diy_services/ElidomGridColumn/query.json"
-            resource="terminologies" 
-            action="" 
+            title="Terminologies"
+            resource-name="Terminology"
+            resource-url="terminologies"
+            root-property ="items"
+            total-property ="total"
+            layout="fullbleed layout vertical"
             selected-row = "{{dropSelectedRow}}">
         </things-resource-dropdown-selector>
 
@@ -80,11 +82,13 @@
 
         <things-resource-dialog-selector
             id="resouceDialogSelector"
-            grid-fields-url ="diy_services/ElidomGridModel/query.json"
-            grid-columns-url ="diy_services/ElidomGridColumn/query.json"
-            resource="terminologies" 
-            action="" 
-            selected-row = "{{selectedRow}}">
+            title="Terminologies"
+            resource-name="Terminology"
+            resource-url="terminologies"
+            root-property ="items"
+            total-property ="total"
+            layout="fullbleed layout vertical"
+            selected-row = "{{dropSelectedRow}}">
         </things-resource-dialog-selector>
 
     </paper-material>

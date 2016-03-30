@@ -50,11 +50,16 @@ Things.RouteContentBehavior = {
 	_currentRouteChange: function(currentRoute) {
 		var myRoute = this.getMyRoute();
 		this.active = (myRoute == currentRoute);
-
+		this._activeContent();
+	},
+	/**
+	 * Content Activation
+	 */
+	_activeContent:function(){
 		if(this.active && !this.isConfigured) {
 			this.initializeContent();
 			this.isConfigured = true;
-		} 
+		}
 	}
 
 };

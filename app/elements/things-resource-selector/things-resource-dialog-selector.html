@@ -1,3 +1,4 @@
+<link rel="import" href="things-dialog-selector.html">
 <!--
 A comment describing this element
 
@@ -85,108 +86,66 @@ Example:
 
 		<things-dialog-selector id ="thingsSelector">
 			<div class="selector-content random-content">
-				<things-basic-grid 
-				  id="grid"
-				  grid-model="[[gridModel]]" 
-				  columns="[[gridColumns]]" 
-				  read-data="[[gridData]]"
-				  page="{{page}}"
-				  limit="{{limit}}"
-				  root-property="items"
-				  total-property="total"
-				  infinitable
-				  paginatable
-				  enable-check-box = "[[enableCheckBox]]"
-				  selected-row-data="{{selectedRow}}"
-				  page-start-idx="{{pageStartIdx}}"
-				  page-end-idx="{{pageEndIdx}}">
-				</things-basic-grid>
-
-				<things-resource 
-				  id="search"
-				  resource="[[resource]]"
-				  action="[[action]]"
-				  selectFields ="[[selectFields]]"
-				  sortFields ="[[sortFields]]"
-				  queryFields ="[[queryFields]]"
-				  method="GET"
-				  content-type="application/json"
-				  last-response="{{gridData}}">
-				</things-resource>
+				<things-selector-content
+					id="selectorContent"
+					title="[[title]]"
+					resource-name="[[resourceName]]"
+					resource-url="[[resourceUrl]]"
+					root-property ="[[rootProperty]]"
+					total-property ="[[totalProperty]]"
+					layout="[[layout]]"
+					selected-row ="[[selectedRow]]"
+					enable-check-box ="[[enableCheckBox]]"
+					is-screen-content ="[[_isScreenContent]]"
+					readonly ="[[readonly]]">
+				</things-selector-content>
 			</div>
 		</things-dialog-selector>
 	</template>
 	<script>
 		Polymer({
 			is: 'things-resource-dialog-selector',
-			properties:{
+properties:{
 				/**
-				 * 그리드 모델 URL
+				 * 그리드 title
 				 * @type {[type]}
 				 */
-				gridFieldsUrl:String,
+				title:String,
 				/**
-				 * 그리드 칼럼 URL
+				 * 그리드 resource name
 				 * @type {[type]}
 				 */
-				gridColumnsUrl:String,
+				resourceName:String,
 				/**
-				 * resouce 대표 URL
+				 * 그리드 resource url
 				 */
-				resouce:{
-					type:Object
+				resourceUrl:{
+					type : String,
+					value:''
 				},
 				/**
-				 * action for search codes
+				 * screen layout
 				 */
-				action:{
-					type:String
+				layout:{
+					type: String,
+					value:'fullbleed layout vertical'
+				},
+				/**
+				 * Search Form에서 검색 결과 Object 중에서 List를 나타내는 프로퍼티 
+				 * 검색 폼 프로퍼티와 그리드 프로퍼티의 연결 프로퍼티 
+				 */
+				rootProperty: {
+					type: String,
+					value: 'items'
 				},
 
 				/**
-				 * query result
+				 * Search Form에서 검색 결과 Object 중에서 Total을 나타내는 프로퍼티 
+				 * 검색 폼 프로퍼티와 그리드 프로퍼티의 연결 프로퍼티 
 				 */
-				listItems:{
-					type:Object,
-					computed:'_computeListItems(gridData)'
-				},
-				/**
-				 * 검색하고자 하는 필드명을 구분자 ','로 구분하여 설정 
-				 *
-				 * select fields - 'id,name,description,category'
-				 */
-				selectFields: {
-					type: String
-				},
-
-				/**
-				 * 소팅하고자 하는 필드명과 ascending 여부, ascending인 경우 true, descending인 경우 false
-				 *
-				 * sort fields - [{ field : 'fieldName1', ascending : true }, { field : 'fieldName2', ascending : false }]
-				 */
-				sortFields: {
-					type: Array
-				},
-				
-				/**
-				 * 검색 조건 필드명과 조건 그리고 값 오브젝트에 대한 Array
-				 *
-				 * query fields - [{ name : 'name', operator : 'like', value : 'hatio' }, { field : 'active_field', value : true }]
-				 */
-				queryFields: {
-					type: Array
-				},
-				/**
-				 * 그리드 구성을 위한 데이타 모델
-				 */
-				gridModel:{
-					type:Object
-				},
-				/**
-				 * 그리드의 Column Configuration
-				 */
-				gridColumns:{
-					type:Object
+				totalProperty: {
+					type: String,
+					value: 'total'
 				},
 				/**
 				 * 선택된 데이타의 오브젝트
@@ -201,6 +160,13 @@ Example:
 				enableCheckBox:{
 					type:Boolean,
 					value:false
+				},
+				/**
+				 * if readonly grid or not
+				 */
+				readonly:{
+					type:Boolean,
+					value:true
 				}
 			},
 			/**
@@ -227,7 +193,7 @@ Example:
 			 * dropdown Open
 			 */
 			open:function(){
-				this.$.search.generateRequest();
+				this.$.selectorContent.refreshGridData();
 				this.$.thingsSelector.open();
 			}
 		});

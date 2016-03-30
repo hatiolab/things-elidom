@@ -82,7 +82,7 @@
 		<paper-material elevation="1" class="flex">
 			<div id="{{gridContainerId}}"></div>
 		
-			<paper-toolbar id="_gridToolbar" class="white">
+			<paper-toolbar id="_gridToolbar" class="white" hidden$="{{readonly}}">
 				<div class="bottom fit">
 					<things-paginator 
 						hidden$="{{infinitable}}"
