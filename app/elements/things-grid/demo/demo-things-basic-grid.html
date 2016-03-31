@@ -80,39 +80,29 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 
       <section>
         <things-resource 
+          id="resource-meta"
           auto
-          action="diy_services/ElidomGridModel/query.json" 
-          last-response="{{gridModel}}">
-        </things-resource>
-
-        <things-resource 
-          auto
-          action="diy_services/ElidomGridColumn/query.json" 
-          last-response="{{gridColumns}}">
+          method="GET"
+          action="diy_grids/2.json"
+          last-response="{{metaData}}">
         </things-resource>
 
         <things-basic-grid 
           id="grid"
-          grid-model="[[gridModel]]" 
-          columns="[[gridColumns]]" 
-          read-data="[[gridData]]"
-          page="{{page}}"
-          limit="{{limit}}"
-          root-property="items"
-          total-property="total"
-          selected-row-data="{{selectedRow}}"
-          page-start-idx="{{pageStartIdx}}"
-          page-end-idx="{{pageEndIdx}}">
+          model="[[metaData.fields]]" 
+          columns="[[metaData.columns]]"
+          config="[[metaData.config]]" 
+          data="[[gridData]]">
         </things-basic-grid>
 
         <things-resource 
           id="search-resource"
-          resource="terminologies"
-          action="" 
-          method="GET"
+          resource="diy_services/DynamicScreen/query.json"
+          action=""
           content-type="application/json"
           last-response="{{gridData}}">
         </things-resource>
+        
       </section>
     </template>
 
@@ -128,7 +118,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
         search: function(e) {
           var grid = this.$.grid;
           var resource = this.$['search-resource'];
-          resource.params = { page : grid.page, limit : grid.limit };
+          // resource.params = { page : grid.page, limit : grid.limit };
           resource.generateRequest();
         }
 
