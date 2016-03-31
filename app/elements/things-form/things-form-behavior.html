@@ -169,7 +169,8 @@ Things.FormBehaviorImpl = {
 	_keyPressHandler: function(event) {
 		var code = event.keyCode;
 		if(code == 13) {
-			this.submitMyForm(event);
+			if(this.page == 1) this.submitMyForm();
+			else this.page = 1;
 		}
 	},
 

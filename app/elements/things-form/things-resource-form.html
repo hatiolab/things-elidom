@@ -21,6 +21,7 @@
 <link rel="import" href="../../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
 
+<link rel="import" href="../things-content/things-load-view-behavior.html">
 <link rel="import" href="./things-form-behavior.html">
 
 <!--
@@ -129,35 +130,35 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			}
 		</style>
 
-		<paper-fullscreen-dialog
+		<!--paper-fullscreen-dialog
 			id="resource-dialog"
 			modal="true"
 			dismiss-icon="close">
 
 			<h2>{{title}}</h2>
 			
-			<paper-button affirmative dialog-confirm on-tap="saveResourceForm">Save</paper-button>
+			<paper-button affirmative dialog-confirm on-tap="saveResourceForm">Save</paper-button-->
 			
-			<paper-tabs selected="0">
-  			<paper-tab>Basic</paper-tab>
-  			<paper-tab>ITEM TWO</paper-tab>
-  			<paper-tab>ITEM THREE</paper-tab>
-			</paper-tabs>
+		<paper-toolbar>
+			<span class="title">[[title]]</span>
+			<things-button color='green' id='save-btn' on-tap='saveResourceForm'>Save</things-button>
+		</paper-toolbar>
 
-			<form
-					is="iron-form" 
-					id="resource-form" 
-					action=[[action]]
-					headers="[[headers]]"
-					content-type="application/json"
-					method="[[method]]"
-					last-response="{{lastResponse}}">
-				<div class="layout horizontal flex">
-					<div id="left-fields" class="layout vertical flex fields"></div>
-					<div id="right-fields" class="layout vertical flex fields"></div>
-				</div>
-			</form>
-		</paper-fullscreen-dialog>
+		<form
+			is="iron-form" 
+			id="resource-form" 
+			action=[[action]]
+			headers="[[headers]]"
+			content-type="application/json"
+			method="[[method]]"
+			last-response="{{lastResponse}}">
+			<div class="layout horizontal flex">
+			<div id="left-fields" class="layout vertical flex fields"></div>
+			<div id="right-fields" class="layout vertical flex fields"></div>
+			</div>
+		</form>
+
+		<!--/paper-fullscreen-dialog-->
 
 		<things-resource 
 			id="member-resource"
@@ -209,7 +210,8 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 
 			behaviors: [
 				Things.FormBehavior,
-				Polymer.IronResizableBehavior
+				Polymer.IronResizableBehavior,
+				Things.LoadViewBehavior
 			],
 
 			/**
@@ -242,10 +244,10 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 				'iron-resize': '_screenResizeHandler',
 				'iron-form-presubmit' :'_preSubmitHandler',
 				'member-resource.things-resource-ajax-success' : '_successResponseHandler',
-				'member-resource.things-resource-ajax-error' : '_errorResponseHandler',
-				'resource-dialog.iron-overlay-closed': 'clearResourceForm',
-				'resource-dialog.iron-overlay-canceled': 'clearResourceForm',
-				'resource-dialog.iron-overlay-opened': '_resourceFormOpenHandler'				
+				'member-resource.things-resource-ajax-error' : '_errorResponseHandler'
+				//'resource-dialog.iron-overlay-closed': 'clearResourceForm',
+				//'resource-dialog.iron-overlay-canceled': 'clearResourceForm',
+				//'resource-dialog.iron-overlay-opened': '_resourceFormOpenHandler'				
 			},
 
 			/**
@@ -262,7 +264,7 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 						this.$['right-fields'].appendChild(newElement);
 					}
 				}
-			},			
+			},
 
 			/**
 			 * save data from resource detail screen
@@ -299,12 +301,12 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 				}
 
 				this.findResource(data.id);
-				this.$['resource-dialog'].toggle();
+				this.popupResourceForm(this, true);
 			},
 
 			/**
 			 * 리소스 아이디로 서버에 리소스를 조회 요청한다.
-			 * @param {Object} resourceId
+			 * @param {String} resourceId
 			 */
 			findResource: function(resourceId) {
 				var resourceGetter = this.$['member-resource'];
@@ -318,7 +320,7 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			/**
 			 * 리소스 폼 내부의 모든 엘리먼트들을 클리어한다.
 			 */
-			clearResourceForm: function(event) {
+			/*clearResourceForm: function(event) {
 				if(event.srcElement.id == 'resource-dialog') {
 					while(this.$['left-fields'].childNodes.length > 0 || this.$['right-fields'].childNodes.length > 0) {
 						if(this.$['left-fields'].childNodes[0]) {
@@ -330,24 +332,25 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 						}
 					}
 				}
-			},
+			},*/
 
 			/**
+			 * TODO 제거할 지 확인 필요 
 			 * resize handler. 화면 크기가 변할 때 폼 사이즈도 함께 변경 
 			 */
 			_screenResizeHandler: function(event) {
-				this.getMyForm().style.width = this.parentNode.offsetWidth + 'px';
+				//this.getMyForm().style.width = this.parentNode.offsetWidth + 'px';
 			},
 
 			/**
 			 * Resource Form이 오픈 된 후 처리 
 			 */
-			_resourceFormOpenHandler: function(event) {
+			/*_resourceFormOpenHandler: function(event) {
 				if(event.srcElement.id == 'resource-dialog') {
 					this.$['resource-dialog'].refit();
 					this.fire('things-resource-form-opened', this.$['resource-form'], this.$['resource-dialog']);
 				}
-			},
+			},*/
 
 			/**
 			 * Resource가 변경될 때 

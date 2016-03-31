@@ -1,0 +1,70 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
+
+<!--
+애플리케이션에 단 하나만 존재하고 다이얼로그가 오픈 될 때 마다 화면 구성을 다시하여 오픈한다. 
+
+  Example:
+
+  <things-full-dialog></things-full-dialog>
+
+@demo ./things-content/demo/demo-full-dialog.html
+-->
+
+<dom-module id="things-full-dialog">
+
+  <template>
+    <paper-dialog 
+      id='dialog' 
+      entry-animation="scale-up-animation"
+      exit-animation="fade-out-animation">
+    </paper-dialog>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'things-full-dialog',
+      
+      properties: {
+        /**
+         * Dialog 내에 포함될 뷰 
+         */
+        detailView: {
+          type: Object
+        }
+      },
+
+      /**
+       * View를 Full Screen 다이얼로그 내에 오픈한다.
+       *
+       * @param {Object} view 오픈할 view
+       * @param {Boolean} modal modal로 오픈할 지 여부
+       */
+      openFullScreenDialog: function(view, modal) {
+        // TODO
+      },
+
+      /**
+       * View를 기본적인 다이얼로그 내에 오픈한다.
+       *
+       * @param {Object} view 오픈할 view
+       * @param {Boolean} modal modal로 오픈할 지 여부
+       */
+      openBasicDialog: function(view, modal) {
+        var dialog = this.$.dialog;
+        dialog.modal = modal;
+        dialog.noCancelOnEscKey = false;
+
+        if(this.detailView) {
+          dialog.removeChild(this.detailView);
+        } 
+        
+        this.detailView = view;
+        dialog.appendChild(this.detailView);
+        dialog.toggle();
+      }
+
+    });
+  </script>
+
+</dom-module>

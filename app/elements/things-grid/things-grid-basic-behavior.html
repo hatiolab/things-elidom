@@ -1,16 +1,21 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
+
 <link rel="import" href="../things-id/things-guid-behavior.html">
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 <link rel="import" href="../things-setting/things-global-behavior.html">
 <link rel="import" href="../things-spinner/things-spinner-behavior.html">
+
 <script src='../../../lib/grid/dataludi.lic.eval-1.2.0.min.js'></script>
 <script src='../../../lib/grid/dataludi.eval-1.2.1.min.js'></script>
+
 <script>
+
 window.Things = window.Things || {};
 
 /**
- * var Things.GridBasicBehavior enables a custom element to be included in an things-grid-behavior
+ * 가장 기본적인 그리드 
+ * dataludi grid를 사용하고 중요한 설정사항은 크게 grid config, grid fields (model), grid columns 설정이 있다.
  *
  * @demo ./things-grid/demo/index.html
  */
@@ -30,7 +35,7 @@ Things.GridBasicBehaviorImpl = {
          */
         appending:{
             type: Boolean,
-            value:false
+            value: false
         },
         /**
          * grid data model - array of fields
@@ -62,10 +67,11 @@ Things.GridBasicBehaviorImpl = {
             type: Object,
             observer: '_afterReadGridData'
         },
+
         /**
          * configure event 
          */
-        events:{
+        events: {
             type: Object
         },
 
@@ -86,6 +92,7 @@ Things.GridBasicBehaviorImpl = {
             notify: true,
             readonly: true
         },
+
         /**
          * grid container id
          * grid container id가 중복이 되면 grid가 다른 grid container에 생성될 수 있으므로 id는 자동 증가하도록 한다.
@@ -94,6 +101,7 @@ Things.GridBasicBehaviorImpl = {
             type: String,
             readonly: true
         },
+
         /**
          * grid data set
          */
@@ -112,12 +120,13 @@ Things.GridBasicBehaviorImpl = {
             type: Object,
             readonly: true
         },
+
         /**
          * enable detail column or not
          */
-        enableDetailColumn:{
+        enableDetailColumn: {
             type: Boolean,
-            value:false
+            value: false
         }
     },
 
@@ -150,9 +159,13 @@ Things.GridBasicBehaviorImpl = {
                     background: '#20006060'
                 }
             }]);
+
+            this.grid._container_ = this;
+            this.registerGridEvent();
         }
-                // grid 구성 후 액션
-        if (this.afterGridInitiate&&this.grid) {
+        
+        // grid 구성 후 액션
+        if (this.afterGridInitiate && this.grid) {
             this.afterGridInitiate();
         }
     },
@@ -178,9 +191,7 @@ Things.GridBasicBehaviorImpl = {
      * attribute 중에 Event 값이 설정되어 있다면 그것으로 이벤트 핸들러를 등록한다.
      */
     registerGridEvent: function() {
-        if (typeof(this.events) !== 'undefined') {
-            this.grid._container_ = this;
-
+        if (this.events) {
             for (var eventName in this.events) {
                 this.grid[eventName] = this[this.events[eventName]];
             }
@@ -230,7 +241,7 @@ Things.GridBasicBehaviorImpl = {
      * set model fields to grid
      */
     _setGridModel: function(gridModel) {
-        if(typeof(gridModel)==='string'){
+        if(typeof(gridModel)==='string') {
             gridModel = JSON.parse(gridModel);
         }
         
@@ -285,19 +296,17 @@ Things.GridBasicBehaviorImpl = {
      */
     _setGridConfig: function(config) {
         var me = this;
-        // config = JSON.parse(config);
-        if(typeof(config)==='string'){
+
+        if(typeof(config) === 'string') {
             config = JSON.parse(config);
         }
 
         if((typeof config == "undefined" || config == null)&&this.grid){
-            this.grid.setEditOptions({
-                readOnly : true
-            });
+            this.grid.setEditOptions({ readOnly : true });
             return;
         }
 
-        if(config && this.grid){
+        if(config && this.grid) {
 			Object.keys(config).forEach(function(objectKey) {
 	            switch (objectKey) {
 	                case 'body':
@@ -337,13 +346,6 @@ Things.GridBasicBehaviorImpl = {
 	                    me.grid.setSummaryMode(SummaryMode);
 	                    break;
 
-	                // case 'event':
-	                // 	config[objectKey].forEach(function(event){
-		               //  	me.gridEvents.push(event);	
-	                // 	});
-	                // 	me.registerGridEvent();
-                 //        break;
-
 	                case 'button':
 	                	config[objectKey].forEach(function(button){
 		                	me.buttons.push(button);	
@@ -358,10 +360,8 @@ Things.GridBasicBehaviorImpl = {
 	            }
 	        });
         }
-
-        if(this.events && this.grid) this.registerGridEvent();
-
     },
+
     /**
      * after read data
      * @param data
@@ -380,6 +380,34 @@ Things.GridBasicBehaviorImpl = {
                 this.dataSet.setRows(data);
             }
         }
+    },
+
+    /**
+     * Dataludi grid cell click 이벤트 핸들러 
+     */
+    _gridCellClicked: function(grid, cellData) {
+        var thingsGrid = grid._container_;
+
+        if (cellData && cellData.dataColumn() && cellData.getDataIndex(grid) >= 0) {
+            var rowIndex = cellData.getDataIndex(grid);
+            var colIndex = cellData.dataField();
+            var row = grid.focusedRow();
+
+            if (row && row.dataIndex() >= 0) {
+                thingsGrid.selectedRowData = row.getRowObject();
+                thingsGrid.fire('things-grid-row-data-select', thingsGrid.selectedRowData);
+            }
+
+            if(cellData.dataField() >= 0) {
+                thingsGrid.selectedCellData = thingsGrid.dataSet.getValue(rowIndex, colIndex);
+                thingsGrid.fire('things-grid-cell-data-select', thingsGrid.selectedCellData);
+            }
+            
+            if (thingsGrid.enableDetailColumn && cellData.dataField() < 0) {
+                thingsGrid.selectedRowData = row.getRowObject();
+                thingsGrid.fire('things-grid-detail-tap', thingsGrid.selectedRowData);
+            }
+        }
     }
 
 };
@@ -391,4 +419,5 @@ Things.GridBasicBehavior = [
     Things.SpinnerBehavior,
     Things.GUIDBehavior
 ];
+
 </script>
