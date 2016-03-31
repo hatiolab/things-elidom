@@ -77,7 +77,8 @@ Things.GridBasicBehaviorImpl = {
          * grid container id가 중복이 되면 grid가 다른 grid container에 생성될 수 있으므로 id는 자동 증가하도록 한다.
          */
         gridContainerId: {
-            type: String
+            type: String,
+            readonly: true
         },
         /**
          * grid data set
@@ -86,14 +87,16 @@ Things.GridBasicBehaviorImpl = {
             type: Object,
             value: function() {
                 return DataLudi.createGridDataSet();
-            }
+            },
+            readonly: true
         },
 
         /**
          * dataludi grid
          */
         grid: {
-            type: Object
+            type: Object,
+            readonly: true
         }
     },
 
@@ -148,7 +151,7 @@ Things.GridBasicBehaviorImpl = {
      * attribute 중에 gridEvent 값이 설정되어 있다면 그것으로 이벤트 핸들러를 등록한다.
      */
     registerGridEvent: function() {
-        if (typeof(this.gridEvents) !== 'undefined') {
+        if (typeof(this.events) !== 'undefined') {
             this.grid._container_ = this;
 
             for (var eventName in this.gridEvents) {
@@ -217,9 +220,35 @@ Things.GridBasicBehaviorImpl = {
         if(typeof(columns)==='string'){
             columns = JSON.parse(columns);
         }
+        
+        if (this.enableDetailColumn) {
+            cols = [{
+                'name': 'Detail',
+                'width': '25',
+                'imageList': 'images',
+                'renderer': {
+                    'type': 'icon'
+                },
+                'styles': {
+                    'textAlignment': 'center',
+                    'iconIndex': 'iconDetail.png',
+                    'iconLocation': 'center'
+                },
+                'header': {
+                    'text': ' '
+                }
+            }];
 
-        if (columns && columns.length > 0 && this.grid) {
-            this.grid.setColumns(columns);
+            columns.forEach(function(item) {
+                cols.push(item);
+            });
+
+        } else {
+            cols = columns;
+        }
+
+        if (cols && cols.length > 0 && this.grid) {
+            this.grid.setColumns(cols);
             this.grid.resetSize();   
         }
     },
@@ -281,12 +310,12 @@ Things.GridBasicBehaviorImpl = {
 	                    me.grid.setSummaryMode(SummaryMode);
 	                    break;
 
-	                case 'event':
-	                	config[objectKey].forEach(function(event){
-		                	me.gridEvents.push(event);	
-	                	});
-	                	me.registerGridEvent();
-                        break;
+	                // case 'event':
+	                // 	config[objectKey].forEach(function(event){
+		               //  	me.gridEvents.push(event);	
+	                // 	});
+	                // 	me.registerGridEvent();
+                 //        break;
 
 	                case 'button':
 	                	config[objectKey].forEach(function(button){
@@ -302,6 +331,8 @@ Things.GridBasicBehaviorImpl = {
 	            }
 	        });
         }
+
+        if(this.events && this.grid) this.registerGridEvent();
 
         // grid 구성 후 액션 
         if (this.afterGridConfigured) {
