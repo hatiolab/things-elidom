@@ -80,14 +80,20 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
       <section>
         <things-diy-grid 
           id="grid"
-          resource-meta-url="diy_grids/1.json"
-          read-data="[[gridData]]"
+          resource-meta-url="diy_grids/2.json"
+          data="[[gridData.items]]"
+          paginatable
+          total-count ="[[gridData.total]]"
+          current-page="{{currentPage}}"
+          per-page="{{perPage}}"
+          page-start-idx="{{pageStartIdx}}"
+          page-end-idx="{{pageEndIdx}}"
           selected-row-data="{{selectedRow}}">
         </things-diy-grid>
 
         <things-resource 
           id="search-resource"
-          resource="rests"
+          resource="diy_services/DynamicScreen/query.json"
           action=""
           method="GET"
           content-type="application/json"
@@ -108,7 +114,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
         search: function(e) {
           var grid = this.$.grid;
           var resource = this.$['search-resource'];
-          resource.params = { page : grid.page, limit : grid.limit };
+          resource.params = { page : grid.currentPage, limit : grid.perPage };
           resource.generateRequest();
         }
 

@@ -38,24 +38,20 @@ pagination을 지원하고 데이터를 표시한 후 저장이나 삭제 등의
 
 		<things-resource-grid
 			id="grid"
-			grid-model="[[metaData.fields]]" 
+			model="[[metaData.fields]]" 
 			columns="[[metaData.columns]]"
 			config ="[[metaData.config]]"
-			read-data="[[readData]]"
-			page="{{page}}"
-			limit="{{perPage}}"
-			root-property="[[rootProperty]]"
-			total-property="[[totalProperty]]"
-			read-data="[[lastResponse]]"
+			data="[[data]]"
+			total-count ="[[totalCount]]"
+			current-page="{{currentPage}}"
+			per-page="{{perPage}}"
+			pagenatable
 			grid-save-action="[[gridSaveUrl]]"
 			selected-row-data="{{selectedRow}}"
 			export-file-name="[[title]]"
 			export-sheet-name="[[title]]"
-			readonly = "[[readonly]]"
-			enable-detail-column ="[[enableDetailColumn]]"
-			enable-check-box ="[[enableCheckBox]]">
+			enable-detail-column ="[[enableDetailColumn]]">
 		</things-resource-grid>
-
 
 	</template>
 
@@ -96,6 +92,10 @@ pagination을 지원하고 데이터를 표시한 후 저장이나 삭제 등의
 						onDataCellClicked : '_gridCellClicked',
 						onScrollToBottom :'_gridScrollToBottom'
 					}
+				},
+				paginatable:{
+					type:Boolean,
+					value:false
 				}
 
 				/**

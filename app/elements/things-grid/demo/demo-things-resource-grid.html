@@ -32,6 +32,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 
   <link rel="import" href="../things-grid-resource-behavior.html">
   <link rel="import" href="../things-resource-grid.html">
+  <link rel="import" href="demo-resource-content.html">
 
   <link rel="stylesheet" href="../../../bower_components/paper-styles/demo.css">
 
@@ -76,44 +77,16 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
     <template>      
       <things-setting id="setting"></things-setting>
 
-      <things-button color="green" id="search">Search</things-button>
+      <things-button color="green" id="search">Meta</things-button>
 
       <section>
-        <things-resource 
-          auto
-          action="diy_services/ElidomGridModel/query.json" 
-          last-response="{{gridModel}}">
-        </things-resource>
-
-        <things-resource 
-          auto
-          action="diy_services/ElidomGridColumn/query.json" 
-          last-response="{{gridColumns}}">
-        </things-resource>
-
-        <things-resource-grid 
-          id="grid"
-          grid-model="[[gridModel]]" 
-          columns="[[gridColumns]]" 
-          read-data="[[gridData]]"
-          page="{{page}}"
-          limit="{{limit}}"
-          root-property="items"
-          total-property="total"
-          grid-save-action="terminologies/update_multiple"
-          selected-row-data="{{selectedRow}}"
-          page-start-idx="{{pageStartIdx}}"
-          page-end-idx="{{pageEndIdx}}">
-        </things-resource-grid>
-
-        <things-resource 
-          id="search-resource"
-          resource="terminologies"
-          action="" 
-          method="GET"
-          content-type="application/json"
-          last-response="{{gridData}}">
-        </things-resource>
+          <demo-resource-content 
+            title="Terminology"
+            resource-name="Terminology"
+            resource-url="terminologies"
+            current-route="[[currentRoute]]"
+            layout="fullbleed layout vertical">
+          </demo-resource-content>
       </section>
     </template>
 
@@ -121,16 +94,24 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
       Polymer({
 
         is: 'sample-resource-grid',
+        propeties:{
+          currentRoute : String
+        },
 
         listeners: {
           'search.tap' : 'search'
         },
 
+        attached: function () {
+           // this.currentRoute ="terminologies" 
+        },
+
         search: function(e) {
-          var grid = this.$.grid;
-          var resource = this.$['search-resource'];
-          resource.params = { page : grid.page, limit : grid.limit };
-          resource.generateRequest();
+          this.currentRoute = "terminologies"
+          // var grid = this.$.grid;
+          // var resource = this.$['search-resource'];
+          // resource.params = { page : grid.page, limit : grid.limit };
+          // resource.generateRequest();
         }
 
       });

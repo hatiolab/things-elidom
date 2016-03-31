@@ -30,7 +30,11 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <link rel="import" href="../../things-spinner/things-spinner.html">
   <link rel="import" href="../../things-setting/things-setting.html">
 
-  <link rel="import" href="../things-grid-basic-behavior.html">
+<link rel="import" href="../../things-button/things-button.html">
+<link rel="import" href="../../things-button/things-button-group.html">
+<link rel="import" href="../../things-button/things-button-bar.html">
+<link rel="import" href="../../things-import-excel/things-import-excel-button.html">
+
   <link rel="import" href="../things-basic-grid.html">
 
   <link rel="stylesheet" href="../../../bower_components/paper-styles/demo.css">
@@ -92,7 +96,30 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
           model="[[metaData.fields]]" 
           columns="[[metaData.columns]]"
           config="[[metaData.config]]" 
-          data="[[gridData]]">
+          data="[[gridData.items]]"
+          total-count ="[[gridData.total]]"
+          per-page ="{{perPage}}"
+          current-page = "{{currentPage}}"
+          enable-toolbar
+          pagenatable>
+          <div class="grid-toolbar-content">
+            <things-import-excel-button 
+              color="green" 
+              id="import-btn"
+              sheet-name="Sheet1"
+              parsed-result="{{gridData}}">Import
+            </things-import-excel-button>
+
+            <things-button-bar id="button-group" buttons="[[buttons]]"></things-button-bar>
+
+            <things-resource 
+              id="save-resource"
+              content-type="application/json"
+              action="{{gridSaveAction}}" 
+              method = "POST"
+              params="{{writeData}}">
+            </things-resource>
+          </div>
         </things-basic-grid>
 
         <things-resource 
@@ -102,7 +129,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
           content-type="application/json"
           last-response="{{gridData}}">
         </things-resource>
-        
+
       </section>
     </template>
 
@@ -118,7 +145,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
         search: function(e) {
           var grid = this.$.grid;
           var resource = this.$['search-resource'];
-          // resource.params = { page : grid.page, limit : grid.limit };
+          resource.params = { page : grid.currentPage, limit : grid.perPage };
           resource.generateRequest();
         }
 

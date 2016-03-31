@@ -1,0 +1,214 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../../bower_components/iron-iconset/iron-iconset.html">
+<link rel="import" href="../../../bower_components/iron-iconset-svg/iron-iconset-svg.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="../../things-button/things-button.html">
+<link rel="import" href="../../things-resource/things-resource.html">
+<link rel="import" href="../../things-grid/things-resource-grid.html">
+<link rel="import" href="../../things-form/things-resource-form.html">
+<link rel="import" href="../../things-form/things-search-form.html">
+
+<link rel="import" href="../../things-content/things-resource-meta-behavior.html">
+<link rel="import" href="../../things-content/things-route-content-behavior.html">
+
+<!--
+하나의 리소스에 대한 기본 액션 (List, Create, Find, Upate, Delete) 및 Import, Export 등의 기능을 제공하는 화면 셋 
+
+Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그리드에서 레코드 하나를 선택할 경우 해당 레코드에 대한 Detail Form이 출력된다.
+
+	Example:
+
+	<things-resource-content 
+	  title="Terminology"
+	  resource-name="Terminology"
+	  resource-url="terminologies"
+	  layout="fullbleed layout vertical">
+	</things-resource-content>
+
+@demo ./things-content/demo/index.html
+-->
+
+<dom-module id="demo-resource-content">
+	<template>
+		<style>
+			:host {
+				display: block;
+				height: 100%;
+			}
+		</style>
+
+		<div class="[[layout]]">
+			<things-resource 
+				id="resources-meta"
+				method="GET"
+				action="[[resourceMetaUrl]]"
+				last-response="{{metaData}}">
+			</things-resource>
+
+			<things-search-form 
+				id="search-form"
+				class="flex"
+				active="[[active]]"
+				title="[[title]]"
+				form-fields="[[searchFormFields]]" 
+				action-url="[[resourceUrl]]" 
+				page="{{page}}"
+				per-page="[[perPage]]"
+				last-response="{{lastResponse}}">
+			</things-search-form>
+
+			<things-resource-grid 
+				id="grid"
+				model="[[gridModel]]" 
+				columns="[[gridColumns]]"
+				data="[[lastResponse.items]]"
+				total-count ="[[lastResponse.total]]"
+				current-page="{{page}}"
+				per-page="{{perPage}}"
+				grid-save-action="[[gridSaveUrl]]"
+				selected-row-data="{{selectedRow}}"
+				export-file-name="[[title]]"
+				export-sheet-name="[[title]]"
+				pagenatable>
+			</things-resource-grid>
+
+			<things-resource-form 
+				id="resource-form"
+				title="[[title]] Detail"
+				resource-url="[[memberResourceUrl]]"
+				form-fields="[[resourceFormFields]]" 
+				input="{{selectedRow}}">
+			</things-resource-form>
+		</div>
+	</template>
+
+	<script>
+		Polymer({
+			is: 'demo-resource-content',
+
+			behaviors: [ 
+				Things.ResourceMetaBehavior,
+				Things.RouteContentBehavior
+			],
+			
+			properties: {
+				/**
+				 * Screen layout
+				 */
+				layout: {
+					type: String
+				},
+
+				/**
+				 * 화면 타이틀 
+				 */
+				title: {
+					type: String
+				},
+
+				/**
+				 * 그리드 저장 (Multiple Save) URL
+				 */
+				gridSaveUrl: {
+					type: String,
+					computed: '_computeGridSaveUrl(resourceUrl)'
+				},
+
+				/**
+				 * Search Form에서 검색 결과 Object 중에서 List를 나타내는 프로퍼티 
+				 * 검색 폼 프로퍼티와 그리드 프로퍼티의 연결 프로퍼티 
+				 */
+				rootProperty: {
+					type: String,
+					value: 'items'
+				},
+
+				/**
+				 * Search Form에서 검색 결과 Object 중에서 Total을 나타내는 프로퍼티 
+				 * 검색 폼 프로퍼티와 그리드 프로퍼티의 연결 프로퍼티 
+				 */
+				totalProperty: {
+					type: String,
+					value: 'total'
+				},
+
+				/**
+				 * 그리드에서 선택된 Row Data
+				 */
+				selectedRow: {
+					type: Object
+				},
+
+				/**
+				 * Get/Update/Delete 등을 위한 {resourceUrl}/:id 형식 URL
+				 */
+				memberResourceUrl: {
+					type: String,
+					computed: '_computeMemberResourceUrl(resourceUrl)'
+				}
+			},
+
+			listeners : {
+				'grid.things-grid-detail-tap': '_showResourceForm',
+				'grid.things-grid-save-success': '_refreshGridData',
+				'resource-form.things-resource-form-saved' : '_refreshGridData'
+			},
+
+			/**
+			 * resourceUrl로 grid save url을 생성
+			 * @param {String} resourceUrl
+			 * @return {String} grid save URL
+			 */
+			_computeGridSaveUrl: function(resourceUrl) {
+				return resourceUrl + '/update_multiple.json';
+			},
+
+			/**
+			 * resourceUrl로 grid save url을 생성
+			 * @param {String} resourceUrl
+			 * @return {String} grid save URL
+			 */
+			_computeMemberResourceUrl: function(resourceUrl) {
+				return resourceUrl + '/:id';
+			},
+
+			/**
+			 * open resource form dialog
+			 * @param event 그리드에서 선택된 event
+			 */
+			_showResourceForm: function(event) {
+				this.$['resource-form'].openResourceForm(event.detail);
+			},
+
+			/**
+			 * research form
+			 */
+			_refreshGridData: function(grid) {
+				this.$['search-form'].getMyForm().submit();
+			},
+
+			/**
+			 * 메뉴에 등록된 자신의 routing 정보를 리턴한다.
+			 */
+			getMyRoute: function() {
+				return this.resourceUrl;
+			},
+
+			/**
+			 * 화면 초기화 함수 
+			 * 메타 데이터를 서버로 요청하여 화면을 구성한다.
+			 */
+			initializeContent: function() {
+				console.log(this.resourceMetaUrl);
+				this.$['resources-meta'].generateRequest();
+			}
+
+		});
+	</script>
+</dom-module>

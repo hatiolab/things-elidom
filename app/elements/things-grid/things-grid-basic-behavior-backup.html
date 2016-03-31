@@ -18,24 +18,86 @@ Things.GridBasicBehaviorImpl = {
 
     properties: {
         /**
-         * grid mode 'canvas'/'html'
+         * grid container id
+         * grid container id가 중복이 되면 grid가 다른 grid container에 생성될 수 있으므로 id는 자동 증가하도록 한다.
+         */
+        gridContainerId: {
+            type: String
+        },
+        /**
+         * grid mode
          */
         mode: {
             type: String,
             value: 'canvas'
         },
+
         /**
-         * data load mode
+         * total record count
+         */
+        totalCount: {
+            type: Number,
+            value: 0
+        },
+
+        /**
+         * limit record count
+         */
+        limit: {
+            type: Number,
+            value: 50,
+            notify: true
+        },
+        /**
+         * use infinite pagenation or not
+         */
+        infinitable: {
+            type: Boolean,
+            value: false
+        },
+        /**
+         * data-fill-mode : 'set', 'append'
          * @type {Object}
          */
-        appending:{
-            type: Boolean,
-            value:false
+        dataFillMode: {
+            type: String,
+            value: 'set'
         },
+        /**
+         * use pagination or not
+         */
+        paginatable: {
+            type: Boolean,
+            value: false
+        },
+
+        /**
+         * page record count
+         */
+        page: {
+            type: Number,
+            value: 1,
+            notify: true
+        },
+
+        /**
+         * page start index
+         */
+        pageStartIdx: {
+            type: Number
+        },
+
+        /**
+         * page end index
+         */
+        pageEndIdx: {
+            type: Number
+        },
+
         /**
          * grid data model - array of fields
          */
-        model: {
+        gridModel: {
             type: Array,
             observer: '_setGridModel'
         },
@@ -56,17 +118,59 @@ Things.GridBasicBehaviorImpl = {
         },
 
         /**
+         * grid header menus
+         */
+        headerMenus: {
+            type: Array
+        },
+
+        /**
+         * root property of loaded data
+         */
+        rootProperty: {
+            type: String,
+            value: ''
+        },
+
+        /**
+         * total count property of loaded data
+         */
+        totalProperty: {
+            type: String,
+            value: ''
+        },
+
+        /**
          * read data
          */
-        data: {
+        readData: {
             type: Object,
             observer: '_afterReadGridData'
         },
+
         /**
-         * configure event 
+         * grid data set
          */
-        events:{
+        dataSet: {
+            type: Object,
+            value: function() {
+                return DataLudi.createGridDataSet();
+            }
+        },
+
+        /**
+         * dataludi grid
+         */
+        grid: {
             type: Object
+        },
+
+        /**
+         * enable detail column
+         */
+        enableDetailColumn: {
+            type: Boolean,
+            value: true
         },
 
         /**
@@ -87,37 +191,19 @@ Things.GridBasicBehaviorImpl = {
             readonly: true
         },
         /**
-         * grid container id
-         * grid container id가 중복이 되면 grid가 다른 grid container에 생성될 수 있으므로 id는 자동 증가하도록 한다.
+         * enable check box or not in grid
          */
-        gridContainerId: {
-            type: String,
-            readonly: true
-        },
-        /**
-         * grid data set
-         */
-        dataSet: {
-            type: Object,
-            value: function() {
-                return DataLudi.createGridDataSet();
-            },
-            readonly: true
-        },
-
-        /**
-         * dataludi grid
-         */
-        grid: {
-            type: Object,
-            readonly: true
-        },
-        /**
-         * enable detail column or not
-         */
-        enableDetailColumn:{
+        enableCheckBox: {
             type: Boolean,
-            value:false
+            notify: true,
+            value: true
+        },
+        /**
+         * readonly
+         */
+        readonly: {
+            type: Boolean,
+            value: false
         }
     },
 
@@ -126,12 +212,10 @@ Things.GridBasicBehaviorImpl = {
     },
 
     /**
-     * initial grid
+     * configure grid
      */
-    initialGrid: function() {
-        if (this.grid == null) {
-            DataLudi.setRootContext('');
-            DataLudi.setAssetRoot('images/grid');
+    configureGrid: function() {
+        if (this.validateGridConfig() && this.grid == null) {
             this.gridContainerId = this.generateGuid();
             this.grid = DataLudi.createGridView(this.gridContainerId, null, false);
             this.grid.setDataSource(this.dataSet);
@@ -150,18 +234,61 @@ Things.GridBasicBehaviorImpl = {
                     background: '#20006060'
                 }
             }]);
+
+            if (this.gridModel && this.gridModel.length > 0) {
+                this._setGridModel(this.gridModel);
+            }
+
+            if (this.columns && this.columns.length > 0) {
+                this._setGridColumns(this.columns);
+            }
+
+            if (this.config && this.config.length > 0) {
+                this._setGridConfig(this.config);
+            }
+
+            // grid event 등록 
+            this.registerGridEvent();
+
+            // grid 구성 후 액션 
+            if (this.afterGridConfigured) {
+                this.afterGridConfigured();
+            }
         }
-                // grid 구성 후 액션
-        if (this.afterGridInitiate&&this.grid) {
-            this.afterGridInitiate();
+    },
+
+    /**
+     * check valid grid configuration
+     */
+    validateGridConfig: function() {
+        if (this.paginatable || this.infinitable) {
+            if (!this.rootProperty) {
+                this.openInfoMsg({
+                    type: 'error',
+                    title: 'Invalid Grid Configuration!',
+                    text: '[root-property] should not be empty if you want to use pagination'
+                });
+                return false;
+            }
+
+            if (!this.totalProperty) {
+                this.openInfoMsg({
+                    type: 'error',
+                    title: 'Invalid Grid Configuration!',
+                    text: '[total-property] should not be empty if you want to use pagination'
+                });
+                return false;
+            }
         }
+
+        return true;
     },
 
     /**
      * clear all grid informations
      */
     clearGrid: function() {
-        this.data = null;
+        this.readData = null;
         this.dataSet = null;
         this.model = null;
         this.columns = null;
@@ -175,14 +302,14 @@ Things.GridBasicBehaviorImpl = {
 
     /**
      * Dataludi 그리드 이벤트를 추가한다.
-     * attribute 중에 Event 값이 설정되어 있다면 그것으로 이벤트 핸들러를 등록한다.
+     * attribute 중에 gridEvent 값이 설정되어 있다면 그것으로 이벤트 핸들러를 등록한다.
      */
     registerGridEvent: function() {
-        if (typeof(this.events) !== 'undefined') {
+        if (typeof(this.gridEvents) !== 'undefined') {
             this.grid._container_ = this;
 
-            for (var eventName in this.events) {
-                this.grid[eventName] = this[this.events[eventName]];
+            for (var eventName in this.gridEvents) {
+                this.grid[eventName] = this[this.gridEvents[eventName]];
             }
         }
     },
@@ -199,25 +326,11 @@ Things.GridBasicBehaviorImpl = {
     },
 
     /**
-     * get grid object
-     */
-    getGridObject : function () {
-         return this.grid; 
-    },
-
-    /**
-     * get grid DataSet
-     */
-    getGridDataSet : function () {
-         return this.dataSet; 
-    },
-
-    /**
      * resize handler
      */
     _gridScreenResizeHandler: function(e) {
         if (this.parentNode.offsetWidth > 0 && this.grid == null) {
-            this.initialGrid();
+            this.configureGrid();
         }
 
         if (this.grid != null && this.grid._container) {
@@ -247,39 +360,42 @@ Things.GridBasicBehaviorImpl = {
         if(typeof(columns)==='string'){
             columns = JSON.parse(columns);
         }
-       
-        if (this.enableDetailColumn) {
-            cols = [{
-                'name': 'Detail',
-                'width': '25',
-                'imageList': 'images',
-                'renderer': {
-                    'type': 'icon'
-                },
-                'styles': {
-                    'textAlignment': 'center',
-                    'iconIndex': 'iconDetail.png',
-                    'iconLocation': 'center'
-                },
-                'header': {
-                    'text': ' '
-                }
-            }];
 
-            columns.forEach(function(item) {
-                cols.push(item);
-            });
+        if (columns && columns.length > 0 && this.grid) {
+            var cols = null;
 
-        } else {
-            cols = columns;
-        }
+            if (this.enableDetailColumn) {
+                cols = [{
+                    'name': 'Detail',
+                    'width': '25',
+                    'imageList': 'images',
+                    'renderer': {
+                        'type': 'icon'
+                    },
+                    'styles': {
+                        'textAlignment': 'center',
+                        'iconIndex': 'iconDetail.png',
+                        'iconLocation': 'center'
+                    },
+                    'header': {
+                        'text': ' '
+                    }
+                }];
 
-        if (cols && cols.length > 0 && this.grid) {
+                columns.forEach(function(item) {
+                    cols.push(item);
+                });
+
+            } else {
+                cols = columns;
+            }
+            // this.grid.checkBar().setVisible(this.enableCheckBox);
             this.grid.setColumns(cols);
-            this.grid.resetSize();   
+            this.grid.rowIndicator().setStateVisible(true);
+            this.grid.resetSize();
+            
         }
     },
-
     /**
      * set grid initial config information
      */
@@ -290,94 +406,90 @@ Things.GridBasicBehaviorImpl = {
             config = JSON.parse(config);
         }
 
-        if((typeof config == "undefined" || config == null)&&this.grid){
-            this.grid.setEditOptions({
-                readOnly : true
-            });
-            return;
-        }
-
         if(config && this.grid){
 			Object.keys(config).forEach(function(objectKey) {
 	            switch (objectKey) {
 	                case 'body':
 	                    me.grid.setBody(config[objectKey]);
 	                    break;
-
 	                case 'checkBar':
 	                    me.grid.setCheckBar(config[objectKey]);
 	                    break;
-
 	                case 'header':
 	                    me.grid.setHeader(config[objectKey]);
 	                    break;
-
 	                case 'footer':
 	                    me.grid.setFooter(config[objectKey]);
 	                    break;
-
 	                case 'columnLayout':
 	                    me.grid.setColumnLayout(config[objectKey]);
 	                    break;
-
 	                case 'dataCellRenderers':
 	                    me.grid.dataCellRenderers().addRenderers(config[objectKey]);
 	                    break;
-
 	                case 'displayOptions':
 	                    me.grid.setDisplayOptions(config[objectKey]);
 	                    break;
-
 	                case 'editOptions':
 	                    me.grid.setEditOptions(config[objectKey]);
 	                    break;
-
 	                case 'summaryMode':
 	                	var SummaryMode = DataLudi.SummaryMode[config[objectKey].toUpperCase()];
 	                    me.grid.setSummaryMode(SummaryMode);
 	                    break;
-
-	                // case 'event':
-	                // 	config[objectKey].forEach(function(event){
-		               //  	me.gridEvents.push(event);	
-	                // 	});
-	                // 	me.registerGridEvent();
-                 //        break;
-
+	                case 'event':
+	                	config[objectKey].forEach(function(event){
+		                	me.gridEvents.push(event);	
+	                	});
+	                	me.registerGridEvent();
 	                case 'button':
 	                	config[objectKey].forEach(function(button){
 		                	me.buttons.push(button);	
 	                	});
-                        break;
-
-                    case 'rowIndicator':
-                        me.grid.rowIndicator().setProperties(config[objectKey]);
-                        break;
-
 	                default: break;
 	            }
 	        });
         }
 
-        if(this.events && this.grid) this.registerGridEvent();
+        if((typeof config == "undefined" || config == null)&&this.grid){
+            if(this.readonly){
+                this.grid.setEditOptions({
+                    readOnly : true
+                });
+
+            }else{
+                this.grid.setEditOptions({
+                    deletable: true,
+                    insertable: true,
+                    appendable: true,
+                    updateByCell: true,
+                    enterToNextRow: true
+                });
+            }
+        }
 
     },
     /**
      * after read data
-     * @param data
+     * @param readData
      */
-    _afterReadGridData: function(data) {
-        if (data && this.dataSet) {
+    _afterReadGridData: function(readData) {
+        if (readData && this.dataSet) {
             if (!this.grid) {
-                this.initialGrid();
+                this.configureGrid();
                 this.resizeGrid(this.parentNode, this.querySelector('div'));
             }
 
-            if (this.appending) {
-                this.dataSet.appendRows(data, 0, -1, false);
+            var items = (this.paginatable || this.infinitable) ? readData[this.rootProperty] : readData;
+            this.totalCount = (this.paginatable || this.infinitable) ? readData[this.totalProperty] : (items ? items.length : 0);
+
+
+            if (this.dataFillMode == 'append') {
+                this.dataSet.appendRows(items, 0, -1, false);
                 this.dataSet.clearRowStates();
+                this.dataFillMode = 'set';
             } else {
-                this.dataSet.setRows(data);
+                this.dataSet.setRows(items);
             }
         }
     }
