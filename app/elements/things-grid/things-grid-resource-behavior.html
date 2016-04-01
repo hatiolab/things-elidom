@@ -1,12 +1,16 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="./things-grid-basic-behavior.html">
+
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
+<link rel="import" href="./things-grid-basic-behavior.html">
+
 <script src='../../../bower_components/jszip/dist/jszip.min.js'></script>
+
 <script>
+
 window.Things = window.Things || {};
 
 /**
- * var Things.GridResourceBehavior enables a custom element to be included in an things-grid-behavior
+ * 조회, 생성, 삭제, 수정 등의 패턴화된 Resource 서비스를 이용하여 C/R/U/D 기능을 기본으로 제공하는 그리드 Behavior 
  *
  * @demo ./things-grid/demo/demo-things-resource-grid.html
  */
