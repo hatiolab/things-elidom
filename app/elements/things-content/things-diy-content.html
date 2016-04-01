@@ -56,19 +56,18 @@
 				action-url="[[resourceUrl]]" 
 				page="{{page}}"
 				per-page="[[perPage]]"
+				param-type="PLAIN"
 				last-response="{{lastResponse}}">
 			</things-search-form>
 
 			<things-resource-grid
 				id="grid"
-				grid-model="{{gridModel}}" 
+				model="{{gridModel}}" 
 				columns="{{gridColumns}}"
 				config ="{{gridConfigs}}"
 				page="{{page}}"
-				limit="{{perPage}}"
-				root-property="[[rootProperty]]"
-				total-property="[[totalProperty]]"
-				data="[[lastResponse.items]]"
+				limit="[[perPage]]"
+				data="[[lastResponse]]"
 				grid-save-action="[[gridSaveUrl]]"
 				selected-row-data="{{selectedRow}}"
 				export-file-name="[[title]]"

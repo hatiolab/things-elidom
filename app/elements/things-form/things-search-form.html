@@ -158,6 +158,16 @@
       nonValueOpers: {
         type: Array,
         value: ['is_null', 'is_not_null', 'is_true', 'is_false', 'is_present', 'is_blank']
+      },
+
+      /**
+       * 검색시 파라미터 유형 : RESOURCE / PLAIN
+       * RESOURCE : 리소스 쿼리인 경우 검색 파라미터가 query = "[{'name' : 'searchField', 'operator' : 'eq', 'value' : 'value'}]" 형식으로 넘어간다.
+       * PLAIN : 검색 파라미터가 Key / Value 형식으로 넘어간다.
+       */
+      paramType: {
+        type: String,
+        value: 'RESOURCE'
       }
 
       /**
@@ -212,7 +222,11 @@
     _preSubmitHandler: function(event) {
       var form = this.getMyForm();
       form.request.params || {};
-      form.request.params = this._handleSubmitParams(form.request.params);
+
+      if(this.paramType == 'RESOURCE') {
+        form.request.params = this._handleSubmitParams(form.request.params);  
+      }
+      
       form.request.params.page = this.page;
       form.request.params.limit = this.perPage;
     },
