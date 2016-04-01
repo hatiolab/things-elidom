@@ -244,6 +244,8 @@
 			/**
 			 * grid 구성 후 추가 액션, callback으로 function전달
 			 */
+			afterGridInitiate: function() {
+				this.fire("things-resource-grid-configured", this.grid);
 			},
 			/**
 			 * when group button tap register button event
