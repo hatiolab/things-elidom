@@ -76,9 +76,12 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
       <things-setting id="setting"></things-setting>
 
       <things-button color="green" id="search">Search</things-button>
+      <things-button color="green" id="refreshmeta">refresh meta</things-button>
+      <paper-input type="text" label ="input meta url" value="{{metaURL}}"></paper-input>
+      <paper-input type="text" label ="input custom service url" value="{{customServiceUrl}}"></paper-input>
 
       <section>
-        <things-diy-grid 
+<!--         <things-diy-grid 
           id="grid"
           resource-meta-url="diy_grids/2.json"
           data="[[gridData.items]]"
@@ -89,11 +92,17 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
           page-start-idx="{{pageStartIdx}}"
           page-end-idx="{{pageEndIdx}}"
           selected-row-data="{{selectedRow}}">
+        </things-diy-grid> -->
+        <things-diy-grid 
+          id="grid"
+          resource-meta-url="{{metaURL}}"
+          data="[[gridData]]"
+          selected-row-data="{{selectedRow}}">
         </things-diy-grid>
-
+        <!--resource="diy_services/GridTestData/query.json"-->
         <things-resource 
           id="search-resource"
-          resource="diy_services/DynamicScreen/query.json"
+          resource ="{{customServiceUrl}}"
           action=""
           method="GET"
           content-type="application/json"
@@ -108,7 +117,8 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
         is: 'sample-diy-grid',
 
         listeners: {
-          'search.tap' : 'search'
+          'search.tap' : 'search',
+          'refreshmeta.tap':'refreshmeta'
         },
 
         search: function(e) {
@@ -116,6 +126,11 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
           var resource = this.$['search-resource'];
           resource.params = { page : grid.currentPage, limit : grid.perPage };
           resource.generateRequest();
+        },
+
+        refreshmeta:function(e){
+          var grid = this.$.grid;
+          grid.refreshMeta();
         }
 
       });
