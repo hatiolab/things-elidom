@@ -1,21 +1,24 @@
-<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
 
-<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../../../bower_components/iron-icons/social-icons.html">
-<link rel="import" href="../../../bower_components/iron-icons/maps-icons.html">
-<link rel="import" href="../../../bower_components/iron-iconset/iron-iconset.html">
-<link rel="import" href="../../../bower_components/iron-iconset-svg/iron-iconset-svg.html">
-<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../../../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../../../bower_components/iron-iconset/iron-iconset.html">
+<link rel="import" href="../../../../bower_components/iron-iconset-svg/iron-iconset-svg.html">
+<link rel="import" href="../../../../bower_components/paper-icon-button/paper-icon-button.html">
 
-<link rel="import" href="../things-button/things-button.html">
-<link rel="import" href="../things-resource/things-resource.html">
-<link rel="import" href="../things-grid/things-resource-grid.html">
-<link rel="import" href="../things-form/things-resource-form.html">
-<link rel="import" href="../things-form/things-search-form.html">
+<link rel="import" href="../../things-button/things-button.html">
+<link rel="import" href="../../things-grid/things-resource-grid.html">
+<link rel="import" href="../../things-file-upload/things-file-upload.html">
+<link rel="import" href="../../things-form/things-search-form.html">
+<link rel="import" href="../../things-resource/things-resource.html">
 
-<link rel="import" href="./things-resource-meta-behavior.html">
-<link rel="import" href="./things-route-content-behavior.html">
+<link rel="import" href="../../things-content/things-load-view-behavior.html">
+<link rel="import" href="../../things-content/things-resource-meta-behavior.html">
+<link rel="import" href="../../things-content/things-route-content-behavior.html">
+<link rel="import" href="../../things-msg-box/things-msgbox-behavior.html">
+<link rel="import" href="../../things-setting/things-global-behavior.html">
 
 <!--
 첨부파일 리스트와 첨부파일 업로드 기능을 제공하는 화면 셋 
@@ -24,17 +27,17 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 
 	Example:
 
-	<things-attachment-content 
-	  title="Terminology"
-	  resource-name="Terminology"
-	  resource-url="terminologies"
+	<things-base-attachment 
+	  title="Attachment"
+	  resource-name="Attachment"
+	  resource-url="attachments"
 	  layout="fullbleed layout vertical">
-	</things-attachment-content>
+	</things-base-attachment>
 
 @demo ./things-content/demo/demo-things-attach-content.html
 -->
 
-<dom-module id="things-attachment-content">
+<dom-module id="things-base-attachment">
 	<template>
 		<style>
 			:host {
@@ -65,41 +68,35 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 
 			<things-resource-grid 
 				id="grid"
-				grid-model="[[gridModel]]" 
+				config="[[gridConfig]]"
+				model="[[gridModel]]" 
 				columns="[[gridColumns]]"
-				infinitable
-				paginatable
-				page="{{page}}"
-				limit="{{perPage}}"
-				root-property="[[rootProperty]]"
-				total-property="[[totalProperty]]"
-				read-data="[[lastResponse]]"
+				data="[[lastResponse.items]]"
+				total-count="[[lastResponse.total]]"
+				current-page="{{page}}"
+				per-page="[[perPage]]"
 				grid-save-action="[[gridSaveUrl]]"
 				selected-row-data="{{selectedRow}}"
 				export-file-name="[[title]]"
 				export-sheet-name="[[title]]"
-				buttons="[[buttons]]">
+				enable-detail-column
+				buttons="[[buttons]]"
+				paginatable>
 			</things-resource-grid>
 
-			<things-resource-form 
-				id="resource-form"
-				title="[[title]] Detail"
-				resource-url="[[memberResourceUrl]]"
-				form-fields="[[resourceFormFields]]" 
-				input="{{selectedRow}}">
-			</things-resource-form>
-
-			<things-file-upload id="file-upload" target="upload" method="POST" timeout="300000" ></things-file-upload>			
 		</div>
 	</template>
 
 	<script>
 		Polymer({
-			is: 'things-attachment-content',
+			is: 'things-base-attachment',
 
 			behaviors: [ 
 				Things.ResourceMetaBehavior,
-				Things.RouteContentBehavior
+				Things.RouteContentBehavior,
+				Things.LoadViewBehavior,
+				Things.GlobalBehavior,
+				Things.MsgBoxBehavior
 			],
 			
 			properties: {
@@ -164,10 +161,6 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 				buttons: {
 					type: Array,
 					value: [ {
-              id: 'import',
-              text: 'Import',
-              icon: 'icons:import'
-            }, {
               id: 'export',
               text: 'Export',
               icon: 'icons:export'
@@ -194,8 +187,8 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 			listeners : {
 				'grid.things-grid-detail-tap': '_showResourceForm',
 				'grid.things-grid-save-success': '_refreshGridData',
-				'grid.things-button-upload-tap' : '_onTapUpload',
-				'resource-form.things-resource-form-saved' : '_refreshGridData'
+				'grid.things-grid-detail-tap' : '_onDetailButtonTap',
+				'grid.things-button-upload-tap' : '_onTapUpload'
 			},
 
 			/**
@@ -217,14 +210,6 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 			},
 
 			/**
-			 * open resource form dialog
-			 * @param event 그리드에서 선택된 event
-			 */
-			_showResourceForm: function(event) {
-				this.$['resource-form'].openResourceForm(event.detail);
-			},
-
-			/**
 			 * research form
 			 */
 			_refreshGridData: function(grid) {
@@ -235,7 +220,27 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 			 * Upload 버튼이 클릭되었을 경우 
 			 */
 			_onTapUpload: function(e) {
-				this.$['file-upload'].hidden = !this.$['file-upload'].hidden;
+				var upload = document.createElement('things-file-upload');
+				upload.id = 'file-upload';
+				upload.target = 'upload';
+				upload.method = 'POST';
+				upload.timeout = 300000;
+				upload.hidden = false;
+				this.popupView(upload, true);
+			},
+
+			/**
+			 * 그리드 셀 선택이 변경되었을 경우 핸들러 
+			 */
+			_onDetailButtonTap: function(e) {
+				var basicUrl = this.get('globals.basicUrl');
+				this.openConfirmMsg({
+					title : 'Do you want to download file?',
+					type : 'info',
+					text : 'You can download file'
+				}, function() {
+					window.location = basicUrl + '/download/' + e.detail.id;
+				});
 			},
 
 			/**

@@ -61,6 +61,13 @@ Things.ResourceMetaBehavior = {
 		},
 
 		/**
+		 * Grid Config
+		 */
+		gridConfig: {
+			type: Object
+		},
+
+		/**
 		 * Grid model
 		 */
 		gridModel: {
@@ -187,7 +194,11 @@ Things.ResourceMetaBehavior = {
 
 		this._sortMetaData(gridColumnMetaList, 'list_rank');
 
-		return gridColumnMetaList.map(function(metaData) {
+		var me = this;
+		// resource selector를 위한 컬럼 팝업 메뉴 
+		var columnPopupMenus = [];
+
+		var gColumns = gridColumnMetaList.map(function(metaData) {
 			var field = { 
 				name: metaData.name, 
 				fieldName: metaData.name, 
@@ -197,9 +208,11 @@ Things.ResourceMetaBehavior = {
 				validations: []
 			};
 
-			if(metaData.align) {
-				field.styles.textAlignment = metaData.align;
-			}
+			// id 필드는 width를 0으로 하고 숨긴다.
+			if(metaData.name == 'id') field.width = 0;
+
+			// align 정보가 있으면 설정
+			if(metaData.align) field.styles.textAlignment = metaData.align;
 
 			if(metaData.editor) {
 				if(('code-combo' == metaData.editor) && metaData.code_list && metaData.code_list.length > 0) {
@@ -219,10 +232,20 @@ Things.ResourceMetaBehavior = {
 					field.editor = { type: 'date' };
 					field.styles.datetimeFormat = metaData.format ? metaData.format : 'yyyy-MM-dd';
 					field.styles.textAlignment = 'center';
-				} else if(metaData.editor =='resource-selector'){
+
+				} else if(metaData.editor == 'resource-selector') {
 					field.styles.textAlignment ='center';
 					field.styles.iconIndex ='ellipsis_hover.png';
 					field.styles.iconLocation ='rightSide';
+					me._setColumnPopupMenu(metaData, field, columnPopupMenus);
+
+				} else if(metaData.editor == 'download-link') {
+					field.renderer = {
+						type: 'link',
+						requiredFields: 'id',
+						showUrl: true,
+						url: (metaData.format ? metaData.format : '') + "/${id}"
+					}
 				}
 			}
 
@@ -236,6 +259,39 @@ Things.ResourceMetaBehavior = {
 
 			return field;
 		});
+
+		if(columnPopupMenus.length > 0) 
+			this.gridConfig = { gridColumnPopupMenus : columnPopupMenus };
+
+		return gColumns;
+	},
+
+	/**
+	 * column menu 설정 
+	 * @param {Object} metaData
+	 * @param {Object} field
+	 * @param {Array} columnPopupMenus
+	 */
+	_setColumnPopupMenu: function(metaData, field, columnPopupMenus) {
+		var popupMenuId = field.name + '_Selector_' + columnPopupMenus.length + 1;
+
+		columnPopupMenus.push({ 
+			name : popupMenuId, 
+			menu : [{
+				label: 'Select',
+				callback: function(data) {
+					alert('select : ' + data);
+				}
+			}, {
+				label: 'Delete',
+				callback: function(data) {
+					alert('delete' + data);
+				}
+			}] 
+		});
+		
+		field.button = 'popup';
+		field.popupMenu = popupMenuId;
 	},
 
 	/**

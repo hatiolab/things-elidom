@@ -86,15 +86,15 @@
 				class="white"
 				hidden$="{{!enableToolbar}}">
 				<div id="gridToolbar" class="bottom fit">
-		            <things-paginator
-					  hidden$="{{!pagenatable}}"
-		              id ="pageinator"
-		              per-page="{{perPage}}" 
-		              current-page="{{currentPage}}" 
-		              total-count="[[totalCount]]"
-		              page-start-idx="[[pageStartIdx]]"
-		              page-end-idx="[[pageEndIdx]]">
-		            </things-paginator>
+					<things-paginator
+						hidden$="{{!paginatable}}"
+						id ="paginator"
+						per-page="{{perPage}}" 
+						current-page="{{currentPage}}" 
+						total-count="[[totalCount]]"
+						page-start-idx="[[pageStartIdx]]"
+						page-end-idx="[[pageEndIdx]]">
+					</things-paginator>
 
 					<things-import-excel-button 
 						color="green" 
@@ -165,37 +165,42 @@
 							icon: 'icons:save'
 						}]
 				},
+
 				/**
 				 * use page nate or not
 				 */
-				pagenatable:{
-					type:Boolean,
-					value:false
+				paginatable: {
+					type: Boolean,
+					value: false
 				},
+				
 				/**
 				 * page limit
 				 * @type {Object}
 				 */
-				perPage:{
-					type:Number,
-					value:100,
-					notify:true
+				perPage: {
+					type: Number,
+					value: 100,
+					notify: true
 				},
+				
 				/**
 				 * current page
 				 */
-				currentPage:{
-					type:Number,
-					value:1,
-					notify:true
+				currentPage: {
+					type: Number,
+					value: 1,
+					notify: true
 				},
+				
 				/**
 				 * total data count
 				 */
-				totalCount:{
-					type:Number,
-					notify:true
+				totalCount: {
+					type: Number,
+					notify: true
 				}
+				
 				/**
 				 * 그리드 Row Data가 선택되었을 경우 fire
 				 *
@@ -223,10 +228,6 @@
 			},
 
 			listeners: {
-				/*'export-btn.tap': 'exportGridData',
-				'add-btn.tap': 'addGridRow',
-				'delete-btn.tap': 'removeGridRow',
-				'save-btn.confirm': 'saveGridData'*/				
 				'import-btn.tap': 'importGridData',
 				'button-group.things-button-tap' : '_onButtonTap',		
 				'save-resource.response' : '_successSaveHandler',
@@ -241,12 +242,14 @@
 			detached: function() {
 				this.clearGrid();
 			},
+
 			/**
 			 * grid 구성 후 추가 액션, callback으로 function전달
 			 */
 			afterGridInitiate: function() {
-				this.fire("things-resource-grid-configured", this.grid);
+				this.fire('things-resource-grid-configured', this.grid);
 			},
+
 			/**
 			 * when group button tap register button event
 			 */
@@ -288,7 +291,7 @@
 
 					if(cellData.dataField() >= 0) {
 						thingsGrid.selectedCellData = thingsGrid.dataSet.getValue(rowIndex, colIndex);
-						thingsGrid.fire('things-grid-cell-data-select', thingsGrid.selectedCellData);
+						thingsGrid.fire('things-grid-cell-data-select', { row : thingsGrid.selectedRowData, cell: cellData });
 					}
 					
 					if (cellData.dataField() < 0) {
@@ -297,13 +300,15 @@
 					}
 				}
 			},
+
 			/**
 			 * Dataludi grid scroll to bottom event handller 
 			 */
-			_gridScrollToBottom:function(grid){
+			_gridScrollToBottom:function(grid) {
 				var thingsGrid = grid._container_;
-				thingsGrid.page += 1;
-				thingsGrid.dataFillMode = 'append';
+				if(thingsGrid.totalCount > thingsGrid.pageEndIdx) {
+					thingsGrid.page += 1;	
+				}				
 			},
 
 			/**
