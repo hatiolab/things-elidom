@@ -304,7 +304,7 @@ Things.GridBasicBehaviorImpl = {
             config = JSON.parse(config);
         }
 
-        if((typeof config == "undefined" || config == null)&&this.grid){
+        if((typeof config == "undefined" || config == null) && this.grid) {
             this.grid.setEditOptions({ readOnly : true });
             return;
         }
@@ -357,6 +357,12 @@ Things.GridBasicBehaviorImpl = {
 
                     case 'rowIndicator':
                         me.grid.rowIndicator().setProperties(config[objectKey]);
+                        break;
+
+                    case 'gridColumnPopupMenus':
+                        config[objectKey].forEach(function(columnMenu) {
+                            me.grid.registerPopupMenu(columnMenu.name, columnMenu.menu);
+                        })
                         break;
 
 	                default: break;
