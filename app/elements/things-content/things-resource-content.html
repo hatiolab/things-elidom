@@ -66,33 +66,30 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				last-response="{{lastResponse}}">
 			</things-search-form>
 
-			<!--things-resource-grid 
+			<things-resource-grid 
 				id="grid"
 				model="[[gridModel]]" 
 				columns="[[gridColumns]]"
-				infinitable
-				paginatable
-				page="{{page}}"
-				limit="{{perPage}}"
-				root-property="[[rootProperty]]"
-				total-property="[[totalProperty]]"
-				read-data="[[lastResponse]]"
+				config ="[[gridConfig]]"
+				data="[[lastResponse.items]]"
+				total-count ="[[lastResponse.total]]"
+				current-page="{{page}}"
+				per-page="{{perPage}}"
 				grid-save-action="[[gridSaveUrl]]"
 				selected-row-data="{{selectedRow}}"
 				export-file-name="[[title]]"
 				export-sheet-name="[[title]]"
-				readonly = "[[readonly]]"
-				enable-check-box ="[[enableCheckBox]]">
-			</things-resource-grid-->
+				paginatable>
+			</things-resource-grid>
 
-			<things-basic-grid
+<!-- 			<things-basic-grid
 				id="grid"
 				enable-detail-column
 				config="[[gridConfig]]"
 				model="[[gridModel]]" 
 				columns="[[gridColumns]]"
 				data="[[items]]">
-			</things-basic-grid>
+			</things-basic-grid> -->
 
 			<!--things-resource-form 
 				id="resource-form"
@@ -259,6 +256,10 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 */
 			initializeContent: function() {
 				this.$['resource-meta'].generateRequest();
+			},
+
+			_openDialog :function(){
+				//TODO : OPen Dialog View
 			}
 
 		});

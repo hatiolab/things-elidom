@@ -274,18 +274,19 @@ Things.ResourceMetaBehavior = {
 	 */
 	_setColumnPopupMenu: function(metaData, field, columnPopupMenus) {
 		var popupMenuId = field.name + '_Selector_' + columnPopupMenus.length + 1;
-
+		var me = this;
 		columnPopupMenus.push({ 
 			name : popupMenuId, 
 			menu : [{
 				label: 'Select',
 				callback: function(data) {
-					alert('select : ' + data);
+					// alert('select : ' + data);
+					me._openDialog();
 				}
 			}, {
 				label: 'Delete',
 				callback: function(data) {
-					alert('delete' + data);
+					me._openDialog();
 				}
 			}] 
 		});

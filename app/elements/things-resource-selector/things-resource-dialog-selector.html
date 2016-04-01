@@ -85,32 +85,32 @@ Example:
         </things-resource>
 
 		<things-dialog-selector id ="thingsSelector">
-			<div class="selector-content random-content">
-				<things-selector-content
-					id="selectorContent"
-					title="[[title]]"
-					resource-name="[[resourceName]]"
-					resource-url="[[resourceUrl]]"
-					root-property ="[[rootProperty]]"
-					total-property ="[[totalProperty]]"
-					layout="[[layout]]"
-					selected-row ="[[selectedRow]]"
-					enable-check-box ="[[enableCheckBox]]"
-					is-screen-content ="[[_isScreenContent]]"
-					readonly ="[[readonly]]">
-				</things-selector-content>
-			</div>
+			<paper-dialog-scrollable class="selector-content random-content">
+				    <things-resource-content
+				    	id="resourceCentent"
+						title="{{title}}"
+						current-route="[[resourceRoute]]"
+						resource-name="[[resourceName]]"
+						resource-url="{{resourceUrl}}"
+						selected-row ="{{selectedRow}}"
+						layout="fullbleed layout vertical">
+					</things-resource-content>
+			</paper-dialog-scrollable>
 		</things-dialog-selector>
 	</template>
 	<script>
 		Polymer({
 			is: 'things-resource-dialog-selector',
-properties:{
+			properties:{
 				/**
 				 * 그리드 title
 				 * @type {[type]}
 				 */
 				title:String,
+				/**
+				 * resource route
+				 */
+				resourceRoute:String,
 				/**
 				 * 그리드 resource name
 				 * @type {[type]}
@@ -131,42 +131,11 @@ properties:{
 					value:'fullbleed layout vertical'
 				},
 				/**
-				 * Search Form에서 검색 결과 Object 중에서 List를 나타내는 프로퍼티 
-				 * 검색 폼 프로퍼티와 그리드 프로퍼티의 연결 프로퍼티 
-				 */
-				rootProperty: {
-					type: String,
-					value: 'items'
-				},
-
-				/**
-				 * Search Form에서 검색 결과 Object 중에서 Total을 나타내는 프로퍼티 
-				 * 검색 폼 프로퍼티와 그리드 프로퍼티의 연결 프로퍼티 
-				 */
-				totalProperty: {
-					type: String,
-					value: 'total'
-				},
-				/**
 				 * 선택된 데이타의 오브젝트
 				 */
 				selectedRow:{
 					type: Object,
 					notify:true
-				},
-				/**
-				 * enable check box or not
-				 */
-				enableCheckBox:{
-					type:Boolean,
-					value:false
-				},
-				/**
-				 * if readonly grid or not
-				 */
-				readonly:{
-					type:Boolean,
-					value:true
 				}
 			},
 			/**
@@ -193,8 +162,10 @@ properties:{
 			 * dropdown Open
 			 */
 			open:function(){
-				this.$.selectorContent.refreshGridData();
+				// this.$.selectorContent.refreshGridData();
+				this.$.resourceCentent.initializeContent();
 				this.$.thingsSelector.open();
+				this.$.resourceCentent._refreshGridData();
 			}
 		});
 	</script>
