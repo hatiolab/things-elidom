@@ -37,11 +37,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 				<!-- Main Content -->
 				<iron-pages attr-for-selected="data-route" selected="{{route}}" class="content">
+
 					<!-- Dynamic Menu Page -->
 					<template is="dom-repeat" items="{{screens}}" as=screen filter="isDynamicScreen">
 						<!-- Dynamic Resource Screen -->
-					  
-					  <!--things-attachment-content -->
 					  <things-resource-content 
 							data-route="{{screen.routing}}"
 							title="{{screen.name}}"
@@ -50,22 +49,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 							resource-url="{{screen.routing}}"
 							layout="fullbleed layout vertical">
 						</things-resource-content>
-					  <!--/things-attachment-content-->
-					  
 					</template>
 
 					<template is="dom-repeat" items="{{screens}}" as=screen filter="isDiyScreen">
 						<!-- Dynamic Diy Screen -->
-					  
 					  <things-diy-content 
 							data-route="{{screen.routing}}"
 							menu-id="{{screen.id}}"
 							resource-url="[[screen.routing]]"
 							current-route="[[route]]"
 							layout="fullbleed layout vertical">
-						</things-diy-content>
-					  
-					</template>					
+						</things-diy-content>					  
+					</template>
 
 					<!-- Static Menu Page -->
 					{% include "things-pages.html" %}

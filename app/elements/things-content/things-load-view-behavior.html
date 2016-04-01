@@ -32,6 +32,16 @@ Things.LoadViewBehavior = {
 	},
 
 	/**
+	 * view를 기본 다이얼로그로 오픈한다.
+	 *
+	 * @param {Object} view
+	 * @param {Boolean} modal
+	 */
+	popupView: function(view, modal) {
+		app.$['common-full-dialog'].openBasicDialog(view, modal);
+	},
+
+	/**
 	 * resource form을 기본 다이얼로그로 오픈한다.
 	 *
 	 * @param {Object} view

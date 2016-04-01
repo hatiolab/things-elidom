@@ -18,9 +18,7 @@
 <link rel="import" href="./things-route-content-behavior.html">
 
 <!--
-서버에서 관리하는 DiyForm, DiyGrid 모델을 기반으로 화면을 구성하는 화면 셋 
-
-Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그리드에서 레코드 하나를 선택할 경우 해당 레코드에 대한 Detail Form이 출력된다.
+서버에서 관리하는 DiyService, DiyForm, DiyGrid 모델을 기반으로 화면을 구성하는 화면 셋 
 
 	Example:
 
@@ -70,7 +68,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				limit="{{perPage}}"
 				root-property="[[rootProperty]]"
 				total-property="[[totalProperty]]"
-				read-data="[[lastResponse]]"
+				data="[[lastResponse.items]]"
 				grid-save-action="[[gridSaveUrl]]"
 				selected-row-data="{{selectedRow}}"
 				export-file-name="[[title]]"

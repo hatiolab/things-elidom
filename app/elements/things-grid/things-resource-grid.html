@@ -291,7 +291,7 @@
 
 					if(cellData.dataField() >= 0) {
 						thingsGrid.selectedCellData = thingsGrid.dataSet.getValue(rowIndex, colIndex);
-						thingsGrid.fire('things-grid-cell-data-select', thingsGrid.selectedCellData);
+						thingsGrid.fire('things-grid-cell-data-select', { row : thingsGrid.selectedRowData, cell: cellData });
 					}
 					
 					if (cellData.dataField() < 0) {
