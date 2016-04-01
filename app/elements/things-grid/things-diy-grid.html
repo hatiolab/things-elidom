@@ -42,10 +42,12 @@ pagination을 지원하고 데이터를 표시한 후 저장이나 삭제 등의
 			columns="[[metaData.columns]]"
 			config ="[[metaData.config]]"
 			data="[[data]]"
+			appending="[[appending]]"
 			total-count ="[[totalCount]]"
 			current-page="{{currentPage}}"
 			per-page="{{perPage}}"
-			pagenatable
+			pagenatable="[[pagenatable]]"
+			enableDetailColumn="[[enableDetailColumn]]"
 			grid-save-action="[[gridSaveUrl]]"
 			selected-row-data="{{selectedRow}}"
 			export-file-name="[[title]]"
@@ -65,12 +67,6 @@ pagination을 지원하고 데이터를 표시한 후 저장이나 삭제 등의
 	
 			properties: {
 				/**
-				 * grid name
-				 */
-				name :{
-					type:String
-				},
-				/**
 				 * Boolean need to set false as defualt
 				 */
 				enableDetailColumn:{
@@ -84,19 +80,80 @@ pagination을 지원하고 데이터를 표시한 후 저장이나 삭제 등의
 					type:String
 				},
 				/**
-				 * 핸들링하고자 하는 grid event를 설정한다. { grid event 명 : 'event handler 명' }
+				 * grid data
 				 */
-				events : {
-					type: Object,
-					value: {
-						onDataCellClicked : '_gridCellClicked',
-						onScrollToBottom :'_gridScrollToBottom'
-					}
+				data:{
+					type:Object
 				},
-				paginatable:{
+				/**
+				 * selected row data
+				 */
+				selectedRow:{
+					type:Object
+				},
+				/**
+				 * grid Save Url
+				 */
+				gridSaveUrl:{
+					type:String
+				},
+				/**
+				 * use page nate or not
+				 */
+				pagenatable:{
 					type:Boolean,
 					value:false
-				}
+				},
+
+				/**
+				 * page limit
+				 * @type {Object}
+				 */
+				perPage:{
+					type:Number,
+					value:100,
+					notify:true
+				},
+
+				/**
+				 * current page
+				 */
+				currentPage:{
+					type:Number,
+					value:1,
+					notify:true
+				},
+
+				/**
+				 * total data count
+				 */
+				totalCount:{
+					type:Number,
+					notify:true
+				},
+
+				/**
+				 * enable toolbar
+				 */
+				enableToolbar:{
+					type:Boolean,
+					value:false
+				},
+		        /**
+		         * data load mode
+		         * @type {Object}
+		         */
+		        appending:{
+		            type: Boolean,
+		            value: false
+		        },
+		        /**
+		         * grid save url
+		         * @type {Object}
+		         */
+		        gridSaveUrl:{
+		        	type:String
+		        }
 
 				/**
 				 * 그리드 Row Data가 선택되었을 경우 fire
@@ -107,71 +164,29 @@ pagination을 지원하고 데이터를 표시한 후 저장이나 삭제 등의
 				 * 그리드 Cell Data가 선택되었을 경우 fire
 				 *
 				 * @event things-grid-cell-data-select
-				 */				
+				 */
+				/**
+				 * 그리드 데이터 Save(저장/삭제/추가) 액션이 성공했을 경우 fire
+				 *
+				 * @event things-grid-save-success
+				 */
+				/**
+				 * 그리드 데이터 Save(저장/삭제/추가) 액션시 에러가 발생 했을 경우 fire
+				 *
+				 * @event things-grid-save-error
+				 */
+				/**
+				 * 그리드 detail이 클릭 되었을 경우 
+				 * @event things-grid-detail-tap
+				 */	
 			},
 
 			created: function() {
-				DataLudi.setRootContext('');
-				DataLudi.setAssetRoot('../../../images/grid');
 			},
-
+			/**
+			 * [detached description]
+			 */
 			detached: function() {
-				this.clearGrid();
-			},
-			/**
-			 * grid 구성 후 추가 액션 
-			 */
-			afterGridConfigured: function() {
-				this.grid.rowIndicator().setStateVisible(true);
-				
-				if(this.readonly){
-
-					this.grid.setEditOptions({
-						readOnly : true
-					});
-
-				}else{
-					this.grid.setEditOptions({
-						deletable: true,
-						insertable: true,
-						appendable: true,
-						updateByCell: true,
-						enterToNextRow: true
-					});
-				}
-				// this.grid.editOptions().setUpdateByCell(true);
-			},
-			/**
-			 * Dataludi grid cell click 이벤트 핸들러 
-			 */
-			_gridCellClicked: function(grid, cellData) {
-				var thingsGrid = grid._container_;
-
-				if (cellData && cellData.dataColumn() && cellData.getDataIndex(grid) >= 0) {
-					var rowIndex = cellData.getDataIndex(grid);
-					var colIndex = cellData.dataField();
-					var row = grid.focusedRow();
-
-					if (row && row.dataIndex() >= 0) {
-						thingsGrid.selectedRowData = row.getRowObject();
-						thingsGrid.fire('things-grid-row-data-select', thingsGrid.selectedRowData);
-					}
-
-					if(cellData.dataField() >= 0) {
-						thingsGrid.selectedCellData = thingsGrid.dataSet.getValue(rowIndex, colIndex);
-						thingsGrid.fire('things-grid-cell-data-select', thingsGrid.selectedCellData);
-					}
-				}
-			},
-			/**
-			 * Dataludi grid scroll to bottom event handller 
-			 * @return {null}
-			 */
-			_gridScrollToBottom:function(grid){
-				console.log('_gridScrollToBottom');
-				var thingsGrid = grid.grid._container_;
-
-				this.page +=1;
 			}
 
 		});
