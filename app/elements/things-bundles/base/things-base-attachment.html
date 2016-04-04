@@ -256,6 +256,17 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 			 */
 			initializeContent: function() {
 				this.$['resource-meta'].generateRequest();
+			},
+
+			_openDialog : function(menu, gridDataSet){
+				//TODO : OPen Dialog View
+				var upload = document.createElement('things-file-upload');
+				upload.id = 'file-upload';
+				upload.target = 'upload';
+				upload.method = 'POST';
+				upload.timeout = 300000;
+				upload.hidden = false;
+				this.popupView(upload, true);
 			}
 
 		});
