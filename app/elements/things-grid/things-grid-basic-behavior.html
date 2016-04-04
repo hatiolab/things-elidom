@@ -165,6 +165,18 @@ Things.GridBasicBehaviorImpl = {
 
             this.grid._container_ = this;
             this.registerGridEvent();
+
+            if(this.config) {
+                this._setGridConfig(this.config);
+            }
+
+            if(this.model) {
+                this._setGridModel(this.model);
+            }
+
+            if(this.columns) {
+                this._setGridColumns(this.columns);
+            }            
         }
         
         // grid 구성 후 액션
