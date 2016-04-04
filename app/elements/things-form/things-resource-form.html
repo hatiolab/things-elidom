@@ -301,7 +301,7 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 				}
 
 				this.findResource(data.id);
-				this.popupResourceForm(this, true);
+				//this.popupResourceForm(this, true);
 			},
 
 			/**
@@ -399,6 +399,7 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 
 				var method = event.srcElement.method.toUpperCase();
 				if(method == 'GET') {
+					this.popupResourceForm(this, true);
 					this.fire('things-resource-form-read', event.detail);
 				} else if(method == 'PUT') {
 					this.fire('things-resource-form-saved', event.detail);

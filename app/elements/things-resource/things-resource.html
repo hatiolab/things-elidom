@@ -189,7 +189,11 @@
 			/**
 			 * auto가 false인 경우 Ajax 요청 
 			 */
-			generateRequest: function() {				
+			generateRequest: function() {
+				if(this.contentType && this.contentType.toLowerCase().indexOf('application/json') >= 0) {
+					this.$._ajax.body = this.params;
+				}
+
 				this.$._ajax.generateRequest();
 			},			
 
@@ -275,9 +279,9 @@
 			},
 
 			/**
-  		 * ajax 호출 시 핸들러
-	  	 */
-			_ajaxRequestHandler: function() {
+			 * ajax 호출 시 핸들러
+			 */
+			_ajaxRequestHandler: function(e) {
 				var newParams = null;
 
 				if((!this.method || this.method.toLowerCase() == 'get') && (!this.action || this.action == 'index')) {
@@ -286,14 +290,12 @@
 					newParams = this.params;
 				} 
 
-				if(this.contentType && this.contentType.toLowerCase().indexOf('application/json') >= 0) {
-					this.$._ajax.body = newParams;
-				} else {
+				if(!(this.contentType && this.contentType.toLowerCase().indexOf('application/json') >= 0)) {
 					this.$._ajax.params = newParams;
 				}
 
 				// :id 실제 id로 변환 
-				if(this.$._ajax.url&&this.$._ajax.url.indexOf(':id') >= 0) {
+				if(this.$._ajax.url && this.$._ajax.url.indexOf(':id') >= 0) {
 					this.$._ajax.url = this.$._ajax.url.replace(':id', this.params.id);
 				}
 			},

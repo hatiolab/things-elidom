@@ -6,13 +6,17 @@
 <link rel="import" href="./things-resource-grid.html">
 
 <!--
-Diy를 통하여 제공하는 기본 그리드. 그리드 데이터를 표시하기만 하는 그리드
-
-pagination을 지원하고 데이터를 표시한 후 저장이나 삭제 등의 트랜잭션 기능은 없다.
+서버에서 관리하는 DiyGrid 정보를 조회해서 그리드를 구성하는 동적 그리드. 
 
 	Example:
 
-
+	  <things-diy-content 
+	  	menu-id="1"
+			data-route="users"
+			current-route="[[route]]"
+			resource-url="users"
+			layout="fullbleed layout vertical">
+		</things-diy-content>	
 
 @demo ./things-grid/demo/demo-things-diy-grid.html
 -->
@@ -60,97 +64,100 @@ pagination을 지원하고 데이터를 표시한 후 저장이나 삭제 등의
 		Polymer({
 			is: 'things-diy-grid',
 
-			// behaviors: [
-			// 	Things.GridBasicBehavior
-			// ],
-	
 			properties: {
 				/**
 				 * Boolean need to set false as defualt
 				 */
-				enableDetailColumn:{
-					type:Boolean,
-					value:false
+				enableDetailColumn: {
+					type: Boolean,
+					value: false
 				},
+
 				/**
 				 * things resource meta url
 				 */
-				resourceMetaUrl:{
-					type:String
+				resourceMetaUrl: {
+					type: String
 				},
+
 				/**
 				 * grid data
 				 */
-				data:{
-					type:Object
+				data: {
+					type: Object
 				},
+
 				/**
 				 * selected row data
 				 */
-				selectedRow:{
-					type:Object
+				selectedRow: {
+					type: Object
 				},
+
 				/**
 				 * grid Save Url
 				 */
-				gridSaveUrl:{
-					type:String
+				gridSaveUrl: {
+					type: String
 				},
+
 				/**
 				 * use page nate or not
 				 */
-				pagenatable:{
-					type:Boolean,
-					value:false
+				pagenatable: {
+					type: Boolean,
+					value: false
 				},
 
 				/**
 				 * page limit
 				 * @type {Object}
 				 */
-				perPage:{
-					type:Number,
-					notify:true
+				perPage: {
+					type: Number,
+					notify: true
 				},
 
 				/**
 				 * current page
 				 */
-				currentPage:{
-					type:Number,
-					notify:true
+				currentPage: {
+					type: Number,
+					notify: true
 				},
 
 				/**
 				 * total data count
 				 */
-				totalCount:{
-					type:Number,
-					notify:true
+				totalCount: {
+					type: Number,
+					notify: true
 				},
 
 				/**
 				 * enable toolbar
 				 */
-				enableToolbar:{
-					type:Boolean,
-					value:false
+				enableToolbar: {
+					type: Boolean,
+					value: false
 				},
-		        /**
-		         * data load mode
-		         * @type {Object}
-		         */
-		        appending:{
-		            type: Boolean,
-		            value: false
-		        },
-		        /**
-		         * grid save url
-		         * @type {Object}
-		         */
-		        gridSaveUrl:{
-		        	type:String
-		        }
+
+				/**
+				* data load mode
+				* @type {Object}
+				*/
+				appending: {
+					type: Boolean,
+					value: false
+				},
+				
+				/**
+				* grid save url
+				* @type {Object}
+				*/
+				gridSaveUrl: {
+					type: String
+				}
 
 				/**
 				 * 그리드 Row Data가 선택되었을 경우 fire
@@ -178,14 +185,11 @@ pagination을 지원하고 데이터를 표시한 후 저장이나 삭제 등의
 				 */	
 			},
 
-			created: function() {
-			},
 			/**
-			 * [detached description]
+			 * Diy Grid의 Configuration 정보를 다시 가져온다.
+			 * 이 정보를 다시 가져온 후 그리드는 다시 구성된다.
 			 */
-			detached: function() {
-			},
-			refreshMeta:function(){
+			refreshMeta: function() {
 				this.$['resource-meta'].generateRequest();
 			}
 

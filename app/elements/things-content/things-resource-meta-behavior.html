@@ -176,6 +176,11 @@ Things.ResourceMetaBehavior = {
 				field.datetimeFormat = metaData.format? metaData.format : 'yyyy-MM-dd';
 			}
 
+			if(metaData.editor == 'resource-selector') {
+				field.fieldName = field.fieldName.substr(0, field.fieldName.indexOf('_id'));
+				field.dataType = 'object';
+			}
+
 			return field;
 		});
 	},
@@ -219,7 +224,7 @@ Things.ResourceMetaBehavior = {
 					field.editor = { type: 'list', domainOnly: true };
 					field.lookupDisplay = true;
 					field.lookupValues = metaData.code_list.map(function(code) { return code.name });
-  					field.lookupLabels = metaData.code_list.map(function(code) { return code.description });
+					field.lookupLabels = metaData.code_list.map(function(code) { return code.description });
 
 				} else if(metaData.editor == 'checkbox') {
 					field.renderer = { type: 'check', editable: true, threeStates: false, trueValues: 'true', falseValues: 'false' };
@@ -237,6 +242,9 @@ Things.ResourceMetaBehavior = {
 					field.styles.textAlignment ='center';
 					field.styles.iconIndex ='ellipsis_hover.png';
 					field.styles.iconLocation ='rightSide';
+					field.name = field.name.substr(0, field.name.indexOf('_id'));
+					field.fieldName = field.name;
+					field.header.text = field.name;
 					me._setColumnPopupMenu(metaData, field, columnPopupMenus);
 
 				} else if(metaData.editor == 'download-link') {
