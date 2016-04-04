@@ -39,13 +39,6 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 
 <dom-module id="things-base-attachment">
 	<template>
-		<style>
-			:host {
-				display: block;
-				height: 100%;
-			}
-		</style>
-
 		<div class="[[layout]]">
 			<things-resource 
 				id="resource-meta"
@@ -161,26 +154,26 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 				buttons: {
 					type: Array,
 					value: [ {
-              id: 'export',
-              text: 'Export',
-              icon: 'icons:export'
-            }, {
-              id: 'add',
-              text: 'Add',
-              icon: 'icons:add'
-            }, {
-              id: 'delete',
-              text: 'Delete',
-              icon: 'icons:delete'
-            }, {
-              id: 'save',
-              text: 'Save',
-              icon: 'icons:save'
-            }, {
-              id: 'upload',
-              text: 'Upload',
-              icon: 'icons:upload'
-            } ]
+					  id: 'export',
+					  text: 'Export',
+					  icon: 'icons:export'
+					}, {
+					  id: 'add',
+					  text: 'Add',
+					  icon: 'icons:add'
+					}, {
+					  id: 'delete',
+					  text: 'Delete',
+					  icon: 'icons:delete'
+					}, {
+					  id: 'save',
+					  text: 'Save',
+					  icon: 'icons:save'
+					}, {
+					  id: 'upload',
+					  text: 'Upload',
+					  icon: 'icons:upload'
+					} ]
 				}
 			},
 
@@ -258,22 +251,27 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 				this.$['resource-meta'].generateRequest();
 			},
 
-			_openDialog : function(menu, gridDataSet){
+			_openDialog : function(grid, index){
 				//TODO : OPen Dialog View
 				var selector = document.createElement('things-resource-content');
-	            selector.id="resouceDialogSelector"
-	            selector.title="StorageInfo"
-	            selector.layout="fullbleed layout vertical"
-	            selector.resourceRoute="StorageInfo"
-	            selector.resourceName="StorageInfo"
-	            selector.resourceUrl="storage_infos"
-	            // selector.selectedRow = "{{dropSelectedRow}}"
+				var me = this;
+
+				selector.id="resouceDialog";
+				selector.title="StorageInfo";
+				selector.layout="fullbleed layout vertical";
+				selector.resourceRoute="StorageInfo";
+				selector.resourceName="StorageInfo";
+				selector.resourceUrl="storage_infos";
+				selector.enableToolbar =false;
 				this.popupView(selector, true);
+				selector.initializeContent();
+				selector.refreshGridData();
 
-	            selector.currentRoute ="storage_infos"
-				// selector.initializeContent();
+				selector.addEventListener('things-grid-row-data-select',function(event){
+		            grid.setCellValue(index, event.detail.id);
+		            me.popupView(selector, true);
+				});
 			}
-
 		});
 	</script>
 </dom-module>

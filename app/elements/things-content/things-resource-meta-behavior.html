@@ -291,7 +291,8 @@ Things.ResourceMetaBehavior = {
 			menu : [{
 				label: 'Select',
 				callback: function(data) {
-					me._openDialog(data, dataSet);
+					var index = grid.focusedIndex();
+					me._openDialog(grid, index);
 				}
 			}, {
 				label: 'Delete',

@@ -176,7 +176,11 @@ Things.GridBasicBehaviorImpl = {
 
             if(this.columns) {
                 this._setGridColumns(this.columns);
-            }            
+            }
+
+            if(this.data){
+                this._afterReadGridData(this.data)
+            }
         }
         
         // grid 구성 후 액션
