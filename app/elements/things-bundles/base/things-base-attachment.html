@@ -260,13 +260,18 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 
 			_openDialog : function(menu, gridDataSet){
 				//TODO : OPen Dialog View
-				var upload = document.createElement('things-file-upload');
-				upload.id = 'file-upload';
-				upload.target = 'upload';
-				upload.method = 'POST';
-				upload.timeout = 300000;
-				upload.hidden = false;
-				this.popupView(upload, true);
+				var selector = document.createElement('things-resource-content');
+	            selector.id="resouceDialogSelector"
+	            selector.title="StorageInfo"
+	            selector.layout="fullbleed layout vertical"
+	            selector.resourceRoute="StorageInfo"
+	            selector.resourceName="StorageInfo"
+	            selector.resourceUrl="storage_infos"
+	            // selector.selectedRow = "{{dropSelectedRow}}"
+				this.popupView(selector, true);
+
+	            selector.currentRoute ="storage_infos"
+				// selector.initializeContent();
 			}
 
 		});
