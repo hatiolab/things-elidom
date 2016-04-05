@@ -178,7 +178,7 @@ Things.GridBasicBehaviorImpl = {
                 this._setGridColumns(this.columns);
             }
 
-            if(this.data){
+            if(this.data) {
                 this._afterReadGridData(this.data)
             }
         }
@@ -418,7 +418,7 @@ Things.GridBasicBehaviorImpl = {
             var colIndex = cellData.dataField();
             var row = grid.focusedRow();
 
-            if (row && row.dataIndex() >= 0) {
+            if(row && row.dataIndex() >= 0) {
                 thingsGrid.selectedRowData = row.getRowObject();
                 thingsGrid.fire('things-grid-row-data-select', thingsGrid.selectedRowData);
             }
@@ -428,7 +428,8 @@ Things.GridBasicBehaviorImpl = {
                 thingsGrid.fire('things-grid-cell-data-select', thingsGrid.selectedCellData);
             }
             
-            if (thingsGrid.enableDetailColumn && cellData.dataField() < 0) {
+            if(thingsGrid.enableDetailColumn && cellData.column._name == 'Detail' && 
+                cellData.column._renderer && cellData.column._renderer.type == 'icon') {
                 thingsGrid.selectedRowData = row.getRowObject();
                 thingsGrid.fire('things-grid-detail-tap', thingsGrid.selectedRowData);
             }

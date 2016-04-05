@@ -198,12 +198,13 @@
 					type: Number,
 					notify: true
 				},
+
 				/**
 				 * if enable toolbar or not
 				 */
-				enableToolbar:{
-					type:Boolean,
-					value:false
+				enableToolbar: {
+					type: Boolean,
+					value: false
 				}
 				
 				/**
@@ -253,6 +254,18 @@
 			 */
 			afterGridInitiate: function() {
 				this.fire('things-resource-grid-configured', this.grid);
+				
+				// header가 ...인 경우 Resource Selector
+				var me = this;
+				this.grid.onDataCellDblClicked = function (grid, index) {
+					if(index.column._header && index.column._header._text == '...') {
+						var matchColumn = me.columns.filter(function(col) { return (index.column._name == col.name); });
+						me.fire('things-grid-resource-column-edit', { 
+							userObj : matchColumn ? matchColumn[0].userObj : null, 
+							index: index 
+						});
+					}
+				};
 			},
 
 			/**
@@ -280,26 +293,34 @@
 
 			/**
 			 * Dataludi grid cell click 이벤트 핸들러 
+			 *
+			 * @param {Object} grid
+			 * @param {Object} cellData
 			 */
 			_gridCellClicked: function(grid, cellData) {
+				if(!grid._container_ || !cellData) return;
+
 				var thingsGrid = grid._container_;
 
-				if (cellData && cellData.dataColumn() && cellData.getDataIndex(grid) >= 0) {
+				if (cellData.dataColumn() && cellData.getDataIndex(grid) >= 0) {
 					var rowIndex = cellData.getDataIndex(grid);
 					var colIndex = cellData.dataField();
 					var row = grid.focusedRow();
 
-					if (row && row.dataIndex() >= 0) {
+					if(row && row.dataIndex() >= 0) {
 						thingsGrid.selectedRowData = row.getRowObject();
 						thingsGrid.fire('things-grid-row-data-select', thingsGrid.selectedRowData);
 					}
 
 					if(cellData.dataField() >= 0) {
-						thingsGrid.selectedCellData = thingsGrid.dataSet.getValue(rowIndex, colIndex);
-						thingsGrid.fire('things-grid-cell-data-select', { row : thingsGrid.selectedRowData, cell: cellData });
+						if(thingsGrid.dataSet) {
+							thingsGrid.selectedCellData = thingsGrid.dataSet.getValue(rowIndex, colIndex);
+							thingsGrid.fire('things-grid-cell-data-select', { row : thingsGrid.selectedRowData, cell: cellData });
+						}
 					}
 					
-					if (cellData.dataField() < 0) {
+					if(thingsGrid.enableDetailColumn && cellData.column._name == 'Detail' && 
+						 cellData.column._renderer && cellData.column._renderer.type == 'icon') {
 						thingsGrid.selectedRowData = row.getRowObject();
 						thingsGrid.fire('things-grid-detail-tap', thingsGrid.selectedRowData);
 					}
@@ -309,7 +330,7 @@
 			/**
 			 * Dataludi grid scroll to bottom event handller 
 			 */
-			_gridScrollToBottom:function(grid) {
+			_gridScrollToBottom: function(grid) {
 				var thingsGrid = grid._container_;
 				if(thingsGrid.totalCount > thingsGrid.pageEndIdx) {
 					thingsGrid.page += 1;	

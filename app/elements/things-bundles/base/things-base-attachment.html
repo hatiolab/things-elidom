@@ -252,7 +252,6 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 			},
 
 			_openDialog : function(grid, index){
-				//TODO : OPen Dialog View
 				var selector = document.createElement('things-resource-content');
 				var me = this;
 
@@ -268,8 +267,7 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 				selector.refreshGridData();
 
 				selector.addEventListener('things-grid-row-data-select',function(event){
-		            grid.setCellValue(index, event.detail.id);
-		            me.popupView(selector, true);
+					grid.setCellValue(index, event.detail.id);
 				});
 			}
 		});

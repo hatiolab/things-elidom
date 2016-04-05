@@ -72,14 +72,14 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				columns="[[gridColumns]]"
 				config ="[[gridConfig]]"
 				data="[[lastResponse.items]]"
-				total-count ="[[lastResponse.total]]"
+				total-count="[[lastResponse.total]]"
 				current-page="{{page}}"
 				per-page="{{perPage}}"
 				grid-save-action="[[gridSaveUrl]]"
 				selected-row-data="{{selectedRow}}"
 				export-file-name="[[title]]"
 				export-sheet-name="[[title]]"
-				enable-detail-column ="[[enableDetailColumn]]"
+				enable-detail-column="[[enableDetailColumn]]"
 				paginatable>
 			</things-resource-grid>
 
@@ -158,12 +158,13 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 					notify: true,
 					readonly: true
 				},
+
 				/**
 				 * enableDetailColumn
 				 */
-				enableDetailColumn:{
-					type:Boolean,
-					value:false
+				enableDetailColumn: {
+					type: Boolean,
+					value: false
 				}
 			},
 
@@ -171,6 +172,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				'search-form.things-form-submit-success': '_searchDataHandler',
 				'grid.things-grid-detail-tap': '_showResourceForm',
 				'grid.things-grid-save-success': 'refreshGridData',
+				'grid.things-grid-resource-column-edit' : '_openResourceSelector'
 			},
 
 			/**
@@ -221,16 +223,8 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 * research form
 			 */
 			refreshGridData: function(grid) {
-				// this.$['search-form'].getMyForm().submit();
 				this.$['search-form'].submitMyForm();
 			},
-
-			// /**
-			//  * grid row selected
-			//  */
-			// _gridRowSelected:function (event) {
-			// 	 this.fire('things-grid-row-selected',event.detail); 
-			// },
 
 			/**
 			 * 메뉴에 등록된 자신의 routing 정보를 리턴한다.
@@ -245,6 +239,50 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 */
 			initializeContent: function() {
 				this.$['resource-meta'].generateRequest();
+			},
+
+			/**
+			 * Open Resource Selector Dialog
+			 *
+			 * @param {Object} event
+			 */
+			_openResourceSelector: function(event) {
+				var index = event.detail.index;
+				var grid = index._grid;
+				var column = index.column;
+				var rowIdx = index.rowIndex;
+				var resourceObj = event.detail.userObj;
+
+				var selector = document.createElement('things-resource-content');
+				selector.id = "resouce-dialog";
+				selector.layout = "fullbleed layout vertical";
+				selector.title = resourceObj.resourceName;
+				selector.resourceName = resourceObj.resourceName;
+				selector.resourceRoute = resourceObj.resourceUrl;
+				selector.resourceUrl = resourceObj.resourceUrl;
+				selector.enableToolbar = false;
+				selector.initializeContent();
+				this.popupView(selector, true);
+				selector.refreshGridData();
+				var me = this;
+
+				selector.addEventListener('things-grid-row-data-select', function(e) {
+					var valueField = resourceObj.valueField;
+					var row = grid.focusedRow();
+
+					if(row && row.dataIndex() >= 0) {
+						var rowObj = row.getRowObject();
+						var selectedObj = rowObj[resourceObj.valueField];
+						selectedObj.id = e.detail.id;
+						selectedObj[resourceObj.delegateColumn] = e.detail[resourceObj.delegateColumn];
+						rowObj[column._name] = e.detail.id;
+						grid.setValueAt(rowIdx, resourceObj.valueField, selectedObj);
+						//var updateCellIndex = grid.getCellIndex(rowIdx, resourceObj.valueField);
+						//grid.setCellValue(updateCellIndex, selectedObj);
+						grid.refreshView();
+						me.popupView(selector, false);
+					}
+				});
 			}
 
 		});

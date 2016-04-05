@@ -171,15 +171,21 @@ Things.ResourceMetaBehavior = {
 
 			if(['integer', 'int', 'long', 'double', 'float'].includes(metaData.col_type)) {
 				field.dataType = 'number';
+
 			} else if(['date', 'time'].includes(metaData.col_type)) {
 				field.dataType = 'datetime';
 				field.datetimeFormat = metaData.format? metaData.format : 'yyyy-MM-dd';
 			}
 
-			if(metaData.editor == 'resource-selector') {
+			if(metaData.editor && metaData.editor.indexOf('resource-column') >= 0) {
 				field.fieldName = field.fieldName.substr(0, field.fieldName.indexOf('_id'));
 				field.dataType = 'object';
 			}
+
+			if(metaData.editor && metaData.editor.indexOf('resource-selector') >= 0) {
+				field.fieldName = field.fieldName.substr(0, field.fieldName.indexOf('_id'));
+				field.dataType = 'object';
+			}			
 
 			return field;
 		});
@@ -200,8 +206,8 @@ Things.ResourceMetaBehavior = {
 		this._sortMetaData(gridColumnMetaList, 'list_rank');
 
 		var me = this;
-		// resource selector를 위한 컬럼 팝업 메뉴 
-		var columnPopupMenus = [];
+		// resource selector 컬럼 
+		var resourceSelectorColumns = [];
 
 		var gColumns = gridColumnMetaList.map(function(metaData) {
 			var field = { 
@@ -238,14 +244,14 @@ Things.ResourceMetaBehavior = {
 					field.styles.datetimeFormat = metaData.format ? metaData.format : 'yyyy-MM-dd';
 					field.styles.textAlignment = 'center';
 
-				} else if(metaData.editor == 'resource-selector') {
-					field.styles.textAlignment ='center';
+				} else if(metaData.editor.indexOf('resource-column') >= 0) {
+					me._newResourceColumn(metaData, field);
+
+				} else if(metaData.editor.indexOf('resource-selector') >= 0) {
+					var delegateColumn = me._newResourceColumn(metaData, field);
 					field.styles.iconIndex ='ellipsis_hover.png';
 					field.styles.iconLocation ='rightSide';
-					field.name = field.name.substr(0, field.name.indexOf('_id'));
-					field.fieldName = field.name;
-					field.header.text = field.name;
-					me._setColumnPopupMenu(metaData, field, columnPopupMenus);
+					me._setResourceEditorColumn(metaData, field, resourceSelectorColumns, delegateColumn);
 
 				} else if(metaData.editor == 'download-link') {
 					field.renderer = {
@@ -268,43 +274,70 @@ Things.ResourceMetaBehavior = {
 			return field;
 		});
 
-		if(columnPopupMenus.length > 0) 
-			this.gridConfig = { gridColumnPopupMenus : columnPopupMenus };
+		// Resource Selector가 있을 경우 컬럼 추가 
+		if(resourceSelectorColumns.length > 0) {
+			resourceSelectorColumns.forEach(function(rec) {
+				var oriFieldName = rec.fieldName.substr(0, rec.fieldName.indexOf('_id'));
+				var foundFields = gColumns.filter(function(col) { return col.name == oriFieldName});
+				var foundIdx = gColumns.indexOf(foundFields[0]);
+				gColumns.splice(foundIdx + 1, 0, rec);
+			});
+		}
 
 		return gColumns;
 	},
 
 	/**
-	 * column menu 설정 
+	 * resource column
+	 *
 	 * @param {Object} metaData
 	 * @param {Object} field
-	 * @param {Array} columnPopupMenus
+	 * @param {String} delegateColumn
 	 */
-	_setColumnPopupMenu: function(metaData, field, columnPopupMenus) {
-		var popupMenuId = field.name + '_Selector_' + columnPopupMenus.length + 1;
-		var grid = this.$.grid.getGridObject();
-		var dataSet = this.$.grid.getGridDataSet();
-		var me = this;
-		// var thingsGrid = me.grid._container_;
-		columnPopupMenus.push({ 
-			name : popupMenuId, 
-			menu : [{
-				label: 'Select',
-				callback: function(data) {
-					var index = grid.focusedIndex();
-					me._openDialog(grid, index);
-				}
-			}, {
-				label: 'Delete',
-				callback: function(data) {
-			        var idx = grid.focusedIndex();
-		            grid.setCellValue(idx, '');
-				}
-			}] 
-		});
-		
-		field.button = 'popup';
-		field.popupMenu = popupMenuId;
+	_newResourceColumn: function(metaData, field) {
+		var delegateColumn = 'name';
+		if(metaData.editor.indexOf('.') >= 0) {
+			delegateColumn = metaData.editor.substr(metaData.editor.indexOf('.') + 1);
+		}
+
+		field.name = field.name.substr(0, field.name.indexOf('_id'));
+		field.fieldName = field.name;
+		field.header.text = field.name;
+		field.valueType = 'text';
+		field.type = 'calced';
+
+		field.valueCallback = function(column, row) {
+			var obj = row.getValue(column._name);
+			return obj ? obj[delegateColumn] : '';
+		};
+
+		return delegateColumn;
+	},
+
+	/**
+	 * resource editor column 설정 
+	 *
+	 * @param {Object} metaData
+	 * @param {Object} field
+	 * @param {Array} resourceSelectorColumns
+	 * @param {String} delegateColumn
+	 */
+	_setResourceEditorColumn: function(metaData, field, resourceSelectorColumns, delegateColumn) {
+		var editorField = {
+			name: metaData.name, 
+			fieldName: metaData.name, 
+			width: 30,
+			editable: false,
+			userObj: {
+				resourceName: metaData.ref_name,
+				resourceUrl: metaData.format,
+				valueField: field.name,
+				delegateColumn: delegateColumn
+			},
+			header: { text: '...' }
+		};
+
+		resourceSelectorColumns.push(editorField);
 	},
 
 	/**
