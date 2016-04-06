@@ -71,10 +71,10 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				model="[[gridModel]]" 
 				columns="[[gridColumns]]"
 				config ="[[gridConfig]]"
-				data="[[lastResponse.items]]"
-				total-count="[[lastResponse.total]]"
 				current-page="{{page}}"
 				per-page="{{perPage}}"
+				data="[[lastResponse.items]]"
+				total-count="[[lastResponse.total]]"
 				grid-save-action="[[gridSaveUrl]]"
 				selected-row-data="{{selectedRow}}"
 				export-file-name="[[title]]"
@@ -84,13 +84,6 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				paginatable>
 			</things-resource-grid>
 
-			<!--things-resource-form 
-				id="resource-form"
-				title="[[title]] Detail"
-				resource-url="[[memberResourceUrl]]"
-				form-fields="[[resourceFormFields]]" 
-				input="{{selectedRow}}">
-			</things-resource-form-->
 		</div>
 	</template>
 
@@ -120,6 +113,14 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				},
 
 				/**
+				 * 자산의 Route 정보
+				 */
+				myRoute: {
+					type: String,
+					computed: '_computeRoute(resourceUrl)'
+				},
+
+				/**
 				 * 그리드 저장 (Multiple Save) URL
 				 */
 				gridSaveUrl: {
@@ -135,33 +136,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				},
 
 				/**
-				 * Get/Update/Delete 등을 위한 {resourceUrl}/:id 형식 URL
-				 */
-				memberResourceUrl: {
-					type: String,
-					computed: '_computeMemberResourceUrl(resourceUrl)'
-				},
-
-				/**
-				 * 검색 결과 리스트
-				 */
-				items: {
-					type: Array,
-					notify: true,
-					readonly: true
-				},
-
-				/**
-				 * 검색 결과 총 레코드 카운트 
-				 */
-				totalCount: {
-					type: Number,
-					notify: true,
-					readonly: true
-				},
-
-				/**
-				 * Detail 버튼을 활성화 시킬 지 여부  
+				 * Detail 버튼을 활성화 시킬 지 여부
 				 */
 				enableDetailColumn: {
 					type: Boolean,
@@ -178,7 +153,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			},
 
 			listeners : {
-				'search-form.things-form-submit-success': '_searchDataHandler',
+				//'search-form.things-form-submit-success': '_searchDataHandler',
 				'grid.things-grid-detail-tap': '_showResourceForm',
 				'grid.things-grid-save-success': 'refreshGridData',
 				'grid.things-grid-resource-column-edit' : '_openResourceSelector'
@@ -186,6 +161,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 
 			/**
 			 * resourceUrl로 grid save url을 생성
+			 *
 			 * @param {String} resourceUrl
 			 * @return {String} grid save URL
 			 */
@@ -194,25 +170,26 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			},
 
 			/**
-			 * resourceUrl로 grid save url을 생성
+			 * resourceUrl로 route 정보를 다시 생성
+			 *
 			 * @param {String} resourceUrl
-			 * @return {String} grid save URL
+			 * @return {String} route
 			 */
-			_computeMemberResourceUrl: function(resourceUrl) {
-				return resourceUrl + '/:id';
+			_computeRoute: function(resourceUrl) {
+				return resourceUrl;
 			},
 
 			/**
 			 * 검색이 성공한 후 처리, rootProperty와 totalProperty로 실제 데이터와 총 레코드 수를 설정한다.
 			 */
-			_searchDataHandler: function(event) {
+			/*_searchDataHandler: function(event) {
 				if(this.rootProperty) {
 					this.items = event.detail[this.rootProperty];
 					this.totalCount = event.detail[this.totalProperty];
 				} else {
 					this.items = event.detail;
 				}
-			},
+			},*/
 
 			/**
 			 * open resource form dialog
@@ -222,14 +199,15 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				var viewElement = document.createElement('things-resource-form');
 				viewElement.id = 'resource-form';
 				viewElement.title = this.title + ' Detail';
-				viewElement.resourceUrl = this.memberResourceUrl;
+				viewElement.resourceUrl = this.resourceUrl + '/:id';
 				viewElement.resource = event.detail;
 				viewElement.formFields = this.resourceFormFields;
 				viewElement.openResourceForm(event.detail);
 			},
 
 			/**
-			 * research form
+			 * reload grid data
+			 * 결국 서치 폼에서 다시 검색한다.
 			 */
 			refreshGridData: function(grid) {
 				this.$['search-form'].submitMyForm();
@@ -239,7 +217,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 * 메뉴에 등록된 자신의 routing 정보를 리턴한다.
 			 */
 			getMyRoute: function() {
-				return this.resourceUrl;
+				return this.myRoute;
 			},
 
 			/**
@@ -263,7 +241,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				var resourceObj = event.detail.userObj;
 
 				var selector = document.createElement('things-resource-content');
-				selector.id = "resouce-dialog";
+				selector.id = "resource-dialog";
 				selector.layout = "fullbleed layout vertical";
 				selector.title = resourceObj.resourceName;
 				selector.resourceName = resourceObj.resourceName;
@@ -271,8 +249,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				selector.resourceUrl = resourceObj.resourceUrl;
 				selector.enableToolbar = false;
 				selector.initializeContent();
-				this.popupView(selector, true);
-				selector.refreshGridData();
+				this.openPopupView(selector, true, selector.refreshGridData);
 				var me = this;
 
 				selector.addEventListener('things-grid-row-data-select', function(e) {
@@ -288,13 +265,10 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 						rowObj[resourceObj.valueField] = selectedObj;
 						rowObj[column._name] = e.detail.id;
 						dataSet.updateRow(rowIdx, rowObj);
-
-						//grid.setValueAt(rowIdx, resourceObj.valueField, selectedObj);
-						//var updateCellIndex = grid.getCellIndex(rowIdx, resourceObj.valueField);
-						//grid.setCellValue(updateCellIndex, selectedObj);
-
+						// popup 닫기 
+						me.closePopupView();
+						// 부모 그리드 Refresh					
 						grid.refreshView();
-						me.popupView(selector, false);
 					}
 				});
 			}

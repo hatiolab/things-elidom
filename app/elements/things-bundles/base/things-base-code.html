@@ -14,6 +14,8 @@
 <link rel="import" href="../../things-form/things-resource-form.html">
 <link rel="import" href="../../things-form/things-search-form.html">
 
+<link rel="import" href="../../things-content/things-full-dialog.html">
+<link rel="import" href="../../things-content/things-load-view-behavior.html">
 <link rel="import" href="../../things-content/things-resource-meta-behavior.html">
 <link rel="import" href="../../things-content/things-route-content-behavior.html">
 
@@ -54,30 +56,22 @@
 
 			<things-resource-grid 
 				id="grid"
-				grid-model="[[gridModel]]" 
+				model="[[gridModel]]" 
 				columns="[[gridColumns]]"
-				infinitable
-				paginatable
-				page="{{page}}"
-				limit="{{perPage}}"
-				root-property="[[rootProperty]]"
-				total-property="[[totalProperty]]"
-				read-data="[[lastResponse]]"
+				config ="[[gridConfig]]"
+				data="[[lastResponse.items]]"
+				total-count="[[lastResponse.total]]"
+				current-page="{{page}}"
+				per-page="{{perPage}}"
 				grid-save-action="[[gridSaveUrl]]"
 				selected-row-data="{{selectedRow}}"
 				export-file-name="[[title]]"
 				export-sheet-name="[[title]]"
-				readonly = "[[readonly]]"
-				enable-check-box ="[[enableCheckBox]]">
+				enable-detail-column
+				enable-toolbar
+				paginatable>
 			</things-resource-grid>
 
-			<things-resource-form 
-				id="resource-form"
-				title="[[title]] Detail"
-				resource-url="[[memberResourceUrl]]"
-				form-fields="[[resourceFormFields]]" 
-				input="{{selectedRow}}">
-			</things-resource-form>
 		</div>
 	</template>
 
@@ -87,7 +81,8 @@
 
 			behaviors: [ 
 				Things.ResourceMetaBehavior,
-				Things.RouteContentBehavior
+				Things.RouteContentBehavior,
+				Things.LoadViewBehavior
 			],
 			
 			properties: {
@@ -114,24 +109,6 @@
 				},
 
 				/**
-				 * Search Form에서 검색 결과 Object 중에서 List를 나타내는 프로퍼티 
-				 * 검색 폼 프로퍼티와 그리드 프로퍼티의 연결 프로퍼티 
-				 */
-				rootProperty: {
-					type: String,
-					value: 'items'
-				},
-
-				/**
-				 * Search Form에서 검색 결과 Object 중에서 Total을 나타내는 프로퍼티 
-				 * 검색 폼 프로퍼티와 그리드 프로퍼티의 연결 프로퍼티 
-				 */
-				totalProperty: {
-					type: String,
-					value: 'total'
-				},
-
-				/**
 				 * 그리드에서 선택된 Row Data
 				 */
 				selectedRow: {
@@ -149,8 +126,7 @@
 
 			listeners : {
 				'grid.things-grid-detail-tap': '_showResourceForm',
-				'grid.things-grid-save-success': '_refreshGridData',
-				'resource-form.things-resource-form-saved' : '_refreshGridData'
+				'grid.things-grid-save-success': 'refreshGridData',
 			},
 
 			/**
@@ -182,7 +158,7 @@
 			/**
 			 * research form
 			 */
-			_refreshGridData: function(grid) {
+			refreshGridData: function(grid) {
 				this.$['search-form'].getMyForm().submit();
 			},
 

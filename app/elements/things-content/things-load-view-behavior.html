@@ -36,9 +36,17 @@ Things.LoadViewBehavior = {
 	 *
 	 * @param {Object} view
 	 * @param {Boolean} modal
+	 * @param {Function} openCallback
 	 */
-	popupView: function(view, modal) {
-		app.$['common-full-dialog'].openBasicDialog(view, modal);
+	openPopupView: function(view, modal, openCallback) {
+		app.$['common-full-dialog'].openBasicDialog(view, modal, openCallback);
+	},
+
+	/**
+	 * view를 기본 다이얼로그로 닫는다.
+	 */
+	closePopupView: function() {
+		app.$['common-full-dialog'].closeBasicDialog();
 	},
 
 	/**

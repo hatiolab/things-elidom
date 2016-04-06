@@ -219,7 +219,7 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 				upload.method = 'POST';
 				upload.timeout = 300000;
 				upload.hidden = false;
-				this.popupView(upload, true);
+				this.openPopupView(upload, true);
 			},
 
 			/**
@@ -262,7 +262,7 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 				selector.resourceName="StorageInfo";
 				selector.resourceUrl="storage_infos";
 				selector.enableToolbar =false;
-				this.popupView(selector, true);
+				this.openPopupView(selector, true);
 				selector.initializeContent();
 				selector.refreshGridData();
 
