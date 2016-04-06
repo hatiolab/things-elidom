@@ -24,35 +24,29 @@ Example:
 				display: block;
 			}
 		</style>
-		<things-combo items ="{{_suportedList}}" label="locale" label-path="" value-path="">
-
-		</things-combo>
+	    <things-code-selector 
+	      id="code-selector" 
+	      label="Language" 
+	      value="en-US" 
+	      code-name="LOCALE" 
+	      label-path="description" 
+	      value-path="name">
+	    </things-code-selector>
 	</template>
 	<script>
 		Polymer({
 			is: 'things-locale-combo',
-			properties:{
-				locale:{
-					type: String,
-					obsever:'requestLocale'
-				},
-				_suportedList :{
-					type: Object
-				}
+			listeners: {
+			  'code-selector.things-combo-value-changed' : '_onComboValueChanged'
+			},
+
+			_onComboValueChanged:function (event) {
+				this.requestLocale(event.detail.value);
 			},
 
 			requestLocale:function (locale) {
 				document.l10n.requestLocales(locale);
 			},
-
-			setSuportedList:function () {
-				var me = this;
-
-				document.l10n.ready(function () {
-					me._suportedList = document.l10n.supportedLocales;
-					console.log(me._suportedList);
-				});
-			}
 		});
 	</script>
 </dom-module>

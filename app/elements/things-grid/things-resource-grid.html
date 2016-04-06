@@ -99,10 +99,7 @@
 					<things-import-excel-button 
 						color="green" 
 						id="import-btn"
-						sheet-name="Sheet1"
-						parsed-result="{{input}}"
-						root-property="[[rootProperty]]"
-						total-property="[[totalProperty]]">Import
+						sheet-name="Sheet1">Import
 					</things-import-excel-button>
 
 					<!--things-button-bar id="button-group" buttons="[[buttons]]"></things-button-bar-->
@@ -237,6 +234,8 @@
 				'button-group.things-button-tap' : '_onButtonTap',		
 				'save-resource.things-resource-ajax-success' : '_successSaveHandler',
 				'save-resource.things-resource-ajax-error' : '_errorSaveHandler',
+				'import-btn.excel-process-finish':'_loadExcelData'
+
 			},
 
 			created: function() {
@@ -298,7 +297,19 @@
 					this.fire('things-button-' + buttonId + '-tap', e.detail);
 				}
 			},
+			/**
+			 * load excel data to grid
+			 */
+			_loadExcelData : function(event){
 
+				new DataLudi.DataLoader(this.dataSet).load("json", '', {
+		        });
+
+		        new DataLudi.DataLoader(this.dataSet).load("json", event.detail, {
+		        	fillMode: 'insert', // 'insert', 'append', 'update', 기본은 'set'
+		            fillPos: 0
+		        });
+			},
 			/**
 			 * Dataludi grid cell click 이벤트 핸들러 
 			 *
