@@ -1,6 +1,5 @@
-<script defer href="../../../bower_components/dist/compat/web/l20n.js"></script>
-<link rel="import" href="../../things-combo/things-combo.html">
-<link rel="localization" href="./locales/manifest.json">
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../things-combo/things-code-selector.html">
 <!--
 A comment describing this element
 
@@ -36,6 +35,18 @@ Example:
 	<script>
 		Polymer({
 			is: 'things-locale-combo',
+			properties:{
+				/**
+				 * localiztion Object
+				 * L+ 10 characters +N
+				 */
+				l10n :{
+					type: Object,
+					readonly:true,
+					notify:true
+				}
+			},
+
 			listeners: {
 			  'code-selector.things-combo-value-changed' : '_onComboValueChanged'
 			},
@@ -45,8 +56,9 @@ Example:
 			},
 
 			requestLocale:function (locale) {
+				this.l10n = document.l10n;
 				document.l10n.requestLocales(locale);
-			},
+			}
 		});
 	</script>
 </dom-module>

@@ -6,6 +6,6 @@
   ],
   "default_locale": "en-US",
   "resources": [
-    "./{{locale}}.l20n"
+    "http://192.168.35.37:9002/rest/terminologies/l20n/{{locale}}"
   ]
 }
