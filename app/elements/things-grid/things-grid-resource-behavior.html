@@ -56,13 +56,6 @@ Things.GridResourceBehaviorImpl = {
 	},
 
 	/**
-	 * import from excel
-	 */
-	importGridData: function() {
-		// TODO
-	},
-
-	/**
 	 * export to excel
 	 */
 	exportGridData: function() {
@@ -78,13 +71,17 @@ Things.GridResourceBehaviorImpl = {
 	 * remove grid row. 실제 삭제하지 않고 플래그 처리한 후 save시 서버에서 일괄 처리한다.
 	 */
 	removeGridRow: function() {
-		var row = this.grid.focusedRow();
-		if (row && row.dataIndex() >= 0) {
-			if (this.dataSet.getRowState(row.dataIndex()) == 'created') {
-				this.dataSet.setRowState(row.dataIndex(), 'createAndDeleted');
-			} else {
-				this.dataSet.setRowState(row.dataIndex(), 'deleted');
-			}
+		var rows = this.grid.getCheckedRows();
+		if (rows && rows.length > 0) {
+			var ds = this.dataSet;
+
+			rows.forEach(function(row) {
+				if (ds.getRowState(row.dataIndex()) == 'created') {
+					ds.setRowState(row.dataIndex(), 'createAndDeleted');
+				} else {
+					ds.setRowState(row.dataIndex(), 'deleted');
+				}
+			});
 		}
 	},
 
@@ -92,8 +89,8 @@ Things.GridResourceBehaviorImpl = {
 	 * add grid row
 	 */
 	addGridRow: function() {
-		var row = Math.max(this.grid.focusedDataIndex(), 0);
-		this.grid.insert(row);
+		this.grid.editOptions().setInsertable(true).setAppendable(true);
+		this.dataSet.insertRow(0, {});
 	},
 
 	/**
