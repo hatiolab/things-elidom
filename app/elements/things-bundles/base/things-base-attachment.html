@@ -69,12 +69,12 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 				current-page="{{page}}"
 				per-page="[[perPage]]"
 				grid-save-action="[[gridSaveUrl]]"
-				selected-row-data="{{selectedRow}}"
 				export-file-name="[[title]]"
 				export-sheet-name="[[title]]"
-				enable-detail-column
 				buttons="[[buttons]]"
-				paginatable>
+				enable-detail-column
+				paginatable
+				enable-toolbar>
 			</things-resource-grid>
 
 		</div>
@@ -89,7 +89,8 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 				Things.RouteContentBehavior,
 				Things.LoadViewBehavior,
 				Things.GlobalBehavior,
-				Things.MsgBoxBehavior
+				Things.MsgBoxBehavior,
+				Things.LoadViewBehavior
 			],
 			
 			properties: {
@@ -113,39 +114,6 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 				gridSaveUrl: {
 					type: String,
 					computed: '_computeGridSaveUrl(resourceUrl)'
-				},
-
-				/**
-				 * Search Form에서 검색 결과 Object 중에서 List를 나타내는 프로퍼티 
-				 * 검색 폼 프로퍼티와 그리드 프로퍼티의 연결 프로퍼티 
-				 */
-				rootProperty: {
-					type: String,
-					value: 'items'
-				},
-
-				/**
-				 * Search Form에서 검색 결과 Object 중에서 Total을 나타내는 프로퍼티 
-				 * 검색 폼 프로퍼티와 그리드 프로퍼티의 연결 프로퍼티 
-				 */
-				totalProperty: {
-					type: String,
-					value: 'total'
-				},
-
-				/**
-				 * 그리드에서 선택된 Row Data
-				 */
-				selectedRow: {
-					type: Object
-				},
-
-				/**
-				 * Get/Update/Delete 등을 위한 {resourceUrl}/:id 형식 URL
-				 */
-				memberResourceUrl: {
-					type: String,
-					computed: '_computeMemberResourceUrl(resourceUrl)'
 				},
 
 				/**
@@ -179,9 +147,9 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 
 			listeners : {
 				'grid.things-grid-detail-tap': '_showResourceForm',
-				'grid.things-grid-save-success': '_refreshGridData',
-				'grid.things-grid-detail-tap' : '_onDetailButtonTap',
-				'grid.things-button-upload-tap' : '_onTapUpload'
+				'grid.things-button-upload-tap' : '_onTapUpload',
+				'grid.things-grid-save-success': 'refreshGridData',
+				'grid.things-grid-resource-column-edit' : '_openResourceSelector'
 			},
 
 			/**
@@ -194,18 +162,9 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 			},
 
 			/**
-			 * resourceUrl로 grid save url을 생성
-			 * @param {String} resourceUrl
-			 * @return {String} grid save URL
-			 */
-			_computeMemberResourceUrl: function(resourceUrl) {
-				return resourceUrl + '/:id';
-			},
-
-			/**
 			 * research form
 			 */
-			_refreshGridData: function(grid) {
+			refreshGridData: function(grid) {
 				this.$['search-form'].getMyForm().submit();
 			},
 
@@ -251,25 +210,51 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 				this.$['resource-meta'].generateRequest();
 			},
 
-			_openDialog : function(grid, index){
+			/**
+			 * Open Resource Selector Dialog
+			 *
+			 * @param {Object} event
+			 */
+			_openResourceSelector: function(event) {
+				var index = event.detail.index;
+				var grid = index._grid;
+				var column = index.column;
+				var rowIdx = index.rowIndex;
+				var resourceObj = event.detail.userObj;
+
 				var selector = document.createElement('things-resource-content');
+				selector.id = 'resource-dialog';
+				selector.layout = 'fullbleed layout vertical';
+				selector.title='StorageInfo';
+				selector.resourceRoute='StorageInfo';
+				selector.resourceName='StorageInfo';
+				selector.resourceUrl='storage_infos';
+				selector.enableToolbar = false;
+				selector.initializeContent();
+				this.openPopupView(selector, true, selector.refreshGridData);
 				var me = this;
 
-				selector.id="resouceDialog";
-				selector.title="StorageInfo";
-				selector.layout="fullbleed layout vertical";
-				selector.resourceRoute="StorageInfo";
-				selector.resourceName="StorageInfo";
-				selector.resourceUrl="storage_infos";
-				selector.enableToolbar =false;
-				this.openPopupView(selector, true);
-				selector.initializeContent();
-				selector.refreshGridData();
+				selector.addEventListener('things-grid-row-data-select', function(e) {
+					var valueField = resourceObj.valueField;
+					var row = grid.focusedRow();
+					var dataSet = grid.dataSource();
 
-				selector.addEventListener('things-grid-row-data-select',function(event){
-					grid.setCellValue(index, event.detail.id);
+					if(row && row.dataIndex() >= 0) {
+						var rowObj = row.getRowObject();
+						var selectedObj = rowObj[resourceObj.valueField];
+						selectedObj.id = e.detail.id;
+						selectedObj[resourceObj.delegateColumn] = e.detail[resourceObj.delegateColumn];
+						rowObj[resourceObj.valueField] = selectedObj;
+						rowObj[column._name] = e.detail.id;
+						dataSet.updateRow(rowIdx, rowObj);
+						// popup 닫기 
+						me.closePopupView();
+						// 부모 그리드 Refresh					
+						grid.refreshView();
+					}
 				});
 			}
+
 		});
 	</script>
 </dom-module>
