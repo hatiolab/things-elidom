@@ -22,7 +22,8 @@
     "vaadin-upload": "^1.0.0-alpha2",
     "MockHttpRequest": "philikon/MockHttpRequest#master",
     "paper-fab-transitions": "^0.1.0",
-    "l20n": "^3.5.1"
+    "l20n": "^3.5.1",
+    "juicy-ace-editor": "^1.1.1"
   },
   "devDependencies": {
     "test-fixture": "PolymerElements/test-fixture#1.0.x",

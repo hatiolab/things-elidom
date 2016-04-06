@@ -15,6 +15,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../things-file-upload/things-file-upload.html">
 <link rel="import" href="../things-card/things-card-list.html">
 <link rel="import" href="../things-card/things-img-card.html">
+<link rel="import" href="../things-code-editor/things-code-editor.html">
+<link rel="import" href="../../../bower_components/juicy-ace-editor/juicy-ace-editor.html">
 
 <dom-module id="things-demo">
   <template>
@@ -22,7 +24,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	<style>
 	  @import "things-demo";
 	</style>
-	
+	<paper-material elevation="1">
+		<h2>things Code Editor</h2>
+	    <things-code-editor id="eval-editor"
+	                      theme="ace/theme/monokai"
+	                      mode="ace/mode/html"
+	                      default="<body></body>"
+	    ></things-code-editor>
+	</paper-material>
 	<paper-material class="Page-paper" elevation="1">
 	  <h2 class="Page-title">[[title]]</h2>
 
