@@ -92,14 +92,14 @@
 			this.detailView = view;
 			this.openCallback = openCallback;
 			dialog.appendChild(this.detailView);
-			dialog.toggle();
+			dialog.open();
 		},
 
 		/**
 		 * View를 기본적인 다이얼로그 내에 닫는다.
 		 */
 		closeBasicDialog: function() {
-			dialog.toggle();
+			this.$.dialog.close();
 		},
 
 		/**
