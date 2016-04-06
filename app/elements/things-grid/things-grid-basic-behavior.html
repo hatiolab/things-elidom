@@ -156,12 +156,27 @@ Things.GridBasicBehaviorImpl = {
                 ]
             });
 
-            this.grid.body().setCellDynamicStyles([{
-                expression: 'row % 2',
-                styles: {
-                    background: '#20006060'
+            this.grid.body().setCellDynamicStyles([
+                // {
+                //     expression: "state == 'c'",
+                //     styles: {
+                //         background: '#1000ff00'
+                //     }
+                // },
+                // {
+                //     expression: "state == 'u'",
+                //     styles: {
+                //         background: '#10ff0000'
+                //     }
+                // },
+                {
+                    expression: "(row % 2) > 0",
+                    styles: {
+                        background: '#20006060'
+                    }
                 }
-            }]);
+
+            ]);
 
             this.grid._container_ = this;
             this.registerGridEvent();

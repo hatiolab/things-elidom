@@ -14,15 +14,17 @@ Example:
 @demo demo/index.html
 -->
 <link rel="import" href="../things-button/things-button.html">
+<script src='shim.js'></script>
+<script src='../../../bower_components/jszip/dist/jszip.min.js'></script>
+<script src='../../../lib/js-xlsx/dist/ods.js'></script>
+<script src='../../../lib/js-xlsx/dist/xlsx.js'></script>
+
+
 <dom-module id="things-import-excel-button">
 	<template>
 		<things-button color="green" id="import-btn" on-click="_importClick">Import</things-button>
 		<input type="file" id="fileInput" on-change="_handleFile" hidden multiple="{{multi}}" accept="{{accept}}">
 	</template>
-	<script src='shim.js'></script>
-	<script src='../../../bower_components/js-xlsx/dist/xlsx.js'></script>
-	<script src='../../../bower_components/js-xlsx/dist/jszip.js'></script>
-	<script src='../../../bower_components/js-xlsx/dist/ods.js'></script>
 	<script>
 		Polymer({
 			is: 'things-import-excel-button',
@@ -59,24 +61,24 @@ Example:
 				},
 				sheetName:{
 					type:String
-				},
-				/**
-				 * root property of loaded data
-				 * @type String
-				 */
-				rootProperty: {
-					type: String,
-					value: ''
-				},
+				}
+				// /**
+				//  * root property of loaded data
+				//  * @type String
+				//  */
+				// rootProperty: {
+				// 	type: String,
+				// 	value: ''
+				// },
 
-				/**
-				 * total count property of loaded data
-				 * @type String
-				 */
-				totalProperty: {
-					type: String,
-					value: ''
-				},
+				// /**
+				//  * total count property of loaded data
+				//  * @type String
+				//  */
+				// totalProperty: {
+				// 	type: String,
+				// 	value: ''
+				// },
 			},
 
 			created:function(){
@@ -173,9 +175,13 @@ Example:
 				if(me.sheetName){
 					var items = me.excel.utils.sheet_to_row_object_array(workbook.Sheets[me.sheetName]);
 					var total = items.length;
-
-					result[this.rootProperty] = items;
-					result[this.totalProperty] = total;
+					if(me.rootProperty)
+					{
+						result[me.rootProperty] = items;
+						result[me.totalProperty] = total;
+					}else{
+						result = items;
+					}
 					return result;
 				}else{
 					workbook.SheetNames.forEach(function(sheetName) {
@@ -183,8 +189,15 @@ Example:
 						var total = roa.length;
 						if(roa.length > 0){
 							result[sheetName]={};
-							result[sheetName][this.rootProperty] = roa;
-							result[sheetName][this.totalProperty] = total
+							if(me.rootProperty)
+							{
+								result[sheetName][this.rootProperty] = roa;
+								result[sheetName][this.totalProperty] = total
+							}else{
+								result[sheetName] = roa;
+							}
+							// result[sheetName][this.rootProperty] = roa;
+							// result[sheetName][this.totalProperty] = total
 						}
 					});
 					return result;

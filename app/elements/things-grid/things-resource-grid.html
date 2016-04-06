@@ -266,8 +266,16 @@
 						});
 					}
 				};
-			},
+				//enableToolbar가 true인 경우 c.u.d활성화
+				if(this.enableToolbar)
+				{
+					this.grid.editOptions().setInsertable(true);
+					this.grid.editOptions().setAppendable(true);
+					this.grid.editOptions().setUpdatable(true);
+					this.grid.editOptions().setDeletable(true);
+				}
 
+			},
 			/**
 			 * when group button tap register button event
 			 */

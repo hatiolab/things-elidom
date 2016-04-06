@@ -1,0 +1,58 @@
+<script defer href="../../../bower_components/dist/compat/web/l20n.js"></script>
+<link rel="import" href="../../things-combo/things-combo.html">
+<link rel="localization" href="./locales/manifest.json">
+<!--
+A comment describing this element
+
+Example:
+
+    <my-elem></my-elem>
+
+Example:
+
+    <my-elem>
+      <h2>Hello my-elem</h2>
+    </my-elem>
+
+@demo demo/index.html
+-->
+
+<dom-module id="things-locale-combo">
+	<template>
+		<style>
+			:host {
+				display: block;
+			}
+		</style>
+		<things-combo items ="{{_suportedList}}" label="locale" label-path="" value-path="">
+
+		</things-combo>
+	</template>
+	<script>
+		Polymer({
+			is: 'things-locale-combo',
+			properties:{
+				locale:{
+					type: String,
+					obsever:'requestLocale'
+				},
+				_suportedList :{
+					type: Object
+				}
+			},
+
+			requestLocale:function (locale) {
+				document.l10n.requestLocales(locale);
+			},
+
+			setSuportedList:function () {
+				var me = this;
+
+				document.l10n.ready(function () {
+					me._suportedList = document.l10n.supportedLocales;
+					console.log(me._suportedList);
+				});
+			}
+		});
+	</script>
+</dom-module>
