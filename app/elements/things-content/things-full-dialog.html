@@ -27,6 +27,14 @@
 			right: 15%;
 			margin: 0px;
 		}
+		paper-dialog-scrollable{
+			position: fixed;
+			top: 10%;
+			bottom:10%;
+			left: 15%;
+			right: 15%;
+			margin: 0px;
+		}
   </style>
 
 	<template>
@@ -34,6 +42,12 @@
 			id='dialog' 
 			entry-animation="scale-up-animation"
 			exit-animation="fade-out-animation">
+				<paper-dialog-scrollable id="scrollroot">
+					
+				</paper-dialog-scrollable>
+				<div class="buttons">
+          			<paper-button dialog-dismiss>Close</paper-button>
+        		</div>
 		</paper-dialog>
 	</template>
 
@@ -80,9 +94,11 @@
 			var dialog = this.$.dialog;
 			dialog.modal = modal;
 			dialog.noCancelOnEscKey = false;
+			console.log(dialog.offsetWidth);
+			var scrollable = this.$.scrollroot.$.scrollable;
 
 			if(this.detailView) {
-				dialog.removeChild(this.detailView);
+				scrollable.removeChild(this.detailView);
 			} 
 
 			if(this.openCallback) {
@@ -91,7 +107,7 @@
 
 			this.detailView = view;
 			this.openCallback = openCallback;
-			dialog.appendChild(this.detailView);
+			scrollable.appendChild(this.detailView);
 			dialog.toggle();
 		},
 
