@@ -80,8 +80,8 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				export-file-name="[[title]]"
 				export-sheet-name="[[title]]"
 				enable-detail-column="[[enableDetailColumn]]"
-				paginatable
-				enable-toolbar>
+				enable-toolbar="[[enableToolbar]]"
+				paginatable>
 			</things-resource-grid>
 
 			<!--things-resource-form 
@@ -161,11 +161,19 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				},
 
 				/**
-				 * enableDetailColumn
+				 * Detail 버튼을 활성화 시킬 지 여부  
 				 */
 				enableDetailColumn: {
 					type: Boolean,
 					value: false
+				},
+
+				/**
+				 * Toolbar를 활성화 시킬 지 여부 
+				 */
+				enableToolbar: {
+					type: Boolean,
+					value: true
 				}
 			},
 
@@ -270,16 +278,21 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				selector.addEventListener('things-grid-row-data-select', function(e) {
 					var valueField = resourceObj.valueField;
 					var row = grid.focusedRow();
+					var dataSet = grid.dataSource();
 
 					if(row && row.dataIndex() >= 0) {
 						var rowObj = row.getRowObject();
 						var selectedObj = rowObj[resourceObj.valueField];
 						selectedObj.id = e.detail.id;
 						selectedObj[resourceObj.delegateColumn] = e.detail[resourceObj.delegateColumn];
+						rowObj[resourceObj.valueField] = selectedObj;
 						rowObj[column._name] = e.detail.id;
-						grid.setValueAt(rowIdx, resourceObj.valueField, selectedObj);
+						dataSet.updateRow(rowIdx, rowObj);
+
+						//grid.setValueAt(rowIdx, resourceObj.valueField, selectedObj);
 						//var updateCellIndex = grid.getCellIndex(rowIdx, resourceObj.valueField);
 						//grid.setCellValue(updateCellIndex, selectedObj);
+
 						grid.refreshView();
 						me.popupView(selector, false);
 					}
