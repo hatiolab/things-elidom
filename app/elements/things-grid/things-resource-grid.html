@@ -234,10 +234,9 @@
 			},
 
 			listeners: {
-				'import-btn.tap': 'importGridData',
 				'button-group.things-button-tap' : '_onButtonTap',		
-				'save-resource.response' : '_successSaveHandler',
-				'save-resource.error' : '_errorSaveHandler',
+				'save-resource.things-resource-ajax-success' : '_successSaveHandler',
+				'save-resource.things-resource-ajax-error' : '_errorSaveHandler',
 			},
 
 			created: function() {
