@@ -14,6 +14,7 @@
 <link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
 
 <link rel="import" href="../things-combo/things-code-selector.html">
+<link rel="import" href="../things-combo/things-resource-selector.html">
 <link rel="import" href="../things-date-picker/things-date-picker.html">
 <link rel="import" href="../things-date-picker/things-time-picker.html">
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
@@ -245,7 +246,7 @@ Things.FormBehaviorImpl = {
 			case 'button':
 				newElement = document.createElement('paper-button');
 				newElement = this.bindAttributes(newElement, element);
-				newElement.innerHTML =element.label;
+				newElement.innerHTML = element.label;
 				break;
 
 			case 'listbox':
@@ -284,6 +285,14 @@ Things.FormBehaviorImpl = {
 				newElement.setAttribute('code-name', element.codeName);
 				newElement.setAttribute('label-path', 'description');
 				newElement.setAttribute('value-path', 'name');
+				break;
+
+			case 'resource-selector':
+				newElement = document.createElement('things-resource-selector');
+				newElement.setAttribute('name', element.name);
+				newElement.setAttribute('label', element.label);
+				newElement.setAttribute('resource-name', element.userObj.resourceName);
+				newElement.setAttribute('resource-url', element.userObj.resourceUrl);
 				break;
 
 			case 'date':

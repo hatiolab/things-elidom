@@ -42,12 +42,10 @@
 			id='dialog' 
 			entry-animation="scale-up-animation"
 			exit-animation="fade-out-animation">
-				<paper-dialog-scrollable id="scrollroot">
-					
-				</paper-dialog-scrollable>
+				<paper-dialog-scrollable id="scrollroot"></paper-dialog-scrollable>
 				<div class="buttons">
-          			<paper-button dialog-dismiss>Close</paper-button>
-        		</div>
+					<paper-button dialog-dismiss>Close</paper-button>
+				</div>
 		</paper-dialog>
 	</template>
 
@@ -94,7 +92,6 @@
 			var dialog = this.$.dialog;
 			dialog.modal = modal;
 			dialog.noCancelOnEscKey = false;
-			console.log(dialog.offsetWidth);
 			var scrollable = this.$.scrollroot.$.scrollable;
 
 			if(this.detailView) {

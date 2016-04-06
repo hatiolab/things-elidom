@@ -9,6 +9,7 @@
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
 
 <link rel="import" href="../things-button/things-button.html">
+<link rel="import" href="../things-combo/things-resource-selector-behavior.html">
 <link rel="import" href="../things-resource/things-resource.html">
 <link rel="import" href="../things-grid/things-basic-grid.html">
 <link rel="import" href="../things-grid/things-resource-grid.html">
@@ -92,9 +93,9 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			is: 'things-resource-content',
 
 			behaviors: [ 
+				Things.ResourceSelectorBehavior,
 				Things.ResourceMetaBehavior,
-				Things.RouteContentBehavior,
-				Things.LoadViewBehavior
+				Things.RouteContentBehavior
 			],
 			
 			properties: {
@@ -235,42 +236,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 */
 			_openResourceSelector: function(event) {
 				var index = event.detail.index;
-				var grid = index._grid;
-				var column = index.column;
-				var rowIdx = index.rowIndex;
-				var resourceObj = event.detail.userObj;
-
-				var selector = document.createElement('things-resource-content');
-				selector.id = "resource-dialog";
-				selector.layout = "fullbleed layout vertical";
-				selector.title = resourceObj.resourceName;
-				selector.resourceName = resourceObj.resourceName;
-				selector.resourceRoute = resourceObj.resourceUrl;
-				selector.resourceUrl = resourceObj.resourceUrl;
-				selector.enableToolbar = false;
-				selector.initializeContent();
-				this.openPopupView(selector, true, selector.refreshGridData);
-				var me = this;
-
-				selector.addEventListener('things-grid-row-data-select', function(e) {
-					var valueField = resourceObj.valueField;
-					var row = grid.focusedRow();
-					var dataSet = grid.dataSource();
-
-					if(row && row.dataIndex() >= 0) {
-						var rowObj = row.getRowObject();
-						var selectedObj = rowObj[resourceObj.valueField];
-						selectedObj.id = e.detail.id;
-						selectedObj[resourceObj.delegateColumn] = e.detail[resourceObj.delegateColumn];
-						rowObj[resourceObj.valueField] = selectedObj;
-						rowObj[column._name] = e.detail.id;
-						dataSet.updateRow(rowIdx, rowObj);
-						// popup 닫기 
-						me.closePopupView();
-						// 부모 그리드 Refresh					
-						grid.refreshView();
-					}
-				});
+				this.openResourceSelectorByGrid(index._grid, index.rowIndex, event.detail.userObj, true);
 			}
 
 		});

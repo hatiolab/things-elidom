@@ -1,0 +1,127 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-fullscreen-dialog/paper-fullscreen-dialog.html">
+
+<link rel="import" href="../things-content/things-load-view-behavior.html">
+
+<script>
+
+window.Things = window.Things || {};
+
+/**
+ * ResourceSelector를 오픈해주는 Behavior.
+ * 
+ * ResourceSelector는 Form이나 Grid에서 오픈할 수 있다.
+ *
+ * @demo demo/index.html
+ */
+Things.ResourceSelectorBehaviorImpl = {
+
+  /**
+   * open resource selector - 그리드에서 사용 
+   *
+   * @params {Object} parentGrid
+   * @params {Object} parentGridRowIdx
+   * @params {Object} resourceObj
+   * @param {Boolean} modal modal로 오픈할 지 여부
+   */
+  openResourceSelectorByGrid: function(parentGrid, parentGridRowIdx, resourceObj, modal) {
+    var selector = this._createResourceContent(resourceObj.resourceName, resourceObj.resourceUrl);
+    this.openPopupView(selector, modal, selector.refreshGridData);
+    this._addSelectedListenerByGrid(selector, parentGrid, parentGridRowIdx, resourceObj);
+  },
+
+  /**
+   * resource-content element를 생성한다.
+   *
+   * @param {String} resourceName
+   * @param {String} resourceUrl
+   * @return {Object} element
+   */
+  _createResourceContent: function(resourceName, resourceUrl) {
+    var selector = document.createElement('things-resource-content');
+    selector.id = "resource-selector";
+    selector.layout = "fullbleed layout vertical";
+
+    selector.title = resourceName;
+    selector.resourceName = resourceName;
+    selector.resourceUrl = resourceUrl;
+    selector.enableToolbar = false;
+    selector.initializeContent();
+    return selector;
+  },
+
+  /**
+   * selector selected changed 
+   *
+   * @params {Object} parentGrid
+   * @params {Object} parentGridRowIdx
+   * @params {Object} resourceObj
+   * @param {Object} selector
+   */
+  _addSelectedListenerByGrid: function(selector, parentGrid, parentRowIdx, resourceObj) {
+    var me = this;
+
+    selector.addEventListener('things-grid-row-data-select', function(e) {
+      var row = parentGrid.focusedRow();
+      var dataSet = parentGrid.dataSource();
+      var valueField = resourceObj.valueField;
+      var delegateColumn = resourceObj.delegateColumn;
+
+      if(row && row.dataIndex() >= 0) {
+        var rowObj = row.getRowObject();
+        var selectedObj = rowObj[valueField];
+        selectedObj.id = e.detail.id;
+        selectedObj[delegateColumn] = e.detail[delegateColumn];
+        rowObj[valueField] = selectedObj;
+        dataSet.updateRow(parentRowIdx, rowObj);
+        // popup 닫기 
+        me.closePopupView();
+        // 부모 그리드 Refresh
+        parentGrid.refreshView();
+      }
+    });
+  },
+
+  /**
+   * open resource selector - form에서 사용 
+   *
+   * @params {Object} parentForm
+   * @params {Object} formField
+   * @params {Object} resourceObj
+   * @param {Boolean} modal modal로 오픈할 지 여부
+   */
+  openResourceSelectorByForm: function(container, modal) {
+    var selector = this._createResourceContent(container.resourceName, container.resourceUrl);
+    this.openPopupView(selector, modal, selector.refreshGridData);
+    this._addSelectedListenerByForm(selector, container);
+  },
+
+    /**
+   * selector selected changed 
+   *
+   * @params {Object} parentGrid
+   * @params {Object} parentGridRowIdx
+   * @params {Object} resourceObj
+   * @param {Object} selector
+   */
+  _addSelectedListenerByForm: function(selector, container) {
+    var me = this;
+
+    selector.addEventListener('things-grid-row-data-select', function(e) {
+      // popup 닫기 
+      me.closePopupView();
+      // 값 설정 
+      container.setValue(e.detail.id);
+      // 부모 그리드 Refresh
+      container.setDisplay(e.detail[container.delegateColumn]);
+    });
+  }
+
+};
+
+Things.ResourceSelectorBehavior = [
+  Things.ResourceSelectorBehaviorImpl,
+  Things.LoadViewBehavior
+];
+
+</script>

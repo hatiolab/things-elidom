@@ -128,8 +128,22 @@ Things.ResourceMetaBehavior = {
 				op : metaData.operator ? metaData.operator : 'eq'
 			};
 				
-			if(metaData.editor && ('code-combo' == metaData.editor)) {
-				field.codeName = metaData.ref_name;
+			if(metaData.editor) {
+				if('code-combo' == metaData.editor) {
+					field.codeName = metaData.ref_name;
+
+				} else if(metaData.editor.indexOf('resource-selector') >= 0) {
+					field.type = 'resource-selector';
+					field.userObj = {
+						delegateColumn : 'name',
+						resourceName : metaData.ref_name,
+						resourceUrl : metaData.format
+					};
+					
+					if(metaData.editor.indexOf('.') > 0) {
+						field.userObj.delegateColumn = metaData.editor.split('.')[1];
+					}
+				}
 			}
 
 			return field;
@@ -148,6 +162,13 @@ Things.ResourceMetaBehavior = {
 			var field = { name : metaData.name, label : metaData.name, type : metaData.editor };
 			if(metaData.editor && ('code-combo' == metaData.editor)) {
 				field.codeName = metaData.ref_name;
+
+			} else if(metaData.editor && (metaData.editor.indexOf('resource-selector') > 0)) {
+				field.type = 'resource-selector';
+				field.delegateColumn = 'name';
+				if(metaData.editor.indexOf('.') > 0) {
+					field.delegateColumn = metaData.editor.split('.')[1];
+				}
 			}
 
 			return field;
