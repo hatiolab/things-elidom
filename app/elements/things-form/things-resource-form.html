@@ -290,7 +290,7 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 				}
 
 				this.findResource(data.id);
-				//this.popupResourceForm(this, true);
+				//this.openPopupView(this, true);
 			},
 
 			/**
@@ -381,14 +381,17 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			},
 
 			/**
-			 * Save 액션 성공 후 후처리 things-resource-form-saved 이벤트가 fire된다.
+			 * Save 액션 성공 후 후처리 
+			 * method가 GET인 경우 : things-resource-form-read 이벤트
+			 * method가 PUT인 경우 : things-resource-form-saved 이벤트
+			 * method가 POST인 경우 : things-resource-form-created 이벤트
 			 */
 			_successResponseHandler: function(event) {
 				this.stopSpinner();
 
 				var method = event.srcElement.method.toUpperCase();
 				if(method == 'GET') {
-					this.popupResourceForm(this, true);
+					this.openPopupView(this, true);
 					this.fire('things-resource-form-read', event.detail);
 				} else if(method == 'PUT') {
 					this.fire('things-resource-form-saved', event.detail);

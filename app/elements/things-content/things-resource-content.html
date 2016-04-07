@@ -152,12 +152,20 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				enableToolbar: {
 					type: Boolean,
 					value: true
+				},
+
+				/**
+				 * detail element name
+				 */
+				detailElement: {
+					type: String,
+					value: 'things-resource-form'
 				}
 			},
 
 			listeners : {
 				//'search-form.things-form-submit-success': '_searchDataHandler',
-				'grid.things-grid-detail-tap': '_showResourceForm',
+				'grid.things-grid-detail-tap': '_showDetailView',
 				'grid.things-grid-save-success': 'refreshGridData',
 				'grid.things-grid-resource-column-edit' : '_openResourceSelector'
 			},
@@ -195,18 +203,47 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			},*/
 
 			/**
-			 * open resource form dialog
+			 * 디테일 뷰를 표시한다.
+			 *
 			 * @param {Event} event 그리드에서 선택된 event
 			 */
-			_showResourceForm: function(event) {
+			_showDetailView: function(event) {
+				if(!this.detailElement || this.detailElement == 'things-resource-form') {
+					this._showResourceForm(event.detail);
+				} else {
+					this._showCustomView(event.detail);
+				}
+			},
+
+			/**
+			 * 표준화된 리소스 디테일 폼을 표시한다.
+			 *
+			 * @param {Object} selectedRecord 그리드에서 선택된 Row Data
+			 */
+			_showResourceForm: function(selectedRecord) {
 				var viewElement = document.createElement('things-resource-form');
 				viewElement.id = 'resource-form';
 				viewElement.title = this.title + ' Detail';
-				viewElement.resourceUrl = this.resourceUrl + '/:id';
-				viewElement.resource = event.detail;
+				viewElement.resourceUrl = this.resourceUrl + '/' + selectedRecord.id;
+				viewElement.resource = selectedRecord;
 				viewElement.formFields = this.resourceFormFields;
-				viewElement.openResourceForm(event.detail);
+				viewElement.openResourceForm(selectedRecord);
 			},
+
+			/**
+			 * 프레임 웍에서 기본으로 제공하지 않는 리소스 디테일 폼을 표시한다.
+			 *
+			 * @param {Object} selectedRecord 그리드에서 선택된 Row Data
+			 */
+			_showCustomView: function(selectedRecord) {
+				var viewElement = document.createElement(this.detailElement);
+				viewElement.id = 'detail-view';
+				viewElement.title = this.title + ' Detail';
+				viewElement.resourceUrl = this.resourceUrl + '/' + selectedRecord.id;
+				viewElement.resource = selectedRecord;
+				viewElement.formFields = this.resourceFormFields;
+				viewElement.showDetailView(selectedRecord);
+			},			
 
 			/**
 			 * reload grid data
