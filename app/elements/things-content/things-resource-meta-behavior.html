@@ -39,11 +39,25 @@ Things.ResourceMetaBehavior = {
 
 		/**
 		 * resource meta data
-		 * resource metaData로 fromFields, gridModel, gridColumns를 파싱한다. 
+		 * resource metaData로 searchFromFields, resourceFormFields, gridModel, gridColumns, selectFields, sortFields를 파싱한다. 
 		 */
 		metaData: {
 			type: Array,
 			observer: 'parseMetaData'
+		},
+
+		/**
+		 * 리스트 조회시 검색할 필드 리스트. ',' 구분자로 구분한다.
+		 */
+		selectFields: {
+			type: String
+		},
+
+		/**
+		 * 리스트 조회시 오더링 할 필드 리스트
+		 */
+		sortFields: {
+			type: Array
 		},
 
 		/**
@@ -84,6 +98,7 @@ Things.ResourceMetaBehavior = {
 
 	/**
 	 * resourceName으로 resource meta url을 생성
+	 *
 	 * @param {String} resourceName
 	 * @return {String} resource meta get URL
 	 */
@@ -93,9 +108,12 @@ Things.ResourceMetaBehavior = {
 
 	/**
 	 * meta data를 파싱한다.
+	 *
 	 * @param {Array} metaDataList
 	 */
 	parseMetaData: function(metaDataList) {
+		if(!metaDataList || metaDataList.length == 0) return;
+
 		// 1. Parse Search Form Fields
 		this.searchFormFields = this._parseSearchFormFields(metaDataList);
 		// 2. Parse Resource Form Fields
@@ -104,17 +122,40 @@ Things.ResourceMetaBehavior = {
 		this.gridModel = this._parseGridModel(metaDataList);
 		// 4. Parse Grid Columns
 		this.gridColumns = this._parseGridColumns(metaDataList);
+		// 5. Parse Sort Fields
+		this.sortFields = this._parseSortFields(metaDataList);
 	},
 
 	/**
-	 * meta data로 부터 SearchFormField를 파싱한다.
+	 * meta data로 부터 SortFields로 파싱한다.
+	 *
+	 * @param {Array} metaDataList
+	 * @return {Array} searchFormFields
+	 */
+	_parseSortFields: function(metaDataList) {
+		var orderMetaList = metaDataList.filter(function(metaData) {
+			return metaData.sort_rank && metaData.sort_rank > 0; 
+		});
+
+		if(!orderMetaList || orderMetaList.length == 0) return;
+
+		this._sortMetaData(orderMetaList, 'sort_rank');
+
+		return orderMetaList.map(function(metaData) {
+			var asc = true;
+			if(metaData.reverse_sort && metaData.reverse_sort === true) asc = false;
+			return { field: metaData.name, ascending: asc }
+		});
+	},
+
+	/**
+	 * meta data로 부터 searchFormFields로 파싱한다.
+	 *
 	 * @param {Array} metaDataList
 	 * @return {Array} searchFormFields
 	 */
 	_parseSearchFormFields: function(metaDataList) {
-		if(!metaDataList) return;
-
-		var searchMetaList = metaDataList.filter(function(metaData) { 
+		var searchMetaList = metaDataList.filter(function(metaData) {
 			return metaData.search_rank && metaData.search_rank > 0; 
 		});
 
@@ -151,13 +192,12 @@ Things.ResourceMetaBehavior = {
 	},
 
 	/**
-	 * meta data로 부터 ResourceFormField를 파싱한다.
+	 * meta data로 부터 resourceFormFields로 파싱한다.
+	 *
 	 * @param {Array} metaDataList
 	 * @return {Array} resourceFormFields
 	 */
 	_parseResourceFormFields: function(metaDataList) {
-		if(!metaDataList) return;
-
 		return metaDataList.map(function(metaData) {
 			var field = { name : metaData.name, label : metaData.name, type : metaData.editor };
 			if(metaData.editor && ('code-combo' == metaData.editor)) {
@@ -172,22 +212,23 @@ Things.ResourceMetaBehavior = {
 			}
 
 			return field;
-		});				
+		});		
 	},
 
 	/**
-	 * meta data로 부터 GridModel을 파싱한다.
+	 * meta data로 부터 gridModel로 파싱한다.
+	 *
 	 * @param {Array} metaDataList
 	 * @return {Array} gridModel
 	 */
 	_parseGridModel: function(metaDataList) {
-		if(!metaDataList) return;
-		
 		var gridModelMetaList = metaDataList.filter(function(metaData) { 
 			return (metaData.name == 'id' || (metaData.list_rank && metaData.list_rank > 0));
 		});
 
-		return gridModelMetaList.map(function(metaData) {
+		var selectColumns = '';
+
+		var gridModel = gridModelMetaList.map(function(metaData) {
 			var field = { fieldName : metaData.name };
 
 			if(['integer', 'int', 'long', 'double', 'float'].includes(metaData.col_type)) {
@@ -206,20 +247,30 @@ Things.ResourceMetaBehavior = {
 			if(metaData.editor && metaData.editor.indexOf('resource-selector') >= 0) {
 				field.fieldName = field.fieldName.substr(0, field.fieldName.indexOf('_id'));
 				field.dataType = 'object';
+			}
+
+			if(selectColumns.length > 2) {
+				this.selectFields = selectColumns.substr(0, selectColumns.length - 1);	
 			}			
 
+			selectColumns += field.fieldName + ',';
 			return field;
 		});
+
+		if(selectColumns.length > 2) {
+			this.selectFields = selectColumns.substr(0, selectColumns.length - 1);	
+		}
+
+		return gridModel;
 	},
 
 	/**
-	 * meta data로 부터 GridColumns를 파싱한다.
+	 * meta data로 부터 gridColumns로 파싱한다.
+	 *
 	 * @param {Array} metaDataList
 	 * @return {Array} gridColumns
 	 */
 	_parseGridColumns: function(metaDataList) {
-		if(!metaDataList) return;
-		
 		var gridColumnMetaList = metaDataList.filter(function(metaData) { 
 			return (metaData.name == 'id' || (metaData.list_rank && metaData.list_rank > 0));
 		});

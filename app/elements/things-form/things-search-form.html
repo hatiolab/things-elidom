@@ -227,6 +227,7 @@
         form.request.params = this._handleSubmitParams(form.request.params);  
       }
       
+      form.request.params.select = this.selectFields ? this.selectFields : '';
       form.request.params.page = this.page;
       form.request.params.limit = this.perPage;
     },
@@ -234,13 +235,12 @@
     /**
      * handle submit params 
      * 서버에 보낼 파라미터를 재구성한다.
+     * @param {Object} params
      */
     _handleSubmitParams: function(params) {
-      var newParams = { select : this.selectFields ? this.selectFields : '' };
-      if(this.sortFields) {
-        newParams.sort = JSON.stringify(this.sortFields);
-      }
-
+      var newParams = this.sortFields ? { 
+        sort : (typeof(this.sortFields) == 'string' ? this.sortFields : JSON.stringify(this.sortFields))
+      } : {};
       var queries = [];
 
       for(prop in params) {
@@ -248,7 +248,7 @@
           var fieldModel = this.formFields.filter(function(formField) { return formField.name == prop })[0];
           var q = { name : prop, operator : fieldModel.op };
           if(!this.nonValueOpers.includes(fieldModel.op)) {
-            q.value = params[prop]; 
+            q.value = params[prop];
           }
           queries.push(q);
         }
