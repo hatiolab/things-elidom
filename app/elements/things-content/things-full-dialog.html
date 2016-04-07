@@ -27,7 +27,8 @@
 			right: 15%;
 			margin: 0px;
 		}
-		paper-dialog-scrollable{
+
+		paper-dialog-scrollable {
 			position: fixed;
 			top: 10%;
 			bottom:10%;
@@ -42,10 +43,10 @@
 			id='dialog' 
 			entry-animation="scale-up-animation"
 			exit-animation="fade-out-animation">
-				<paper-dialog-scrollable id="scrollroot"></paper-dialog-scrollable>
-				<div class="buttons">
-					<paper-button dialog-dismiss>Close</paper-button>
-				</div>
+			<paper-dialog-scrollable id="scrollroot"></paper-dialog-scrollable>
+			<div class="buttons">
+				<paper-button dialog-dismiss>Close</paper-button>
+			</div>
 		</paper-dialog>
 	</template>
 
@@ -55,6 +56,7 @@
 		is: 'things-full-dialog',
 
 		properties: {
+			
 			/**
 			* Dialog 내에 포함될 뷰 
 			*/
@@ -62,6 +64,9 @@
 				type: Object
 			},
 
+			/**
+			 * Dialog가 오픈된 후 콜백 
+			 */
 			openCallback: {
 				type: Object
 			}

@@ -160,7 +160,8 @@ Things.ResourceMetaBehavior = {
 		});
 
 		this._sortMetaData(searchMetaList, 'search_rank');
-
+		var me = this;
+		
 		return searchMetaList.map(function(metaData) {
 			var field = { 
 				name : metaData.name, 
@@ -169,24 +170,7 @@ Things.ResourceMetaBehavior = {
 				op : metaData.operator ? metaData.operator : 'eq'
 			};
 				
-			if(metaData.editor) {
-				if('code-combo' == metaData.editor) {
-					field.codeName = metaData.ref_name;
-
-				} else if(metaData.editor.indexOf('resource-selector') >= 0) {
-					field.type = 'resource-selector';
-					field.userObj = {
-						delegateColumn : 'name',
-						resourceName : metaData.ref_name,
-						resourceUrl : metaData.format
-					};
-					
-					if(metaData.editor.indexOf('.') > 0) {
-						field.userObj.delegateColumn = metaData.editor.split('.')[1];
-					}
-				}
-			}
-
+			if(metaData.editor) me._parseFormField(field, metaData)
 			return field;
 		});
 	},
@@ -198,21 +182,33 @@ Things.ResourceMetaBehavior = {
 	 * @return {Array} resourceFormFields
 	 */
 	_parseResourceFormFields: function(metaDataList) {
+		var me = this;
 		return metaDataList.map(function(metaData) {
 			var field = { name : metaData.name, label : metaData.name, type : metaData.editor };
-			if(metaData.editor && ('code-combo' == metaData.editor)) {
-				field.codeName = metaData.ref_name;
-
-			} else if(metaData.editor && (metaData.editor.indexOf('resource-selector') > 0)) {
-				field.type = 'resource-selector';
-				field.delegateColumn = 'name';
-				if(metaData.editor.indexOf('.') > 0) {
-					field.delegateColumn = metaData.editor.split('.')[1];
-				}
-			}
-
+			if(metaData.editor) me._parseFormField(field, metaData)
 			return field;
 		});		
+	},
+
+	/**
+	 * form field를 파싱한다.
+	 */
+	_parseFormField: function(field, metaData) {
+		if('code-combo' == metaData.editor) {
+			field.codeName = metaData.ref_name;
+
+		} else if(metaData.editor.indexOf('resource-selector') >= 0) {
+			field.type = 'resource-selector';
+			field.userObj = {
+				delegateColumn : 'name',
+				resourceName : metaData.ref_name,
+				resourceUrl : metaData.format
+			};
+			
+			if(metaData.editor.indexOf('.') > 0) {
+				field.userObj.delegateColumn = metaData.editor.split('.')[1];
+			}
+		}
 	},
 
 	/**
