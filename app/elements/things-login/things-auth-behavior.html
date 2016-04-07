@@ -27,9 +27,9 @@ Things.AuthBehaviorImpl = {
     this.unlisten(this.signoutAjax, 'error', '_signoutFailure');
   },
 
-  signout: function() {
+  signout: function(logoutUrl) {
     // TODO 로그아웃 URL global에서 관리 
-    this.signoutAjax.url = 'http://192.168.35.229:9004/rest/logout';
+    this.signoutAjax.url = logoutUrl;
     this.signoutAjax.method = 'POST';
     this.signoutAjax.withCredentials = true;
     this.signoutAjax.generateRequest();

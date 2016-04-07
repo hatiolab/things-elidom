@@ -82,13 +82,14 @@
         <iron-icon icon="icons:account-circle">
         </iron-icon>{{ globals.user.name }}
       </div-->
-
-      <div class="user-menu pull-right">
+      <div class="user-menu pull-left">
         <paper-icon-button icon="icons:menu" id="sidebar-toggler" class="side-toggle pull-left">
         </paper-icon-button>
-        <!-- <things-locale-combo></things-locale-combo> -->
-        <paper-icon-button icon="icons:search" id="toggleSetting"></paper-icon-button>
         <!-- <things-setting ></things-setting> -->
+      </div>
+      <div class="user-menu pull-right">
+        <paper-icon-button icon="icons:search" id="toggleSetting"></paper-icon-button>
+        <things-logout url="logout" icon="icons:exit-to-app"></things-logout>
       </div>      
     </div>
 

@@ -16,15 +16,13 @@
         is: 'things-logout',
 
         behaviors: [ 
-          Things.GlobalBehavior, 
           Things.AuthBehavior 
         ],
 
         properties: {
           url: {
             type: String,
-            value: '',
-            notify: true
+            value: ''
           },
 
           logoutUrl: {
@@ -34,8 +32,7 @@
 
           icon: {
             type: String,
-            value: 'exit-to-app',
-            notify: true
+            value: 'exit-to-app'
           }
         },
 
@@ -49,7 +46,7 @@
 
         logout: function(e) {
           if(this.isSignedIn()) {
-            this.signout();
+            this.signout(this.url);
           }
         }
 
