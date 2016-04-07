@@ -295,6 +295,9 @@ Custom property | Description | Default
           observer: '_valueChanged'
         },
 
+        /**
+         * label
+         */
         label: {
           type: String
         }
@@ -318,8 +321,6 @@ Custom property | Description | Default
       },
 
       _valueChanged: function(value) {
-        console.log(value);
-
         if(value === true || value === 'true') {
           this.state = 'on';
         } else if(value === false || value === 'false') {

@@ -1,5 +1,6 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+
 <link rel="import" href="../things-setting/things-global-behavior.html">
 <link rel="import" href="../things-setting/things-setting-dialog.html">
 <link rel="import" href="../things-setting/things-setting.html">
@@ -9,62 +10,75 @@
   <template>
 	<style>
 	  :host {
-		display: block;
-		background-color:var(--paper-blue-grey-800);
-		color:#fff;
+			display: block;
+			background-color:var(--paper-blue-grey-800);
+			color:#fff;
 	  }
-	  :host iron-icon{
-		width:15px;height:15px;
-		margin-right:4px;
+	  
+	  :host iron-icon {
+			width:15px;height:15px;
+			margin-right:4px;
 	  }
-	  :host .side-toggle{background-color:var(--paper-teal-700);}
-	  :host .side-toggle paper-icon-button{
-		width:31px;height:31px;
-		margin-left:3px;
-		padding:0 4px 0 2px;
+
+	  :host .side-toggle {
+	  	background-color:var(--paper-teal-700);
 	  }
-	  :host .user-menu{
-		padding:7px 5px 0 0;
-		color:var(--paper-blue-grey-400);
-		font-size:13px;
+
+	  :host .side-toggle paper-icon-button {
+			width:31px;height:31px;
+			margin-left:3px;
+			padding:0 4px 0 2px;
 	  }
-	  :host .user-menu paper-icon-button{
-		width:18px;height:18px;
-		position:relative;
-		top:-1px;
-		margin-left:5px;
-		padding:1px;
-		color:var(--paper-blue-grey-200);
+
+	  :host .user-menu {
+			padding:7px 5px 0 0;
+			color:var(--paper-blue-grey-400);
+			font-size:13px;
 	  }
-	  :host .user-menu things-logout::shadow paper-icon-button{
-		width:18px;height:18px;
-		position:relative;
-		top:-1px;
-		margin-left:1px;
-		padding:0px;
-		color:var(--paper-blue-grey-200);
+
+	  :host .user-menu paper-icon-button {
+			width:18px;height:18px;
+			position:relative;
+			top:-1px;
+			margin-left:5px;
+			padding:1px;
+			color:var(--paper-blue-grey-200);
 	  }
-	  :host .search{padding:5px 0 3px 5px;}
-	  :host .search input{
-		background-color:rgba(255,255,255,.1);
-		border-radius:3px;
-		border:1px solid rgba(255,255,255,.15);
-		padding:1px 3px;
-		max-width:120px;
-		color:#fff;
-		font-size:13px;
+
+	  :host .user-menu things-logout::shadow paper-icon-button {
+			width:18px;height:18px;
+			position:relative;
+			top:-1px;
+			margin-left:1px;
+			padding:0px;
+			color:var(--paper-blue-grey-200);
 	  }
-	  :host .search paper-icon-button{
-		width:22px;height:22px;
-		margin-left:3px;
-		padding:1px;
+
+	  :host .search {
+	  	padding:5px 0 3px 5px;
 	  }
+
+	  :host .search input {
+			background-color:rgba(255,255,255,.1);
+			border-radius:3px;
+			border:1px solid rgba(255,255,255,.15);
+			padding:1px 3px;
+			max-width:120px;
+			color:#fff;
+			font-size:13px;
+	  }
+
+	  :host .search paper-icon-button {
+			width:22px;height:22px;
+			margin-left:3px;
+			padding:1px;
+		}
 	</style>
 
 	<div>
 		<paper-icon-button icon="icons:menu" id="sidebar-toggler">
 		</paper-icon-button>
-		<paper-icon-button icon="icons:search" id="toggleSetting"></paper-icon-button>
+		<paper-icon-button icon="icons:settings" id="toggleSetting"></paper-icon-button>
 		<things-logout id="logout" action="logout" icon="icons:exit-to-app"></things-logout>
 	</div>
 
@@ -74,36 +88,36 @@
 	(function() {
 	  'use strict';
 
-	  Polymer({
+		Polymer({
 		is: 'things-header',
 
 		behaviors: [ Things.GlobalBehavior ],
 
 		properties: {
-		  /**
-		   * drawer id
-		   */
-		  drawerId: {
-			type: String
-		  },
+			/**
+			 * drawer id
+			 */
+			drawerId: {
+				type: String
+			},
 
-		  /**
-		   * signed-in user object
-		   */
-		  user: {
-			type: Object,
-			value: {
-			  name: '',
-			  id: ''
+			/**
+			 * signed-in user object
+			 */
+			user: {
+				type: Object,
+				value: {
+					name: '',
+					id: ''
+				}
 			}
-		  }
 		},
 
 		listeners: {
-		  'sidebar-toggler.tap': 'toggleSidebar',
-		  'toggleSetting.tap': 'openSettingDialog',
-		  'logout.things-logout-succeed':'toggleSidebar'
-		  //'user.tap': 'showUserInfo'
+			'sidebar-toggler.tap': 'toggleSidebar',
+			'toggleSetting.tap': 'openSettingDialog',
+			'logout.things-logout-succeed': 'toggleSidebar'
+			//'user.tap': 'showUserInfo'
 		},
 
 		/**
