@@ -84,7 +84,7 @@
           }
         },
         /**
-         * 그리드 검색 URL
+         * 그리드 search URL
          */
         gridSearchUrl: {
           type: String,
@@ -136,11 +136,6 @@
        */
       _computeGridSaveUrl: function() {
         return 'http://192.168.35.225:9002/rest/properties/' + '/update_multiple.json';
-      },
-
-      _onGridUrlChange:function(url){
-        this.$.resourceSearch.action=url;
-        this.$.resourceSearch.generateRequest();
       }
 
 
