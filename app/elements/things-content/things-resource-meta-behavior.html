@@ -217,6 +217,25 @@ Things.ResourceMetaBehavior = {
 				field.name = field.name.substr(0, field.name.indexOf('_id'));
 				field.type = 'resource-field';
 			}
+
+		} else if(metaData.editor.indexOf('resource-column') >= 0) {
+			field.type = 'resource-field';
+			field.userObj = {
+				delegateColumn : 'name',
+				resourceName : metaData.ref_name,
+				resourceUrl : metaData.format
+			};
+			
+			if(metaData.editor.indexOf('.') > 0) {
+				field.userObj.delegateColumn = metaData.editor.split('.')[1];
+			}
+
+			if(resourceForm) {
+				field.name = field.name.substr(0, field.name.indexOf('_id'));
+				field.userObj.readOnly = true;
+			}	else {
+				field.type = 'resource-selector'
+			}
 		}
 	},
 

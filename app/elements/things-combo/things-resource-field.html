@@ -31,8 +31,8 @@ Resource Selector. 서버에 저장되어 있는 리소스 정보를 조회하�
     <paper-input label="" name="[[idName]]" value="[[idValue]]" hidden></paper-input>
 
     <paper-input label="[[label]]" value="[[displayValue]]" readonly>
-      <iron-icon icon="icons:list" prefix on-tap="openResourceSelector"></iron-icon>
-      <paper-icon-button suffix on-tap="clearValue" icon="clear" alt="clear" title="clear">
+      <iron-icon icon="icons:list" prefix on-tap="openResourceSelector" hidden="[[readOnly]]"></iron-icon>
+      <paper-icon-button suffix on-tap="clearValue" icon="clear" alt="clear" title="clear" hidden="[[readOnly]]">
       </paper-icon-button>
     </paper-input>
   </template>
@@ -108,6 +108,14 @@ Resource Selector. 서버에 저장되어 있는 리소스 정보를 조회하�
           delegateColumn: {
             type: String,
             value: 'name'
+          },
+
+          /**
+           * 읽기 전용인지 여부 
+           */
+          readOnly: {
+            type: Boolean,
+            value: false
           }
         },
 
