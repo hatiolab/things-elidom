@@ -20,14 +20,14 @@
         ],
 
         properties: {
-          url: {
+          action: {
             type: String,
             value: ''
           },
 
           logoutUrl: {
             type: String,
-            computed: '_computeLogoutUrl(globals.basicUrl, url)'
+            computed: '_computeLogoutUrl(globals.basicUrl, action)'
           },
 
           icon: {
@@ -46,7 +46,7 @@
 
         logout: function(e) {
           if(this.isSignedIn()) {
-            this.signout(this.url);
+            this.signout(this.logoutUrl);
           }
         }
 

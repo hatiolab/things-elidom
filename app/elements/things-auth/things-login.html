@@ -111,10 +111,10 @@ Example:
         <paper-button id="submitButton" raised disabled on-click="submitHandler">
           <paper-spinner id="spinner" hidden></paper-spinner>[[submitLabel]]
         </paper-button>
-
+<!-- 
         <paper-button id="resetbutton" raised on-click="resetHandler">
           [[resetLabel]]
-        </paper-button>
+        </paper-button> -->
 
       </form>
     </paper-material>
@@ -259,10 +259,10 @@ Example:
        * @type {Object}
        * @default Cancel
        */
-      resetLabel: {
-        type: String,
-        value: 'Reset'
-      }
+      // resetLabel: {
+      //   type: String,
+      //   value: 'Reset'
+      // }
     },
 
     // Element Lifecycle
@@ -331,7 +331,8 @@ Example:
 
       // 1. save user information
       this.set('globals.user', user);
-      this.showToast('Welcome to Things System.');
+      // this.showToast('Welcome to Things System.');
+      this.showToastMsg('Welcome to Things System.');
 
       // 2. reset login form
       loginForm.reset();      
@@ -340,13 +341,13 @@ Example:
       var oriBasicUrl = this.get('globals.basicUrl');
       this.set('globals.basicUrl', '');
       this.set('globals.basicUrl', oriBasicUrl);
-
+      this.fire('things-login-succeed')
       // 4. move to page
       page(this.successRoute);
     },
 
     _failureResponse: function(event) {
-      this.showToast('Login failure.');
+      this.showToastMsg('Login failure.');
     }
 
   });

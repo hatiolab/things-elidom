@@ -6,8 +6,8 @@
 <link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
 
 <link rel="import" href="../things-resource/things-resource.html">
+<link rel="import" href="../things-setting/things-global-behavior.html">
 <link rel="import" href="./things-routing-behavior.html">
-
 <!--
 해당 Element는 
 	1.things-routing-behavior.html를 사용하여 Routing 등록 및 설정을 수행한다.
@@ -196,7 +196,8 @@
 				 */
 				screens: {
 					type: Array,
-					notify: true
+					notify: true,
+					value :[]
 				},
 				
 				/**
@@ -213,9 +214,12 @@
 			],
 
 			behaviors: [
-				Things.RoutingBehavior
+				Things.RoutingBehavior,
+				Things.GlobalBehavior
 			],
-
+			attached :function(){
+				this.addDefaultRouting('home', 'login');
+			},
 			/**
 			 * When last response data recieved this function will be called
 			 * then convert these data to menu tree and set to menuGroup
@@ -268,10 +272,14 @@
 			 * @return {null}
 			 */
 			_onSelectedMenuChange: function(selectedMenu) {
-				if(selectedMenu) {
-					var data = JSON.parse(selectedMenu.getAttribute("data"));
-					var url = '/' + (data.routing ? data.routing : '');
-					page(url);
+				if(this.isSignedIn()){
+					if(selectedMenu) {
+						var data = JSON.parse(selectedMenu.getAttribute("data"));
+						var url = '/' + (data.routing ? data.routing : '');
+						page(url);
+					}
+				}else{
+					page('/login');
 				}
 			},
 

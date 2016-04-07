@@ -28,7 +28,6 @@ Things.AuthBehaviorImpl = {
   },
 
   signout: function(logoutUrl) {
-    // TODO 로그아웃 URL global에서 관리 
     this.signoutAjax.url = logoutUrl;
     this.signoutAjax.method = 'POST';
     this.signoutAjax.withCredentials = true;
@@ -36,16 +35,17 @@ Things.AuthBehaviorImpl = {
   },
 
   _signoutSuccess: function(event) {
-    this.showToast('Succeeded to Logout');
+    this.showToastMsg('Succeeded to Logout');
     this.set('globals.user', null);
+    this.fire('things-logout-succeed')
     page('/login');
   },
 
   _signoutFailure: function(event) {
     if(event && event.detail && event.detail.error && event.detail.error.target && event.detail.error.target.statusText) {
-      this.showToast(event.detail.error.target.statusText);
+      this.showToastMsg(event.detail.error.target.statusText);
     } else {
-      this.showToast('Failed to Logout');
+      this.showToastMsg('Failed to Logout');
     }
   }
 
