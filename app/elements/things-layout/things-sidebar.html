@@ -272,15 +272,15 @@
 			 * @return {null}
 			 */
 			_onSelectedMenuChange: function(selectedMenu) {
-				if(this.isSignedIn()){
+				//if(this.isSignedIn()) {
 					if(selectedMenu) {
 						var data = JSON.parse(selectedMenu.getAttribute("data"));
 						var url = '/' + (data.routing ? data.routing : '');
 						page(url);
 					}
-				}else{
-					page('/login');
-				}
+				//} else {
+				//	page('/login');
+				//}
 			},
 
 			/**

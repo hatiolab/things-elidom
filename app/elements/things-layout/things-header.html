@@ -107,32 +107,31 @@
 		},
 
 		/**
-		 * 로그인 이후에만 toggle이 적용됨 
-		 */
+		* 로그인 이후에만 toggle이 적용됨 
+		*/
 		toggleSidebar: function(e) {
 			var drawer = app.$[this.drawerId];
-			if(this.isSignedIn()) {
-
-				if(drawer.forceNarrow) {
-					drawer.forceNarrow = false
-				} else if(!drawer.narrow) {
-					drawer.forceNarrow = true
-				} else {
-					drawer.togglePanel();
-				}
-			}else{
-				if(!drawer.narrow) {
-					drawer.forceNarrow = true
-				}
+			//if(this.isSignedIn()) {
+			if(drawer.forceNarrow) {
+				drawer.forceNarrow = false
+			} else if(!drawer.narrow) {
+				drawer.forceNarrow = true
+			} else {
+				drawer.togglePanel();
 			}
+			//} else {
+			//	if(!drawer.narrow) {
+			//		drawer.forceNarrow = true
+			//	}
+			//}
 		},
 
 		showUserInfo: function(e) {
-		  app.$.profile.open();
+			app.$.profile.open();
 		},
 
 		openSettingDialog: function(e) {
-		  app.$.setting.open();
+			app.$.setting.open();
 		}
 
 	  });
