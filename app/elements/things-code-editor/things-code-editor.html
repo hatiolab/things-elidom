@@ -18,8 +18,13 @@
         </style>
         <!-- ace-editor의 TEXT부분에 공백이 추가되지 않도록 {{zpl}}주의에 공백을 주지않도록 해야함. -->
         <div>
-            <juicy-ace-editor id="eval-editor" theme$="{{theme}}" mode$="{{mode}}" fontsize$="{{fontsize}}" readonly$="{{readonly}}" softtabs$="{{softtabs}}" tabsize$="{{tabsize}}" wrapmode$="{{wrapmode}}">{{default}}</juicy-ace-editor>
+            <juicy-ace-editor id="eval-editor" theme$="{{theme}}" mode$="{{mode}}" fontsize$="{{fontsize}}" readonly$="{{readonly}}" softtabs$="{{softtabs}}" tabsize$="{{tabsize}}" wrapmode$="{{wrapmode}}">{{source}}</juicy-ace-editor>
+			 <things-button-bar id="button-bar" buttons="[[buttons]]"></things-button-bar>
         </div>
+
+        <things-resource id="save-resource" content-type="application/json" action="{{saveUrl}}" method="POST" params="{{record}}">
+        </things-resource>
+
     </template>
     <script>
     (function() {
@@ -29,10 +34,10 @@
             is: 'things-code-editor',
 
             properties: {
-            	/**
-            	 * script editor theme
-            	 * "ace/theme/chrome","ace/theme/clouds","ace/theme/crimson_editor","ace/theme/dawn","ace/theme/dreamweaver","ace/theme/eclipse","ace/theme/github","ace/theme/solarized_light","ace/theme/textmate","ace/theme/tomorrow","ace/theme/xcode","ace/theme/kuroir","ace/theme/katzenmilch","ace/theme/ambiance","ace/theme/chaos","ace/theme/clouds_midnight","ace/theme/cobalt","ace/theme/idle_fingers","ace/theme/kr_theme","ace/theme/merbivore","ace/theme/merbivore_soft","ace/theme/mono_industrial","ace/theme/monokai","ace/theme/pastel_on_dark","ace/theme/solarized_dark","ace/theme/terminal","ace/theme/tomorrow_night","ace/theme/tomorrow_night_blue","ace/theme/tomorrow_night_bright","ace/theme/tomorrow_night_eighties","ace/theme/twilight","ace/theme/vibrant_ink"
-            	 */
+                /**
+                 * script editor theme
+                 * "ace/theme/chrome","ace/theme/clouds","ace/theme/crimson_editor","ace/theme/dawn","ace/theme/dreamweaver","ace/theme/eclipse","ace/theme/github","ace/theme/solarized_light","ace/theme/textmate","ace/theme/tomorrow","ace/theme/xcode","ace/theme/kuroir","ace/theme/katzenmilch","ace/theme/ambiance","ace/theme/chaos","ace/theme/clouds_midnight","ace/theme/cobalt","ace/theme/idle_fingers","ace/theme/kr_theme","ace/theme/merbivore","ace/theme/merbivore_soft","ace/theme/mono_industrial","ace/theme/monokai","ace/theme/pastel_on_dark","ace/theme/solarized_dark","ace/theme/terminal","ace/theme/tomorrow_night","ace/theme/tomorrow_night_blue","ace/theme/tomorrow_night_bright","ace/theme/tomorrow_night_eighties","ace/theme/twilight","ace/theme/vibrant_ink"
+                 */
                 theme: {
                     type: String
                 },
@@ -40,30 +45,21 @@
                  * data record
                  */
                 record: {
-                    type: String,
+                    type: Object,
                     notify: true
                 },
                 /**
                  * data record field
                  */
                 codeField: {
-                    type: String,
-                    notify: true
+                    type: String
                 },
                 /**
                  * save URL
                  */
-                saveUrl:{
-                	type: String,
-                	notify:true
-                },
-                /**
-                 * code result
-                 */
-                result: {
+                saveUrl: {
                     type: String,
-                    notify: true,
-                    readonly:true
+                    notify: true
                 },
                 /**
                  * script editor mode
@@ -78,7 +74,7 @@
                  */
                 fontsize: {
                     type: String,
-                    value: '10px'
+                    value: '14px'
                 },
                 /**
                  * if edit able
@@ -107,28 +103,74 @@
                 wrapmode: {
                     type: Boolean,
                     value: true
+                },
+
+                buttons: {
+                    type: Array,
+                    value: [{
+                        id: 'save-btn',
+                        text: 'Save'
+                    }]
                 }
 
             },
-	        listeners: {
-	          'eval-editor.editor-ready': 'onEditorReady',
-	          'eval-editor.change':'onBlurEvalEditor'
-	        },
-            ready: function() {
-
+            listeners: {
+                'eval-editor.editor-ready': '_onEditorReady',
+                'eval-editor.change': '_onEditorChange',
+                'button-bar.things-button-tap': '_onButtonTap',
             },
-            onEditorReady: function(e) {
-	          // event.detail should be a ace-editor
-	          e.detail.renderer.setShowGutter(false);
-	        },
+	        observers: [
+	        	'_onRecordChanged(record,codeField)'
+	        ],
+            /**
+             * return editor source
+             */
+            getSource: function() {
+                return this.record[this.codeField]
+            },
+            /**
+             * on record change
+             */
+            _onRecordChanged:function(record,codeField){
+            	this.source = record[codeField]
+            },
+            /**
+             * when editor ready
+             */
+            _onEditorReady: function(e) {
+                // event.detail should be a ace-editor
+                e.detail.renderer.setShowGutter(false);
+            },
 
-	        onBlurEvalEditor: function(after) {
-	        	this.result = this.$['eval-editor'].value;
-	        },
+            /**
+             * called when editor's change event called
+             */
+            _onEditorChange: function(after) {
+                this.record[this.codeField] = this.$['eval-editor'].editor.getValue();
+            },
+            /**
+             * when group button tap register button event
+             */
+            _onButtonTap: function(e) {
+                var buttonId = e.detail.id;
 
-	        getResult : function () {
-	        	return this.result;
-	        }
+                if (buttonId == 'export-btn') {
+                    this.exporSourceFile();
+
+                } else if (buttonId == 'save-btn') {
+                    this._gridSaveAction();
+
+                } else {
+                    this.fire('things-button-' + buttonId + '-tap', e.detail);
+                }
+            },
+			/**
+			 * grid save action
+			 */
+			_gridSaveAction: function() {
+				this.$['save-resource'].generateRequest();
+			}
+
 
         });
     })();

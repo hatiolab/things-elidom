@@ -29,7 +29,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	    <things-code-editor id="eval-editor"
 	                      theme="ace/theme/monokai"
 	                      mode="ace/mode/html"
-	                      default="<body></body>"
+	                      record='{
+	                      	"name" : "test",
+	                      	"source" :"<body></body>"
+	                      }'
+	                      code-field ="source"
+	                      save-url ="hi"
 	    ></things-code-editor>
 	</paper-material>
 	<paper-material class="Page-paper" elevation="1">

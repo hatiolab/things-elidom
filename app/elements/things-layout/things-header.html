@@ -1,6 +1,8 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../things-setting/things-global-behavior.html">
+<link rel="import" href="../things-setting/things-setting-dialog.html">
+<link rel="import" href="../things-setting/things-setting.html">
 <link rel="import" href="../things-login/things-logout.html">
 
 <dom-module id="things-header">
@@ -81,11 +83,12 @@
         </iron-icon>{{ globals.user.name }}
       </div-->
 
-      <div class="user-menu pull-right" id="setting">
+      <div class="user-menu pull-right">
         <paper-icon-button icon="icons:menu" id="sidebar-toggler" class="side-toggle pull-left">
         </paper-icon-button>
-        <things-locale-combo></things-locale-combo>
-        <paper-icon-button icon="icons:search"></paper-icon-button>
+        <!-- <things-locale-combo></things-locale-combo> -->
+        <paper-icon-button icon="icons:search" id="toggleSetting"></paper-icon-button>
+        <!-- <things-setting ></things-setting> -->
       </div>      
     </div>
 
@@ -122,7 +125,7 @@
 
         listeners: {
           'sidebar-toggler.tap': 'toggleSidebar',
-          'setting.tap': 'openSettingDialog'
+          'toggleSetting.tap': 'openSettingDialog'
           //'user.tap': 'showUserInfo'
         },
 
@@ -148,7 +151,8 @@
         },
 
         openSettingDialog: function(e) {
-          app.$.setting.open()
+          app.$.setting.open();
+          console.log(app.$.setting);
         }
 
       });
