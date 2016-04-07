@@ -15,6 +15,7 @@
 
 <link rel="import" href="../things-combo/things-code-selector.html">
 <link rel="import" href="../things-combo/things-resource-selector.html">
+<link rel="import" href="../things-combo/things-resource-field.html">
 <link rel="import" href="../things-date-picker/things-date-picker.html">
 <link rel="import" href="../things-date-picker/things-time-picker.html">
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
@@ -289,6 +290,14 @@ Things.FormBehaviorImpl = {
 
 			case 'resource-selector':
 				newElement = document.createElement('things-resource-selector');
+				newElement.setAttribute('name', element.name);
+				newElement.setAttribute('label', element.label);
+				newElement.setAttribute('resource-name', element.userObj.resourceName);
+				newElement.setAttribute('resource-url', element.userObj.resourceUrl);
+				break;
+
+			case 'resource-field':
+				newElement = document.createElement('things-resource-field');
 				newElement.setAttribute('name', element.name);
 				newElement.setAttribute('label', element.label);
 				newElement.setAttribute('resource-name', element.userObj.resourceName);

@@ -1,19 +1,19 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
-<link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
 
 <!--
+ResourceSelector를 위한 다이얼로그.
 애플리케이션에 단 하나만 존재하고 다이얼로그가 오픈 될 때 마다 화면 구성을 다시하여 오픈한다. 
 
   Example:
 
-  <things-full-dialog></things-full-dialog>
+  <things-resource-dialog></things-resource-dialog>
 
-@demo ./things-content/demo/demo-full-dialog.html
+@demo ./things-combo/demo/demo-resource-dialog.html
 -->
 
-<dom-module id="things-full-dialog">
+<dom-module id="things-resource-dialog">
   <style>
 		:host {
 			display: inline-block;
@@ -44,11 +44,8 @@
 			id='dialog' 
 			entry-animation="scale-up-animation"
 			exit-animation="fade-out-animation">
-
-			<paper-dialog-scrollable id="scrollroot">
-			</paper-dialog-scrollable>
-
-			<div class="group-btnline">
+			<paper-dialog-scrollable id="scrollroot"></paper-dialog-scrollable>
+			<div class="buttons">
 				<paper-button dialog-dismiss>Close</paper-button>
 			</div>
 		</paper-dialog>
@@ -57,7 +54,7 @@
   <script>
 	Polymer({
 
-		is: 'things-full-dialog',
+		is: 'things-resource-dialog',
 
 		properties: {
 			
@@ -81,23 +78,13 @@
 		},
 
 		/**
-	   * View를 Full Screen 다이얼로그 내에 오픈한다.
-	   *
-	   * @param {Object} view 오픈할 view
-	   * @param {Boolean} modal modal로 오픈할 지 여부
-	   */
-		openFullScreenDialog: function(view, modal) {
-			// TODO
-		},
-
-		/**
-		 * View를 기본적인 다이얼로그 내에 오픈한다.
+		 * 전역 ResourceDialog를 찾아서 view를 내용으로 추가하여 오픈한다.
 		 *
 		 * @param {Object} view 오픈할 view
 		 * @param {Boolean} modal modal로 오픈할 지 여부
 		 * @param {Object} openCallback
 		 */
-		openBasicDialog: function(view, modal, openCallback) {
+		showResourceDialog: function(view, modal, openCallback) {
 			var dialog = this.$.dialog;
 			dialog.modal = modal;
 			dialog.noCancelOnEscKey = false;
@@ -118,9 +105,9 @@
 		},
 
 		/**
-		 * View를 기본적인 다이얼로그 내에 닫는다.
+		 * 전역 ResourceDialog를 찾아서 닫는다.
 		 */
-		closeBasicDialog: function() {
+		closeResourceDialog: function() {
 			this.$.dialog.close();
 		},
 
