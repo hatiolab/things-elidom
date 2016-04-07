@@ -42,7 +42,7 @@
         _valueChangeHandler: function(e) {
           if(this.valuePath) {
             if(e.detail.value) {
-              this.fire('things-combo-value-changed', { value : e.detail.value, item : this.$.combo.selectedItem});
+              this.fire('things-combo-value-changed', { value : e.detail.value, item : this.$.combo.selectedItem });
             } else {
               this.fire('things-combo-value-changed', { value : '', item : {} });
             }

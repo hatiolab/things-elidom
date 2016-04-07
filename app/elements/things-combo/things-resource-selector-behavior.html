@@ -1,7 +1,6 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/paper-fullscreen-dialog/paper-fullscreen-dialog.html">
 
-<link rel="import" href="../things-content/things-load-view-behavior.html">
+<link rel="import" href="./things-combo/things-resource-dialog.html">
 
 <script>
 
@@ -14,7 +13,7 @@ window.Things = window.Things || {};
  *
  * @demo demo/index.html
  */
-Things.ResourceSelectorBehaviorImpl = {
+Things.ResourceSelectorBehavior = {
 
   /**
    * open resource selector - 그리드에서 사용 
@@ -26,7 +25,7 @@ Things.ResourceSelectorBehaviorImpl = {
    */
   openResourceSelectorByGrid: function(parentGrid, parentGridRowIdx, resourceObj, modal) {
     var selector = this._createResourceContent(resourceObj.resourceName, resourceObj.resourceUrl);
-    this.openPopupView(selector, modal, selector.refreshGridData);
+    this._getResourceSelectorDialog().showResourceDialog(selector, modal, selector.refreshGridData);
     this._addSelectedListenerByGrid(selector, parentGrid, parentGridRowIdx, resourceObj);
   },
 
@@ -41,7 +40,6 @@ Things.ResourceSelectorBehaviorImpl = {
     var selector = document.createElement('things-resource-content');
     selector.id = "resource-selector";
     selector.layout = "fullbleed layout vertical";
-
     selector.title = resourceName;
     selector.resourceName = resourceName;
     selector.resourceUrl = resourceUrl;
@@ -75,7 +73,7 @@ Things.ResourceSelectorBehaviorImpl = {
         rowObj[valueField] = selectedObj;
         dataSet.updateRow(parentRowIdx, rowObj);
         // popup 닫기 
-        me.closePopupView();
+        me._getResourceSelectorDialog().closeResourceDialog();
         // 부모 그리드 Refresh
         parentGrid.refreshView();
       }
@@ -92,7 +90,7 @@ Things.ResourceSelectorBehaviorImpl = {
    */
   openResourceSelectorByForm: function(container, modal) {
     var selector = this._createResourceContent(container.resourceName, container.resourceUrl);
-    this.openPopupView(selector, modal, selector.refreshGridData);
+    this._getResourceSelectorDialog().showResourceDialog(selector, modal, selector.refreshGridData);
     this._addSelectedListenerByForm(selector, container);
   },
 
@@ -109,19 +107,19 @@ Things.ResourceSelectorBehaviorImpl = {
 
     selector.addEventListener('things-grid-row-data-select', function(e) {
       // popup 닫기 
-      me.closePopupView();
+      me._getResourceSelectorDialog().closeResourceDialog();
       // 값 설정 
-      container.setValue(e.detail.id);
-      // 부모 그리드 Refresh
-      container.setDisplay(e.detail[container.delegateColumn]);
+      container.setObjValue(e.detail);
     });
+  },
+
+  /**
+   * Resource Selector Dialog
+   */
+  _getResourceSelectorDialog: function() {
+    return app.$['resource-dialog'];
   }
 
 };
-
-Things.ResourceSelectorBehavior = [
-  Things.ResourceSelectorBehaviorImpl,
-  Things.LoadViewBehavior
-];
 
 </script>
