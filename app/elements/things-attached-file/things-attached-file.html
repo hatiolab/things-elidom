@@ -26,11 +26,10 @@
       <things-resource 
         id="resourceSearch"
         method="GET"
-        resource=[[gridSearchUrl]]
-        action=''
-        params="[[queryFields]]"
-        last-response="{{lastResponse}}"
-        auto>
+        content-type="application/x-www-form-urlencoded"
+        resource="[[gridSearchUrl]]"
+        query-fields="[[queryFields]]"
+        last-response="{{lastResponse}}">
       </things-resource>
 
       <things-resource-grid 
@@ -43,6 +42,10 @@
         enable-toolbar>
       </things-resource-grid>
       
+    </div>
+
+    <div>
+      <paper-button raised dialog-confirm on-tap="generateRequest">Search</paper-button>
     </div>
 
   </template>
@@ -74,7 +77,7 @@
             }, {
               fieldName: 'fileSize'
             }, {
-              fieldName: 'mimetype'
+              fieldName: 'mimeType'
             }, {
               fieldName: 'creator'
             }, {
@@ -120,22 +123,21 @@
          */
         gridSearchUrl: {
           type: String,
-          value: 'attachments'
-          
-        },
-
-        listeners: {
-          'grid.things-grid-detail-tap': '_showResourceForm',
-          'grid.things-grid-resource-column-edit': '_openResourceSelector'
-        },
-
-        /**
-         * Grid Search URL 생성
-         */
-        _computeGridSearchUrl: function(type, id) {
-          return [].join('/');
+          value: function() {
+            return 'attachments';
+          }
         }
+      },
+
+      listeners: {
+        'grid.things-grid-detail-tap': '_showResourceForm',
+        'grid.things-grid-resource-column-edit': '_openResourceSelector'
+      },
+
+      generateRequest: function() {
+        this.$.resourceSearch.generateRequest();
       }
+      
     });
   </script>
 </dom-module>
