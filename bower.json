@@ -23,7 +23,9 @@
     "MockHttpRequest": "philikon/MockHttpRequest#master",
     "paper-fab-transitions": "^0.1.0",
     "l20n": "^3.5.1",
-    "juicy-ace-editor": "^1.1.1"
+    "juicy-ace-editor": "^1.1.1",
+    "gold-email-input": "^1.0.7",
+    "gold-phone-input": "^1.0.9"
   },
   "devDependencies": {
     "test-fixture": "PolymerElements/test-fixture#1.0.x",

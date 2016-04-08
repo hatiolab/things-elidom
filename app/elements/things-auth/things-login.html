@@ -5,6 +5,7 @@
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../../bower_components/gold-email-input/gold-email-input.html">
+<link rel="import" href="./things-signup.html">
 <link rel="import" href="../things-setting/things-global-behavior.html">
 
 <!--
@@ -111,6 +112,10 @@ Example:
         <paper-button id="submitButton" raised disabled on-click="submitHandler">
           <paper-spinner id="spinner" hidden></paper-spinner>[[submitLabel]]
         </paper-button>
+        <!-- <paper-button id="signup" raised on-click="_onSignupTap"></paper-button> -->
+        <div on-click="_onSignupTap">
+          <a href="#">register</a>
+        </div>
 <!-- 
         <paper-button id="resetbutton" raised on-click="resetHandler">
           [[resetLabel]]
@@ -291,6 +296,15 @@ Example:
       submitButton.disabled = !loginForm.validate();
     },
 
+    _onSignupTap:function (event) {
+      var element = document.createElement("things-signup");
+      element.actionUrl ='users/register';
+      element.method='POST';
+
+      var dialog = app.$['common-full-dialog'];
+      dialog.openBasicDialog(element,true,null);
+
+    },
     submitHandler: function (event) {
       spinner.active = true;
       spinner.hidden = false;

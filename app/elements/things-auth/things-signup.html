@@ -1,3 +1,11 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../../bower_components/gold-email-input/gold-email-input.html">
+<link rel="import" href="../things-form/things-form-behavior.html">
 <!--
 A comment describing this element
 
@@ -14,18 +22,52 @@ Example:
 @demo demo/index.html
 -->
 
-<dom-module id="things-singup">
+<dom-module id="things-signup">
 	<template>
-		<style>
-			:host {
-				display: block;
-			}
-		</style>
-		
+		<form is="iron-form" 
+			id="form" 
+			action=[[action]]
+			headers="[[headers]]"
+			content-type="application/json"
+			method="[[method]]"
+			last-response="{{lastResponse}}">
+			
+			<paper-input required name ="name" label="username"></paper-input>
+
+			<gold-email-input auto-validate required name="email" label="your email address"></gold-email-input>
+
+			<paper-input id="pw" required name="password" type="password" label="password"></paper-input>
+			<paper-input id="confirmed-pw" auto-validate required name="confirmed-password" type="password" label="confirm password" validator ="_passwordValidate" errorMessage ="Password is not same"></paper-input>
+
+			<paper-button raised on-click ="_submitMyForm">register</paper-button>
+			<paper-button raised on-click ="_resetMyForm">reset</paper-button>
+		</form>
 	</template>
 	<script>
 		Polymer({
-			is: 'things-singup'
+			is: 'things-signup',
+			properties:{
+			},
+			behaviors: [
+				Things.FormBehavior
+			],
+			_successResponseHandler:function (event) {
+				this.showToastMsg('Success');
+			},
+			_errorResponseHandler:function (event) {
+				this.showToastMsg('Failure');
+			},
+			_submitMyForm:function(event){
+				if(this._passwordValidate())this.submitMyForm()
+				else { this.showToastMsg('Password is not same'); return;}
+			},
+			_resetMyForm:function (event) {
+				this.resetMyForm();
+			},
+			_passwordValidate:function () {
+				// console.
+				return this.$.pw.value ===this.$['confirmed-pw'].value;
+			}
 		});
 	</script>
 </dom-module>
