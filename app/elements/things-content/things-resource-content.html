@@ -157,7 +157,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				/**
 				 * detail element name
 				 */
-				detailElement: {
+				detailView: {
 					type: String,
 					value: 'things-resource-form'
 				}
@@ -208,7 +208,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 * @param {Event} event 그리드에서 선택된 event
 			 */
 			_showDetailView: function(event) {
-				if(!this.detailElement || this.detailElement == 'things-resource-form') {
+				if(!this.detailView || this.detailView == 'things-resource-form') {
 					this._showResourceForm(event.detail);
 				} else {
 					this._showCustomView(event.detail);
@@ -224,6 +224,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				var viewElement = document.createElement('things-resource-form');
 				viewElement.id = 'resource-form';
 				viewElement.title = this.title + ' Detail';
+				viewElement.resourceName = this.resourceName;
 				viewElement.resourceUrl = this.resourceUrl + '/' + selectedRecord.id;
 				viewElement.resource = selectedRecord;
 				viewElement.formFields = this.resourceFormFields;
@@ -240,9 +241,10 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 * @param {Object} selectedRecord 그리드에서 선택된 Row Data
 			 */
 			_showCustomView: function(selectedRecord) {
-				var viewElement = document.createElement(this.detailElement);
+				var viewElement = document.createElement(this.detailView);
 				viewElement.id = 'detail-view';
 				viewElement.title = this.title + ' Detail';
+				viewElement.resourceName = this.resourceName;
 				viewElement.resourceUrl = this.resourceUrl + '/' + selectedRecord.id;
 				viewElement.resource = selectedRecord;
 				viewElement.formFields = this.resourceFormFields;

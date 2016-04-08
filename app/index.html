@@ -42,11 +42,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 					<template is="dom-repeat" items="{{screens}}" as=screen filter="isDynamicScreen">
 						<!-- Dynamic Resource Screen -->
 					  <things-resource-content 
-							data-route="{{screen.routing}}"
-							title="{{screen.name}}"
+							data-route="[[screen.routing]]"
+							title="[[screen.name]]"
 							current-route="[[route]]"
-							resource-name="{{screen.name}}"
-							resource-url="{{screen.routing}}"
+							resource-name="[[screen.name]]"
+							resource-url="[[screen.routing]]"
+							detail-view="[[screen.detail_form_id]]"
 							layout="fullbleed layout vertical"
 							enable-detail-column>
 						</things-resource-content>
