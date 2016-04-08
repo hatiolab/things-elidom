@@ -21,11 +21,40 @@ Example:
 				display: block;
 			}
 		</style>
-		
+        <paper-tabs selected="{{current}}" noink>
+            <template is="dom-repeat" items="{{panels}}">
+                <paper-tab>{{item.title}}</paper-tab>
+            </template>
+        </paper-tabs>
+
+        <iron-pages id="tabPages" selected="{{current}}">
+        	<template is="dom-if" if={{is}}>
+        		
+        	</template>
+        </iron-pages>		
 	</template>
 	<script>
 		Polymer({
-			is: 'things-resource-tabs'
+			is: 'things-resource-tabs',
+			properties:{
+				resourceUrl :{
+					type: String
+				},
+				resource:{
+					type:Object
+				},
+				title:{
+					type:String
+				}
+			},
+			observers: [
+				'_onResourceUrlChanged(resourceUrl,resource.*)',
+			]
+			_onResourceUrlChanged:function (resourceUrl) {
+				 //TODO : Caculate extention URL and Attachment URLs
+			},
+
+
 		});
 	</script>
 </dom-module>
