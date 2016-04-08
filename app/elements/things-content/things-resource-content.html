@@ -228,6 +228,10 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				viewElement.resource = selectedRecord;
 				viewElement.formFields = this.resourceFormFields;
 				viewElement.openResourceForm(selectedRecord);
+				var me = this;
+				viewElement.addEventListener('things-resource-form-saved', function(e) {
+					me.refreshGridData();
+				});
 			},
 
 			/**

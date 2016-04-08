@@ -91,6 +91,7 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 				Things.ResourceSelectorBehavior,
 				Things.GlobalBehavior,
 				Things.MsgBoxBehavior,
+				Things.LoadViewBehavior
 			],
 			
 			properties: {
@@ -146,7 +147,7 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 			},
 
 			listeners : {
-				'grid.things-grid-detail-tap': '_showResourceForm',
+				'grid.things-grid-detail-tap': '_onDetailButtonTap',
 				'grid.things-button-upload-tap' : '_onTapUpload',
 				'grid.things-grid-save-success': 'refreshGridData',
 				'grid.things-grid-resource-column-edit' : '_openResourceSelector'
@@ -218,45 +219,6 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 			_openResourceSelector: function(event) {
 				var index = event.detail.index;
 				this.openResourceSelectorByGrid(index._grid, index.rowIndex, event.detail.userObj, true);
-
-
-				/*var index = event.detail.index;
-				var grid = index._grid;
-				var column = index.column;
-				var rowIdx = index.rowIndex;
-				var resourceObj = event.detail.userObj;
-
-				var selector = document.createElement('things-resource-content');
-				selector.id = 'resource-dialog';
-				selector.layout = 'fullbleed layout vertical';
-				selector.title='StorageInfo';
-				selector.resourceRoute='StorageInfo';
-				selector.resourceName='StorageInfo';
-				selector.resourceUrl='storage_infos';
-				selector.enableToolbar = false;
-				selector.initializeContent();
-				this.openPopupView(selector, true, selector.refreshGridData);
-				var me = this;
-
-				selector.addEventListener('things-grid-row-data-select', function(e) {
-					var valueField = resourceObj.valueField;
-					var row = grid.focusedRow();
-					var dataSet = grid.dataSource();
-
-					if(row && row.dataIndex() >= 0) {
-						var rowObj = row.getRowObject();
-						var selectedObj = rowObj[resourceObj.valueField];
-						selectedObj.id = e.detail.id;
-						selectedObj[resourceObj.delegateColumn] = e.detail[resourceObj.delegateColumn];
-						rowObj[resourceObj.valueField] = selectedObj;
-						rowObj[column._name] = e.detail.id;
-						dataSet.updateRow(rowIdx, rowObj);
-						// popup 닫기 
-						me.closePopupView();
-						// 부모 그리드 Refresh					
-						grid.refreshView();
-					}
-				});*/
 			}
 
 		});
