@@ -192,6 +192,8 @@
 			generateRequest: function() {
 				if(this.contentType && this.contentType.toLowerCase().indexOf('application/json') >= 0) {
 					this.$._ajax.body = this.params;
+				} else if(!this.contentType || this.contentType.toLowerCase() == 'application/x-www-form-urlencoded') {
+					this.$._ajax.params = this.handleRequestParams(this.params);
 				}
 
 				this.$._ajax.generateRequest();
