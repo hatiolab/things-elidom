@@ -1,0 +1,86 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../elements.html">
+<!--
+A comment describing this element
+
+Example:
+
+    <my-elem></my-elem>
+
+Example:
+
+    <my-elem>
+      <h2>Hello my-elem</h2>
+    </my-elem>
+
+@demo demo/index.html
+-->
+
+<dom-module id="things-tabs-container">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+
+            <paper-tabs selected="{{current}}" noink>
+                <template is="dom-repeat" items="{{panels}}">
+                    <paper-tab>{{item.title}}</paper-tab>
+                </template>
+            </paper-tabs>
+
+            <iron-pages id="tabPages" selected="{{current}}">
+            </iron-pages>
+    </template>
+    <script>
+        Polymer({
+            is: 'things-tabs-container',
+            properties:{
+                /**
+                 * The panels in which to use for the carousel (an array of photos)
+                 */
+                panels:{
+                    type : Array,
+                    value:[
+                    {'name':'things-resource-content','title':'Centent1'},
+                    {'name':'things-resource-content','title':'Centent2'}],
+                    observer:'panelsChange'
+                }
+            },
+            panelsChange: function(panels){
+               
+                var elements = [];
+                var me = this;
+
+                this.panels.forEach(function(panel){
+                    var element = document.createElement(panel.name);
+                    var div = document.createElement('div');
+
+                    if(panel && panel.length>0){
+                        element = this.bindAttributes(element,panels);
+                    }
+                    div.appendChild(element);
+
+                    me.$.tabPages.appendChild(div);
+                    elements.push(div);
+                });
+                this.tempElements = elements;
+            },
+            /**
+             * Bind element's attribute values by formField informations.
+             * @param {Object} child element of the form
+             * @param {Object} element information object from formFields
+             */
+            bindAttributes: function(element, attrs) {
+                for(attr in attrs) {
+                    element.setAttribute(attr, attrs[attr]);
+                }
+
+                return element;
+            },
+
+        });
+    </script>
+</dom-module>

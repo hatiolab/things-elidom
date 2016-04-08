@@ -65,53 +65,14 @@
 
 <!-- Resouce Selector Sample page -->
 <section class="Page" data-route="resource_selector">
-    <paper-material class="Page-paper" elevation="1">
-        <paper-input label="dropdown-seletor" 
-                      data-selector ="resouceDropSelector" 
-                      on-tap="open"
-                      value = "{{dropSelectedRow.name}}">
-
-        </paper-input>
-
-        <input is="iron-input" 
-                bind-value="{{dropSelectedRow.name}}"
-                data-selector ="resouceDropSelector" 
-                on-tap="open">
-
-        <things-resource-dropdown-selector
-            id="resouceDropSelector"
-            title="Terminologies"
-            resource-name="Terminology"
-            resource-url="terminologies"
-            root-property ="items"
-            total-property ="total"
-            layout="fullbleed layout vertical"
-            selected-row = "{{dropSelectedRow}}">
-        </things-resource-dropdown-selector>
-
-
-        <paper-input label="dialog-seletor" 
-                    data-selector ="resouceDialogSelector" 
-                    on-tap="open"
-                    value = "{{selectedRow.name}}">
-        </paper-input>
-        <input is="iron-input" 
-                bind-value="{{selectedRow.name}}"
-                data-selector ="resouceDialogSelector" 
-                on-tap="open">
-
-        <things-resource-dialog-selector
-            id="resouceDialogSelector"
-            title="StorageInfo"
-            resource-route="StorageInfo"
-            current-route ="StorageInfo"
-            resource-name="StorageInfo"
-            resource-url="storage_infos"
-            layout="fullbleed layout vertical"
-            selected-row = "{{dropSelectedRow}}">
-        </things-resource-dialog-selector>
-
-    </paper-material>
+  <paper-material elevation="1">
+    <div>
+      <things-resource-tabs></things-resource-tabs>
+    </div>
+    <div>
+      <things-tabs-container></things-tabs-container>
+    </div>
+  </paper-material>
 </section>
 
 <!-- Extension Property Page -->
