@@ -12,6 +12,8 @@
         id="resource-search"
         method="GET"
         action="[[gridSearchUrl]]"
+        select-fields="[[searchFields]]"
+        sort-fields="[[sortFields]]"
         last-response="{{lastResponse}}"
         auto>
       </things-resource>
@@ -143,12 +145,17 @@
             id: 'delete-btn',
             text: 'Delete',
             icon: 'icons:delete'
+          }, {
+            id: 'refresh-btn',
+            text: 'Refresh',
+            icon: 'icons:refresh'
           } ]
         }
       },
 
       listeners: {
         'grid.things-button-new-btn-tap' : 'addRow',
+        'grid.things-button-refresh-btn-tap' : 'reloadData',
         'grid.things-grid-save-success' : 'reloadData'
       },
 

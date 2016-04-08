@@ -290,7 +290,7 @@
 				if((!this.method || this.method.toLowerCase() == 'get') && (!this.action || this.action == 'index')) {
 					newParams = this.handleRequestParams(this.params);
 				} else {
-					newParams = this.params;
+					if(this.params) newParams = this.params;
 				} 
 
 				if(!(this.contentType && this.contentType.toLowerCase().indexOf('application/json') >= 0)) {
