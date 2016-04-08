@@ -21,10 +21,11 @@
 <link rel="import" href="../things-setting/things-global-behavior.html">
 
 <dom-module id="things-extension">
+
   <template>
     <div class="[[layout]]">
       <things-resource 
-        id="resourceSearch"
+        id="resource-search"
         method="GET"
         action="[[gridSearchUrl]]"
         last-response="{{lastResponse}}"
@@ -39,16 +40,14 @@
         data="[[lastResponse]]"
         grid-save-action="[[gridSaveUrl]]"
         buttons="[[buttons]]"
-        enable-detail-column
         enable-toolbar>
       </things-resource-grid>
-      
     </div>
-
   </template>
 
   <script>
     Polymer({
+
       is: 'things-extension',
 
       behaviors: [ 
@@ -56,44 +55,87 @@
       ],
       
       properties: {
-        type: {
+
+        /**
+         * entity type
+         */
+        entityType: {
           type: String
         },
 
-        id: {
+        /**
+         * record id
+         */
+        entityId: {
           type: String
         },
 
+        /**
+         * grid search fields
+         */
+        searchFields : {
+          type: String,
+          value: 'id,name,value,on_type,on_id'
+        },
+
+        /**
+         * grid sort fields
+         */
+        sortFields : {
+          type: Array,
+          value: [ {
+            field : 'name',
+            ascending : true
+          } ]
+        },
+
+        /**
+         * grid model
+         */
         gridModel: {
-          type: Object,
-          value: function() {
-            return [
-              { 'fieldName' : 'name' },
-              { 'fieldName' : 'value' }
-            ]
-          }
+          type: Array,
+          value: [ {
+            fieldName : 'id'
+          }, {
+            fieldName : 'on_type'
+          }, {
+            fieldName : 'on_id'
+          }, { 
+            fieldName : 'name' 
+          }, { 
+            fieldName : 'value' 
+          } ]
         },
         
+        /**
+         * grid columns
+         */
         gridColumns: {
-          type: Object,
-          value: function() {
-            return [
-              {
-                fieldName: 'name',
-                width: '120'
-              }, {
-                fieldName: 'value',
-                width: '600'
-              }
-            ]
-          }
+          type: Array,
+          value: [ {
+            fieldName: 'id',
+            width: 0
+          }, {
+            fieldName: 'on_type',
+            width: 0
+          }, {
+            fieldName: 'on_id',
+            width: 0
+          }, {
+            fieldName: 'name',
+            width: '250'
+          }, {
+            fieldName: 'value',
+            width: '350'
+          } ]
         },
+
         /**
          * 그리드 search URL
          */
         gridSearchUrl: {
           type: String,
-          computed: '_computeGridSearchUrl(type, id)',
+          computed: '_computeGridSearchUrl(entityType,entityId)',
         },
 
         /**
@@ -101,7 +143,7 @@
          */
         gridSaveUrl: {
           type: String,
-          computed: '_computeGridSaveUrl()'
+          computed: '_computeGridSaveUrl(entityType,entityId)'
         },
 
         /**
@@ -110,117 +152,63 @@
         buttons: {
           type: Array,
           value: [ {
-            id: 'add',
+            id: 'new-btn',
             text: 'Add',
             icon: 'icons:add'
-          },{
-            id: 'save',
+          }, {
+            id: 'save-btn',
             text: 'Save',
             icon: 'icons:save'
-          }]
+          }, {
+            id: 'delete-btn',
+            text: 'Delete',
+            icon: 'icons:delete'
+          } ]
         }
       },
 
-      listeners : {
-        'grid.things-grid-detail-tap': '_showResourceForm',
-        'grid.things-grid-resource-column-edit' : '_openResourceSelector'
+      listeners: {
+        'grid.things-button-new-btn-tap' : 'addRow',
+        'grid.things-grid-save-success' : 'reloadData'
       },
 
-       /**
-        * Grid Search URL 생성
-        */
-       
-       _computeGridSearchUrl: function(type, id) {
-        return ['properties', type, id].join('/');
-       },
+      /**
+       * Entity Type, Entity Record Id로 Grid Search URL 생성
+       *
+       * @param {String} onType
+       * @param {String} onId
+       * @return {String} grid search url
+       */
+      _computeGridSearchUrl: function(onType, onId) {
+        return ['properties', onType, onId].join('/');
+      },
 
       /**
-       * resourceUrl로 grid save url을 생성
-       * @param {String} resourceUrl
-       * @return {String} grid save URL
+       * Entity Type, Entity Record Id로 Grid Save URL 생성
+       *
+       * @param {String} onType
+       * @param {String} onId
+       * @return {String} grid save url
        */
-      _computeGridSaveUrl: function() {
-        return 'http://192.168.35.225:9002/rest/properties/' + '/update_multiple.json';
+      _computeGridSaveUrl: function(onType, onId) {
+        return 'properties/update_multiple.json';
+      },
+
+      /**
+       * add grid row
+       */
+      addRow: function(e) {
+        this.$.grid.dataSet.insertRow(0, { 
+          id: null, name : '', value : '', on_type : this.entityType, on_id : this.entityId
+        });
+      },
+
+      /**
+       * reload grid data
+       */
+      reloadData: function(e) {
+        this.$['resource-search'].generateRequest();
       }
-
-
-      // /**
-      //  * 그리드 셀 선택이 변경되었을 경우 핸들러 
-      //  */
-      // _onDetailButtonTap: function(e) {
-      //   var basicUrl = this.get('globals.basicUrl');
-      //   this.openConfirmMsg({
-      //     title : 'Do you want to download file?',
-      //     type : 'info',
-      //     text : 'You can download file'
-      //   }, function() {
-      //     window.location = basicUrl + '/download/' + e.detail.id;
-      //   });
-      // },
-
-      // /**
-      //  * 메뉴에 등록된 자신의 routing 정보를 리턴한다.
-      //  */
-      // getMyRoute: function() {
-      //   return this.resourceUrl;
-      // },
-
-      // /**
-      //  * 화면 초기화 함수 
-      //  * 메타 데이터를 서버로 요청하여 화면을 구성한다.
-      //  */
-      // initializeContent: function() {
-      //   this.$['resource-meta'].generateRequest();
-      // },
-
-      // /**
-      //  * Open Resource Selector Dialog
-      //  *
-      //  * @param {Object} event
-      //  */
-      // _openResourceSelector: function(event) {
-      //   var index = event.detail.index;
-      //   this.openResourceSelectorByGrid(index._grid, index.rowIndex, event.detail.userObj, true);
-
-
-      //   var index = event.detail.index;
-      //   var grid = index._grid;
-      //   var column = index.column;
-      //   var rowIdx = index.rowIndex;
-      //   var resourceObj = event.detail.userObj;
-
-      //   var selector = document.createElement('things-resource-content');
-      //   selector.id = 'resource-dialog';
-      //   selector.layout = 'fullbleed layout vertical';
-      //   selector.title='StorageInfo';
-      //   selector.resourceRoute='StorageInfo';
-      //   selector.resourceName='StorageInfo';
-      //   selector.resourceUrl='storage_infos';
-      //   selector.enableToolbar = false;
-      //   selector.initializeContent();
-      //   this.openPopupView(selector, true, selector.refreshGridData);
-      //   var me = this;
-
-      //   selector.addEventListener('things-grid-row-data-select', function(e) {
-      //     var valueField = resourceObj.valueField;
-      //     var row = grid.focusedRow();
-      //     var dataSet = grid.dataSource();
-
-      //     if(row && row.dataIndex() >= 0) {
-      //       var rowObj = row.getRowObject();
-      //       var selectedObj = rowObj[resourceObj.valueField];
-      //       selectedObj.id = e.detail.id;
-      //       selectedObj[resourceObj.delegateColumn] = e.detail[resourceObj.delegateColumn];
-      //       rowObj[resourceObj.valueField] = selectedObj;
-      //       rowObj[column._name] = e.detail.id;
-      //       dataSet.updateRow(rowIdx, rowObj);
-      //       // popup 닫기 
-      //       me.closePopupView();
-      //       // 부모 그리드 Refresh         
-      //       grid.refreshView();
-      //     }
-      //   });
-      // }
 
     });
   </script>
