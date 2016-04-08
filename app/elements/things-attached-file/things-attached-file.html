@@ -24,10 +24,12 @@
   <template>
     <div class="[[layout]]">
       <things-resource 
-        id="resourceSearch"
+        id="resource-search"
         method="GET"
-        content-type="application/x-www-form-urlencoded"
+        action=""
         resource="[[gridSearchUrl]]"
+        select-fields="[[selectFields]]"
+        sort-fields="[[sortFields]]"
         query-fields="[[queryFields]]"
         last-response="{{lastResponse}}">
       </things-resource>
@@ -37,7 +39,7 @@
         config="[[gridConfig]]"
         model="[[gridModel]]" 
         columns="[[gridColumns]]"
-        data="[[lastResponse]]"
+        data="[[lastResponse.items]]"
         enable-detail-column
         enable-toolbar>
       </things-resource-grid>
@@ -45,7 +47,7 @@
     </div>
 
     <div>
-      <paper-button raised dialog-confirm on-tap="generateRequest">Search</paper-button>
+      <paper-button raised dialog-confirm on-tap="search">Search</paper-button>
     </div>
 
   </template>
@@ -59,73 +61,139 @@
       ],
 
       properties: {
-        type: {
+        entityType: {
           type: String
         },
 
-        id: {
+        entityId: {
           type: String
         },
 
+        resouceName: {
+          type: String
+        },
+
+        /**
+         * Grid Model
+         * 
+         * @type {Array}
+         */
         gridModel: {
-          type: Object,
-          value: function() {
-            return[{
-              fieldName: 'name'
-            }, {
-              fieldName: 'value'
-            }, {
-              fieldName: 'fileSize'
-            }, {
-              fieldName: 'mimeType'
-            }, {
-              fieldName: 'creator'
-            }, {
-              fieldName: 'createdAt'
-            }]
-          }
+          type: Array,
+          value: [{
+            fieldName: 'name'
+          }, {
+            fieldName: 'storage_info',
+            dataType: 'object'
+          }, {
+            fieldName: 'tag'            
+          },  {
+            fieldName: 'path'            
+          }, {
+            fieldName: 'file_size'
+          }, {
+            fieldName: 'creator',
+            dataType: 'object'
+          }, {
+            fieldName: 'created_at'
+          }]
         },
 
+        /**
+         * Grid Columns
+         * 
+         * @type {Array}
+         */
         gridColumns: {
-          type: Object,
-          value: function() {
-            return [{
-              fieldName: 'Name'
-            }, {
-              fieldName: 'File Size'
-            }, {
-              fieldName: 'Mime-Type'
-            }, {
-              fieldName: 'Created By'
-            }, {
-              fieldName: 'Created At'
-            }]
-          }
+          type: Array,
+          value: [{
+            fieldName: 'name',
+            width: 150
+          }, {
+            name: 'storage_info',
+            fieldName: 'storage_info',
+            width: 120,
+            valueType: 'text',
+            type: 'calced',
+            header: {
+              text : 'Storage'
+            },
+            valueCallback : function(column, row) {
+              var obj = row.getValue('storage_info');
+              return obj ? obj.name : '';
+            }
+          }, {
+            fieldName: 'tag',
+            width: 100
+          }, {
+            fieldName: 'path',
+            width: 300
+          }, {
+            fieldName: 'file_size',
+            width: 80
+          }, {
+            name: 'creator',
+            fieldName: 'creator',
+            width: 100,
+            valueType: 'text',
+            type: 'calced',
+            header: {
+              text : 'Creator'
+            },
+            valueCallback : function(column, row) {
+              var obj = row.getValue('creator');
+              return obj ? obj.name : '';
+            }
+          }, {
+            fieldName: 'created_at',
+            width: 130
+          }]
         },
 
+        /**
+         * Select field 
+         * 쿼리 필드 설정
+         * 
+         * @type {String}
+         */
+        selectFields: {
+          type: String,
+          value: 'id,name,storage_info_id,tag,path,file_size,creator,created_at'
+        },
+
+        /**
+         * Sort field 
+         * 소팅 필드 설정
+         * 
+         * @type {String}
+         */
+        sortFields: {
+          type: Array,
+          value: [ {
+            field: 'created_at',
+            ascending: false
+          } ]
+        },
+
+        /**
+         * Query field 
+         * 쿼리 조건 설정
+         * 
+         * @type {Object}
+         */
         queryFields: {
           type: Array,
-          value: function() {
-            return [{
-              name: 'onType',
-              operator: 'eq',
-              value: 'Alarm'
-            }, {
-              name: 'onId',
-              operator: 'eq',
-              value: '1'
-            }]
-          }
+          computed: '_computeQueryFields(entityType,entityId)'
         },
 
         /**
          * Grid Search URL
+         *
+         * 
          */
         gridSearchUrl: {
           type: String,
-          value: function() {
-            return 'attachments';
-          }
+          value: 'attachments'
         }
       },
 
@@ -134,8 +202,27 @@
         'grid.things-grid-resource-column-edit': '_openResourceSelector'
       },
 
-      generateRequest: function() {
-        this.$.resourceSearch.generateRequest();
+      search: function() {
+        this.$['resource-search'].generateRequest();
+      },
+
+      _computeQueryFields: function(entityType, entityId) {
+        if(!this.queryFields || this.queryFields.length == 0) {
+          return [{
+            name: 'onType',
+            operator: 'eq',
+            value: this.entityType
+          }, {
+            name: 'onId',
+            operator: 'eq',
+            value: this.entityId
+          }];
+        } else {
+          var newQueryFields = this.queryFields;
+          newQueryFields[0].value = this.entityType;
+          newQueryFields[1].value = this.entityId;
+          return newQueryFields;
+        }
       }
       
     });
