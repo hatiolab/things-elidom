@@ -382,7 +382,7 @@ A comment describing this element
 				switch (event.type) {
 					case 'upload-success':
 						status.textContent = 'Uploaded.';
-						console.log(event);
+						// console.log(event);
 						break;
 					case 'upload-error':
 						status.textContent = file.error;
@@ -401,14 +401,14 @@ A comment describing this element
 			var li = document.createElement('li');
 			li.innerHTML = '<strong></strong><br/> <span></span>';
 			file.listItem = li;
-			this.$.customFilesList.appendChild(li);
+			// this.$.customFilesList.appendChild(li);
 			this._updateListItem(event);
 		},
 		/**
 		 * when file removed remove html tag
 		 */
 		_fileRemove: function(event) {
-			console.log('_fileRemove');
+			// console.log('_fileRemove');
 			var file = event.detail.file;
 			if (file.listItem) {
 				this.$.customFilesList.removeChild(file.listItem);

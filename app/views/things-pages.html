@@ -67,11 +67,25 @@
 <section class="Page" data-route="resource_selector">
   <paper-material elevation="1">
     <div>
-      <things-resource-tabs></things-resource-tabs>
-    </div>
-    <div>
+      <things-resource
+        auto
+        content-type="application/json"
+        resource="Alarm"
+        action""
+        method="get"
+        last-response="{{lastResponse}}">
+      </things-resource>
+
+      <things-resource-tabs 
+          resource-name="alarm" 
+          resource="{{lastResponse}}" 
+          attachable 
+          enable-extension>
+      </things-resource-tabs>
+    </div> 
+<!--     <div>
       <things-tabs-container></things-tabs-container>
-    </div>
+    </div> -->
   </paper-material>
 </section>
 

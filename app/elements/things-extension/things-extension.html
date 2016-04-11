@@ -14,8 +14,7 @@
         action="[[gridSearchUrl]]"
         select-fields="[[searchFields]]"
         sort-fields="[[sortFields]]"
-        last-response="{{lastResponse}}"
-        auto>
+        last-response="{{lastResponse}}">
       </things-resource>
 
       <things-resource-grid 
@@ -155,8 +154,8 @@
 
       listeners: {
         'grid.things-button-new-btn-tap' : 'addRow',
-        'grid.things-button-refresh-btn-tap' : 'reloadData',
-        'grid.things-grid-save-success' : 'reloadData'
+        'grid.things-button-refresh-btn-tap' : 'search',
+        'grid.things-grid-save-success' : 'search'
       },
 
       /**
@@ -193,7 +192,7 @@
       /**
        * reload grid data
        */
-      reloadData: function(e) {
+      search: function(e) {
         this.$['resource-search'].generateRequest();
       }
 

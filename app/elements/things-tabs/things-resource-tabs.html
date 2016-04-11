@@ -2,7 +2,7 @@
 <link rel="import" href="../../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../things-extension/things-extension.html">
-<link rel="import" href="../things-attach-file/things-attach-file.html">
+<link rel="import" href="../things-attached-file/things-attached-file.html">
 <!--
 A comment describing this element
 
@@ -26,30 +26,33 @@ Example:
 				display: block;
 			}
 		</style>
-        <paper-tabs selected="{{current}}" noink>
-            <template is="dom-repeat" items="{{panels}}">
-                <paper-tab>{{item.title}}</paper-tab>
+        <paper-tabs id="tabGroup" selected="{{_current}}" noink>
+            <template is="dom-repeat" items="{{_panels}}">
+                <paper-tab id ="{{item.elementId}}">{{item.title}}</paper-tab>
             </template>
         </paper-tabs>
 
-        <iron-pages id="tabPages" selected="{{current}}">
-        	<things-resource-form 
+        <iron-pages id="tabPages" selected="{{_current}}">
+
+        	<things-resource-form
         		id="thingsResourceForm" 
         		resource-url = "{{_resourceUrl}}"
         		resource ="{{resource}}">
         	</things-resource-form>
 
+
         	<template is="dom-if" if={{attachable}}>
         		<things-extension 
         			id="thingsExtension"
-        			entity-id ="entityId"
-        			entity-type="entityType"></things-extension>        		
+        			entity-id ="{{entityId}}"
+        			entity-type="{{entityType}}"></things-extension>        		
         	</template>
+
         	<template is="dom-if" if={{enableExtension}}>
         		<things-attached-file 
         			id="thingsAttachedFile"
-        			entity-id="entityId"
-        			entity-type="entityType">
+        			entity-id="{{entityId}}"
+        			entity-type="{{entityType}}">
         		</things-attached-file>
         	</template>
         </iron-pages>		
@@ -76,8 +79,7 @@ Example:
 				 * 최초 폼이 실행되는 시점에 서버에 요청하여 리턴받은 데이터
 				 */
 				resource: {
-					type: Object,
-					observer: '_resourceChanged'
+					type: Object
 				},
 				/**
 				 * Save 하기 전에 폼에는 있지만 Save하는데 필요 없는 필드를 삭제하기 위한 필드명
@@ -106,16 +108,42 @@ Example:
 				_panels:{
 					type: Array,
 					value:[
-						{'title':'Basic Info.','id':'thingsResourceForm'},
-						{'title':'Attachments.','id':'thingsExtension'},
-						{'title':'Properties','id':'thingsAttachedFile'}
+						{'title':'Basic Info.',
+						 'elementId':'things-resource-form'}
 					]
+				},
+				_current:{
+					type:Number,
+					value:0
 				}
 
 			},
 			observers: [
-				'_onResourceUrlChanged(resourceName,resource.id)'
+				'_onResourceChanged(resourceName,resource.id)',
+				// '_onTestResourceChanged(resource)',
+				'_onAttachableChanged(_panels, attachable)',
+				'_onEnableExtensionChanged(_panels, enableExtension)'
 			],
+			listeners:{
+				'tabPages.iron-select':'_onPageSelected'
+			},
+
+			ready:function () {
+			},
+			/**
+			 * fire element id+selected event with page element detail
+			 */
+			_onPageSelected:function (event) {
+				if(event.detail.id =="things-resource-form"){
+					event.detail.openResourceForm(this.resource);
+				}else{
+					console.log(event.detail);
+					event.detail.search();
+
+				}
+				
+				this.fire(event.detail.id+'Selected', event.detail);
+			},
 			/**
 			 * create elements things-basic-detial,
 			 * set things-Resource-Form resourceUrl
@@ -124,13 +152,28 @@ Example:
 			 * entityType ="{{resourceUrl}}"
 			 * entityId ="{{resource.id}}"
 			 */
-			_onResourceUrlChanged:function (resourceName,id) {
+			_onResourceChanged:function (resourceName,id) {
 				//bind attribute for extention
 				this._resourceUrl = [resourceName,id].join('/');
 				this.entityId = id;
 				this.entityType = resourceName;
+			},
+			/**
+			 * add attached file panel
+			 */
+			_onAttachableChanged:function (attachable) {
+				var attachment = {'title':'Attachments.',
+								  'elementId':'things-attached-file'};
+				this.push('_panels',attachment);
+			},
+			/**
+			 * add extension panel
+			 */
+			_onEnableExtensionChanged:function (enableExtension) {
+				var extension = {'title':'Properties.',
+								 'elementId':'things-extension'};
+				this.push('_panels',extension);
 			}
-
 		});
 	</script>
 </dom-module>
