@@ -114,7 +114,7 @@ Example:
 
 			},
 			observers: [
-				'_onResourceUrlChanged(resourceName,resource.id)',
+				'_onResourceUrlChanged(resourceName,resource.id)'
 			],
 			/**
 			 * create elements things-basic-detial,
@@ -129,9 +129,6 @@ Example:
 				this._resourceUrl = [resourceName,id].join('/');
 				this.entityId = id;
 				this.entityType = resourceName;
-			},
-			ready:function () {
-				   
 			}
 
 		});

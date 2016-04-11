@@ -26,11 +26,13 @@
 
       <things-file-upload 
         id="resouce-file-upload"
-        target="upload/attach"
+        target="[[targetUrl]]"
         method="POST"
-        resource-id = "1"
+        resource-id="1"
         resource-type="Alarm"
-        timeout="300000">
+        timeout="300000"
+        selector-hidden="true"
+        tag-hidden="true">
       </things-file-upload>
 
       <things-resource 
@@ -73,15 +75,18 @@
       ],
 
       properties: {
+
+        /**
+         *  Resource Type
+         */
         entityType: {
           type: String
         },
 
+        /**
+         * Resouce id
+         */
         entityId: {
-          type: String
-        },
-
-        resouceName: {
           type: String
         },
 
@@ -232,31 +237,38 @@
         },
 
         /**
-         * Grid Search URL
-         *
-         * 
+         * Grid Search URL 
          */
         gridSearchUrl: {
           type: String,
           value: 'attachments'
         },
 
+        /**
+         * upload target url
+         */
         targetUrl: {
           type: String,
-          computed: '_computeTargetUrl(entityType)'
+          value: 'upload/attach'
         }
       },
 
       listeners: {
         'grid.things-grid-detail-tap': '_onDetailButtonTap',
-        'grid.things-grid-save-success': 'refreshGridData',        
-        'grid.things-grid-resource-column-edit': '_openResourceSelector'
+        'grid.things-grid-resource-column-edit': '_openResourceSelector',
+        'things-upload-response': '_reloadList'
       },
 
+      /**
+       * search 쿼리 실행
+       */
       search: function() {
         this.$['resource-search'].generateRequest();
       },
 
+      /**
+       * 쿼리 조건 설정
+       */
       _computeQueryFields: function(entityType, entityId) {
         if(!this.queryFields || this.queryFields.length == 0) {
           return [{
@@ -276,15 +288,8 @@
         }
       },
 
-      _computeTargetUrl: function(entityType) {
-        var basicUrl = this.get('globals.basicUrl');
-        var urlTail = ['attach', entityType].join('/');
-        return basicUrl + urlTail;
-      },
-
       /**
        * Detail icon 클릭시 Download
-       * 
        */
       _onDetailButtonTap: function(e) {
         var basicUrl = this.get('globals.basicUrl');
@@ -295,7 +300,14 @@
         }, function() {
           window.location = basicUrl + '/download/' + e.detail.id;
         });
-      },      
+      },
+
+      /**
+       * Reloading Uploaded list
+       */
+      _reloadList: function(e) {
+        this.search();
+      }
       
     });
   </script>
