@@ -28,8 +28,8 @@
         id="resouce-file-upload"
         target="[[targetUrl]]"
         method="POST"
-        resource-id="1"
-        resource-type="Alarm"
+        resource-id="[[entityId]]"
+        resource-type="[[entityType]]"
         timeout="300000"
         selector-hidden="true"
         tag-hidden="true">
@@ -190,16 +190,6 @@
           }]
         },
 
-        params: [{
-          type: String,
-          name: 'onType',
-          value: 'Alarm'
-        },{
-          type: String,
-          name: 'onId',
-          value: '1'
-        }],
-
         /**
          * Select field 
          * 쿼리 필드 설정
@@ -305,7 +295,7 @@
       /**
        * Reloading Uploaded list
        */
-      _reloadList: function(e) {
+      _reloadList: function() {
         this.search();
       }
       
