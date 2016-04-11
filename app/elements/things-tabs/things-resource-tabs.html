@@ -1,3 +1,8 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../things-extension/things-extension.html">
+<link rel="import" href="../things-attach-file/things-attach-file.html">
 <!--
 A comment describing this element
 
@@ -28,8 +33,24 @@ Example:
         </paper-tabs>
 
         <iron-pages id="tabPages" selected="{{current}}">
-        	<template is="dom-if" if={{is}}>
-        		
+        	<things-resource-form 
+        		id="thingsResourceForm" 
+        		resource-url = "{{_resourceUrl}}"
+        		resource ="{{resource}}">
+        	</things-resource-form>
+
+        	<template is="dom-if" if={{attachable}}>
+        		<things-extension 
+        			id="thingsExtension"
+        			entity-id ="entityId"
+        			entity-type="entityType"></things-extension>        		
+        	</template>
+        	<template is="dom-if" if={{enableExtension}}>
+        		<things-attached-file 
+        			id="thingsAttachedFile"
+        			entity-id="entityId"
+        			entity-type="entityType">
+        		</things-attached-file>
         	</template>
         </iron-pages>		
 	</template>
@@ -37,23 +58,81 @@ Example:
 		Polymer({
 			is: 'things-resource-tabs',
 			properties:{
-				resourceUrl :{
+				/**
+				 * 폼 타이틀 
+				 */
+				title: {
 					type: String
 				},
-				resource:{
-					type:Object
+				/**
+				 * resource name으로 정보는 On Type으로 적용하여 
+				 * property, attach file들을 조회 한다.
+				 */
+				resourceName: {
+					type: String
 				},
-				title:{
-					type:String
+				/**
+				 * 폼에 채우기 위한 리소스
+				 * 최초 폼이 실행되는 시점에 서버에 요청하여 리턴받은 데이터
+				 */
+				resource: {
+					type: Object,
+					observer: '_resourceChanged'
+				},
+				/**
+				 * Save 하기 전에 폼에는 있지만 Save하는데 필요 없는 필드를 삭제하기 위한 필드명
+				 */
+				removeFieldsOnSave: {
+					type: Array,
+					value: ['creator', 'updater', 'creator_id', 'updater_id', 'created_at', 'updated_at']
+				},
+				/**
+				 * active attachment panel
+				 */
+				attachable: {
+					type: Boolean,
+					value:false
+				},
+				/**
+				 * active extention panel
+				 */
+				enableExtension:{
+					type: Boolean,
+					Value:false
+				},
+				/**
+				 * default panel array
+				 */
+				_panels:{
+					type: Array,
+					value:[
+						{'title':'Basic Info.','id':'thingsResourceForm'},
+						{'title':'Attachments.','id':'thingsExtension'},
+						{'title':'Properties','id':'thingsAttachedFile'}
+					]
 				}
+
 			},
 			observers: [
-				'_onResourceUrlChanged(resourceUrl,resource.*)',
-			]
-			_onResourceUrlChanged:function (resourceUrl) {
-				 //TODO : Caculate extention URL and Attachment URLs
+				'_onResourceUrlChanged(resourceName,resource.id)',
+			],
+			/**
+			 * create elements things-basic-detial,
+			 * set things-Resource-Form resourceUrl
+			 * set things-extension entityType, entityId
+			 * set things-attached-file entityType, entityId  
+			 * entityType ="{{resourceUrl}}"
+			 * entityId ="{{resource.id}}"
+			 */
+			_onResourceUrlChanged:function (resourceName,id) {
+				//bind attribute for extention
+				this._resourceUrl = [resourceName,id].join('/');
+				this.entityId = id;
+				this.entityType = resourceName;
 			},
-
+			ready:function () {
+				   
+			}
 
 		});
 	</script>
