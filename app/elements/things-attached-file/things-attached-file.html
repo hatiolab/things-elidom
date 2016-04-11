@@ -23,6 +23,15 @@
 <dom-module id="things-attached-file">
   <template>
     <div class="[[layout]]">
+
+      <things-file-upload 
+        id="resouce-file-upload"
+        target="upload"
+        method="POST"
+        headers="[[params]]"
+        timeout="300000">
+      </things-file-upload>
+
       <things-resource 
         id="resource-search"
         method="GET"
@@ -39,6 +48,7 @@
         config="[[gridConfig]]"
         model="[[gridModel]]" 
         columns="[[gridColumns]]"
+        buttons="[[buttons]]"
         data="[[lastResponse.items]]"
         enable-detail-column
         enable-toolbar>
@@ -57,7 +67,8 @@
       is: 'things-attached-file',
 
       behaviors: [
-        Things.MsgBoxBehavior
+        Things.MsgBoxBehavior,
+        Things.GlobalBehavior
       ],
 
       properties: {
@@ -74,6 +85,24 @@
         },
 
         /**
+         * Button Setting
+         * 
+         * @type {Array}
+         */
+        buttons : {
+          type: Array,
+          value: [{
+            id: 'delete-btn',
+            text: 'Delete',
+            icon: 'icons:delete'
+          }, {
+            id: 'save-btn',
+            text: 'Save',
+            icon: 'icons:save'
+          }]
+        },          
+
+        /**
          * Grid Model
          * 
          * @type {Array}
@@ -81,6 +110,8 @@
         gridModel: {
           type: Array,
           value: [{
+            fieldName: 'id'
+          }, {
             fieldName: 'name'
           }, {
             fieldName: 'storage_info',
@@ -97,7 +128,7 @@
           }, {
             fieldName: 'created_at'
           }]
-        },
+        },      
 
         /**
          * Grid Columns
@@ -107,6 +138,9 @@
         gridColumns: {
           type: Array,
           value: [{
+            fieldName: 'id',
+            width: 0
+          }, {
             fieldName: 'name',
             width: 150
           }, {
@@ -150,6 +184,16 @@
           }]
         },
 
+        params: [{
+          type: String,
+          name: 'onType',
+          value: 'Alarm'
+        },{
+          type: String,
+          name: 'onId',
+          value: '1'
+        }],
+
         /**
          * Select field 
          * 쿼리 필드 설정
@@ -183,7 +227,7 @@
          */
         queryFields: {
           type: Array,
-          computed: '_computeQueryFields(entityType,entityId)'
+          computed: '_computeQueryFields(entityType, entityId)'
         },
 
         /**
@@ -194,11 +238,17 @@
         gridSearchUrl: {
           type: String,
           value: 'attachments'
+        },
+
+        targetUrl: {
+          type: String,
+          computed: '_computeTargetUrl(entityType)'
         }
       },
 
       listeners: {
-        'grid.things-grid-detail-tap': '_showResourceForm',
+        'grid.things-grid-detail-tap': '_onDetailButtonTap',
+        'grid.things-grid-save-success': 'refreshGridData',        
         'grid.things-grid-resource-column-edit': '_openResourceSelector'
       },
 
@@ -223,7 +273,28 @@
           newQueryFields[1].value = this.entityId;
           return newQueryFields;
         }
-      }
+      },
+
+      _computeTargetUrl: function(entityType) {
+        var basicUrl = this.get('globals.basicUrl');
+        var urlTail = ['attach', entityType].join('/');
+        return basicUrl + urlTail;
+      },
+
+      /**
+       * Detail icon 클릭시 Download
+       * 
+       */
+      _onDetailButtonTap: function(e) {
+        var basicUrl = this.get('globals.basicUrl');
+        this.openConfirmMsg({
+          title : 'Do you want to download file?',
+          type : 'info',
+          text : 'You can download file'
+        }, function() {
+          window.location = basicUrl + '/download/' + e.detail.id;
+        });
+      },      
       
     });
   </script>
