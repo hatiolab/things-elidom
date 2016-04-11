@@ -59,10 +59,6 @@
       
     </div>
 
-    <div>
-      <paper-button raised dialog-confirm on-tap="search">Search</paper-button>
-    </div>
-
   </template>
 
   <script>    
@@ -245,6 +241,7 @@
 
       listeners: {
         'grid.things-grid-detail-tap': '_onDetailButtonTap',
+        'grid.things-grid-save-success': 'refreshGridData',
         'grid.things-grid-resource-column-edit': '_openResourceSelector',
         'things-upload-response': '_reloadList'
       },
