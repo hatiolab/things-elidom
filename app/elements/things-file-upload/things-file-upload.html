@@ -4,14 +4,13 @@
 <link rel="import" href="../../../bower_components/iron-demo-helpers/demo-pages-shared-styles.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
 <link rel="import" href="../../../bower_components/paper-styles/default-theme.html">
-<link rel="import" href="../../../bower_components/vaadin-upload/vaadin-upload.html">
 
 <link rel="import" href="../things-setting/things-global-behavior.html">
 <link rel="import" href="../things-spinner/things-spinner-behavior.html">
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 
 <link rel="import" href="./things-storage-selector.html">
-
+<link rel="import" href="./things-upload.html">
 <!--
 A comment describing this element
 
@@ -130,7 +129,7 @@ A comment describing this element
 				<span class="title">[[title]]</span>
 			</paper-toolbar>
 
-			<vaadin-upload
+			<things-upload
 							accept="[[accept]]" 
 							headers="[[headers]]" 
 							i18n="[[i18n]]" 
@@ -144,10 +143,10 @@ A comment describing this element
 							timeout=[[timeout]]
 							id="fileUpload">
 				<content></content>
-			</vaadin-upload>
+			</things-upload>
 
 			<things-storage-selector id="storage"></things-storage-selector>
-			<paper-input id="tag" label="Tag"></paper-input>
+			<paper-input id="tag" label="Tag" value="{{resourceTag}}"></paper-input>
 
 			<h4>Files List</h4>
 			<ul id="customFilesList"></ul>
@@ -312,7 +311,7 @@ A comment describing this element
 			/**
 			 * resouce Tag
 			 */
-			resouceTag:{
+			resourceTag:{
 				type:String
 			},
 			/**
@@ -409,14 +408,19 @@ A comment describing this element
 			// Custom upload request url for file
 			var file = event.detail.file;
 			var target = this.$.fileUpload.target
-			file.uploadTarget = [this._basicUrl, target, this.storage].join('/');
+			// file.on_id = this.resourceId;
+			// file.on_type = this.resourceType;
 
+			var formData = event.detail.formData;
+			formData.append('onId', this.resourceId);
+			formData.append('onType',this.resourceType);
+			file.uploadTarget = [this._basicUrl, target, this.storage].join('/');
 		},
 		/**
 		 * when upload request sent this function will be worked
 		 */
 		_uploadRequest:function(event){
-			console.log(event);
+			// console.log(event);
 		},
 		/**
 		 * when upload result come in this function will be worked
