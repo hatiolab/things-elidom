@@ -66,18 +66,18 @@ Custom property | Description | Default
         @apply(--layout-vertical);
         display: block;
         position: relative;
-        text-align: center;
-        overflow: hidden;
+        text-align: left;
       }
 
-      :host:not([nodrop]) {
+      :host(:not([nodrop])) {
         border: 1px dashed;
         border-color: var(--divider-color,  #666);
         border-radius: 3px;
+        overflow: hidden;
         padding: 16px;
       }
 
-      :host[dragover-valid] {
+      :host([dragover-valid]) {
         border-color: var(--primary-color, #00B4F0);
       }
 
@@ -91,7 +91,7 @@ Custom property | Description | Default
         display: none;
         z-index: 10;
       }
-      :host[dragover]::before {
+      :host([dragover])::before {
         display: block;
       }
 
@@ -101,15 +101,17 @@ Custom property | Description | Default
       }
 
       #dropLabel {
+        @apply(--layout-flex);
         @apply(--paper-font-body2);
         position: relative;
-        margin-top: 8px;
+        padding: .43em .57em;
+        margin: 0 .29em;
         color: var(--disabled-text-color, #b3b3b3);
         @apply(--vaadin-upload-drop-label);
       }
 
-      :host[dragover-valid] #dropLabel,
-      :host[dragover-valid] ::content .drop-label {
+      :host([dragover-valid]) #dropLabel,
+      :host([dragover-valid]) ::content .drop-label {
         color: var(--primary-color, #00B4F0);
         @apply(--vaadin-upload-drop-label-dragover);
       }
@@ -121,40 +123,35 @@ Custom property | Description | Default
 
       #fileList {
         position: relative;
-        text-align: left;
         @apply(--vaadin-upload-file-list);
       }
 
       #buttons {
         @apply(--layout-horizontal);
-        @apply(--layout-center-justified);
         position: relative;
-        margin: 8px 0 0;
         @apply(--vaadin-upload-buttons);
       }
 
-      :host[nodrop] #buttons {
-        @apply(--layout-end-justified);
-        @apply(--vaadin-upload-buttons-nodrop);
-      }
-
-      paper-button {
-        @apply(--paper-font-button);
-        color: var(--primary-color, #00B4F0);
-        padding: .43em .57em;
-        @apply(--vaadin-upload-button);
+      #buttonsPrimary {
+        @apply(--layout-horizontal);
+        @apply(--layout-flex);
+        @apply(--layout-start);
+        margin-left: -.29em;
+        @apply(--vaadin-upload-buttons-primary);
       }
 
       #addFiles {
-        margin-right: 0;
+        @apply(--paper-font-button);
+        padding: .43em .57em;
         background: var(--primary-color, #00B4F0);
         color: var(--primary-font-color, #FFFFFF);
         @apply(--vaadin-upload-button-add);
       }
 
-      :host[nodrop] #addFiles {
-        margin-right: auto;
-        @apply(--vaadin-upload-button-add-nodrop);
+      #addFiles[disabled] {
+        background: var(--divider-color, #e0e0e0);
+        color: var(--disabled-text-color, gray);
+        @apply(--vaadin-upload-button-add-disabled);
       }
     </style>
 

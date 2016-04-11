@@ -5,6 +5,8 @@
 <link rel="import" href="../../../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
 <link rel="import" href="../../../bower_components/paper-styles/default-theme.html">
 
+<link rel="import" href="../../../bower_components/vaadin-upload/vaadin-upload.html">
+
 <link rel="import" href="../things-setting/things-global-behavior.html">
 <link rel="import" href="../things-spinner/things-spinner-behavior.html">
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
@@ -145,11 +147,8 @@ A comment describing this element
 				<content></content>
 			</things-upload>
 
-			<things-storage-selector id="storage"></things-storage-selector>
-			<paper-input id="tag" label="Tag" value="{{resourceTag}}"></paper-input>
-
-			<h4>Files List</h4>
-			<ul id="customFilesList"></ul>
+			<things-storage-selector id="storage" hidden="{{selectorHidden}}"></things-storage-selector>
+			<paper-input id="tag" label="Tag" value="{{resourceTag}}" hidden="{{tagHidden}}"></paper-input>
 		</div>
 
 	</template>
@@ -164,6 +163,22 @@ A comment describing this element
 			 * 화면에 표시할 지 여부 
 			 */
 			hidden: {
+				type: Boolean,
+				value: false
+			},
+
+			/**
+			 * selector 화면에 표시할지 여부
+			 */
+			selectorHidden: {
+				type: Boolean,
+				value: false
+			},
+
+			/**
+			 * tag 화면에 표시할지 여부
+			 */
+			tagHidden: {
 				type: Boolean,
 				value: false
 			},
@@ -300,19 +315,19 @@ A comment describing this element
 			 * file resource entity type
 			 */
 			resourceType:{
-				type:String
+				type: String
 			},
 			/**
 			 * resource Id
 			 */
 			resourceId:{
-				type:String
+				type: String
 			},
 			/**
 			 * resouce Tag
 			 */
 			resourceTag:{
-				type:String
+				type: String
 			},
 			/**
 			 * compute basic url for reuqest generation
@@ -367,6 +382,7 @@ A comment describing this element
 				switch (event.type) {
 					case 'upload-success':
 						status.textContent = 'Uploaded.';
+						console.log(event);
 						break;
 					case 'upload-error':
 						status.textContent = file.error;
@@ -426,7 +442,7 @@ A comment describing this element
 		 * when upload result come in this function will be worked
 		 */
 		_uploadResponse:function(event){
-
+			this.fire('things-upload-response', event.detail);
 		},
 		/**
 		 * when upload aborted this function will be worked
