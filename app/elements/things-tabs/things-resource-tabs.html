@@ -42,18 +42,18 @@ Example:
 
 
         	<template is="dom-if" if={{attachable}}>
-        		<things-extension 
-        			id="thingsExtension"
-        			entity-id ="{{entityId}}"
-        			entity-type="{{entityType}}"></things-extension>        		
-        	</template>
-
-        	<template is="dom-if" if={{enableExtension}}>
         		<things-attached-file 
         			id="thingsAttachedFile"
         			entity-id="{{entityId}}"
         			entity-type="{{entityType}}">
         		</things-attached-file>
+        	</template>
+
+        	<template is="dom-if" if={{enableExtension}}>
+        		<things-extension 
+        			id="thingsExtension"
+        			entity-id ="{{entityId}}"
+        			entity-type="{{entityType}}"></things-extension>        		
         	</template>
         </iron-pages>		
 	</template>
@@ -113,13 +113,12 @@ Example:
 					]
 				},
 				_current:{
-					type:Number,
-					value:0
+					type:Number
 				}
 
 			},
 			observers: [
-				'_onResourceChanged(resourceName,resource.id)',
+				'_onResourceChanged(resourceName,resource)',
 				// '_onTestResourceChanged(resource)',
 				'_onAttachableChanged(_panels, attachable)',
 				'_onEnableExtensionChanged(_panels, enableExtension)'
@@ -131,15 +130,22 @@ Example:
 			ready:function () {
 			},
 			/**
+			 *
+			 * 
+			 */
+			_onTestResourceChanged:function (resource) {
+				 console.log(resource); 
+			},
+			/**
 			 * fire element id+selected event with page element detail
 			 */
 			_onPageSelected:function (event) {
 				if(event.detail.id =="things-resource-form"){
 					event.detail.openResourceForm(this.resource);
 				}else{
-					console.log(event.detail);
-					event.detail.search();
-
+					this.entityId = this.resource.id;
+					this.entityType = this.resourceName;
+					event.target.selectedItem.search();
 				}
 				
 				this.fire(event.detail.id+'Selected', event.detail);
@@ -152,11 +158,11 @@ Example:
 			 * entityType ="{{resourceUrl}}"
 			 * entityId ="{{resource.id}}"
 			 */
-			_onResourceChanged:function (resourceName,id) {
+			_onResourceChanged:function (resourceName,resource) {
 				//bind attribute for extention
-				this._resourceUrl = [resourceName,id].join('/');
-				this.entityId = id;
-				this.entityType = resourceName;
+				// console.log(this.resource);
+				this._resourceUrl = [resourceName,resource.id].join('/');
+				this._current=0;
 			},
 			/**
 			 * add attached file panel

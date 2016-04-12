@@ -104,10 +104,10 @@
             width: 0
           }, {
             fieldName: 'name',
-            width: 250
+            width: 200
           }, {
             fieldName: 'value',
-            width: 350
+            width: 800
           } ]
         },
 
@@ -193,6 +193,7 @@
        * reload grid data
        */
       search: function(e) {
+        var value1 = this.gridSearchUrl
         this.$['resource-search'].generateRequest();
       }
 
