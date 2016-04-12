@@ -430,6 +430,7 @@ A comment describing this element
 			var formData = event.detail.formData;
 			formData.append('onId', this.resourceId);
 			formData.append('onType',this.resourceType);
+			file.xhr.withCredentials = true;
 			file.uploadTarget = [this._basicUrl, target, this.storage].join('/');
 		},
 		/**

@@ -1,0 +1,65 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../things-combo/things-code-selector.html">
+<!--
+This Element for system register a global value Named _THi18n for i18n objects
+objects initial value is 
+_THi18n:{
+	en:{},
+	....
+},
+after initiate data with server resource will be
+_THi18n:{
+	en:{
+		menu:{
+			id:display,
+			id:display
+		},
+		button:{
+			id:display,
+			....
+		}
+		....
+	}
+}
+
+Example:
+
+    <things-i18n></things-i18n>
+
+@demo demo/index.html
+-->
+
+<dom-module id="things-i18n">
+	<template>
+		<style>
+			:host {
+				display: block;
+			}
+		</style>
+<!-- 		<things-resource
+			auto
+			content-type="application/json"
+			resource ="terminologies"
+			action=""
+			method="GET"
+			last-response="{{terminologies}}"
+		>
+		</things-resource>
+ -->	</template>
+	<script>
+		Polymer({
+			is: 'things-i18n',
+			properties:{
+				locale:{
+					type:Object
+				}
+			},
+			observers:[
+				'_onTerminologiesChange(terminologies)'
+			],
+			_onTerminologiesChange:function (terminologies) {
+				 console.log(terminologies);
+			}
+		});
+	</script>
+</dom-module>
