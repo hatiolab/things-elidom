@@ -305,7 +305,7 @@
       loadDetailData: function(resource) {
         if(resource) {
           var rId = (typeof(resource) === 'object') ? resource.id : resource;
-          if(rId != this.resourceId) {
+          if(!this.lastResponse || rId != this.resourceId) {
             this.resourceId = rId;
             this.loadData();
           }

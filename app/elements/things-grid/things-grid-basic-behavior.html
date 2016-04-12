@@ -283,12 +283,14 @@ Things.GridBasicBehaviorImpl = {
      * set grid column views to grid
      */
     _setGridColumns: function(columns) {
-        if(typeof(columns)==='string'){
+        if(!columns) return;
+        
+        if(typeof(columns) === 'string') {
             columns = JSON.parse(columns);
         }
        
         if (this.enableDetailColumn) {
-            cols = [{
+            cols = [ {
                 'name': 'Detail',
                 'width': '25',
                 'imageList': 'images',
@@ -303,7 +305,7 @@ Things.GridBasicBehaviorImpl = {
                 'header': {
                     'text': ' '
                 }
-            }];
+            } ];
 
             columns.forEach(function(item) {
                 cols.push(item);

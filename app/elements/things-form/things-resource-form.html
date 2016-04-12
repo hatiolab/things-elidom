@@ -308,14 +308,11 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 				var originalAction = resourceSaver.action;
 				var originalContentType = resourceSaver.contentType;
 
-				if(this.resource.id) {
+				resourceSaver.method = this.resource.id ? 'PUT' : 'POST';
+				if(resourceSaver.action && resourceSaver.action.indexOf(':id') >= 0) {
 					resourceSaver.action = resourceSaver.action.replace(':id', this.resource.id);
-					resourceSaver.method ='PUT';
-				} else {
-					resourceSaver.action = resourceSaver.action.replace('/:id', '');
-					resourceSaver.method ='POST';
 				}
-
+				
 				var params = this.serializeMyForm();
 				params = this._filterResourceColumns(params);
 				resourceSaver.params = params;

@@ -57,18 +57,27 @@
 <section class="Page" data-route="resource_selector">
   <paper-material elevation="1">
     <div>
+      <things-resource 
+        auto
+        id="resource-meta"
+        method="GET"
+        action="entities/Alarm/resource_columns"
+        last-response="{{metaData}}">
+      </things-resource>
+
       <things-resource
         auto
         content-type="application/json"
-        resource="alarms/1"
         method="get"
-        action=""
+        action="alarms/1"
         last-response="{{detailViewData}}">
       </things-resource>
 
       <things-resource-tabs 
         search-meta
+        meta-data="{{metaData}}"
         resource-type="Alarm" 
+        resource-url="alarms"
         resource="{{detailViewData}}" 
         attachable 
         prop-extensible>
