@@ -22,14 +22,14 @@ Things.ResourceMetaBehaviorImpl = {
 		 */
 		resourceMetaUrl: {
 			type: String,
-			computed: '_computeResourceMetaUrl(resourceName)'
+			computed: '_computeResourceMetaUrl(resourceType)'
 		},
 
 		/**
-		 * resource 이름
+		 * entity type
 		 * ex) User resource라고 하면 User
 		 */
-		resourceName: {
+		resourceType: {
 			type: String
 		},
 
@@ -100,13 +100,13 @@ Things.ResourceMetaBehaviorImpl = {
 	},
 
 	/**
-	 * resourceName으로 resource meta url을 생성
+	 * resourceType으로 resource meta url을 생성
 	 *
-	 * @param {String} resourceName
+	 * @param {String} resourceType
 	 * @return {String} resource meta get URL
 	 */
-	_computeResourceMetaUrl: function(resourceName) {
-		return 'entities/' + resourceName + '/resource_columns.json';
+	_computeResourceMetaUrl: function(resourceType) {
+		return 'entities/' + resourceType + '/resource_columns.json';
 	},
 
 	/**

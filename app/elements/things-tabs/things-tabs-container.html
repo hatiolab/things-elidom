@@ -35,7 +35,7 @@ Example:
     </paper-tabs>
 
     <iron-pages id="tabPages" selected="{{current}}">
-      <!--things-base-code-detail code-id="968" resource="[[resource]]" resource-name="Common Code" resource-url="common_codes"></things-base-code-detail>
+      <!--things-base-code-detail code-id="968" resource="[[resource]]" resource-type="Common Code" resource-url="common_codes"></things-base-code-detail>
       <things-extension entity-id="1" entity-type="Alarm"></things-extension-->
     </iron-pages>
   </template>
@@ -59,7 +59,7 @@ Example:
           type: String
         },
 
-        resourceName: {
+        resourceType: {
           type: String
         },
 
@@ -87,13 +87,13 @@ Example:
             'title' : 'Common Code Form',
             'element' : 'things-base-code-detail',
             'code-id' : 968,
-            'resource-name' : 'CommonCode',
+            'resource-type' : 'CommonCode',
             'resource-url': 'common_codes'
           }, {
             'title' : 'properties',
             'element' : 'things-extension',
-            'entity-type' : 'Alarm',
-            'entity-id' : '1'
+            'resource-type' : 'Alarm',
+            'resource-id' : '1'
           } ],
           observer:'_panelsChange'
         }

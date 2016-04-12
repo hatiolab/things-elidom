@@ -15,7 +15,7 @@ Resource Selector. 서버에 저장되어 있는 리소스 정보를 조회하�
       id="resource-selector" 
       label="Language" 
       name="user_id"
-      resource-name="User" 
+      resource-type="User" 
       resource-url="users"
       delegate-column="name"
     </things-resource-field>
@@ -89,14 +89,14 @@ Resource Selector. 서버에 저장되어 있는 리소스 정보를 조회하�
           },
 
           /**
-           * 코드 데이터 중에서 Code Selector에 표시할 데이터 패스.
+           * entity type
            */
-          resourceName: {
+          resourceType: {
             type: String
           },
 
           /**
-           * 코드 데이터 중에서 Code Selector가 가질 값에 대한 데이터 패스.
+           * 데이터 조회를 위한 URL
            */
           resourceUrl: {
             type: String

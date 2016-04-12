@@ -30,7 +30,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 
 	<things-resource-content 
 	  title="Terminology"
-	  resource-name="Terminology"
+	  resource-type="Terminology"
 	  resource-url="terminologies"
 	  layout="fullbleed layout vertical">
 	</things-resource-content>
@@ -224,7 +224,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				var viewElement = document.createElement('things-resource-form');
 				viewElement.id = 'resource-form';
 				viewElement.title = this.title + ' Detail';
-				viewElement.resourceName = this.resourceName;
+				viewElement.resourceType = this.resourceType;
 				viewElement.resourceUrl = this.resourceUrl + '/' + selectedRecord.id;
 				viewElement.resource = selectedRecord;
 				viewElement.formFields = this.resourceFormFields;
@@ -244,7 +244,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				var viewElement = document.createElement(this.detailView);
 				viewElement.id = 'detail-view';
 				viewElement.title = this.title + ' Detail';
-				viewElement.resourceName = this.resourceName;
+				viewElement.resourceType = this.resourceType;
 				viewElement.resourceUrl = this.resourceUrl + '/' + selectedRecord.id;
 				viewElement.resource = selectedRecord;
 				viewElement.formFields = this.resourceFormFields;

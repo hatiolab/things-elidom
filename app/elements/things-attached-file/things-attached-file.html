@@ -28,8 +28,8 @@
         id="resouce-file-upload"
         target="[[targetUrl]]"
         method="POST"
-        resource-id="[[entityId]]"
-        resource-type="[[entityType]]"
+        resource-id="[[resourceId]]"
+        resource-type="[[resourceType]]"
         timeout="300000"
         selector-hidden="true"
         tag-hidden="true">
@@ -75,14 +75,14 @@
         /**
          *  Resource Type
          */
-        entityType: {
+        resourceType: {
           type: String
         },
 
         /**
          * Resouce id
          */
-        entityId: {
+        resourceId: {
           type: String
         },
 
@@ -219,7 +219,7 @@
          */
         queryFields: {
           type: Array,
-          computed: '_computeQueryFields(entityType, entityId)'
+          computed: '_computeQueryFields(resourceType, resourceId)'
         },
 
         /**
@@ -248,22 +248,24 @@
 
       /**
        * 쿼리 조건 설정
+       * @param {String} resourceType
+       * @param {String} resourceId
        */
-      _computeQueryFields: function(entityType, entityId) {
+      _computeQueryFields: function(resourceType, resourceId) {
         if(!this.queryFields || this.queryFields.length == 0) {
           return [ {
             name: 'onType',
             operator: 'eq',
-            value: this.entityType
+            value: this.resourceType
           }, {
             name: 'onId',
             operator: 'eq',
-            value: this.entityId
+            value: this.resourceId
           } ];
         } else {
           var newQueryFields = this.queryFields;
-          newQueryFields[0].value = this.entityType;
-          newQueryFields[1].value = this.entityId;
+          newQueryFields[0].value = this.resourceType;
+          newQueryFields[1].value = this.resourceId;
           return newQueryFields;
         }
       },
@@ -302,8 +304,11 @@
        */
       loadDetailData: function(resource) {
         if(resource) {
-          this.entityId = (typeof(resource) === 'object') ? resource.id : resource;
-          this.loadData();
+          var rId = (typeof(resource) === 'object') ? resource.id : resource;
+          if(rId != this.resourceId) {
+            this.resourceId = rId;
+            this.loadData();
+          }
         }
       },
 

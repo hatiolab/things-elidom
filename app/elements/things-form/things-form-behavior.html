@@ -294,7 +294,7 @@ Things.FormBehaviorImpl = {
 				newElement = document.createElement('things-resource-selector');
 				newElement.setAttribute('name', element.name);
 				newElement.setAttribute('label', element.label);
-				newElement.setAttribute('resource-name', element.userObj.resourceName);
+				newElement.setAttribute('resource-type', element.userObj.resourceType);
 				newElement.setAttribute('resource-url', element.userObj.resourceUrl);
 				break;
 
@@ -302,7 +302,7 @@ Things.FormBehaviorImpl = {
 				newElement = document.createElement('things-resource-field');
 				newElement.setAttribute('name', element.name);
 				newElement.setAttribute('label', element.label);
-				newElement.setAttribute('resource-name', element.userObj.resourceName);
+				newElement.setAttribute('resource-type', element.userObj.resourceType);
 				newElement.setAttribute('resource-url', element.userObj.resourceUrl);
 				if(element.userObj.readOnly && element.userObj.readOnly === true) {
 					newElement.setAttribute('read-only', element.userObj.readOnly);

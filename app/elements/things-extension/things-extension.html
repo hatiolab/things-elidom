@@ -38,16 +38,16 @@
       properties: {
 
         /**
-         * entity type
+         * resource type
          */
-        entityType: {
+        resourceType: {
           type: String
         },
 
         /**
-         * record id
+         * resource id
          */
-        entityId: {
+        resourceId: {
           type: String
         },
 
@@ -56,7 +56,7 @@
          */
         gridSearchUrl: {
           type: String,
-          computed: '_computeGridSearchUrl(entityType,entityId)',
+          computed: '_computeGridSearchUrl(resourceType,resourceId)',
         },
 
         /**
@@ -187,7 +187,7 @@
        */
       addRow: function(e) {
         this.$.grid.dataSet.insertRow(0, { 
-          id: null, name : '', value : '', on_type : this.entityType, on_id : this.entityId
+          id: null, name : '', value : '', on_type : this.resourceType, on_id : this.resourceId
         });
       },
 
@@ -212,8 +212,11 @@
        */
       loadDetailData: function(resource) {
         if(resource) {
-          this.entityId = (typeof(resource) === 'object') ? resource.id : resource;
-          this.loadData();
+          var rId = (typeof(resource) === 'object') ? resource.id : resource;
+          if(rId != this.resourceId) {
+            this.resourceId = rId;
+            this.loadData();
+          }
         }
       },
 

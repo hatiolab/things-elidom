@@ -1,178 +1,248 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+
 <dom-module id="things-code-editor">
-    <template>
-        <style>
-        :host {
-            display: block;
-            @apply(--layout-vertical);
+  <template>
+    <style>
+      :host {
+        display: block;
+        @apply(--layout-vertical);
+      }
+
+      juicy-ace-editor {
+        @apply(--layout-flex);
+        @apply(--layout-vertical);
+        width: 94%;
+        height: 300px;
+        margin: 7px 0 0 7px;
+        overflow: auto;
+      }
+    </style>
+
+    <!-- ace-editor의 TEXT부분에 공백이 추가되지 않도록 {{zpl}}주의에 공백을 주지않도록 해야함. -->
+    <div>
+      <juicy-ace-editor 
+        id="eval-editor" 
+        theme$="{{theme}}" 
+        mode$="{{mode}}" 
+        fontsize$="{{fontsize}}" 
+        readonly$="{{readonly}}" 
+        softtabs$="{{softtabs}}" 
+        tabsize$="{{tabsize}}" 
+        wrapmode$="{{wrapmode}}">{{source}}</juicy-ace-editor>
+
+      <things-button-bar id="button-bar" buttons="[[buttons]]"></things-button-bar>
+    </div>
+
+    <things-resource 
+      id="save-resource" 
+      content-type="application/json" 
+      action="{{saveUrl}}" 
+      method="POST" 
+      params="{{resource}}">
+    </things-resource>
+  </template>
+
+  <script>
+    
+    Polymer({
+    
+      is: 'things-code-editor',
+
+      properties: {
+        /**
+         * script editor theme
+         * "ace/theme/chrome","ace/theme/clouds","ace/theme/crimson_editor","ace/theme/dawn","ace/theme/dreamweaver","ace/theme/eclipse","ace/theme/github","ace/theme/solarized_light","ace/theme/textmate","ace/theme/tomorrow","ace/theme/xcode","ace/theme/kuroir","ace/theme/katzenmilch","ace/theme/ambiance","ace/theme/chaos","ace/theme/clouds_midnight","ace/theme/cobalt","ace/theme/idle_fingers","ace/theme/kr_theme","ace/theme/merbivore","ace/theme/merbivore_soft","ace/theme/mono_industrial","ace/theme/monokai","ace/theme/pastel_on_dark","ace/theme/solarized_dark","ace/theme/terminal","ace/theme/tomorrow_night","ace/theme/tomorrow_night_blue","ace/theme/tomorrow_night_bright","ace/theme/tomorrow_night_eighties","ace/theme/twilight","ace/theme/vibrant_ink"
+         */
+        theme: {
+          type: String
+        },
+
+        /**
+         * data resource
+         */
+        resource: {
+          type: Object,
+          notify: true
+        },
+
+        /**
+         * data resource field
+         */
+        codeField: {
+          type: String
+        },
+
+        /**
+         * form fields
+         */
+        formFields: {
+          type: Array,
+          observer: '_onFormFieldsChanged'
+        },
+
+        /**
+         * save URL
+         */
+        saveUrl: {
+          type: String,
+          notify: true
+        },
+
+        /**
+         * script editor mode
+         * modes include belows
+         * "ace/mode/abap","ace/mode/actionscript","ace/mode/ada","ace/mode/apache_conf","ace/mode/asciidoc","ace/mode/assembly_x86","ace/mode/autohotkey","ace/mode/batchfile","ace/mode/c9search","ace/mode/c_cpp","ace/mode/cirru","ace/mode/clojure","ace/mode/cobol","ace/mode/coffee","ace/mode/coldfusion","ace/mode/csharp","ace/mode/css","ace/mode/curly","ace/mode/d","ace/mode/dart","ace/mode/diff","ace/mode/dot","ace/mode/erlang","ace/mode/ejs","ace/mode/forth","ace/mode/ftl","ace/mode/gherkin","ace/mode/glsl","ace/mode/golang","ace/mode/groovy","ace/mode/haml","ace/mode/handlebars","ace/mode/haskell","ace/mode/haxe","ace/mode/html","ace/mode/html_ruby","ace/mode/ini","ace/mode/jack","ace/mode/jade","ace/mode/java","ace/mode/javascript","ace/mode/json","ace/mode/jsoniq","ace/mode/jsp","ace/mode/jsx","ace/mode/julia","ace/mode/latex","ace/mode/less","ace/mode/liquid","ace/mode/lisp","ace/mode/livescript","ace/mode/logiql","ace/mode/lsl","ace/mode/lua","ace/mode/luapage","ace/mode/lucene","ace/mode/makefile","ace/mode/matlab","ace/mode/markdown","ace/mode/mel","ace/mode/mysql","ace/mode/mushcode","ace/mode/nix","ace/mode/objectivec","ace/mode/ocaml","ace/mode/pascal","ace/mode/perl","ace/mode/pgsql","ace/mode/php","ace/mode/powershell","ace/mode/prolog","ace/mode/properties","ace/mode/protobuf","ace/mode/python","ace/mode/r","ace/mode/rdoc","ace/mode/rhtml","ace/mode/ruby","ace/mode/rust","ace/mode/sass","ace/mode/scad","ace/mode/scala","ace/mode/smarty","ace/mode/scheme","ace/mode/scss","ace/mode/sh","ace/mode/sjs","ace/mode/space","ace/mode/snippets","ace/mode/soy_template","ace/mode/sql","ace/mode/stylus","ace/mode/svg","ace/mode/tcl","ace/mode/tex","ace/mode/text","ace/mode/textile","ace/mode/toml","ace/mode/twig","ace/mode/typescript","ace/mode/vbscript","ace/mode/velocity","ace/mode/verilog","ace/mode/xml","ace/mode/xquery","ace/mode/yaml"
+         */
+        mode: {
+          type: String
+        },
+
+        /**
+         * font size
+         */
+        fontsize: {
+          type: String,
+          value: '14px'
+        },
+
+        /**
+         * if edit able
+         */
+        readonly: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * if enable sfottabs or not
+         */
+        softtabs: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * tab size
+         */
+        tabsize: {
+          type: Number,
+          value: 4
+        },
+
+        /**
+         * text wrapmode 
+         */
+        wrapmode: {
+          type: Boolean,
+          value: true
+        },
+
+        /**
+         * Buttons
+         */
+        buttons: {
+          type: Array,
+          readonly: true,
+          value: [ {
+            id: 'save-btn',
+            text: 'Save'
+          } ]
         }
-        
-        juicy-ace-editor {
-            @apply(--layout-flex);
-            @apply(--layout-vertical);
-            width: 94%;
-            height: 300px;
-            margin: 7px 0 0 7px;
-            overflow: auto;
+      },
+
+      listeners: {
+        'eval-editor.editor-ready': '_onEditorReady',
+        'eval-editor.change': '_onEditorChange',
+        'button-bar.things-button-tap': '_onButtonTap',
+      },
+
+      observers: [
+        '_onResourceChanged(resource,codeField)'
+      ],
+
+      /**
+       * return editor source
+       */
+      getSource: function() {
+        return this.codeField ? this.resource[this.codeField] : null;
+      },
+
+      /**
+       * on resource change
+       * @param {Object} resource
+       * @param {String} codeField
+       */
+      _onResourceChanged: function(resource, codeField) {
+        if(codeField) {
+          this.source = resource[codeField]
         }
-        </style>
-        <!-- ace-editor의 TEXT부분에 공백이 추가되지 않도록 {{zpl}}주의에 공백을 주지않도록 해야함. -->
-        <div>
-            <juicy-ace-editor id="eval-editor" theme$="{{theme}}" mode$="{{mode}}" fontsize$="{{fontsize}}" readonly$="{{readonly}}" softtabs$="{{softtabs}}" tabsize$="{{tabsize}}" wrapmode$="{{wrapmode}}">{{source}}</juicy-ace-editor>
-			 <things-button-bar id="button-bar" buttons="[[buttons]]"></things-button-bar>
-        </div>
+      },
 
-        <things-resource id="save-resource" content-type="application/json" action="{{saveUrl}}" method="POST" params="{{record}}">
-        </things-resource>
+      /**
+       * on form fields change
+       * @param {Array} formFields
+       */
+      _onFormFieldsChanged: function(formFields) {
+        var codeFields = formFields.filter(function(field) { return (field.type == 'code-editor'); });
+        if(codeFields && codeFields.length > 0) this.codeField = codeFields[0].name;
+      },
 
-    </template>
-    <script>
-    (function() {
-        'use strict';
+      /**
+       * when editor ready
+       */
+      _onEditorReady: function(e) {
+        // event.detail should be a ace-editor
+        e.detail.renderer.setShowGutter(false);
+      },
 
-        Polymer({
-            is: 'things-code-editor',
+      /**
+       * called when editor's change event called
+       */
+      _onEditorChange: function(after) {
+        this.resource[this.codeField] = this.$['eval-editor'].editor.getValue();
+      },
 
-            properties: {
-                /**
-                 * script editor theme
-                 * "ace/theme/chrome","ace/theme/clouds","ace/theme/crimson_editor","ace/theme/dawn","ace/theme/dreamweaver","ace/theme/eclipse","ace/theme/github","ace/theme/solarized_light","ace/theme/textmate","ace/theme/tomorrow","ace/theme/xcode","ace/theme/kuroir","ace/theme/katzenmilch","ace/theme/ambiance","ace/theme/chaos","ace/theme/clouds_midnight","ace/theme/cobalt","ace/theme/idle_fingers","ace/theme/kr_theme","ace/theme/merbivore","ace/theme/merbivore_soft","ace/theme/mono_industrial","ace/theme/monokai","ace/theme/pastel_on_dark","ace/theme/solarized_dark","ace/theme/terminal","ace/theme/tomorrow_night","ace/theme/tomorrow_night_blue","ace/theme/tomorrow_night_bright","ace/theme/tomorrow_night_eighties","ace/theme/twilight","ace/theme/vibrant_ink"
-                 */
-                theme: {
-                    type: String
-                },
-                /**
-                 * data record
-                 */
-                record: {
-                    type: Object,
-                    notify: true
-                },
-                /**
-                 * data record field
-                 */
-                codeField: {
-                    type: String
-                },
-                /**
-                 * save URL
-                 */
-                saveUrl: {
-                    type: String,
-                    notify: true
-                },
-                /**
-                 * script editor mode
-                 * modes include belows
-                 * "ace/mode/abap","ace/mode/actionscript","ace/mode/ada","ace/mode/apache_conf","ace/mode/asciidoc","ace/mode/assembly_x86","ace/mode/autohotkey","ace/mode/batchfile","ace/mode/c9search","ace/mode/c_cpp","ace/mode/cirru","ace/mode/clojure","ace/mode/cobol","ace/mode/coffee","ace/mode/coldfusion","ace/mode/csharp","ace/mode/css","ace/mode/curly","ace/mode/d","ace/mode/dart","ace/mode/diff","ace/mode/dot","ace/mode/erlang","ace/mode/ejs","ace/mode/forth","ace/mode/ftl","ace/mode/gherkin","ace/mode/glsl","ace/mode/golang","ace/mode/groovy","ace/mode/haml","ace/mode/handlebars","ace/mode/haskell","ace/mode/haxe","ace/mode/html","ace/mode/html_ruby","ace/mode/ini","ace/mode/jack","ace/mode/jade","ace/mode/java","ace/mode/javascript","ace/mode/json","ace/mode/jsoniq","ace/mode/jsp","ace/mode/jsx","ace/mode/julia","ace/mode/latex","ace/mode/less","ace/mode/liquid","ace/mode/lisp","ace/mode/livescript","ace/mode/logiql","ace/mode/lsl","ace/mode/lua","ace/mode/luapage","ace/mode/lucene","ace/mode/makefile","ace/mode/matlab","ace/mode/markdown","ace/mode/mel","ace/mode/mysql","ace/mode/mushcode","ace/mode/nix","ace/mode/objectivec","ace/mode/ocaml","ace/mode/pascal","ace/mode/perl","ace/mode/pgsql","ace/mode/php","ace/mode/powershell","ace/mode/prolog","ace/mode/properties","ace/mode/protobuf","ace/mode/python","ace/mode/r","ace/mode/rdoc","ace/mode/rhtml","ace/mode/ruby","ace/mode/rust","ace/mode/sass","ace/mode/scad","ace/mode/scala","ace/mode/smarty","ace/mode/scheme","ace/mode/scss","ace/mode/sh","ace/mode/sjs","ace/mode/space","ace/mode/snippets","ace/mode/soy_template","ace/mode/sql","ace/mode/stylus","ace/mode/svg","ace/mode/tcl","ace/mode/tex","ace/mode/text","ace/mode/textile","ace/mode/toml","ace/mode/twig","ace/mode/typescript","ace/mode/vbscript","ace/mode/velocity","ace/mode/verilog","ace/mode/xml","ace/mode/xquery","ace/mode/yaml"
-                 */
-                mode: {
-                    type: String
-                },
-                /**
-                 * font size
-                 */
-                fontsize: {
-                    type: String,
-                    value: '14px'
-                },
-                /**
-                 * if edit able
-                 */
-                readonly: {
-                    type: Boolean,
-                    value: false
-                },
-                /**
-                 * if enable sfottabs or not
-                 */
-                softtabs: {
-                    type: Boolean,
-                    value: false
-                },
-                /**
-                 * tab size
-                 */
-                tabsize: {
-                    type: Number,
-                    value: 4
-                },
-                /**
-                 * text wrapmode 
-                 */
-                wrapmode: {
-                    type: Boolean,
-                    value: true
-                },
+      /**
+       * when group button tap register button event
+       */
+      _onButtonTap: function(e) {
+        var buttonId = e.detail.id;
 
-                buttons: {
-                    type: Array,
-                    value: [{
-                        id: 'save-btn',
-                        text: 'Save'
-                    }]
-                }
+        if (buttonId == 'save-btn') {
+          this._gridSaveAction();
 
-            },
-            listeners: {
-                'eval-editor.editor-ready': '_onEditorReady',
-                'eval-editor.change': '_onEditorChange',
-                'button-bar.things-button-tap': '_onButtonTap',
-            },
-	        observers: [
-	        	'_onRecordChanged(record,codeField)'
-	        ],
-            /**
-             * return editor source
-             */
-            getSource: function() {
-                return this.record[this.codeField]
-            },
-            /**
-             * on record change
-             */
-            _onRecordChanged:function(record,codeField){
-            	this.source = record[codeField]
-            },
-            /**
-             * when editor ready
-             */
-            _onEditorReady: function(e) {
-                // event.detail should be a ace-editor
-                e.detail.renderer.setShowGutter(false);
-            },
+        } else {
+          this.fire('things-button-' + buttonId + '-tap', e.detail);
+        }
+      },
 
-            /**
-             * called when editor's change event called
-             */
-            _onEditorChange: function(after) {
-                this.record[this.codeField] = this.$['eval-editor'].editor.getValue();
-            },
-            /**
-             * when group button tap register button event
-             */
-            _onButtonTap: function(e) {
-                var buttonId = e.detail.id;
-
-                if (buttonId == 'export-btn') {
-                    this.exporSourceFile();
-
-                } else if (buttonId == 'save-btn') {
-                    this._gridSaveAction();
-
-                } else {
-                    this.fire('things-button-' + buttonId + '-tap', e.detail);
-                }
-            },
 			/**
 			 * grid save action
 			 */
 			_gridSaveAction: function() {
 				this.$['save-resource'].generateRequest();
-			}
+			},
 
+      /***************************************************************************************
+       *                            Start detail item view interface
+       ***************************************************************************************/
 
-        });
-    })();
-    </script>
+      /**
+       * detail item view를 구성하기 위한 필수 함수 
+       * item view를 구성한다.
+       *
+       * @return {Object} resource 리소스 데이터 (Object) 혹은 리소스 아이디 (Number)
+       */
+      loadDetailData: function(resource) {
+        if(resource) {
+          this.resource = resource;
+        }
+      }
+
+      /***************************************************************************************
+       *                            End detail item view interface
+       ***************************************************************************************/      
+    });
+
+  </script>
 </dom-module>

@@ -11,9 +11,24 @@ A comment describing this element
 
 Example:
 
-  <things-resource-tabs>
-    <h2>Hello my-elem</h2>
-  </things-resource-tabs>
+  <div>
+    <things-resource
+      auto
+      content-type="application/json"
+      resource="alarms/1"
+      method="get"
+      action=""
+      last-response="{{detailViewData}}">
+    </things-resource>
+
+    <things-resource-tabs 
+      search-meta
+      resource-type="Alarm" 
+      resource="{{detailViewData}}" 
+      attachable 
+      prop-extensible>
+    </things-resource-tabs>
+  </div>
 
 @demo demo/index.html
 -->
@@ -52,16 +67,16 @@ Example:
 			<template is="dom-if" if={{attachable}}>
 				<things-attached-file 
 					id="attachments"
-					entity-id="{{entityId}}"
-					entity-type="{{entityType}}">
+					resource-type="{{resourceType}}"
+					resource-id="{{resourceId}}">
 				</things-attached-file>
 			</template>
 
 			<template is="dom-if" if={{propExtensible}}>
 				<things-extension 
 					id="ext-properties"
-					entity-id="{{entityId}}"
-					entity-type="{{entityType}}"></things-extension>        		
+					resource-type="{{resourceType}}"
+					resource-id="{{resourceId}}"></things-extension>        		
 			</template>
 		</iron-pages>
 
@@ -96,7 +111,7 @@ Example:
 				 */
 				resourceMetaUrl: {
 					type: String,
-					computed: '_computeResourceMetaUrl(searchMeta,entityType)'
+					computed: '_computeResourceMetaUrl(searchMeta,resourceType)'
 				},
 
 				/**
@@ -108,30 +123,22 @@ Example:
 				},				
 
 				/**
-				 * entity type
+				 * resource type
 				 */
-				entityType: {
+				resourceType: {
 					type: String
 				},
 
 				/**
-				 * entity id
+				 * resource id
 				 */
-				entityId: {
-					type: String
-				},
-
-				/**
-				 * TODO 
-				 * entity url
-				 */
-				entityUrl: {
+				resourceId: {
 					type: String
 				},
 
 				/**
 				 * resource url, detail에 대한 서버 측 서비스 호출을 위한 URL
-				 * entityType, entityId로 resourceUrl이 결정된다.
+				 * resourceType, resourceId로 resourceUrl이 결정된다.
 				 */
 				resourceUrl: {
 					type: String,
@@ -198,7 +205,7 @@ Example:
 			},
 
 			observers: [
-				'_onResourceChanged(entityType, resource)',
+				'_onResourceChanged(resourceType, resource)',
 				'_onAttachableChanged(_panels, attachable)',
 				'_onPropExtensibleChanged(_panels, propExtensible)'
 			],
@@ -227,45 +234,46 @@ Example:
 			},
 
 			/**
-			 * create elements things-basic-detial,
-			 * set things-Resource-Form resourceUrl
-			 * set things-extension entityType, entityId
-			 * set things-attached-file entityType, entityId  
-			 * entityType ="{{resourceUrl}}"
-			 * entityId ="{{resource.id}}"
+			 * resource가 변경되었을 경우 
+			 *
+			 * @param {String} resourceType
+			 * @param {Object} resource
 			 */
-			_onResourceChanged: function(entityType, resource) {
-				this.resourceUrl = [entityType, resource.id].join('/');
+			_onResourceChanged: function(resourceType, resource) {
+				this.resourceUrl = [resourceType, resource.id].join('/');
 				this.currentTabIdx = 0;
 			},
 
 			/**
-			 * add attached file panel
+			 * add attachment panel
+			 * @param {Boolean} attachable
 			 */
 			_onAttachableChanged: function(attachable) {
-				var attachment = { title: 'Attachments.', elementId: 'things-attached-file' };
-				this.push('_panels', attachment);
+				if(attachable) {
+					this.push('_panels', { title: 'Attachments.', elementId: 'things-attached-file' });	
+				}
 			},
 
 			/**
 			 * add extension panel
+			 * @param {Boolean} propExtensible
 			 */
 			_onPropExtensibleChanged: function(propExtensible) {
-				var extension = { title: 'Properties.', elementId: 'things-extension' };
-				this.push('_panels', extension);
+				if(propExtensible) {
+					this.push('_panels', { title: 'Properties.', elementId: 'things-extension' });	
+				}				
 			},
 
 			/**
-			 * resourceName으로 resource meta url을 생성
+			 * resourceType으로 resource meta url을 생성
 			 *
 			 * @param {Boolean} searchMeta
-			 * @param {String} entityName
+			 * @param {String} resourceType
 			 * @return {String} resource meta get URL
 			 */
-			_computeResourceMetaUrl: function(searchMeta, entityName) {
+			_computeResourceMetaUrl: function(searchMeta, resourceType) {
 				if(this.searchMeta) {
-					var url = 'entities/' + entityName + '/resource_columns.json';
-					return url;					
+					return 'entities/' + resourceType + '/resource_columns.json';
 				} else {
 					return null;
 				}
