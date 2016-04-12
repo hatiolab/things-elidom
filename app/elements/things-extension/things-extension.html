@@ -14,7 +14,7 @@
         action="[[gridSearchUrl]]"
         select-fields="[[searchFields]]"
         sort-fields="[[sortFields]]"
-        last-response="{{lastResponse}}">
+        last-response="{{extProps}}">
       </things-resource>
 
       <things-resource-grid 
@@ -22,7 +22,7 @@
         config="[[gridConfig]]"
         model="[[gridModel]]" 
         columns="[[gridColumns]]"
-        data="[[lastResponse]]"
+        data="[[extProps]]"
         grid-save-action="[[gridSaveUrl]]"
         buttons="[[buttons]]"
         enable-toolbar>
@@ -52,10 +52,35 @@
         },
 
         /**
+         * 그리드 search URL
+         */
+        gridSearchUrl: {
+          type: String,
+          computed: '_computeGridSearchUrl(entityType,entityId)',
+        },
+
+        /**
+         * 그리드 save URL
+         */
+        gridSaveUrl: {
+          type: String,
+          readonly: true,
+          value: 'properties/update_multiple.json'
+        },
+
+        /**
+         * 확장 프로퍼티 데이터 
+         */
+        extProps: {
+          type: Array
+        },
+
+        /**
          * grid search fields
          */
         searchFields : {
           type: String,
+          readonly: true,
           value: 'id,name,value,on_type,on_id'
         },
 
@@ -64,6 +89,7 @@
          */
         sortFields : {
           type: Array,
+          readonly: true,
           value: [ {
             field : 'name',
             ascending : true
@@ -75,6 +101,7 @@
          */
         gridModel: {
           type: Array,
+          readonly: true,
           value: [ {
             fieldName : 'id'
           }, {
@@ -93,6 +120,7 @@
          */
         gridColumns: {
           type: Array,
+          readonly: true,
           value: [ {
             fieldName: 'id',
             width: 0
@@ -112,26 +140,11 @@
         },
 
         /**
-         * 그리드 search URL
-         */
-        gridSearchUrl: {
-          type: String,
-          computed: '_computeGridSearchUrl(entityType,entityId)',
-        },
-
-        /**
-         * 그리드 save URL
-         */
-        gridSaveUrl: {
-          type: String,
-          computed: '_computeGridSaveUrl(entityType,entityId)'
-        },
-
-        /**
          * 버튼 정보 
          */
         buttons: {
           type: Array,
+          readonly: true,
           value: [ {
             id: 'new-btn',
             text: 'Add',
@@ -154,8 +167,8 @@
 
       listeners: {
         'grid.things-button-new-btn-tap' : 'addRow',
-        'grid.things-button-refresh-btn-tap' : 'search',
-        'grid.things-grid-save-success' : 'search'
+        'grid.things-button-refresh-btn-tap' : 'loadData',
+        'grid.things-grid-save-success' : 'loadData'
       },
 
       /**
@@ -170,17 +183,6 @@
       },
 
       /**
-       * Entity Type, Entity Record Id로 Grid Save URL 생성
-       *
-       * @param {String} onType
-       * @param {String} onId
-       * @return {String} grid save url
-       */
-      _computeGridSaveUrl: function(onType, onId) {
-        return 'properties/update_multiple.json';
-      },
-
-      /**
        * add grid row
        */
       addRow: function(e) {
@@ -190,12 +192,44 @@
       },
 
       /**
-       * reload grid data
+       * load data
+       */      
+      loadData: function() {
+        if(this.gridSearchUrl) {
+          this.$['resource-search'].generateRequest();
+        }
+      },
+
+      /***************************************************************************************
+       *                            Start detail item view interface
+       ***************************************************************************************/
+
+      /**
+       * detail item view를 구성하기 위한 필수 함수 
+       * item view를 구성한다.
+       *
+       * @return {Object} resource 리소스 데이터 (Object) 혹은 리소스 아이디 (Number)
        */
-      search: function(e) {
-        var value1 = this.gridSearchUrl
-        this.$['resource-search'].generateRequest();
+      loadDetailData: function(resource) {
+        if(resource) {
+          this.entityId = (typeof(resource) === 'object') ? resource.id : resource;
+          this.loadData();
+        }
+      },
+
+      /**
+       * detail item view를 구성하기 위한 필수 함수 
+       * data로 부터 item view의 데이터를 직접 로딩한다. 외부에서 직접 데이터를 설정한다.
+       *
+       * @param {Object} data
+       */
+      loadDetailDataDirectly: function(data) {
+        this.extProps = data;
       }
+
+      /***************************************************************************************
+       *                            End detail item view interface
+       ***************************************************************************************/
 
     });
   </script>

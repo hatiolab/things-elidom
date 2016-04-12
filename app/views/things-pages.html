@@ -12,16 +12,6 @@
   <img avatar src="https://maps.gstatic.com/tactile/pane/default_geocode-1x.png"/>
 </things-login>
 
-<!-- common code page -->
-<!--things-base-code 
-  data-route="common_codes"
-  current-route="[[route]]"
-  title="Common Code"
-  resource-name="CommonCode"
-  resource-url="common_codes"
-  layout="fullbleed layout vertical">
-</things-base-code-->
-
 <!-- attachment page -->
 <things-base-attachment 
   data-route="attachments"
@@ -34,9 +24,9 @@
 
 <!-- demo page -->
 <section class="Page" data-route="demo">
-    <paper-material class="Page-paper" elevation="1">
-        <things-demo title="Elidom Demo"></things-demo>
-    </paper-material>
+  <paper-material class="Page-paper" elevation="1">
+    <things-demo title="Elidom Demo"></things-demo>
+  </paper-material>
 </section>
 
 <!-- sample page -->
@@ -58,9 +48,9 @@
 
 <!-- API Document page -->
 <section class="Page" data-route="apidoc">
-    <paper-material class="Page-paper" elevation="1">
-    	<a href="elements/index.html">apiDoc</a>
-    </paper-material>
+  <paper-material class="Page-paper" elevation="1">
+    <a href="elements/index.html">apiDoc</a>
+  </paper-material>
 </section>
 
 <!-- Resouce Selector Sample page -->
@@ -73,51 +63,53 @@
         resource="alarms/1"
         method="get"
         action=""
-        last-response="{{lastResponse}}">
+        last-response="{{detailViewData}}">
       </things-resource>
 
       <things-resource-tabs 
-          resource-name="Alarm" 
-          resource="{{lastResponse}}" 
-          attachable 
-          enable-extension>
+        search-meta
+        entity-type="Alarm" 
+        resource="{{detailViewData}}" 
+        attachable 
+        prop-extensible>
       </things-resource-tabs>
-    </div> 
-<!--     <div>
-      <things-tabs-container></things-tabs-container>
-    </div> -->
+    </div>    
   </paper-material>
 </section>
 
 <!-- Extension Property Page -->
 <section class="Page" data-route="extension_property">
-    <paper-material class="Page-paper" elevation="1">
-        <things-extension entity-id="1" entity-type="Alarm"></things-extension>
-    </paper-material>
+  <paper-material class="Page-paper" elevation="1">
+    <things-extension entity-id="1" entity-type="Alarm"></things-extension>
+  </paper-material>
 </section>
 
 <!-- Attached file  -->
 <section class="Page" data-route="attached_file">
-    <paper-material class="Page-paper" elevation="1">
-        <things-attached-file entity-id="1" entity-type="Alarm"></things-attached-file>
-    </paper-material>
+  <paper-material class="Page-paper" elevation="1">
+    <things-attached-file entity-id="1" entity-type="Alarm"></things-attached-file>
+  </paper-material>
 </section>
 
 <script type="text/javascript">
-    var app = document.querySelector('#app');
+  var app = document.querySelector('#app');
 
-    app.open = function(e) {
-      var input = e.target;
-      while (!input.hasAttribute('data-selector') && input !== document.body) {
-        input = input.parentElement;
-      }
-      if (!input.hasAttribute('data-selector')) {
-        return;
-      }
-      var id = input.getAttribute('data-selector');
-      var el = document.getElementById(id);
-      if (el) {
-        el.open();
-      }
-    };
+  app.open = function(e) {
+    var input = e.target;
+    
+    while (!input.hasAttribute('data-selector') && input !== document.body) {
+      input = input.parentElement;
+    }
+
+    if (!input.hasAttribute('data-selector')) {
+      return;
+    }
+    
+    var id = input.getAttribute('data-selector');
+    var el = document.getElementById(id);
+    
+    if (el) {
+      el.open();
+    }
+  };
 </script>

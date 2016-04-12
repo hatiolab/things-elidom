@@ -236,10 +236,51 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 				'member-resource.things-resource-ajax-error' : '_errorResponseHandler'
 			},
 
+			observers: [
+				'_onFormFieldsChanged(formFields)',
+			],
+
+      /***************************************************************************************
+       *                            Start detail item view interface
+       ***************************************************************************************/
+
+      /**
+       * detail item view를 구성하기 위한 필수 함수 
+       * item view를 구성한다.
+       *
+       * @return {Object} resource 리소스 데이터 (Object) 혹은 리소스 아이디 (Number)
+       */
+      loadDetailData: function(resource) {
+      	this.resource = resource;
+      },
+
+      /**
+       * detail item view를 구성하기 위한 필수 함수 
+       * data로 부터 item view의 데이터를 직접 로딩한다. 외부에서 직접 데이터를 설정한다.
+       *
+       * @param {Object} resource
+       */
+      loadDetailDataDirectly: function(resource) {
+        this.resource = resource;
+      },
+
+      /***************************************************************************************
+       *                            End detail item view interface
+       ***************************************************************************************/      
+
+			/**
+			 * 리소스 폼이 이미 구성되었는지 여부 
+			 */
+			isFormConfigured: function() {
+				return this.$['left-fields'].childNodes.length > 0 || this.$['right-fields'].childNodes.length > 0;
+			},
+
 			/**
 			 * 리소스 폼 화면을 구성. formFields 정보로 동적으로 폼 하위 엘리먼트를 생성하여 폼을 구성한다. 
 			 */
 			reconfigureMyForm: function() {
+				if(this.isFormConfigured()) return;
+				
 				for(index in this.formFields) {
 					var field = this.formFields[index];
 					var newElement = this.createFormElement(field);
@@ -282,7 +323,7 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			 * @param {Object} data 리소스 데이터 
 			 */
 			openResourceForm: function(data) {
-				if(this.$['left-fields'].childNodes.length == 0) {
+				if(!this.isFormConfigured()) {
 					this.reconfigureMyForm();
 				}
 
@@ -303,12 +344,22 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			},
 
 			/**
+			 * FormFields가 변경될 때 
+			 * @param {Array} formFields 
+			 */
+			_onFormFieldsChanged: function(formFields) {
+				this._resourceChanged(this.resource);
+			},
+
+			/**
 			 * Resource가 변경될 때 
 			 * @param {Object} 리소스 
 			 */
 			_resourceChanged: function(resource) {
-				this._bindData(this.$['left-fields'].childNodes, resource);
-				this._bindData(this.$['right-fields'].childNodes, resource);
+				if(resource && this.isFormConfigured()) {
+					this._bindData(this.$['left-fields'].childNodes, resource);
+					this._bindData(this.$['right-fields'].childNodes, resource);
+				}
 			},
 
 			/**

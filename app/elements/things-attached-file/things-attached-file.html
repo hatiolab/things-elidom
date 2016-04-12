@@ -139,7 +139,7 @@
          */
         gridColumns: {
           type: Array,
-          value: [{
+          value: [ {
             fieldName: 'id',
             width: 0
           }, {
@@ -183,7 +183,7 @@
           }, {
             fieldName: 'created_at',
             width: 130
-          }]
+          } ]
         },
 
         /**
@@ -243,14 +243,7 @@
         'grid.things-grid-detail-tap': '_onDetailButtonTap',
         'grid.things-grid-save-success': 'refreshGridData',
         'grid.things-grid-resource-column-edit': '_openResourceSelector',
-        'things-upload-response': '_reloadList'
-      },
-
-      /**
-       * search 쿼리 실행
-       */
-      search: function() {
-        this.$['resource-search'].generateRequest();
+        'things-upload-response': 'loadData'
       },
 
       /**
@@ -258,7 +251,7 @@
        */
       _computeQueryFields: function(entityType, entityId) {
         if(!this.queryFields || this.queryFields.length == 0) {
-          return [{
+          return [ {
             name: 'onType',
             operator: 'eq',
             value: this.entityType
@@ -266,7 +259,7 @@
             name: 'onId',
             operator: 'eq',
             value: this.entityId
-          }];
+          } ];
         } else {
           var newQueryFields = this.queryFields;
           newQueryFields[0].value = this.entityType;
@@ -290,11 +283,43 @@
       },
 
       /**
-       * Reloading Uploaded list
+       * detail item view를 구성하기 위한 필수 함수 
+       * load data
+       */      
+      loadData: function() {
+        this.$['resource-search'].generateRequest();
+      },
+
+      /***************************************************************************************
+       *                            Start detail item view interface
+       ***************************************************************************************/
+
+      /**
+       * detail item view를 구성하기 위한 필수 함수 
+       * item view를 구성한다.
+       *
+       * @return {Object} resource 리소스 데이터 (Object) 혹은 리소스 아이디 (Number)
        */
-      _reloadList: function() {
-        this.search();
+      loadDetailData: function(resource) {
+        if(resource) {
+          this.entityId = (typeof(resource) === 'object') ? resource.id : resource;
+          this.loadData();
+        }
+      },
+
+      /**
+       * detail item view를 구성하기 위한 필수 함수 
+       * data로 부터 item view의 데이터를 직접 로딩한다. 외부에서 직접 데이터를 설정한다.
+       *
+       * @param {Object} data
+       */
+      loadDetailDataDirectly: function(data) {
+        // TODO
       }
+
+      /***************************************************************************************
+       *                            End detail item view interface
+       ***************************************************************************************/      
       
     });
   </script>

@@ -1,0 +1,246 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<script>
+
+window.Things = window.Things || {};
+
+/**
+ * 구성하고자 하는 리소스 화면 구성을 위해 모델 정보를 제공하는 Behavior
+ * 리소스의 메타 데이터를 조회하는 URL 구성과 메타 데이터를 받은 후 검색 폼, 그리드, 디테일 폼에 필요한 모델 정보를 제공한다.
+ *
+ * @demo ./things-content/demo/demo-things-resource-meta-behavior.html
+ */
+Things.GridMetaBehavior = {
+
+	properties: {
+		/**
+		 * Grid Config
+		 */
+		gridConfig: {
+			type: Object
+		},
+
+		/**
+		 * Grid model
+		 */
+		gridModel: {
+			type: Array
+		},
+
+		/**
+		 * Grid columns
+		 */
+		gridColumns: {
+			type: Array
+		}
+	},
+
+	/**
+	 * meta data로 부터 gridModel로 파싱한다.
+	 *
+	 * @param {Array} metaDataList
+	 * @return {Array} gridModel
+	 */
+	_parseGridModel: function(metaDataList) {
+		var gridModelMetaList = metaDataList.filter(function(metaData) { 
+			return (metaData.name == 'id' || (metaData.list_rank && metaData.list_rank > 0));
+		});
+
+		var selectColumns = '';
+
+		var gridModel = gridModelMetaList.map(function(metaData) {
+			var field = { fieldName : metaData.name };
+
+			if(['integer', 'int', 'long', 'double', 'float'].includes(metaData.col_type)) {
+				field.dataType = 'number';
+
+			} else if(['date', 'time'].includes(metaData.col_type)) {
+				field.dataType = 'datetime';
+				field.datetimeFormat = metaData.format? metaData.format : 'yyyy-MM-dd';
+			}
+
+			if(metaData.editor && metaData.editor.indexOf('resource-column') >= 0) {
+				field.fieldName = field.fieldName.substr(0, field.fieldName.indexOf('_id'));
+				field.dataType = 'object';
+			}
+
+			if(metaData.editor && metaData.editor.indexOf('resource-selector') >= 0) {
+				field.fieldName = field.fieldName.substr(0, field.fieldName.indexOf('_id'));
+				field.dataType = 'object';
+			}
+
+			if(selectColumns.length > 2) {
+				this.selectFields = selectColumns.substr(0, selectColumns.length - 1);	
+			}			
+
+			selectColumns += field.fieldName + ',';
+			return field;
+		});
+
+		if(selectColumns.length > 2) {
+			this.selectFields = selectColumns.substr(0, selectColumns.length - 1);	
+		}
+
+		return gridModel;
+	},
+
+	/**
+	 * meta data로 부터 gridColumns로 파싱한다.
+	 *
+	 * @param {Array} metaDataList
+	 * @return {Array} gridColumns
+	 */
+	_parseGridColumns: function(metaDataList) {
+		var gridColumnMetaList = metaDataList.filter(function(metaData) { 
+			return (metaData.name == 'id' || (metaData.list_rank && metaData.list_rank > 0));
+		});
+
+		this._sortMetaData(gridColumnMetaList, 'list_rank');
+
+		var me = this;
+		// resource selector 컬럼 
+		var resourceSelectorColumns = [];
+
+		var gColumns = gridColumnMetaList.map(function(metaData) {
+			var field = { 
+				name: metaData.name, 
+				fieldName: metaData.name, 
+				width: metaData.width ? metaData.width : 100,
+				header: { text: metaData.name },
+				styles: {},
+				validations: []
+			};
+
+			// id 필드는 width를 0으로 하고 숨긴다.
+			if(metaData.name == 'id') field.width = 0;
+
+			// align 정보가 있으면 설정
+			if(metaData.align) field.styles.textAlignment = metaData.align;
+
+			if(metaData.editor) {
+				if(('code-combo' == metaData.editor) && metaData.code_list && metaData.code_list.length > 0) {
+					field.editor = { type: 'list', domainOnly: true };
+					field.lookupDisplay = true;
+					field.lookupValues = metaData.code_list.map(function(code) { return code.name });
+					field.lookupLabels = metaData.code_list.map(function(code) { return code.description });
+
+				} else if(metaData.editor == 'checkbox') {
+					field.renderer = { type: 'check', editable: true, threeStates: false, trueValues: 'true', falseValues: 'false' };
+
+				} else if(metaData.editor == 'number') {
+					field.editor = { type: 'number' };
+					field.styles.numberFormat = metaData.format ? metaData.format : '0,000';
+
+				} else if(metaData.editor == 'date' || metaData.editor == 'time') {
+					field.editor = { type: 'date' };
+					field.styles.datetimeFormat = metaData.format ? metaData.format : 'yyyy-MM-dd';
+					field.styles.textAlignment = 'center';
+
+				} else if(metaData.editor.indexOf('resource-column') >= 0) {
+					me._newResourceColumn(metaData, field);
+
+				} else if(metaData.editor.indexOf('resource-selector') >= 0) {
+					var delegateColumn = me._newResourceColumn(metaData, field);
+					field.styles.iconIndex ='ellipsis_hover.png';
+					field.styles.iconLocation ='rightSide';
+					me._setResourceEditorColumn(metaData, field, resourceSelectorColumns, delegateColumn);
+
+				} else if(metaData.editor == 'download-link') {
+					field.renderer = {
+						type: 'link',
+						requiredFields: 'id',
+						showUrl: true,
+						url: (metaData.format ? metaData.format : '') + "/${id}"
+					}
+				}
+			}
+
+			if(metaData.name != 'id' && !metaData.nullable) {
+				field.validations.push({expression : 'value is not empty', level: 'error', message: '(' + metaData.name + ') should not be empty!'});
+			}
+
+			if(metaData.col_size && metaData.col_size > 0 && metaData.col_type == 'string') {
+				field.validations.push({expression : 'len value < ' + metaData.col_size, level: 'error', message: 'Maximum (' + metaData.name + ') length is (' + metaData.col_size + ')'});
+			}
+
+			return field;
+		});
+
+		// Resource Selector가 있을 경우 컬럼 추가 
+		if(resourceSelectorColumns.length > 0) {
+			resourceSelectorColumns.forEach(function(rec) {
+				var oriFieldName = rec.fieldName.substr(0, rec.fieldName.indexOf('_id'));
+				var foundFields = gColumns.filter(function(col) { return col.name == oriFieldName});
+				var foundIdx = gColumns.indexOf(foundFields[0]);
+				gColumns.splice(foundIdx + 1, 0, rec);
+			});
+		}
+
+		return gColumns;
+	},
+
+	/**
+	 * resource column
+	 *
+	 * @param {Object} metaData
+	 * @param {Object} field
+	 * @param {String} delegateColumn
+	 */
+	_newResourceColumn: function(metaData, field) {
+		var delegateColumn = 'name';
+		if(metaData.editor.indexOf('.') >= 0) {
+			delegateColumn = metaData.editor.substr(metaData.editor.indexOf('.') + 1);
+		}
+
+		field.name = field.name.substr(0, field.name.indexOf('_id'));
+		field.fieldName = field.name;
+		field.header.text = field.name;
+		field.valueType = 'text';
+		field.type = 'calced';
+
+		field.valueCallback = function(column, row) {
+			var obj = row.getValue(column._name);
+			return obj ? obj[delegateColumn] : '';
+		};
+
+		return delegateColumn;
+	},
+
+	/**
+	 * resource editor column 설정 
+	 *
+	 * @param {Object} metaData
+	 * @param {Object} field
+	 * @param {Array} resourceSelectorColumns
+	 * @param {String} delegateColumn
+	 */
+	_setResourceEditorColumn: function(metaData, field, resourceSelectorColumns, delegateColumn) {
+		var editorField = {
+			name: metaData.name, 
+			fieldName: metaData.name, 
+			width: 30,
+			editable: false,
+			userObj: {
+				resourceName: metaData.ref_name,
+				resourceUrl: metaData.format,
+				valueField: field.name,
+				delegateColumn: delegateColumn
+			},
+			header: { text: '...' }
+		};
+
+		resourceSelectorColumns.push(editorField);
+	},
+
+	/**
+	 * list sorting
+	 */
+	_sortMetaData: function(list, sortField) {
+		list.sort(function(a, b) {
+			return (a[sortField] > b[sortField]) ? 1 : ((b[sortField] > a[sortField]) ? -1 : 0);
+		});
+	}	
+
+};
+
+</script>

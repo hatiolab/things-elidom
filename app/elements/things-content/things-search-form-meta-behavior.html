@@ -1,0 +1,163 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<script>
+
+window.Things = window.Things || {};
+
+/**
+ * 구성하고자 하는 리소스 화면 구성을 위해 모델 정보를 제공하는 Behavior
+ * 리소스의 메타 데이터를 조회하는 URL 구성과 메타 데이터를 받은 후 검색 폼, 그리드, 디테일 폼에 필요한 모델 정보를 제공한다.
+ *
+ * @demo ./things-content/demo/demo-things-resource-meta-behavior.html
+ */
+Things.SearchFormMetaBehavior = {
+
+	properties: {
+
+		/**
+		 * 리스트 조회시 검색할 필드 리스트. ',' 구분자로 구분한다.
+		 */
+		selectFields: {
+			type: String
+		},
+
+		/**
+		 * 리스트 조회시 오더링 할 필드 리스트
+		 */
+		sortFields: {
+			type: Array
+		},
+
+		/**
+		 * Search form fields
+		 */
+		searchFormFields: {
+			type: Array
+		}
+	},
+
+	/**
+	 * meta data로 부터 select fields를 파싱한다.
+	 *
+	 * @param {Array} metaDataList
+	 * @return {String} selectFields
+	 */
+	_parseSelectFields: function(metaDataList) {
+		var listMetaList = metaDataList.filter(function(metaData) { 
+			return (metaData.name == 'id' || (metaData.list_rank && metaData.list_rank > 0));
+		});
+
+		var selectColumns = listMetaList.map(function(metaData) { return metaData.name; });
+		return selectColumns.join(',');
+	},
+
+	/**
+	 * meta data로 부터 SortFields로 파싱한다.
+	 *
+	 * @param {Array} metaDataList
+	 * @return {Array} sortFields
+	 */
+	_parseSortFields: function(metaDataList) {
+		var orderMetaList = metaDataList.filter(function(metaData) {
+			return metaData.sort_rank && metaData.sort_rank > 0; 
+		});
+
+		if(!orderMetaList || orderMetaList.length == 0) return;
+
+		this._sortMetaData(orderMetaList, 'sort_rank');
+
+		return orderMetaList.map(function(metaData) {
+			var asc = true;
+			if(metaData.reverse_sort && metaData.reverse_sort === true) asc = false;
+			return { field: metaData.name, ascending: asc }
+		});
+	},
+
+	/**
+	 * meta data로 부터 searchFormFields로 파싱한다.
+	 *
+	 * @param {Array} metaDataList
+	 * @return {Array} searchFormFields
+	 */
+	_parseSearchFormFields: function(metaDataList) {
+		var searchMetaList = metaDataList.filter(function(metaData) {
+			return metaData.search_rank && metaData.search_rank > 0; 
+		});
+
+		this._sortMetaData(searchMetaList, 'search_rank');
+		var me = this;
+		
+		return searchMetaList.map(function(metaData) {
+			var field = { 
+				name : metaData.name, 
+				label : metaData.name, 
+				type : metaData.editor,
+				op : metaData.operator ? metaData.operator : 'eq'
+			};
+				
+			if(metaData.editor) me._parseFormField(field, metaData, false)
+			return field;
+		});
+	},
+
+	/**
+	 * form field를 파싱한다.
+	 *
+	 * @param {Object} field
+	 * @param {Object} metaData
+	 * @param {Boolean} resourceForm resourceForm인지 아닌지 여부 
+	 */
+	_parseFormField: function(field, metaData, resourceForm) {
+		if('code-combo' == metaData.editor) {
+			field.codeName = metaData.ref_name;
+
+		} else if(metaData.editor.indexOf('resource-selector') >= 0) {
+			field.type = 'resource-selector';
+			field.userObj = {
+				delegateColumn : 'name',
+				resourceName : metaData.ref_name,
+				resourceUrl : metaData.format
+			};
+			
+			if(metaData.editor.indexOf('.') > 0) {
+				field.userObj.delegateColumn = metaData.editor.split('.')[1];
+			}
+
+			if(resourceForm) {
+				field.name = field.name.substr(0, field.name.indexOf('_id'));
+				field.type = 'resource-field';
+			}
+
+		} else if(metaData.editor.indexOf('resource-column') >= 0) {
+			field.type = 'resource-field';
+			field.userObj = {
+				delegateColumn : 'name',
+				resourceName : metaData.ref_name,
+				resourceUrl : metaData.format
+			};
+			
+			if(metaData.editor.indexOf('.') > 0) {
+				field.userObj.delegateColumn = metaData.editor.split('.')[1];
+			}
+
+			if(resourceForm) {
+				field.name = field.name.substr(0, field.name.indexOf('_id'));
+				field.userObj.readOnly = true;
+			}	else {
+				field.type = 'resource-selector'
+			}
+		}
+	},
+
+	/**
+	 * list sorting
+	 */
+	_sortMetaData: function(list, sortField) {
+		list.sort(function(a, b) {
+			return (a[sortField] > b[sortField]) ? 1 : ((b[sortField] > a[sortField]) ? -1 : 0);
+		});
+	}	
+
+};
+
+</script>

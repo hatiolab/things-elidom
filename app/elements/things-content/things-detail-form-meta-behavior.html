@@ -1,0 +1,90 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<script>
+
+window.Things = window.Things || {};
+
+/**
+ * 구성하고자 하는 리소스 화면 구성을 위해 모델 정보를 제공하는 Behavior
+ * 리소스의 메타 데이터를 조회하는 URL 구성과 메타 데이터를 받은 후 검색 폼, 그리드, 디테일 폼에 필요한 모델 정보를 제공한다.
+ *
+ * @demo ./things-content/demo/demo-things-resource-meta-behavior.html
+ */
+Things.DetailFormMetaBehavior = {
+
+	properties: {
+		/**
+		 * Resource form fields
+		 */
+		resourceFormFields: {
+			type: Array
+		}
+	},
+
+	/**
+	 * meta data로 부터 resourceFormFields로 파싱한다.
+	 *
+	 * @param {Array} metaDataList
+	 * @return {Array} resourceFormFields
+	 */
+	_parseResourceFormFields: function(metaDataList) {
+		var me = this;
+		return metaDataList.map(function(metaData) {
+			var field = { name : metaData.name, label : metaData.name, type : metaData.editor };
+			if(metaData.editor) me._parseFormField(field, metaData, true);
+			return field;
+		});		
+	},
+
+	/**
+	 * form field를 파싱한다.
+	 *
+	 * @param {Object} field
+	 * @param {Object} metaData
+	 * @param {Boolean} resourceForm resourceForm인지 아닌지 여부 
+	 */
+	_parseFormField: function(field, metaData, resourceForm) {
+		if('code-combo' == metaData.editor) {
+			field.codeName = metaData.ref_name;
+
+		} else if(metaData.editor.indexOf('resource-selector') >= 0) {
+			field.type = 'resource-selector';
+			field.userObj = {
+				delegateColumn : 'name',
+				resourceName : metaData.ref_name,
+				resourceUrl : metaData.format
+			};
+			
+			if(metaData.editor.indexOf('.') > 0) {
+				field.userObj.delegateColumn = metaData.editor.split('.')[1];
+			}
+
+			if(resourceForm) {
+				field.name = field.name.substr(0, field.name.indexOf('_id'));
+				field.type = 'resource-field';
+			}
+
+		} else if(metaData.editor.indexOf('resource-column') >= 0) {
+			field.type = 'resource-field';
+			field.userObj = {
+				delegateColumn : 'name',
+				resourceName : metaData.ref_name,
+				resourceUrl : metaData.format
+			};
+			
+			if(metaData.editor.indexOf('.') > 0) {
+				field.userObj.delegateColumn = metaData.editor.split('.')[1];
+			}
+
+			if(resourceForm) {
+				field.name = field.name.substr(0, field.name.indexOf('_id'));
+				field.userObj.readOnly = true;
+			}	else {
+				field.type = 'resource-selector'
+			}
+		}
+	}
+
+};
+
+</script>

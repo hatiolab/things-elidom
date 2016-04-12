@@ -1,6 +1,8 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
+
 <link rel="import" href="../elements.html">
+
 <!--
 A comment describing this element
 
@@ -18,69 +20,127 @@ Example:
 -->
 
 <dom-module id="things-tabs-container">
-    <template>
-        <style>
-            :host {
-                display: block;
-            }
-        </style>
 
-            <paper-tabs selected="{{current}}" noink>
-                <template is="dom-repeat" items="{{panels}}">
-                    <paper-tab>{{item.title}}</paper-tab>
-                </template>
-            </paper-tabs>
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
 
-            <iron-pages id="tabPages" selected="{{current}}">
-            </iron-pages>
-    </template>
-    <script>
-        Polymer({
-            is: 'things-tabs-container',
-            properties:{
-                /**
-                 * The panels in which to use for the carousel (an array of photos)
-                 */
-                panels:{
-                    type : Array,
-                    value:[
-                    {'name':'things-resource-content','title':'Centent1'},
-                    {'name':'things-resource-content','title':'Centent2'}],
-                    observer:'panelsChange'
-                }
-            },
-            panelsChange: function(panels){
-               
-                var elements = [];
-                var me = this;
+    <paper-tabs selected="{{current}}" noink>
+      <template is="dom-repeat" items="{{panels}}">
+        <paper-tab>{{item.title}}</paper-tab>
+      </template>
+    </paper-tabs>
 
-                this.panels.forEach(function(panel){
-                    var element = document.createElement(panel.name);
-                    var div = document.createElement('div');
+    <iron-pages id="tabPages" selected="{{current}}">
+      <!--things-base-code-detail code-id="968" resource="[[resource]]" resource-name="Common Code" resource-url="common_codes"></things-base-code-detail>
+      <things-extension entity-id="1" entity-type="Alarm"></things-extension-->
+    </iron-pages>
+  </template>
 
-                    if(panel && panel.length>0){
-                        element = this.bindAttributes(element,panels);
-                    }
-                    div.appendChild(element);
+  <script>
+    Polymer({
 
-                    me.$.tabPages.appendChild(div);
-                    elements.push(div);
-                });
-                this.tempElements = elements;
-            },
-            /**
-             * Bind element's attribute values by formField informations.
-             * @param {Object} child element of the form
-             * @param {Object} element information object from formFields
-             */
-            bindAttributes: function(element, attrs) {
-                for(attr in attrs) {
-                    element.setAttribute(attr, attrs[attr]);
-                }
+      is: 'things-tabs-container',
 
-                return element;
-            },
+      behaviors: [ 
+        Things.LoadViewBehavior
+      ],      
+      
+      properties: {
+        current : {
+          type: Number,
+          value: 0
+        },
 
-        });
-    </script>
+        title: {
+          type: String
+        },
+
+        resourceName: {
+          type: String
+        },
+
+        resourceUrl: {
+          type: String
+        },
+
+        resource: {
+          type: Object,
+          value: {
+            id: 968
+          }
+        },
+
+        formFields: {
+          type: Array
+        },
+
+        /**
+         * The panels in which to use for the carousel (an array of photos)
+         */
+        panels: {
+          type: Array,
+          value: [ {
+            'title' : 'Common Code Form',
+            'element' : 'things-base-code-detail',
+            'code-id' : 968,
+            'resource-name' : 'CommonCode',
+            'resource-url': 'common_codes'
+          }, {
+            'title' : 'properties',
+            'element' : 'things-extension',
+            'entity-type' : 'Alarm',
+            'entity-id' : '1'
+          } ],
+          observer:'_panelsChange'
+        }
+      },
+      
+      _panelsChange: function(panels) {
+        var elements = [];
+        var me = this;
+
+        this.panels.forEach(function(panel) {
+          var element = document.createElement(panel.element);
+          var div = document.createElement('div');
+
+          //if(panel && panel.length > 0) {
+          element = me.bindAttributes(element, panel);
+          //}
+
+          //div.appendChild(element);
+          me.$.tabPages.appendChild(element);
+          elements.push(div);
+        });          
+      },
+      
+      /**
+      * Bind element's attribute values by formField informations.
+      * @param {Object} child element of the form
+      * @param {Object} element information object from formFields
+      */
+      bindAttributes: function(element, attrs) {
+        for(attr in attrs) {
+          if(attr != 'element')
+            element.setAttribute(attr, attrs[attr]);
+        }
+
+        return element;
+      },
+
+      /**
+       * detail view를 오픈 
+       *
+       * @param {Object} resource
+       */
+      showDetailView: function(resource) {
+        this.resource = resource;
+        this.openPopupView(this, true);
+      }      
+
+    });
+  </script>
 </dom-module>

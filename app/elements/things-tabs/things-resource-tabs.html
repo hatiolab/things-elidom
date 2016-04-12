@@ -1,79 +1,143 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="../things-extension/things-extension.html">
+
+<link rel="import" href="../things-content/things-detail-form-meta-behavior.html">
 <link rel="import" href="../things-attached-file/things-attached-file.html">
+<link rel="import" href="../things-extension/things-extension.html">
+
 <!--
 A comment describing this element
 
 Example:
 
-    <my-elem></my-elem>
-
-Example:
-
-    <my-elem>
-      <h2>Hello my-elem</h2>
-    </my-elem>
+  <things-resource-tabs>
+    <h2>Hello my-elem</h2>
+  </things-resource-tabs>
 
 @demo demo/index.html
 -->
 
 <dom-module id="things-resource-tabs">
 	<template>
+
 		<style>
 			:host {
 				display: block;
 			}
 		</style>
-        <paper-tabs id="tabGroup" selected="{{_current}}" noink>
-            <template is="dom-repeat" items="{{_panels}}">
-                <paper-tab id ="{{item.elementId}}">{{item.title}}</paper-tab>
-            </template>
-        </paper-tabs>
 
-        <iron-pages id="tabPages" selected="{{_current}}">
+		<things-resource 
+			auto
+			id="resource-meta"
+			method="GET"
+			action="[[resourceMetaUrl]]"
+			last-response="{{metaData}}">
+		</things-resource>
 
-        	<things-resource-form
-        		id="thingsResourceForm" 
-        		resource-url = "{{_resourceUrl}}"
-        		resource ="{{resource}}">
-        	</things-resource-form>
+		<paper-tabs id="tabGroup" selected="{{currentTabIdx}}" noink>
+			<template is="dom-repeat" items="{{_panels}}">
+				<paper-tab id="{{item.elementId}}">{{item.title}}</paper-tab>
+			</template>
+		</paper-tabs>
 
+		<iron-pages id="tabPages" selected="{{currentTabIdx}}">
+			<things-resource-form
+				id="resource-form" 
+				resource-url="{{resourceUrl}}"
+				form-fields="[[formFields]]"
+				resource="{{resource}}">
+			</things-resource-form>
 
-        	<template is="dom-if" if={{attachable}}>
-        		<things-attached-file 
-        			id="thingsAttachedFile"
-        			entity-id="{{entityId}}"
-        			entity-type="{{entityType}}">
-        		</things-attached-file>
-        	</template>
+			<template is="dom-if" if={{attachable}}>
+				<things-attached-file 
+					id="attachments"
+					entity-id="{{entityId}}"
+					entity-type="{{entityType}}">
+				</things-attached-file>
+			</template>
 
-        	<template is="dom-if" if={{enableExtension}}>
-        		<things-extension 
-        			id="thingsExtension"
-        			entity-id ="{{entityId}}"
-        			entity-type="{{entityType}}"></things-extension>        		
-        	</template>
-        </iron-pages>		
+			<template is="dom-if" if={{propExtensible}}>
+				<things-extension 
+					id="ext-properties"
+					entity-id="{{entityId}}"
+					entity-type="{{entityType}}"></things-extension>        		
+			</template>
+		</iron-pages>
+
 	</template>
+
 	<script>
 		Polymer({
+
 			is: 'things-resource-tabs',
-			properties:{
+
+			behaviors: [ Things.DetailFormMetaBehavior ],
+
+			properties: {
 				/**
 				 * 폼 타이틀 
 				 */
 				title: {
 					type: String
 				},
+
 				/**
-				 * resource name으로 정보는 On Type으로 적용하여 
-				 * property, attach file들을 조회 한다.
+				 * 메타 데이터 조회 여부
+				 * 메타 데이터를 조회 하지 않는다면 formFields를 직접 설정해줘야 함 
 				 */
-				resourceName: {
+				searchMeta: {
+					type: Boolean,
+					value: false
+				},
+
+				/**
+				 * view 구성을 위해 필요한 메타 데이터를 조회하기 위한 URL
+				 */
+				resourceMetaUrl: {
+					type: String,
+					computed: '_computeResourceMetaUrl(searchMeta,entityType)'
+				},
+
+				/**
+				 * meta data for detail form
+				 */
+				metaData: {
+					type: Array,
+					observer: '_parseMetaData'
+				},				
+
+				/**
+				 * entity type
+				 */
+				entityType: {
 					type: String
 				},
+
+				/**
+				 * entity id
+				 */
+				entityId: {
+					type: String
+				},
+
+				/**
+				 * TODO 
+				 * entity url
+				 */
+				entityUrl: {
+					type: String
+				},
+
+				/**
+				 * resource url, detail에 대한 서버 측 서비스 호출을 위한 URL
+				 * entityType, entityId로 resourceUrl이 결정된다.
+				 */
+				resourceUrl: {
+					type: String,
+					readonly: true
+				},
+
 				/**
 				 * 폼에 채우기 위한 리소스
 				 * 최초 폼이 실행되는 시점에 서버에 요청하여 리턴받은 데이터
@@ -81,6 +145,14 @@ Example:
 				resource: {
 					type: Object
 				},
+
+				/**
+				 * form fields
+				 */
+				formFields: {
+					type: Array
+				},
+
 				/**
 				 * Save 하기 전에 폼에는 있지만 Save하는데 필요 없는 필드를 삭제하기 위한 필드명
 				 */
@@ -88,68 +160,72 @@ Example:
 					type: Array,
 					value: ['creator', 'updater', 'creator_id', 'updater_id', 'created_at', 'updated_at']
 				},
+
 				/**
 				 * active attachment panel
 				 */
 				attachable: {
 					type: Boolean,
-					value:false
+					value: false
 				},
+
 				/**
-				 * active extention panel
+				 * active extension properties panel
 				 */
-				enableExtension:{
+				propExtensible: {
 					type: Boolean,
-					Value:false
+					Value: false
 				},
+
+				/**
+				 * 현재 선택된 탭 index
+				 */
+				currentTabIdx: {
+					type: Number,
+					value: 0
+				},
+
 				/**
 				 * default panel array
 				 */
-				_panels:{
+				_panels: {
 					type: Array,
-					value:[
-						{'title':'Basic Info.',
-						 'elementId':'things-resource-form'}
-					]
-				},
-				_current:{
-					type:Number
+					value: [ {
+						title: 'Basic Info.', 
+						elementId: 'things-resource-form'
+					} ]
 				}
-
 			},
+
 			observers: [
-				'_onResourceChanged(resourceName,resource)',
-				// '_onTestResourceChanged(resource)',
+				'_onResourceChanged(entityType, resource)',
 				'_onAttachableChanged(_panels, attachable)',
-				'_onEnableExtensionChanged(_panels, enableExtension)'
+				'_onPropExtensibleChanged(_panels, propExtensible)'
 			],
-			listeners:{
-				'tabPages.iron-select':'_onPageSelected'
+
+			listeners: {
+				'tabPages.iron-select': '_onPageSelected'
 			},
 
-			ready:function () {
-			},
 			/**
-			 *
-			 * 
+			 * Active Tab을 설정한다.
+			 * @param {Number} currentTabIdx
 			 */
-			_onTestResourceChanged:function (resource) {
-				 console.log(resource); 
+			setActiveTab: function(currentTabIdx) {
+				this.currentTabIdx = currentTabIdx;
 			},
+
 			/**
 			 * fire element id+selected event with page element detail
 			 */
-			_onPageSelected:function (event) {
-				if(event.detail.id =="things-resource-form"){
-					event.detail.openResourceForm(this.resource);
-				}else{
-					this.entityId = this.resource.id;
-					this.entityType = this.resourceName;
-					event.target.selectedItem.search();
-				}
-				
-				this.fire(event.detail.id+'Selected', event.detail);
+			_onPageSelected: function(event) {
+				if(!this.resource) return;
+
+				var detailItemView = event.detail.item;
+				detailItemView.loadDetailData(this.resource);				
+				this.fire(detailItemView.id + '-selected', detailItemView);
 			},
+
 			/**
 			 * create elements things-basic-detial,
 			 * set things-Resource-Form resourceUrl
@@ -158,28 +234,53 @@ Example:
 			 * entityType ="{{resourceUrl}}"
 			 * entityId ="{{resource.id}}"
 			 */
-			_onResourceChanged:function (resourceName,resource) {
-				//bind attribute for extention
-				// console.log(this.resource);
-				this._resourceUrl = [resourceName,resource.id].join('/');
-				this._current=0;
+			_onResourceChanged: function(entityType, resource) {
+				this.resourceUrl = [entityType, resource.id].join('/');
+				this.currentTabIdx = 0;
 			},
+
 			/**
 			 * add attached file panel
 			 */
-			_onAttachableChanged:function (attachable) {
-				var attachment = {'title':'Attachments.',
-								  'elementId':'things-attached-file'};
-				this.push('_panels',attachment);
+			_onAttachableChanged: function(attachable) {
+				var attachment = { title: 'Attachments.', elementId: 'things-attached-file' };
+				this.push('_panels', attachment);
 			},
+
 			/**
 			 * add extension panel
 			 */
-			_onEnableExtensionChanged:function (enableExtension) {
-				var extension = {'title':'Properties.',
-								 'elementId':'things-extension'};
-				this.push('_panels',extension);
-			}
+			_onPropExtensibleChanged: function(propExtensible) {
+				var extension = { title: 'Properties.', elementId: 'things-extension' };
+				this.push('_panels', extension);
+			},
+
+			/**
+			 * resourceName으로 resource meta url을 생성
+			 *
+			 * @param {Boolean} searchMeta
+			 * @param {String} entityName
+			 * @return {String} resource meta get URL
+			 */
+			_computeResourceMetaUrl: function(searchMeta, entityName) {
+				if(this.searchMeta) {
+					var url = 'entities/' + entityName + '/resource_columns.json';
+					return url;					
+				} else {
+					return null;
+				}
+			},
+
+			/**
+			 * meta data를 파싱한다.
+			 *
+			 * @param {Array} metaDataList
+			 */
+			_parseMetaData: function(metaDataList) {
+				if(!metaDataList || metaDataList.length == 0) return;
+				this.formFields = this._parseResourceFormFields(metaDataList);
+			}			
+
 		});
 	</script>
 </dom-module>
