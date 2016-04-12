@@ -19,181 +19,190 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../../../bower_components/juicy-ace-editor/juicy-ace-editor.html">
 
 <dom-module id="things-demo">
-  <template>
-	<style include="shared-styles"></style>
-	<style>
-	  @import "things-demo";
-	</style>
+	<template>
+		<style include="shared-styles"></style>
+		<style>
+			@import "things-demo";
+		</style>
 
-	<!-- code Editor -->
-	<paper-material elevation="1">
-		<h2>things Code Editor</h2>
-	    <things-code-editor id="eval-editor"
-	                      theme="ace/theme/monokai"
-	                      mode="ace/mode/html"
-	                      record='{
-	                      	"name" : "test",
-	                      	"source" :"<body></body>"
-	                      }'
-	                      code-field ="source"
-	                      save-url ="hi"
-	    ></things-code-editor>
-	</paper-material>
+		<!-- code Editor -->
+		<paper-material elevation="1">
+			<h2>things Code Editor</h2>
+			<things-code-editor 
+				id="eval-editor"
+				theme="ace/theme/monokai"
+				mode="ace/mode/html"
+				resource='{
+					"name" : "test",
+					"source" :"<body></body>"
+				}'
+				code-field ="source"
+				save-url ="hi">
+			</things-code-editor>
+		</paper-material>
 
+		<!-- others -->
+		<paper-material class="Page-paper" elevation="1">
+			<h2 class="Page-title">[[title]]</h2>
 
-	<!-- others -->
-	<paper-material class="Page-paper" elevation="1">
-	  <h2 class="Page-title">[[title]]</h2>
+			<p class="paper-font-subhead">Things Components Demo</p>
+		</paper-material>
 
-	  <p class="paper-font-subhead">Things Components Demo</p>
-	</paper-material>
+		<paper-material class="Page-paper" elevation="1">
+			<p class="paper-font-subhead"><a href="/elements/index.html" target="_blank">Component API & Demo</a></p>
+		</paper-material>
 
-	<paper-material class="Page-paper" elevation="1">
-	  <p class="paper-font-subhead"><a href="/elements/index.html" target="_blank">Component API & Demo</a></p>
-	</paper-material>
+		<things-file-upload target="upload" method="POST" timeout="300000" ></things-file-upload>
 
-	<things-file-upload target="upload" method="POST" timeout="300000" ></things-file-upload>
+		<paper-material class="Page-paper" elevation="1">
+			<p class="paper-font-subhead">Things Setting</p>
 
-	<paper-material class="Page-paper" elevation="1">
-	  <p class="paper-font-subhead">Things Setting</p>
+			<paper-input label="Base URL" value="{{globals.basicUrl}}"></paper-input>
 
-	  <paper-input label="Base URL" value="{{globals.basicUrl}}"></paper-input>
+			<things-setting id="setting"></things-setting>
 
-	  <things-setting id="setting"></things-setting>
+			<div class="buttons">
+				<things-button color="green" id="setting-btn">Setting</things-button>
+			</div>
+		</paper-material>
 
-	  <div class="buttons">
-		<things-button color="green" id="setting-btn">Setting</things-button>
-	  </div>
-	</paper-material>
+		<paper-material class="Page-paper" elevation="1">
+			<p class="paper-font-subhead">Things Profile</p>
 
-	<paper-material class="Page-paper" elevation="1">
-	  <p class="paper-font-subhead">Things Profile</p>
+			<things-profile name="elidom" email="elidom@example.com" img="../../images/profile.png"></things-profile>
+		</paper-material>
 
-	  <things-profile name="elidom" email="elidom@example.com" img="../../images/profile.png"></things-profile>
-	</paper-material>
+		<paper-material class="Page-paper" elevation="1">
+			<p class="paper-font-subhead">Things Button</p>
 
-	<paper-material class="Page-paper" elevation="1">
-	  <p class="paper-font-subhead">Things Button</p>
+			<paper-input  
+				name="buttonAction" 
+				type="text" 
+				label="Button Action" 
+				value="{{thingsButtonMessage}}">
+			</paper-input>
 
-	  <paper-input  name="buttonAction" 
-					type="text" 
-					label="Button Action" 
-					value="{{thingsButtonMessage}}">
-	  </paper-input>
+			<div class="buttons">
+				<things-button color="green" id="things-btn-1">Search Button</things-button>
 
-	  <div class="buttons">
-		<things-button color="green" id="things-btn-1">Search Button</things-button>
+				<things-button 
+					id="things-btn-2" 
+					color="indigo" 
+					confirm=true 
+					title="Confirm" 
+					message="Are you sure to save?">Save Button</things-button>
 
-		<things-button id="things-btn-2" color="indigo" confirm=true title="Confirm" message="Are you sure to save?">Save Button</things-button>
+				<things-button id="things-btn-3" color="pink" confirm=true title="Confirm" message="Are you sure to delete?">Delete Button</things-button>
+			</div>
+		</paper-material>
 
-		<things-button id="things-btn-3" color="pink" confirm=true title="Confirm" message="Are you sure to delete?">Delete Button</things-button>
-	  </div>
-	</paper-material>
+		<paper-material class="Page-paper" elevation="1">
+			<p class="paper-font-subhead">Things Message Box / Spinner</p>
 
-	<paper-material class="Page-paper" elevation="1">
-	  <p class="paper-font-subhead">Things Message Box / Spinner</p>
+			<div class="buttons">
+				<paper-button raised id="msg-button">Message Box</paper-button>
+				<paper-button raised id="confirm-button">Confirm Box</paper-button>
+				<paper-button raised id="prompt-button">Prompt Box</paper-button>
+				<paper-button raised id="spn-button">Spinner</paper-button>
+			</div>      
+		</paper-material>
 
-	  <div class="buttons">
-		<paper-button raised id="msg-button">Message Box</paper-button>
-		<paper-button raised id="confirm-button">Confirm Box</paper-button>
-		<paper-button raised id="prompt-button">Prompt Box</paper-button>
-		<paper-button raised id="spn-button">Spinner</paper-button>
-	  </div>      
-	</paper-material>
+		<paper-material class="Page-paper" elevation="1">
+			<p class="paper-font-subhead">Things Event Handler</p>
 
-	<paper-material class="Page-paper" elevation="1">
-	  <p class="paper-font-subhead">Things Event Handler</p>
+			<div class="buttons">
+				<paper-button raised id="evt-button">Fire Event</paper-button>
+			</div>
+		</paper-material>
 
-	  <div class="buttons">
-		<paper-button raised id="evt-button">Fire Event</paper-button>
-	  </div>
-	</paper-material>
+		<paper-material class="Page-paper" elevation="1">
+			<p class="paper-font-subhead">Web Socket</p>
 
-	<paper-material class="Page-paper" elevation="1">
-	  <p class="paper-font-subhead">Web Socket</p>
+			<paper-input  
+				name="wsurl" 
+				type="text" 
+				label="Web Socket URL" 
+				value="{{wsUrl}}">
+			</paper-input>
 
-		<paper-input  name="wsurl" 
-					  type="text" 
-					  label="Web Socket URL" 
-					  value="{{wsUrl}}">
-		</paper-input>
+			<paper-input  
+				name="status" 
+				type="text" 
+				label="Web Socket Status" 
+				value="{{wsStatus}}">
+			</paper-input>
 
-		<paper-input  name="status" 
-					  type="text" 
-					  label="Web Socket Status" 
-					  value="{{wsStatus}}">
-		</paper-input>
+			<paper-input  
+				name="message" 
+				type="text" 
+				label="Message To Send" 
+				value="{{wsSendMessage}}">
+			</paper-input>
 
-		<paper-input  name="message" 
-					  type="text" 
-					  label="Message To Send" 
-					  value="{{wsSendMessage}}">
-		</paper-input>
+			<paper-input  
+				name="returnMessage" 
+				type="text" 
+				label="Received Message" 
+				value="[[wsReceiveMessage]]">
+			</paper-input>
 
-		<paper-input  name="returnMessage" 
-					  type="text" 
-					  label="Received Message" 
-					  value="[[wsReceiveMessage]]">
-		</paper-input>
+			<div class="buttons">
+				<paper-button raised id="ws-open-button">Open</paper-button>
+				<paper-button raised id="ws-send-button">Send Message</paper-button>
+				<paper-button raised id="ws-close-button">Close</paper-button>
+			</div>
+		</paper-material>
 
-		<div class="buttons">
-		  <paper-button raised id="ws-open-button">Open</paper-button>
-		  <paper-button raised id="ws-send-button">Send Message</paper-button>
-		  <paper-button raised id="ws-close-button">Close</paper-button>
-		</div>
-	</paper-material>
+		<paper-material class="Page-paper" elevation="1">
+			<p class="paper-font-subhead">Things Alarm</p>
 
-	<paper-material class="Page-paper" elevation="1">
-	  <p class="paper-font-subhead">Things Alarm</p>
+			<things-alarm-badge count="3"></things-alarm-badge>
 
-	  <things-alarm-badge count="3"></things-alarm-badge>
+			<div class="buttons">
+				<paper-button raised id="alarm-button">Alarm Badge Click</paper-button>
+			</div>
+		</paper-material>
 
-	  <div class="buttons">
-		<paper-button raised id="alarm-button">Alarm Badge Click</paper-button>
-	  </div>
-	</paper-material>
+		<paper-material class="Page-paper" elevation="1">
+			<p class="paper-font-subhead">Things Combo</p>
 
-	<paper-material class="Page-paper" elevation="1">
-	  <p class="paper-font-subhead">Things Combo</p>
+			<paper-input label="Selected Value" value="{{codeName}}"></paper-input>
 
-	  <paper-input label="Selected Value" value="{{codeName}}"></paper-input>
+			<paper-input label="Selected Description" value="{{codeDesc}}"></paper-input>
 
-	  <paper-input label="Selected Description" value="{{codeDesc}}"></paper-input>
+			<things-combo 
+				id="combo" 
+				label="Language" 
+				value="en-US" 
+				items="{{comboItems}}" 
+				label-path="description" 
+				value-path="name">
+			</things-combo>
 
-	  <things-combo 
-		id="combo" 
-		label="Language" 
-		value="en-US" 
-		items="{{comboItems}}" 
-		label-path="description" 
-		value-path="name">
-	  </things-combo>
+			<things-code-selector 
+				id="code-selector" 
+				label="Language" 
+				value="en-US" 
+				code-name="LOCALE" 
+				label-path="description" 
+				value-path="name">
+			</things-code-selector>
 
-	  <things-code-selector 
-		id="code-selector" 
-		label="Language" 
-		value="en-US" 
-		code-name="LOCALE" 
-		label-path="description" 
-		value-path="name">
-	  </things-code-selector>
+		</paper-material>
 
-	</paper-material>
+		<paper-material class="Page-paper" elevation="1">
+			<p class="paper-font-subhead">Date Picker</p>
+			<things-date-picker label="Date Picker" locale="ko" read-format="YYYY-MM-DD"></things-date-picker>
+		</paper-material>
 
-	<paper-material class="Page-paper" elevation="1">
-	  <p class="paper-font-subhead">Date Picker</p>
-	  <things-date-picker label="Date Picker" locale="ko" read-format="YYYY-MM-DD"></things-date-picker>
-	</paper-material>
+		<paper-material class="Page-paper" elevation="1">
+			<p class="paper-font-subhead">Time Picker</p>
+			<things-time-picker label="Time Picker"></things-time-picker>
+		</paper-material>
 
-	<paper-material class="Page-paper" elevation="1">
-	  <p class="paper-font-subhead">Time Picker</p>
-	  <things-time-picker label="Time Picker"></things-time-picker>
-	</paper-material>
+		<things-msg-box id="msg-box" title="Things Message Box" message="This is Message Box"></things-msg-box>
 
-	<things-msg-box id="msg-box" title="Things Message Box" message="This is Message Box"></things-msg-box>
-
-	<things-websocket id="ws" url="{{wsUrl}}"></things-websocket>
-
+		<things-websocket id="ws" url="{{wsUrl}}"></things-websocket>
 
   </template>
 

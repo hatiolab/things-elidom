@@ -52,6 +52,7 @@
         model="[[gridModel]]" 
         columns="[[gridColumns]]"
         buttons="[[buttons]]"
+        grid-save-action="[[gridSaveUrl]]"
         data="[[lastResponse.items]]"
         enable-detail-column
         enable-toolbar>
@@ -123,7 +124,8 @@
           },  {
             fieldName: 'path'            
           }, {
-            fieldName: 'file_size'
+            fieldName: 'file_size',
+            dataType: 'number'
           }, {
             fieldName: 'creator',
             dataType: 'object'
@@ -163,9 +165,13 @@
             width: 100
           }, {
             fieldName: 'path',
-            width: 300
+            width: 400
           }, {
             fieldName: 'file_size',
+            styles: {
+              numberFormat: "#,###",
+              textAlignment: 'far'
+            },
             width: 80
           }, {
             name: 'creator',
@@ -194,7 +200,7 @@
          */
         selectFields: {
           type: String,
-          value: 'id,name,storage_info_id,tag,path,file_size,creator,created_at'
+          value: 'id,name,storage_info,tag,path,file_size,creator,created_at'
         },
 
         /**
@@ -231,6 +237,14 @@
         },
 
         /**
+         * 그리드 저장 (Multiple Save) URL
+         */
+        gridSaveUrl: {
+          type: String,
+          value: 'attachments/update_multiple'
+        },        
+
+        /**
          * upload target url
          */
         targetUrl: {
@@ -241,7 +255,7 @@
 
       listeners: {
         'grid.things-grid-detail-tap': '_onDetailButtonTap',
-        'grid.things-grid-save-success': 'refreshGridData',
+        'grid.things-grid-save-success': 'loadData',
         'grid.things-grid-resource-column-edit': '_openResourceSelector',
         'things-upload-response': 'loadData'
       },

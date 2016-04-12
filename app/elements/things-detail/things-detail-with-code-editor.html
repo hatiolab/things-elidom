@@ -2,6 +2,8 @@
 <link rel="import" href="../../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
 
+<link rel="import" href="../things-code-editor/things-code-editor.html">
+<link rel="import" href="../things-code-editor/things-template-editor.html">
 <link rel="import" href="../things-content/things-detail-form-meta-behavior.html">
 <link rel="import" href="../things-content/things-load-view-behavior.html">
 <link rel="import" href="../things-attached-file/things-attached-file.html">
@@ -29,7 +31,7 @@ Example:
       last-response="{{detailViewData}}">
     </things-resource>
 
-    <things-resource-tabs 
+    <things-detail-with-code-editor 
       search-meta
       meta-data="{{metaData}}"
       resource-type="Alarm" 
@@ -37,13 +39,13 @@ Example:
       resource="{{detailViewData}}" 
       attachable 
       prop-extensible>
-    </things-resource-tabs>
+    </things-detail-with-code-editor>
   </div>
 
 @demo demo/index.html
 -->
 
-<dom-module id="things-resource-tabs">
+<dom-module id="things-detail-with-code-editor">
 	<template>
 
 		<style>
@@ -74,6 +76,22 @@ Example:
 				remove-fields-on-save="[[removeFieldsOnSave]]">
 			</things-resource-form>
 
+			<things-template-editor 
+				id="template-editor"
+				theme="ace/theme/monokai"
+				mode="ace/mode/groovy"
+				form-fields="[[formFields]]"
+				save-url="[[memberResourceUrl]]">
+			</things-template-editor>
+
+			<things-code-editor 
+				id="code-editor"
+				theme="ace/theme/monokai"
+				mode="ace/mode/html"
+				form-fields="[[formFields]]"
+				save-url="[[memberResourceUrl]]">
+			</things-code-editor>
+
 			<template is="dom-if" if={{attachable}}>
 				<things-attached-file 
 					id="attachments"
@@ -97,7 +115,7 @@ Example:
 	<script>
 		Polymer({
 
-			is: 'things-resource-tabs',
+			is: 'things-detail-with-code-editor',
 
 			behaviors: [ 
 				Things.DetailFormMetaBehavior,
@@ -203,8 +221,14 @@ Example:
 				_panels: {
 					type: Array,
 					value: [ {
-						title: 'Basic Info.', 
+						title: 'Basic', 
 						elementId: 'things-resource-form'
+					}, {
+						title: 'Template', 
+						elementId: 'things-template-editor'
+					}, {
+						title: 'Logic', 
+						elementId: 'things-code-editor'
 					} ]
 				}
 			},
