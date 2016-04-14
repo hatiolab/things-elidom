@@ -45,7 +45,7 @@ Example:
 @demo demo/index.html
 -->
 
-<dom-module id="things-base-diy-forms-detail">
+<dom-module id="things-base-diy-template-detail">
   <template>
 
     <style>
@@ -77,20 +77,29 @@ Example:
       </things-resource-form>
 
       <things-template-editor 
-        id="search-field"
+        id="template"
         theme="ace/theme/monokai"
         mode="ace/mode/json"
-        template-field="searchs"
+        template-field="template"
         save-url="[[memberResourceUrl]]">
       </things-template-editor>
 
-      <things-template-editor 
-        id="detail-form-field"
-        theme="ace/theme/monokai"
-        mode="ace/mode/json"
-        template-field="details"
-        save-url="[[memberResourceUrl]]">
-      </things-template-editor>
+      <template is="dom-if" if={{attachable}}>
+        <things-attached-file 
+          id="attachments"
+          target-url="upload_resource"
+          resource-type="[[resourceType]]"
+          resource-id="{{resourceId}}">
+        </things-attached-file>
+      </template>      
+
+      <template is="dom-if" if={{propExtensible}}>
+        <things-extension 
+          id="ext-properties"
+          resource-type="[[resourceType]]"
+          resource-id="{{resourceId}}">
+        </things-extension>           
+      </template>
 
     </iron-pages>
 
@@ -99,7 +108,7 @@ Example:
   <script>
     Polymer({
 
-      is: 'things-base-diy-forms-detail',
+      is: 'things-base-diy-template-detail',
 
       behaviors: [ 
         Things.DetailFormMetaBehavior,
@@ -176,6 +185,22 @@ Example:
         },
 
         /**
+         * active attachment panel
+         */
+        attachable: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * active extension properties panel
+         */
+        propExtensible: {
+          type: Boolean,
+          Value: false
+        },        
+
+        /**
          * 현재 선택된 탭 index
          */
         currentTabIdx: {
@@ -192,11 +217,14 @@ Example:
             title: 'Basic', 
             elementId: 'things-resource-form'
           }, {
-            title: 'Search Fields', 
+            title: 'Template', 
             elementId: 'things-template-editor'
           }, {
-            title: 'Detail Form Field', 
+            title: 'Attachments', 
             elementId: 'things-template-editor'
+          }, {
+            title: 'Properties',
+            elementId: ''
           } ]
         }
       },

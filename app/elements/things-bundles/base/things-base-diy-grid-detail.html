@@ -45,7 +45,7 @@ Example:
 @demo demo/index.html
 -->
 
-<dom-module id="things-base-diy-forms-detail">
+<dom-module id="things-base-diy-grid-detail">
   <template>
 
     <style>
@@ -77,18 +77,26 @@ Example:
       </things-resource-form>
 
       <things-template-editor 
-        id="search-field"
+        id="configuration"
         theme="ace/theme/monokai"
         mode="ace/mode/json"
-        template-field="searchs"
+        template-field="config"
         save-url="[[memberResourceUrl]]">
       </things-template-editor>
 
       <things-template-editor 
-        id="detail-form-field"
+        id="fields"
         theme="ace/theme/monokai"
         mode="ace/mode/json"
-        template-field="details"
+        template-field="fields"
+        save-url="[[memberResourceUrl]]">
+      </things-template-editor>
+
+      <things-template-editor 
+        id="columns"
+        theme="ace/theme/monokai"
+        mode="ace/mode/json"
+        template-field="columns"
         save-url="[[memberResourceUrl]]">
       </things-template-editor>
 
@@ -99,7 +107,7 @@ Example:
   <script>
     Polymer({
 
-      is: 'things-base-diy-forms-detail',
+      is: 'things-base-diy-grid-detail',
 
       behaviors: [ 
         Things.DetailFormMetaBehavior,
@@ -192,10 +200,13 @@ Example:
             title: 'Basic', 
             elementId: 'things-resource-form'
           }, {
-            title: 'Search Fields', 
+            title: 'Configuration', 
             elementId: 'things-template-editor'
           }, {
-            title: 'Detail Form Field', 
+            title: 'Fields', 
+            elementId: 'things-template-editor'
+          }, {
+            title: 'Columns',
             elementId: 'things-template-editor'
           } ]
         }
