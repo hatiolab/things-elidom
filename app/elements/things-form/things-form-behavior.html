@@ -325,11 +325,20 @@ Things.FormBehaviorImpl = {
 				// TODO
 				break;
 
+			// code-editor, template-editor 필드인 경우 정보를 저장은 해당 editor에서 책임지고 Form에서는 관계하지 않는다.
+			case 'code-editor':
+				break;
+
+			case 'template-editor':
+				break;
+
 			default:
 				newElement = document.createElement('paper-input');
 				newElement = this.bindAttributes(newElement, element);
 		}
 
+		if(!newElement) return null;
+		
 		if(element.name == 'id' || element.name == 'domain_id' || element.name == 'domainId') {
 			newElement.setAttribute('hidden', true);
 		}

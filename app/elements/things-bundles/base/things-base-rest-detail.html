@@ -1,0 +1,262 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/iron-icon/iron-icon.html">
+
+<link rel="import" href="../../things-combo/things-resource-selector-behavior.html">
+<link rel="import" href="../../things-content/things-load-view-behavior.html">
+<link rel="import" href="../../things-grid/things-resource-grid.html">
+<link rel="import" href="../../things-resource/things-resource.html">
+
+<dom-module id="things-base-rest-detail">
+
+  <template>
+    <div class="[[layout]]">
+      <things-resource 
+        id="resource-search"
+        method="GET"
+        action="[[gridSearchUrl]]"
+        last-response="{{lastResponse}}"
+        auto>
+      </things-resource>
+
+      <things-resource-form
+        id='resource-form'
+        title="[[title]]"
+        resource-type="CommonCode"
+        resource-url="[[codeDetailUrl]]"
+        resource="[[resource]]"
+        form-fields="[[formFields]]">
+      </things-resource-form>
+
+      <span><paper-icon-button icon="icons:view-list"></paper-icon-button>API List</span>
+
+      <things-resource-grid 
+        id="grid"
+        config="[[gridConfig]]"
+        model="[[gridModel]]" 
+        columns="[[gridColumns]]"
+        data="[[items]]"
+        grid-save-action="[[gridSaveUrl]]"
+        buttons="[[buttons]]"
+        enable-toolbar>
+      </things-resource-grid>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'things-base-rest-detail',
+
+      behaviors: [ 
+        Things.LoadViewBehavior
+      ],
+
+      properties: {
+
+        /**
+         * code id
+         */
+        codeId: {
+          type: String
+        },
+
+        /**
+         * code resource
+         */
+        resource: {
+          type: Object
+        },
+
+        /**
+         * 화면 타이틀 
+         */
+        title: {
+          type: String
+        },
+
+        /**
+         * code list
+         */
+        items: {
+          type: Array
+        },
+
+        /**
+         * code 조회 정보 
+         */
+        lastResponse: {
+          type: Object,
+          observer: '_codeMasterChanged'
+        },
+
+        /**
+         * grid search fields
+         */
+        searchFields : {
+          type: String,
+          value: 'id,parent_id,name,description'
+        },
+
+        /**
+         * grid sort fields
+         */
+        sortFields : {
+          type: Array,
+          value: [ {
+            field : 'name',
+            ascending : true
+          } ]
+        },
+
+        /**
+         * grid model
+         */
+        gridModel: {
+          type: Array,
+          value: [ {
+            fieldName : 'id'
+          }, {
+            fieldName : 'parent_id'
+          }, { 
+            fieldName : 'name' 
+          }, { 
+            fieldName : 'description' 
+          } ]
+        },
+        
+        /**
+         * grid columns
+         */
+        gridColumns: {
+          type: Array,
+          value: [ {
+            fieldName: 'id',
+            width: 0
+          }, {
+            fieldName: 'parent_id',
+            width: 0
+          }, {
+            fieldName: 'name',
+            width: 250
+          }, {
+            fieldName: 'description',
+            width: 350
+          } ]
+        },
+
+        /**
+         * Code lsit search URL
+         */
+        gridSearchUrl: {
+          type: String,
+          computed: '_computeCodeSearchUrl(codeId)',
+        },
+
+        /**
+         * Code list save URL
+         */
+        gridSaveUrl: {
+          type: String,
+          computed: '_computeCodeListSaveUrl(codeId)'
+        },
+
+        /**
+         * Code detail find/save URL
+         */
+        codeDetailUrl: {
+          type: String,
+          computed: '_computeCodeDetailUrl(codeId)'
+        },
+
+        /**
+         * 버튼 정보 
+         */
+        buttons: {
+          type: Array,
+          value: [ {
+            id: 'new-btn',
+            text: 'Add',
+            icon: 'icons:add'
+          }, {
+            id: 'save-btn',
+            text: 'Save',
+            icon: 'icons:save'
+          }, {
+            id: 'delete-btn',
+            text: 'Delete',
+            icon: 'icons:delete'
+          } ]
+        }
+      },
+
+      listeners: {
+        'grid.things-button-new-btn-tap' : 'addRow',
+        'grid.things-grid-save-success' : 'reloadGrid'
+      },
+
+      /**
+       * 코드 정보 변경시 
+       */
+      _codeMasterChanged: function(lastResponse) {
+        this.items = lastResponse.items;
+        this.resource = lastResponse;
+      },
+
+      /**
+       * Code Search URL
+       *
+       * @param {String} codeId
+       * @return {String} code search url
+       */
+      _computeCodeSearchUrl: function(codeId) {
+        return ['common_codes', codeId].join('/');
+      },
+
+      /**
+       * Code Id로 Code List Save URL 생성
+       *
+       * @param {String} codeId
+       * @return {String} code save url
+       */
+      _computeCodeListSaveUrl: function(codeId) {
+        return 'common_codes/' + codeId + '/update_multiple_codes.json';
+      },
+
+      /**
+       * Code Id로 Code Master Save URL 생성
+       *
+       * @param {String} codeId
+       * @return {String} code save url
+       */
+      _computeCodeDetailUrl: function(codeId) {
+        return 'common_codes/' + codeId + '.json';
+      },
+
+      /**
+       * add grid row
+       */
+      addRow: function(e) {
+        this.$.grid.dataSet.insertRow(0, { id: null, name : '', description : '', parent_id : this.codeId });
+      },
+
+      /**
+       * reload grid data
+       */
+      reloadGrid: function(e) {
+        this.$['resource-search'].generateRequest();
+      },
+
+      /**
+       * detail view를 오픈 
+       *
+       * @param {Object} resource
+       */
+      showDetailView: function(resource) {
+        this.resource = resource;
+        this.openPopupView(this, true);
+        this.codeId = this.resource.id;
+      }
+
+    });
+  </script>
+</dom-module>

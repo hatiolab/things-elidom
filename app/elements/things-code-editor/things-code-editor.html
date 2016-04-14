@@ -12,7 +12,7 @@
         @apply(--layout-flex);
         @apply(--layout-vertical);
         width: 94%;
-        height: 300px;
+        height: 430px;
         margin: 7px 0 0 7px;
         overflow: auto;
       }
@@ -21,7 +21,7 @@
     <!-- ace-editor의 TEXT부분에 공백이 추가되지 않도록 {{zpl}}주의에 공백을 주지않도록 해야함. -->
     <div>
       <juicy-ace-editor 
-        id="eval-editor" 
+        id="code-editor" 
         theme$="{{theme}}" 
         mode$="{{mode}}" 
         fontsize$="{{fontsize}}" 
@@ -34,11 +34,11 @@
     </div>
 
     <things-resource 
-      id="save-resource" 
+      id="save-code" 
       content-type="application/json" 
       action="{{saveUrl}}" 
-      method="POST" 
-      params="{{resource}}">
+      method="PUT" 
+      params="{{saveResource}}">
     </things-resource>
   </template>
 
@@ -86,6 +86,14 @@
         saveUrl: {
           type: String,
           notify: true
+        },
+
+        /**
+         * resource to save
+         * resource 데이터 중에 removeFieldsOnSave 필드를 제외하고 업데이트 요청
+         */
+        saveResource: {
+          type: Object
         },
 
         /**
@@ -151,8 +159,8 @@
       },
 
       listeners: {
-        'eval-editor.editor-ready': '_onEditorReady',
-        'eval-editor.change': '_onEditorChange',
+        'code-editor.editor-ready': '_onEditorReady',
+        'code-editor.change': '_onEditorChange',
         'button-bar.things-button-tap': '_onButtonTap',
       },
 
@@ -199,7 +207,7 @@
        * called when editor's change event called
        */
       _onEditorChange: function(after) {
-        this.resource[this.codeField] = this.$['eval-editor'].editor.getValue();
+        this.resource[this.codeField] = this.$['code-editor'].editor.getValue();
       },
 
       /**
@@ -209,19 +217,22 @@
         var buttonId = e.detail.id;
 
         if (buttonId == 'save-btn') {
-          this._gridSaveAction();
+          this._saveCode();
 
         } else {
           this.fire('things-button-' + buttonId + '-tap', e.detail);
         }
       },
 
-			/**
-			 * grid save action
-			 */
-			_gridSaveAction: function() {
-				this.$['save-resource'].generateRequest();
-			},
+      /**
+       * save code
+       */
+      _saveCode: function() {
+        this.resource[this.codeField] = this.$['code-editor'].editor.getValue();
+        this.saveResource = { id: this.resource.id };
+        this.saveResource[this.codeField] = this.resource[this.codeField];
+        this.$['save-code'].generateRequest();
+      },
 
       /***************************************************************************************
        *                            Start detail item view interface

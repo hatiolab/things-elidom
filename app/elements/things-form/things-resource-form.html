@@ -197,11 +197,11 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 				},
 
 				/**
-				 * Save 하기 전에 폼에는 있지만 Save하는데 필요 없는 필드를 삭제하기 위한 필드명
+				 * 폼에는 있지만 업데이트하기에 불필요한 필드를 삭제하기 위한 필드명
 				 */
 				removeFieldsOnSave: {
 					type: Array,
-					value: ['creator', 'updater', 'creator_id', 'updater_id', 'created_at', 'updated_at']
+					value: ['domain_id', 'creator', 'updater', 'creator_id', 'updater_id', 'created_at', 'updated_at']
 				}
 			},
 
@@ -291,6 +291,7 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 				for(index in this.formFields) {
 					var field = this.formFields[index];
 					var newElement = this.createFormElement(field);
+					if(!newElement) continue;
 
 					if((index % 2) == 0) {
 						this.$['left-fields'].appendChild(newElement);

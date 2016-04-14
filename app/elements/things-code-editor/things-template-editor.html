@@ -12,7 +12,7 @@
         @apply(--layout-flex);
         @apply(--layout-vertical);
         width: 94%;
-        height: 300px;
+        height: 430px;
         margin: 7px 0 0 7px;
         overflow: auto;
       }
@@ -34,11 +34,11 @@
     </div>
 
     <things-resource 
-      id="save-resource" 
+      id="save-code" 
       content-type="application/json" 
       action="{{saveUrl}}" 
-      method="POST" 
-      params="{{resource}}">
+      method="PUT" 
+      params="{{saveResource}}">
     </things-resource>
   </template>
 
@@ -86,6 +86,14 @@
         saveUrl: {
           type: String,
           notify: true
+        },
+
+        /**
+         * resource to save
+         * resource 데이터 중에 removeFieldsOnSave 필드를 제외하고 업데이트 요청
+         */
+        saveResource: {
+          type: Object
         },
 
         /**
@@ -209,19 +217,22 @@
         var buttonId = e.detail.id;
 
         if (buttonId == 'save-btn') {
-          this._gridSaveAction();
+          this._saveCode();
 
         } else {
           this.fire('things-button-' + buttonId + '-tap', e.detail);
         }
       },
 
-			/**
-			 * grid save action
-			 */
-			_gridSaveAction: function() {
-				this.$['save-resource'].generateRequest();
-			},
+      /**
+       * save code
+       */
+      _saveCode: function() {
+        this.resource[this.templateField] = this.$['template-editor'].editor.getValue();
+        this.saveResource = { id: this.resource.id };
+        this.saveResource[this.templateField] = this.resource[this.templateField];
+        this.$['save-code'].generateRequest();
+      },
 
       /***************************************************************************************
        *                            Start detail item view interface

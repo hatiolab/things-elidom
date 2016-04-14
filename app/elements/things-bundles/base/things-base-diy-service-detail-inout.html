@@ -1,0 +1,244 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/iron-icon/iron-icon.html">
+
+<link rel="import" href="../../things-combo/things-resource-selector-behavior.html">
+<link rel="import" href="../../things-content/things-load-view-behavior.html">
+<link rel="import" href="../../things-grid/things-resource-grid.html">
+<link rel="import" href="../../things-resource/things-resource.html">
+
+<dom-module id="things-base-diy-service-detail-inout">
+
+  <template>
+    <div class="[[layout]]">
+      <things-resource 
+        id="get-params"
+        method="GET"
+        action="[[gridSearchUrl]]"
+        last-response="{{items}}">
+      </things-resource>
+
+      <things-resource-grid 
+        id="grid"
+        config="[[gridConfig]]"
+        model="[[gridModel]]" 
+        columns="[[gridColumns]]"
+        data="[[items]]"
+        grid-save-action="[[gridSaveUrl]]"
+        buttons="[[buttons]]"
+        enable-toolbar>
+      </things-resource-grid>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'things-base-diy-service-detail-inout',
+
+      behaviors: [ 
+        Things.LoadViewBehavior
+      ],
+
+      properties: {
+
+        /**
+         * diy service id
+         */
+        diyServiceId: {
+          type: String
+        },
+
+        /**
+         * entity resource
+         */
+        resource: {
+          type: Object
+        },
+
+        /**
+         * entity columns 조회 정보 
+         */
+        items: {
+          type: Array
+        },        
+
+        /**
+         * in / out
+         */
+        mode: {
+          type: String
+        },
+
+        /**
+         * grid model
+         */
+        gridModel: {
+          type: Array,
+          value: [ { 
+            fieldName: 'id' 
+          }, { 
+            fieldName: 'name' 
+          }, { 
+            fieldName: 'resource_id' 
+          }, { 
+            fieldName: 'resource_type' 
+          }, { 
+            fieldName: 'rank' 
+          }, { 
+            fieldName: 'description'
+          } ]
+        },
+        
+        /**
+         * grid columns
+         */
+        gridColumns: {
+          type: Array,
+          value: [ { 
+            fieldName: 'id', name: 'id', width: 0 
+          }, { 
+            fieldName: 'resource_id', name: 'resource_id', width: 0 
+          }, { 
+            fieldName: 'resource_type', name: 'resource_type', width: 0
+          }, { 
+            fieldName: 'rank', name: 'rank', width: 60,
+            header: { text : 'Rank' },
+            styles: { textAlignment: 'far' }
+          }, { 
+            fieldName: 'name', name: 'name', width: 250,
+            header: { text : 'Name' }
+          }, { 
+            fieldName: 'description', name: 'description', width: 350,
+            header: { text : 'Description' }
+          } ] 
+        },
+
+        /**
+         * DiySearch In/Out Parameters Search URL
+         */
+        gridSearchUrl: {
+          type: String,
+          computed: '_computeInoutSearchUrl(diyServiceId,mode)'
+        },
+
+        /**
+         * DiySearch In/Out Parameters Save URL
+         */
+        gridSaveUrl: {
+          type: String,
+          computed: '_computeInoutSaveUrl(diyServiceId,mode)'
+        },
+
+        /**
+         * 버튼 정보 
+         */
+        buttons: {
+          type: Array,
+          value: [ {
+            id: 'add-btn',
+            text: 'Add',
+            icon: 'icons:add'
+          }, {
+            id: 'save-btn',
+            text: 'Save',
+            icon: 'icons:save'
+          }, {
+            id: 'delete-btn',
+            text: 'Delete',
+            icon: 'icons:delete'
+          } ]
+        }
+      },
+
+      listeners: {
+        'get-params.things-resource-ajax-success': '_onParametersSaved',        
+        'grid.things-grid-pre-save' : '_beforeParamsSave',
+        'grid.things-grid-save-success' : 'reloadGrid'
+      },
+
+      /**
+       * DiyServiceId, Mode(in/out) 데이터로 In/Out Parameters Search URL 생성
+       *
+       * @param {String} diyServiceId
+       * @param {String} mode
+       * @return {String} in/out parameteres search url
+       */
+      _computeInoutSearchUrl: function(diyServiceId, mode) {
+        return 'diy_services/' + diyServiceId + '/parameters/' + mode;
+      },
+
+      /**
+       * DiyServiceId, Mode(in/out) 데이터로 In/Out Parameters Save URL 생성
+       *
+       * @param {String} diyServiceId
+       * @param {String} mode
+       * @return {String} in/out parameteres save url
+       */
+      _computeInoutSaveUrl: function(diyServiceId, mode) {
+        return 'diy_services/' + diyServiceId + '/update_multiple_parameters/' + mode;
+      },
+
+      /**
+       * in/out Parameter 저장 후 
+       */
+      _onParametersSaved: function(event) {
+        if(this.mode == 'out') {
+          this.resource.service_out_params = event.detail;
+        } else {
+          this.resource.service_in_params = event.detail;
+        }
+      },      
+
+      /**
+       * In/Out Parameters 저장 전에...
+       */
+      _beforeParamsSave: function(event) {
+        var grid = event.target;
+        var changedList = grid.writeData;
+
+        if(!changedList || changedList.length == 0)         
+          return event;
+
+        var resourceId = this.diyServiceId;
+        changedList.forEach(function(changedData) {
+          if(changedData.cud_flag_ == 'c') {
+            changedData.resource_type = 'DiyService';
+            changedData.resource_id = resourceId;
+          }
+        });
+
+        return event;
+      },      
+
+      /**
+       * reload grid data
+       */
+      reloadGrid: function(e) {
+        this.$['get-params'].generateRequest();
+      },
+
+      /***************************************************************************************
+       *                            Start detail item view interface
+       ***************************************************************************************/
+
+      /**
+       * detail item view를 구성하기 위한 필수 함수 
+       * item view를 구성한다.
+       *
+       * @return {Object} resource 리소스 데이터 (Object) 혹은 리소스 아이디 (Number)
+       */
+      loadDetailData: function(resource) {
+        if(resource) {
+          this.diyServiceId = this.resource.id;
+          this.resource = resource;
+          this.items = (this.mode == 'in') ? this.resource.service_in_params : this.resource.service_out_params;
+        }
+      }
+
+      /***************************************************************************************
+       *                            End detail item view interface
+       ***************************************************************************************/ 
+
+    });
+  </script>
+</dom-module>

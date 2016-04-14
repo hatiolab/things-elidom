@@ -205,7 +205,8 @@
         for(index in this.formFields) {
           var field = this.formFields[index];
           var newElement = this.createFormElement(field);
-
+          if(!newElement) continue;
+          
           if((index % 2) == 0) {
             this.$['left-fields'].appendChild(newElement);
           } else {

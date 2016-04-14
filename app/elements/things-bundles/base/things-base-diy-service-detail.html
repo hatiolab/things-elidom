@@ -1,0 +1,261 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
+
+<link rel="import" href="../../things-code-editor/things-code-editor.html">
+<link rel="import" href="../../things-content/things-detail-form-meta-behavior.html">
+<link rel="import" href="../../things-content/things-load-view-behavior.html">
+
+<link rel="import" href="./things-base-diy-service-detail-inout.html">
+<link rel="import" href="./things-base-diy-service-detail-test.html">
+
+<!--
+DiyService Detail View
+
+Example:
+
+@demo demo/index.html
+-->
+
+<dom-module id="things-base-diy-service-detail">
+	<template>
+
+		<style>
+			:host {
+				display: block;
+			}
+		</style>
+
+		<things-resource 
+			id="get-resource"
+			method="GET"
+			action="[[memberResourceUrl]]"
+			last-response="{{resource}}">
+		</things-resource>
+
+		<paper-tabs id="tabGroup" selected="{{currentTabIdx}}" noink>
+			<template is="dom-repeat" items="{{_panels}}">
+				<paper-tab id="{{item.elementId}}">{{item.title}}</paper-tab>
+			</template>
+		</paper-tabs>
+
+		<iron-pages id="tabPages" selected="{{currentTabIdx}}">
+			<things-resource-form
+				id="resource-form" 
+				resource-url="[[memberResourceUrl]]"
+				resource="{{resource}}"
+				form-fields="[[formFields]]"
+				remove-fields-on-save="[[removeFieldsOnSave]]">
+			</things-resource-form>
+
+			<things-code-editor 
+				id="code-editor"
+				theme="ace/theme/monokai"
+				mode="ace/mode/groovy"
+				code-field="service_logic"
+				save-url="[[memberResourceUrl]]">
+			</things-code-editor>
+
+			<things-base-diy-service-detail-inout 
+				id="in-params"
+				mode="in"
+				resource="[[resource]]">
+			</things-base-diy-service-detail-inout>
+
+			<things-base-diy-service-detail-inout 
+				id="out-params"
+				mode="out"
+				resource="[[resource]]">
+			</things-base-diy-service-detail-inout>			
+		</iron-pages>
+
+	</template>
+
+	<script>
+		Polymer({
+
+			is: 'things-base-diy-service-detail',
+
+			behaviors: [ 
+				Things.DetailFormMetaBehavior,
+				Things.LoadViewBehavior
+			],
+
+			properties: {
+				/**
+				 * 폼 타이틀 
+				 */
+				title: {
+					type: String
+				},
+
+				/**
+				 * meta data for detail form
+				 */
+				metaData: {
+					type: Array,
+					observer: '_parseMetaData'
+				},				
+
+				/**
+				 * resource type
+				 */
+				resourceType: {
+					type: String
+				},
+
+				/**
+				 * resource id
+				 */
+				resourceId: {
+					type: String
+				},
+
+				/**
+				 * resource 대표 url
+				 * User Resource라면 users
+				 */
+				resourceUrl: {
+					type: String
+				},
+
+				/**
+				 * resource member url, resource url과 resourceId로 memberResourceUrl을 구성한다.
+				 */
+				memberResourceUrl: {
+					type: String,
+					computed: '_computeMemberResourceUrl(resourceUrl,resourceId)'
+				},
+
+				/**
+				 * 폼에 채우기 위한 리소스
+				 * 최초 폼이 실행되는 시점에 서버에 요청하여 리턴받은 데이터
+				 */
+				resource: {
+					type: Object
+				},
+
+				/**
+				 * form fields
+				 */
+				formFields: {
+					type: Array
+				},
+
+				/**
+				 * Save 하기 전에 폼에는 있지만 Save하는데 필요 없는 필드를 삭제하기 위한 필드명
+				 */
+				removeFieldsOnSave: {
+					type: Array,
+					value: ['domain_id', 'creator', 'updater', 'creator_id', 'updater_id', 'created_at', 'updated_at', 'service_in_params', 'service_out_params']
+				},
+
+				/**
+				 * 현재 선택된 탭 index
+				 */
+				currentTabIdx: {
+					type: Number,
+					value: 0
+				},
+
+				/**
+				 * default panel array
+				 */
+				_panels: {
+					type: Array,
+					value: [ {
+						title: 'Basic', 
+						elementId: 'things-resource-form'
+					}, {
+						title: 'Service Logic', 
+						elementId: 'things-code-editor'
+					}, {
+						title: 'Input Parameters', 
+						elementId: 'things-base-diy-service-detail-inout'
+					}, {
+						title: 'Output Parameters', 
+						elementId: 'things-base-diy-service-detail-inout'
+					}/*, {
+						title: 'Test',
+						elementId: 'things-base-diy-service-detail-test'
+					}*/ ]
+				}
+			},
+
+			observers: [
+				'_onResourceChanged(resource)'
+			],
+
+			listeners: {
+				'tabPages.iron-select': '_onPageSelected'
+			},
+
+			/**
+			 * Active Tab을 설정한다.
+			 * @param {Number} currentTabIdx
+			 */
+			setActiveTab: function(currentTabIdx) {
+				this.currentTabIdx = currentTabIdx;
+			},
+
+			/**
+			 * fire element id+selected event with page element detail
+			 */
+			_onPageSelected: function(event) {
+				if(!this.resource) return;
+
+				var detailItemView = event.detail.item;
+				detailItemView.loadDetailData(this.resource);				
+				this.fire(detailItemView.id + '-selected', detailItemView);
+			},
+
+			/**
+			 * resource가 변경되었을 경우 
+			 *
+			 * @param {Object} resource
+			 */
+			_onResourceChanged: function(resource) {
+				if(resource && resource.id) {
+					this.resourceId = resource.id;
+					this.currentTabIdx = 0;
+				}
+			},
+
+			/**
+			 * resourceUrl로 resource member url을 생성
+			 *
+			 * @param {String} resourceUrl
+			 * @param {String} resourceId
+			 * @return {String} resource member URL
+			 */
+			_computeMemberResourceUrl: function(resourceUrl, resourceId) {
+				return resourceUrl + '/' + resourceId;
+			},
+
+			/**
+			 * meta data를 파싱한다.
+			 *
+			 * @param {Array} metaDataList
+			 */
+			_parseMetaData: function(metaDataList) {
+				if(!metaDataList || metaDataList.length == 0) return;
+				this.formFields = this._parseResourceFormFields(metaDataList);
+			},
+
+      /**
+       * detail view를 오픈 
+       *
+       * @param {Object} resource
+       */
+      showDetailView: function(resource) {
+      	if(resource) {
+					this.resourceId = resource.id;
+					this.$['get-resource'].generateRequest();
+      	}
+
+        this.openPopupView(this, true);
+      }
+
+		});
+	</script>
+</dom-module>
