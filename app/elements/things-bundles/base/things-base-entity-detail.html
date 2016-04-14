@@ -44,14 +44,14 @@
       properties: {
 
         /**
-         * code id
+         * entity id
          */
-        codeId: {
+        entityId: {
           type: String
         },
 
         /**
-         * code resource
+         * entity resource
          */
         resource: {
           type: Object
@@ -65,41 +65,26 @@
         },
 
         /**
-         * code list
+         * entity column return data
          */
         items: {
           type: Array
         },
 
-        entityName: {
-          type: String
-        },
-
         /**
-         * code 조회 정보 
+         * entity columns 조회 정보 
          */
         lastResponse: {
           type: Object,
-          observer: '_codeMasterChanged'
-        },
+          observer: '_entityColumnChange'
+        },        
 
         /**
-         * grid search fields
+         * Detail 클릭시 나타나는 detail title
+         * 
          */
-        searchFields : {
-          type: String,
-          value: 'id,parent_id,name,description'
-        },
-
-        /**
-         * grid sort fields
-         */
-        sortFields : {
-          type: Array,
-          value: [ {
-            field : 'name',
-            ascending : true
-          } ]
+        entityName: {
+          type: String
         },
 
         /**
@@ -110,7 +95,7 @@
           value: [ { fieldName: 'id' }, { fieldName: 'entity_id' }, { fieldName: 'disp_rank' }, 
                    { fieldName: 'name' }, { fieldName: 'description'}, { fieldName: 'term' },
                    { fieldName: 'ref_type' }, { fieldName: 'ref_name' }, { fieldName: 'col_type' },
-                   { fieldName: 'col_size' }, { fieldName: 'Nullable' }, { fieldName: 'def_val'},
+                   { fieldName: 'col_size' }, { fieldName: 'nullable' }, { fieldName: 'def_val'},
                    { fieldName: 'uniq_rank' }, { fieldName: 'list_rank' }, { fieldName: 'search_rank' },
                    { fieldName: 'sort_rank' }, { fieldName: 'reverse_sort' }, { fieldName: 'editor' },
                    { fieldName: 'width' }, { fieldName: 'align' }, { fieldName: 'format' }, { fieldName: 'operator'} ]
@@ -121,46 +106,87 @@
          */
         gridColumns: {
           type: Array,
-          value: [ { fieldName: 'id', width: 0 }, { fieldName: 'entity_id', width: 0 }, { fieldName: 'disp_rank' },
-                   { fieldName: 'name' }, { fieldName: 'description'}, { fieldName: 'term' },
-                   { name:"ref_type",
-                     fieldName:"ref_type",
-                     width:100,
-                     header:{text:"ref_type"},
+          value: [ { fieldName: 'id', width: 0 }, { fieldName: 'entity_id', width: 0 }, { fieldName: 'disp_rank', },
+                   { fieldName: 'name' }, { fieldName: 'description'}, { fieldName: 'term', width: 140 },
+                   { name: 'ref_type', // 코드를 받아 선택하는 필드 설정
+                     fieldName: 'ref_type',
+                     width: 100,
+                     header: { text: 'ref_type'},
                      editor: { type: 'list', domainOnly: true },
-                     lookupDisplay:true,
-                     lookupValues:["Entity","CommonCode"],
-                     lookupLabels:["Entity","CommonCode"]
-                    },                    
-                   { fieldName: 'ref_name' }, { fieldName: 'col_type' },
-                   { fieldName: 'col_size' }, { fieldName: 'Nullable' }, { fieldName: 'def_val'},
-                   { fieldName: 'uniq_rank' }, { fieldName: 'list_rank' }, { fieldName: 'search_rank' },
-                   { fieldName: 'sort_rank' }, { fieldName: 'reverse_sort' }, { fieldName: 'editor' },
-                   { fieldName: 'width' }, { fieldName: 'align' }, { fieldName: 'format' }, { fieldName: 'operator'} ]
+                     lookupDisplay: true,
+                     lookupValues: [ 'Entity', 'CommonCode' ], // TODO : 데이터 받아서 출력하도록 수정해야 합니다. 
+                     lookupLabels: [ 'Entity', 'CommonCode' ] },
+                   { fieldName: 'ref_name', width: 140 },
+                   { name: 'col_type', // 코드를 받아 선택하는 필드 설정
+                     fieldName: 'col_type',
+                     width: 100,
+                     header: { text: 'col_type'},
+                     editor: { type: 'list', domainOnly: true },
+                     lookupDisplay: true,
+                     lookupValues: [ 'binary', 'boolean', 'date' ,'datetime',
+                                     'decimal', 'double', 'float', 'integer',
+                                     'long', 'string', 'text', 'time', 'timestamp' ], // TODO : 데이터 받아서 출력하도록 수정해야 합니다. 
+                     lookupLabels: [ 'binary', 'boolean', 'date' ,'datetime',
+                                     'decimal', 'double', 'float', 'integer',
+                                     'long', 'string', 'text', 'time', 'timestamp' ] }, // TODO : 데이터 받아서 출력하도록 수정해야 합니다. 
+                   { fieldName: 'col_size', type: 'number' },
+                   { name: 'nullable',
+                     fieldName: 'nullable',
+                     width: 100,
+                     header: {text:'nullable'},
+                     validations: [],
+                     renderer: {'type':'check', 'editable':true, 'threeStates': false, 'trueValues': 'true', 'falseValues': 'false'}
+                   },
+                   { fieldName: 'def_val'},
+                   { fieldName: 'uniq_rank', type: 'number' }, { fieldName: 'list_rank', type: 'number' },
+                   { fieldName: 'search_rank', type: 'number' }, { fieldName: 'sort_rank', type: 'number' },
+                   { name: 'reverse_sort',
+                     fieldName: 'reverse_sort',
+                     width: 100,
+                     header: {text: 'reverse_sort'},
+                     validations: [],
+                     renderer: {'type':'check', 'editable':true, 'threeStates': false, 'trueValues': 'true', 'falseValues': 'false'}
+                   },
+                   { fieldName: 'editor', width: 140 }, { fieldName: 'width', type: 'number' },
+                   { name: 'align', // 코드를 받아 선택하는 필드 설정
+                     fieldName: 'align',
+                     width: 100,
+                     header: { text: 'align'},
+                     editor: { type: 'list', domainOnly: true },
+                     lookupDisplay: true,
+                     lookupValues: [ 'Center', 'Far', 'Right' ], // TODO : 데이터 받아서 출력하도록 수정해야 합니다. 
+                     lookupLabels: [ 'Center', 'Far', 'Right' ] }, 
+                   { fieldName: 'format' },
+                   { name: 'operator', // 코드를 받아 선택하는 필드 설정
+                     fieldName: 'operator',
+                     header: { text: 'operator'},
+                     editor: { type: 'list', domainOnly: true },
+                     lookupDisplay: true,
+                     lookupValues: [ 'contains', 'dnew', 'dnsw', 'eq', 'ew', 'gt', 'gte',
+                                     'in', 'is_blank', 'is_false', 'is_not_false', 'is_not_null',
+                                     'is_not_true', 'is_null', 'is_present', 'is_true', 'like',
+                                     'lt', 'lte', 'nlike', 'noteq', 'notin', 'sw' ], // TODO : 데이터 받아서 출력하도록 수정해야 합니다. 
+                     lookupLabels: [ 'contains', 'dnew', 'dnsw', 'eq', 'ew', 'gt', 'gte',
+                                     'in', 'is_blank', 'is_false', 'is_not_false', 'is_not_null',
+                                     'is_not_true', 'is_null', 'is_present', 'is_true', 'like',
+                                     'lt', 'lte', 'nlike', 'noteq', 'notin', 'sw' ] } 
+                  ] 
         },
 
         /**
-         * Code lsit search URL
+         * Entity Column searching URL
          */
         gridSearchUrl: {
           type: String,
-          computed: '_computeCodeSearchUrl(codeId)',
+          computed: '_computeEntitySearchUrl(entityId)',
         },
 
         /**
-         * Code list save URL
+         * Entity Column save URL
          */
         gridSaveUrl: {
           type: String,
-          computed: '_computeCodeListSaveUrl(codeId)'
-        },
-
-        /**
-         * Code detail find/save URL
-         */
-        codeDetailUrl: {
-          type: String,
-          computed: '_computeCodeDetailUrl(codeId)'
+          computed: '_computeEntityColumnSaveUrl(entityId)'
         },
 
         /**
@@ -192,45 +218,35 @@
       /**
        * 코드 정보 변경시 
        */
-      _codeMasterChanged: function(lastResponse) {
+      _entityColumnChange: function(lastResponse) {
         this.items = lastResponse.items;
       },
 
       /**
-       * Code Search URL
+       * EntityColumn Search URL
        *
-       * @param {String} codeId
-       * @return {String} code search url
+       * @param {String} entityId
+       * @return {String} entity search url
        */
-      _computeCodeSearchUrl: function(codeId) {
-        return ['entities', codeId, 'entity_columns'].join('/');
+      _computeEntitySearchUrl: function(entityId) {
+        return ['entities', entityId, 'entity_columns'].join('/');
       },
 
       /**
-       * Code Id로 Code List Save URL 생성
+       * Entity Id로 Entity Column Save URL 생성
        *
-       * @param {String} codeId
-       * @return {String} code save url
+       * @param {String} entityId
+       * @return {String} entity column save url
        */
-      _computeCodeListSaveUrl: function(codeId) {
-        return 'common_codes/' + codeId + '/update_multiple_codes.json';
-      },
-
-      /**
-       * Code Id로 Code Master Save URL 생성
-       *
-       * @param {String} codeId
-       * @return {String} code save url
-       */
-      _computeCodeDetailUrl: function(codeId) {
-        return 'common_codes/' + codeId + '.json';
+      _computeEntityColumnSaveUrl: function(entityId) {
+        return 'entities/' + entityId + '/update_multiple_entity_columns.json';
       },
 
       /**
        * add grid row
        */
       addRow: function(e) {
-        this.$.grid.dataSet.insertRow(0, { id: null, name : '', description : '', parent_id : this.codeId });
+        this.$.grid.dataSet.insertRow(0, { id: null, name : '', description : '' });
       },
 
       /**
@@ -241,7 +257,7 @@
       },
 
       /**
-       * detail view를 오픈 
+       * detail view를 오픈과 detail title 초기화
        *
        * @param {Object} resource
        */
@@ -249,7 +265,7 @@
         this.entityName = resource.name;
         this.resource = resource;
         this.openPopupView(this, true);
-        this.codeId = this.resource.id;
+        this.entityId = this.resource.id;
       }
 
     });
