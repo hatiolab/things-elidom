@@ -1,0 +1,240 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/iron-icon/iron-icon.html">
+
+<link rel="import" href="../../things-combo/things-resource-selector-behavior.html">
+<link rel="import" href="../../things-content/things-load-view-behavior.html">
+<link rel="import" href="../../things-grid/things-resource-grid.html">
+<link rel="import" href="../../things-msg-box/things-msgbox-behavior.html">
+<link rel="import" href="../../things-resource/things-resource.html">
+<link rel="import" href="../../things-setting/things-global-behavior.html">
+
+<dom-module id="things-base-storage-detail">
+
+  <template>
+    <div class="[[layout]]">
+      <things-resource 
+        id="resource-search"
+        method="GET"
+        action="[[gridSearchUrl]]"
+        select-fields="[[selectFields]]"
+        sort-fields="[[sortFields]]"
+        query-fields="{{queryFields}}"
+        page="[[page]]"
+        limit="[[limit]]"
+        last-response="{{lastResponse}}">
+      </things-resource>
+
+      <span><paper-icon-button icon="icons:view-list"></paper-icon-button>[[storageName]]</span>
+
+      <things-resource-grid 
+        id="grid"
+        config="[[gridConfig]]"
+        model="[[gridModel]]" 
+        columns="[[gridColumns]]"
+        data="[[lastResponse.items]]"
+        total-count="[[lastResponse.total]]"
+        current-page="{{page}}"
+        per-page="[[limit]]"
+        buttons='[]'
+        enable-detail-column
+        enable-toolbar
+        paginatable>
+      </things-resource-grid>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'things-base-storage-detail',
+
+      behaviors: [
+        Things.GlobalBehavior,
+        Things.MsgBoxBehavior,
+        Things.LoadViewBehavior
+      ],
+
+      properties: {
+        /**
+         * 화면 타이틀 
+         */
+        title: {
+          type: String
+        },
+
+        /**
+         * storage info resource
+         */
+        resource: {
+          type: Object
+        },
+
+        /**
+         * 선택된 Storage Name
+         */
+        storageName: {
+          type: String
+        },
+
+        /**
+         * 첨부 파일 조회 정보 
+         */
+        lastResponse: {
+          type: Object
+        },
+
+        /**
+         * grid search fields
+         */
+        selectFields: {
+          type: String,
+          value: 'id,name,description,storage_info_id,on_type,on_id,tag,path,creator,created_at'
+        },
+
+        /**
+         * grid sort fields
+         */
+        sortFields: {
+          type: Array,
+          value: [ {
+            field : 'created_at',
+            ascending : false
+          } ]
+        },
+
+        /**
+         * grid query fields
+         */
+        queryFields: {
+          type: Array,
+          value: [ {
+            name: 'storage_info_id',
+            operator: 'eq',
+            value: null
+          } ],
+          notify: true
+        },
+
+        /**
+         * grid model
+         */
+        gridModel: {
+          type: Array,
+          value: [ { 
+            fieldName: 'id' 
+          }, { 
+            fieldName: 'name' 
+          }, { 
+            fieldName: 'tag' 
+          }, { 
+            fieldName: 'path'
+          }, { 
+            fieldName: 'created_at' 
+          } ]
+        },
+        
+        /**
+         * grid columns
+         */
+        gridColumns: {
+          type: Array,
+          value: [ { 
+            name: 'id',
+            fieldName: 'id', width: 0 
+          }, { 
+            name: 'name',
+            fieldName: 'name',
+            width: 200,
+            header: { text : 'File Name' }
+          }, { 
+            name: 'tag',
+            fieldName: 'tag',
+            width: 120,
+            header: { text : 'Tag' }
+          }, { 
+            name: 'path',
+            fieldName: 'path',
+            width: 350,
+            header: { text : 'Path' }
+          }, { 
+            name: 'created_at',
+            fieldName: 'created_at', 
+            width: 130,
+            header: { text : 'Created At' }
+          } ]
+        },
+
+        /**
+         * Attachment search URL
+         */
+        gridSearchUrl: {
+          type: String,
+          value: 'attachments',
+        },
+
+        /**
+         * Current Page
+         */
+        page: {
+          type: Number,
+          value: 1,
+          observer: 'reloadGrid'
+        },
+
+        /**
+         * Limit
+         */
+        limit: {
+          type: Number,
+          value: 50
+        }
+      },
+
+      listeners : {
+        'grid.things-grid-detail-tap': '_downloadFile'
+      },      
+
+      /**
+       * 그리드 셀 선택이 변경되었을 경우 파일 다운로드  
+       */
+      _downloadFile: function(e) {
+        var basicUrl = this.get('globals.basicUrl');
+        this.openConfirmMsg({
+          title : 'Do you want to download file?',
+          type : 'info',
+          text : 'You can download file',
+          showCancelButton: true
+        }, function() {
+          window.location = basicUrl + '/download/' + e.detail.id;
+        });
+      },
+
+      /**
+       * reload grid data
+       */
+      reloadGrid: function(e) {
+        if(!this.resource || !this.resource.id) return;
+
+        this.queryFields = [ {
+          name: 'storage_info_id',
+          operator: 'eq',
+          value: this.resource.id
+        } ];
+        this.$['resource-search'].generateRequest();
+      },
+
+      /**
+       * detail view를 오픈 
+       *
+       * @param {Object} resource
+       */
+      showDetailView: function(resource) {
+        this.storageName = resource.name;
+        this.resource = resource;
+        this.openPopupView(this, true);
+        this.reloadGrid();
+      }
+
+    });
+  </script>
+</dom-module>

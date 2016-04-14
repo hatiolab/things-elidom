@@ -122,7 +122,7 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 				 */
 				buttons: {
 					type: Array,
-					value: [ {
+					value: [ /*{
 					  id: 'export',
 					  text: 'Export',
 					  icon: 'icons:swap-vert'
@@ -130,7 +130,7 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 					  id: 'add',
 					  text: 'Add',
 					  icon: 'icons:add'
-					}, {
+					}, */{
 					  id: 'delete',
 					  text: 'Delete',
 					  icon: 'icons:delete'
@@ -147,7 +147,7 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 			},
 
 			listeners : {
-				'grid.things-grid-detail-tap': '_onDetailButtonTap',
+				'grid.things-grid-detail-tap': '_downloadFile',
 				'grid.things-button-upload-tap' : '_onTapUpload',
 				'grid.things-grid-save-success': 'refreshGridData',
 				'grid.things-grid-resource-column-edit' : '_openResourceSelector'
@@ -183,14 +183,15 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 			},
 
 			/**
-			 * 그리드 셀 선택이 변경되었을 경우 핸들러 
+			 * 그리드 셀 선택이 변경되었을 경우 파일 다운로드  
 			 */
-			_onDetailButtonTap: function(e) {
+			_downloadFile: function(e) {
 				var basicUrl = this.get('globals.basicUrl');
 				this.openConfirmMsg({
 					title : 'Do you want to download file?',
 					type : 'info',
-					text : 'You can download file'
+					text : 'You can download file',
+					showCancelButton: true
 				}, function() {
 					window.location = basicUrl + '/download/' + e.detail.id;
 				});
