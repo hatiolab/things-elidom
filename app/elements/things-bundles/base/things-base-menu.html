@@ -1,0 +1,324 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../../../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../../../bower_components/iron-iconset/iron-iconset.html">
+<link rel="import" href="../../../../bower_components/iron-iconset-svg/iron-iconset-svg.html">
+<link rel="import" href="../../../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="../../things-button/things-button.html">
+<link rel="import" href="../../things-combo/things-resource-selector-behavior.html">
+<link rel="import" href="../../things-resource/things-resource.html">
+<link rel="import" href="../../things-grid/things-basic-grid.html">
+<link rel="import" href="../../things-grid/things-resource-grid.html">
+<link rel="import" href="../../things-form/things-resource-form.html">
+<link rel="import" href="../../things-form/things-search-form.html">
+
+<link rel="import" href="../../things-content/things-full-dialog.html">
+<link rel="import" href="../../things-content/things-load-view-behavior.html">
+<link rel="import" href="../../things-content/things-resource-meta-behavior.html">
+<link rel="import" href="../../things-content/things-route-content-behavior.html">
+
+<!--
+하나의 리소스에 대한 기본 액션 (List, Create, Find, Upate, Delete) 및 Import, Export 등의 기능을 제공하는 화면 셋 
+
+Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그리드에서 레코드 하나를 선택할 경우 해당 레코드에 대한 Detail Form이 출력된다.
+
+	Example:
+
+	<things-base-menu 
+	  title="Menu"
+	  resource-type="Menu"
+	  resource-url="menus"
+	  layout="fullbleed layout vertical">
+	</things-base-menu>
+
+@demo ./things-content/demo/index.html
+-->
+
+<dom-module id="things-base-menu">
+	<template>
+		<style>
+			:host {
+				display: block;
+				height: 100%;
+			}
+		</style>
+
+		<div class="[[layout]]">
+			<things-resource 
+				id="resource-meta"
+				method="GET"
+				action="[[resourceMetaUrl]]"
+				last-response="{{metaData}}">
+			</things-resource>
+
+			<things-search-form 
+				id="search-form"
+				class="flex"
+				active="[[active]]"
+				title="[[title]]"
+				form-fields="[[searchFormFields]]" 
+				select-fields="[[selectFields]]"
+				sort-fields="[[sortFields]]"
+				action-url="[[resourceUrl]]" 
+				page=1
+				per-page=1000
+				last-response="{{mainMenus}}">
+			</things-search-form>
+
+			<span><paper-icon-button icon="icons:view-list"></paper-icon-button>Main Menus</span>
+
+			<things-resource-grid 
+				id="grid"
+				config ="[[gridConfig]]"
+				model="[[gridModel]]" 
+				columns="[[mainGridColumns]]"
+				current-page=1
+				per-page=1000
+				data="[[mainMenus.items]]"
+				total-count="[[mainMenus.total]]"
+				grid-save-action="[[gridSaveUrl]]"
+				selected-row-data="{{selectedRow}}"
+				buttons="[[buttons]]"
+				enable-detail-column
+				enable-toolbar>
+			</things-resource-grid>
+
+			<things-resource 
+				id="search-submenus"
+				method="GET"
+				action="menus/:id/sub_menus"
+				last-response="{{subMenus}}">
+			</things-resource>
+
+			<span><paper-icon-button icon="icons:view-list"></paper-icon-button>Sub Menus</span>
+
+			<things-resource-grid 
+				id="sub-grid"
+				config ="[[gridConfig]]"
+				model="[[gridModel]]"
+				columns="[[gridColumns]]"
+				current-page=1
+				per-page=1000
+				data="[[subMenus]]"
+				grid-save-action="[[gridSaveUrl]]"
+				buttons="[[buttons]]"
+				enable-toolbar>
+			</things-resource-grid>
+
+		</div>
+	</template>
+
+	<script>
+		Polymer({
+			is: 'things-base-menu',
+
+			behaviors: [ 
+				Things.ResourceSelectorBehavior,
+				Things.ResourceMetaBehavior,
+				Things.RouteContentBehavior
+			],
+			
+			properties: {
+				/**
+				 * Screen layout
+				 */
+				layout: {
+					type: String
+				},
+
+				/**
+				 * 화면 타이틀 
+				 */
+				title: {
+					type: String,
+					value: 'Menu'
+				},
+
+				/**
+				 * 자산의 Route 정보
+				 */
+				myRoute: {
+					type: String,
+					computed: '_computeRoute(resourceUrl)'
+				},
+
+				/**
+				 * 그리드 저장 (Multiple Save) URL
+				 */
+				gridSaveUrl: {
+					type: String,
+					computed: '_computeGridSaveUrl(resourceUrl)'
+				},
+
+				/**
+				 * 그리드에서 선택된 Row Data
+				 */
+				selectedRow: {
+					type: Object
+				},
+
+				/**
+				 * mainGridColumn
+				 */
+				mainGridColumns: {
+					type: Array,
+					value: [ {
+						"name":"id","fieldName":"id","width":0,"header":{"text":"id"}
+					}, {
+						"name":"rank","fieldName":"rank","width":50,"header":{"text":"rank"},"styles":{"textAlignment":"far"}
+					}, {
+						"name":"name","fieldName":"name","width":150,"header":{"text":"name"},"validations":[{"expression":"value is not empty","level":"error","message":"(name) should not be empty!"},{"expression":"len value < 64","level":"error","message":"Maximum (name) length is (64)"}]
+					}, {
+						"name":"menu_type","fieldName":"menu_type","width":100,"header":{"text":"menu_type"},"validations":[{"expression":"len value < 20","level":"error","message":"Maximum (menu_type) length is (20)"}],"editor":{"type":"list","domainOnly":true},"lookupDisplay":true,"lookupValues":["MENU","SCREEN","SEPARATOR","TEMPLATE"],"lookupLabels":["Menu","Screen","SEPARATOR","Template"]
+					}, {
+						"name":"category","fieldName":"category","width":100,"header":{"text":"category"},"validations":[{"expression":"len value < 64","level":"error","message":"Maximum (category) length is (64)"}],"editor":{"type":"list","domainOnly":true},"lookupDisplay":true,"lookupValues":["STANDARD","TERMINAL"],"lookupLabels":["STANDARD","TERMINAL"]
+					}, {
+						"name":"hidden_flag","fieldName":"hidden_flag","width":100,"header":{"text":"hidden_flag"},"validations":[],"renderer":{"type":"check","editable":true,"threeStates":false,"trueValues":"true","falseValues":"false"}
+					} ]
+				},
+
+				/**
+				 * grid buttons
+				 */
+				buttons: {
+					type: Array,
+					value: [{
+						id: 'add-btn',
+						text: 'Add',
+						icon: 'icons:add'
+					}, {
+						id: 'delete-btn',
+						text: 'Delete',
+						icon: 'icons:delete'
+					}, {
+						id: 'save-btn',
+						text: 'Save',
+						icon: 'icons:save'
+					}]
+				}
+			},
+
+			listeners : {
+				'search-form.things-form-submit-posthandle-params' : '_beforeSearchMenu', 
+				'grid.things-grid-detail-tap': '_showSubMenus',
+				'grid.things-grid-save-success': '_reloadMainMenus',
+				'grid.things-grid-resource-column-edit' : '_openResourceSelector',
+				'sub-grid.things-grid-save-success': '_reloadSubMenus',
+				'sub-grid.things-grid-pre-save' : '_beforeSubMenuSave'		
+			},
+
+			/**
+			 * resourceUrl로 grid save url을 생성
+			 *
+			 * @param {String} resourceUrl
+			 * @return {String} grid save URL
+			 */
+			_computeGridSaveUrl: function(resourceUrl) {
+				return resourceUrl + '/update_multiple.json';
+			},
+
+			/**
+			 * resourceUrl로 route 정보를 다시 생성
+			 *
+			 * @param {String} resourceUrl
+			 * @return {String} route
+			 */
+			_computeRoute: function(resourceUrl) {
+				return resourceUrl;
+			},
+
+			/**
+			 * 메뉴 조회 전 액션
+			 *
+			 * @param {Event} event Form Submit Event
+			 */			
+			_beforeSearchMenu: function(event) {
+				var form = event.detail;
+
+				if(!form.request.params.query) {
+					form.request.params.query = "[{'name': 'parent_id', 'operator': 'is_null'}]";
+				} else {
+					var query = form.request.params.query;
+					var queryArr = JSON.parse(query);
+					queryArr.push({ name: 'parent_id', operator : 'is_null' });
+					form.request.params.query = JSON.stringify(queryArr);
+				}
+			},
+
+			/**
+			 * 서브 메뉴를 표시한다.
+			 *
+			 * @param {Event} event 그리드에서 선택된 event
+			 */
+			_showSubMenus: function(event) {
+				this.$['search-submenus'].selectFields = this.selectFields;
+				this.$['search-submenus'].action = 'menus/' + event.detail.id + '/sub_menus?showall=true';
+				this._reloadSubMenus();
+			},
+
+			/**
+			 * 메인 메뉴 드리드 리프레쉬
+			 */
+			_reloadMainMenus: function(event) {
+				this.$['search-form'].submitMyForm();
+			},
+
+			/**
+			 * 서브 메뉴 그리드 리프레쉬
+			 */
+			_reloadSubMenus: function(event) {
+				this.$['search-submenus'].generateRequest();
+			},
+
+			/**
+			 * 서브 메뉴 저장 전에...
+			 */
+			_beforeSubMenuSave: function(event) {
+				var subGrid = event.target;
+				var changedList = subGrid.writeData;
+
+				if(!changedList || changedList.length == 0)					
+					return event;
+
+				var parentId = this.selectedRow.id;
+				changedList.forEach(function(changedData) {
+					if(changedData.cud_flag_ == 'c' && (!changedData.parent || !changedData.parent_id)) {
+						changedData.parent_id = parentId;
+					}
+				});
+
+				return event;
+			},
+
+			/**
+			 * 메뉴에 등록된 자신의 routing 정보를 리턴한다.
+			 */
+			getMyRoute: function() {
+				return this.myRoute;
+			},
+
+			/**
+			 * 화면 초기화 함수 
+			 * 메타 데이터를 서버로 요청하여 화면을 구성한다.
+			 */
+			initializeContent: function() {
+				this.$['resource-meta'].generateRequest();
+			},
+
+			/**
+			 * Open Resource Selector Dialog
+			 *
+			 * @param {Object} event
+			 */
+			_openResourceSelector: function(event) {
+				var index = event.detail.index;
+				this.openResourceSelectorByGrid(index._grid, index.rowIndex, event.detail.userObj, true);
+			}
+
+		});
+	</script>
+</dom-module>

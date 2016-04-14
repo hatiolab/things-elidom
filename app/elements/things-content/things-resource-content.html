@@ -164,7 +164,6 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			},
 
 			listeners : {
-				//'search-form.things-form-submit-success': '_searchDataHandler',
 				'grid.things-grid-detail-tap': '_showDetailView',
 				'grid.things-grid-save-success': 'refreshGridData',
 				'grid.things-grid-resource-column-edit' : '_openResourceSelector'
@@ -189,18 +188,6 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			_computeRoute: function(resourceUrl) {
 				return resourceUrl;
 			},
-
-			/**
-			 * 검색이 성공한 후 처리, rootProperty와 totalProperty로 실제 데이터와 총 레코드 수를 설정한다.
-			 */
-			/*_searchDataHandler: function(event) {
-				if(this.rootProperty) {
-					this.items = event.detail[this.rootProperty];
-					this.totalCount = event.detail[this.totalProperty];
-				} else {
-					this.items = event.detail;
-				}
-			},*/
 
 			/**
 			 * 디테일 뷰를 표시한다.

@@ -171,12 +171,21 @@
       }
 
       /**
-       * Fired when the successful response is arrived after submit
+       * Fires before handle parameters before form submit
+       *
+       * @event things-form-submit-prehandle-params
+      /**
+       * Fires after handle parameters before form submit
+       *
+       * @event things-form-submit-prehandle-params
+       */
+      /**
+       * Fires when the successful response is arrived after submit
        *
        * @event things-form-submit-success
        */
       /**
-       * Fired when the error response is arrived after submit
+       * Fires when the error response is arrived after submit
        *
        * @event things-form-submit-error
        */
@@ -221,6 +230,8 @@
      */
     _preSubmitHandler: function(event) {
       var form = this.getMyForm();
+      this.fire('things-form-submit-prehandle-params', form);
+
       form.request.params || {};
 
       if(this.paramType == 'RESOURCE') {
@@ -230,6 +241,8 @@
       form.request.params.select = this.selectFields ? this.selectFields : '';
       form.request.params.page = this.page;
       form.request.params.limit = this.perPage;
+
+      this.fire('things-form-submit-posthandle-params', form);
     },
 
     /**

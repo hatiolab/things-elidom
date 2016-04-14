@@ -234,7 +234,7 @@
 				'button-group.things-button-tap' : '_onButtonTap',		
 				'save-resource.things-resource-ajax-success' : '_successSaveHandler',
 				'save-resource.things-resource-ajax-error' : '_errorSaveHandler',
-				'import-btn.excel-process-finish':'_loadExcelData'
+				'import-btn.excel-process-finish': '_loadExcelData'
 
 			},
 
@@ -265,16 +265,16 @@
 						});
 					}
 				};
-				//enableToolbar가 true인 경우 c.u.d활성화
-				if(this.enableToolbar)
-				{
+
+				// enableToolbar가 true인 경우 c.u.d 활성화
+				if(this.enableToolbar) {
 					this.grid.editOptions().setInsertable(true);
 					this.grid.editOptions().setAppendable(true);
 					this.grid.editOptions().setUpdatable(true);
 					this.grid.editOptions().setDeletable(true);
 				}
-
 			},
+
 			/**
 			 * when group button tap register button event
 			 */
@@ -297,19 +297,20 @@
 					this.fire('things-button-' + buttonId + '-tap', e.detail);
 				}
 			},
+
 			/**
 			 * load excel data to grid
 			 */
-			_loadExcelData : function(event){
-
-				new DataLudi.DataLoader(this.dataSet).load("json", '', {
-		        });
-
-		        new DataLudi.DataLoader(this.dataSet).load("json", event.detail, {
-		        	fillMode: 'insert', // 'insert', 'append', 'update', 기본은 'set'
-		            fillPos: 0
-		        });
+			_loadExcelData : function(event) {
+				// 1. clear grid
+				new DataLudi.DataLoader(this.dataSet).load("json", '', {});
+				// 2. load excel data to grid
+				new DataLudi.DataLoader(this.dataSet).load("json", event.detail, {
+					fillMode: 'insert', // 'insert', 'append', 'update', 기본은 'set'
+					fillPos: 0
+				});
 			},
+
 			/**
 			 * Dataludi grid cell click 이벤트 핸들러 
 			 *
@@ -360,7 +361,12 @@
 			 * grid save action
 			 */
 			_gridSaveAction: function() {
-				this.$['save-resource'].generateRequest();
+				// Allow for a presubmit hook
+				var event = this.fire('things-grid-pre-save', {}, {cancelable: true});
+
+				if(!event.defaultPrevented) {
+					this.$['save-resource'].generateRequest();
+				}
 			},
 
 			/**
