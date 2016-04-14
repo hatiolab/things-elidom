@@ -1,0 +1,273 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/iron-icon/iron-icon.html">
+
+<link rel="import" href="../../things-combo/things-resource-selector-behavior.html">
+<link rel="import" href="../../things-content/things-load-view-behavior.html">
+<link rel="import" href="../../things-grid/things-resource-grid.html">
+<link rel="import" href="../../things-resource/things-resource.html">
+
+<dom-module id="things-base-diy-forms-detail">
+
+  <template>
+    <div class="[[layout]]">
+      <things-resource 
+        id="resource-search"
+        method="GET"
+        action="[[gridSearchUrl]]"
+        last-response="{{lastResponse}}"
+        auto>
+      </things-resource>
+
+      <span><paper-icon-button icon="icons:view-list"></paper-icon-button>[[entityName]]</span>
+      <things-resource-grid 
+        id="grid"
+        config="[[gridConfig]]"
+        model="[[gridModel]]" 
+        columns="[[gridColumns]]"
+        data="[[items]]"
+        grid-save-action="[[gridSaveUrl]]"
+        buttons="[[buttons]]"
+        enable-toolbar>
+      </things-resource-grid>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'things-base-diy-forms-detail',
+
+      behaviors: [ 
+        Things.LoadViewBehavior
+      ],
+
+      properties: {
+
+        /**
+         * entity id
+         */
+        entityId: {
+          type: String
+        },
+
+        /**
+         * entity resource
+         */
+        resource: {
+          type: Object
+        },
+
+        /**
+         * 화면 타이틀 
+         */
+        title: {
+          type: String
+        },
+
+        /**
+         * entity column return data
+         */
+        items: {
+          type: Array
+        },
+
+        /**
+         * entity columns 조회 정보 
+         */
+        lastResponse: {
+          type: Object,
+          observer: '_entityColumnChange'
+        },        
+
+        /**
+         * Detail 클릭시 나타나는 detail title
+         * 
+         */
+        entityName: {
+          type: String
+        },
+
+        /**
+         * grid model
+         */
+        gridModel: {
+          type: Array,
+          value: [ { fieldName: 'id' }, { fieldName: 'entity_id' }, { fieldName: 'disp_rank' }, 
+                   { fieldName: 'name' }, { fieldName: 'description'}, { fieldName: 'term' },
+                   { fieldName: 'ref_type' }, { fieldName: 'ref_name' }, { fieldName: 'col_type' },
+                   { fieldName: 'col_size' }, { fieldName: 'nullable' }, { fieldName: 'def_val'},
+                   { fieldName: 'uniq_rank' }, { fieldName: 'list_rank' }, { fieldName: 'search_rank' },
+                   { fieldName: 'sort_rank' }, { fieldName: 'reverse_sort' }, { fieldName: 'editor' },
+                   { fieldName: 'width' }, { fieldName: 'align' }, { fieldName: 'format' }, { fieldName: 'operator'} ]
+        },
+        
+        /**
+         * grid columns
+         */
+        gridColumns: {
+          type: Array,
+          value: [ { fieldName: 'id', width: 0 }, { fieldName: 'entity_id', width: 0 }, { fieldName: 'disp_rank', },
+                   { fieldName: 'name' }, { fieldName: 'description'}, { fieldName: 'term', width: 140 },
+                   { name: 'ref_type', // 코드를 받아 선택하는 필드 설정
+                     fieldName: 'ref_type',
+                     width: 100,
+                     header: { text: 'ref_type'},
+                     editor: { type: 'list', domainOnly: true },
+                     lookupDisplay: true,
+                     lookupValues: [ 'Entity', 'CommonCode' ], // TODO : 데이터 받아서 출력하도록 수정해야 합니다. 
+                     lookupLabels: [ 'Entity', 'CommonCode' ] },
+                   { fieldName: 'ref_name', width: 140 },
+                   { name: 'col_type', // 코드를 받아 선택하는 필드 설정
+                     fieldName: 'col_type',
+                     width: 100,
+                     header: { text: 'col_type'},
+                     editor: { type: 'list', domainOnly: true },
+                     lookupDisplay: true,
+                     lookupValues: [ 'binary', 'boolean', 'date' ,'datetime',
+                                     'decimal', 'double', 'float', 'integer',
+                                     'long', 'string', 'text', 'time', 'timestamp' ], // TODO : 데이터 받아서 출력하도록 수정해야 합니다. 
+                     lookupLabels: [ 'binary', 'boolean', 'date' ,'datetime',
+                                     'decimal', 'double', 'float', 'integer',
+                                     'long', 'string', 'text', 'time', 'timestamp' ] }, // TODO : 데이터 받아서 출력하도록 수정해야 합니다. 
+                   { fieldName: 'col_size', type: 'number' },
+                   { name: 'nullable',
+                     fieldName: 'nullable',
+                     width: 100,
+                     header: {text:'nullable'},
+                     validations: [],
+                     renderer: {'type':'check', 'editable':true, 'threeStates': false, 'trueValues': 'true', 'falseValues': 'false'}
+                   },
+                   { fieldName: 'def_val'},
+                   { fieldName: 'uniq_rank', type: 'number' }, { fieldName: 'list_rank', type: 'number' },
+                   { fieldName: 'search_rank', type: 'number' }, { fieldName: 'sort_rank', type: 'number' },
+                   { name: 'reverse_sort',
+                     fieldName: 'reverse_sort',
+                     width: 100,
+                     header: {text: 'reverse_sort'},
+                     validations: [],
+                     renderer: {'type':'check', 'editable':true, 'threeStates': false, 'trueValues': 'true', 'falseValues': 'false'}
+                   },
+                   { fieldName: 'editor', width: 140 }, { fieldName: 'width', type: 'number' },
+                   { name: 'align', // 코드를 받아 선택하는 필드 설정
+                     fieldName: 'align',
+                     width: 100,
+                     header: { text: 'align'},
+                     editor: { type: 'list', domainOnly: true },
+                     lookupDisplay: true,
+                     lookupValues: [ 'Center', 'Far', 'Right' ], // TODO : 데이터 받아서 출력하도록 수정해야 합니다. 
+                     lookupLabels: [ 'Center', 'Far', 'Right' ] }, 
+                   { fieldName: 'format' },
+                   { name: 'operator', // 코드를 받아 선택하는 필드 설정
+                     fieldName: 'operator',
+                     header: { text: 'operator'},
+                     editor: { type: 'list', domainOnly: true },
+                     lookupDisplay: true,
+                     lookupValues: [ 'contains', 'dnew', 'dnsw', 'eq', 'ew', 'gt', 'gte',
+                                     'in', 'is_blank', 'is_false', 'is_not_false', 'is_not_null',
+                                     'is_not_true', 'is_null', 'is_present', 'is_true', 'like',
+                                     'lt', 'lte', 'nlike', 'noteq', 'notin', 'sw' ], // TODO : 데이터 받아서 출력하도록 수정해야 합니다. 
+                     lookupLabels: [ 'contains', 'dnew', 'dnsw', 'eq', 'ew', 'gt', 'gte',
+                                     'in', 'is_blank', 'is_false', 'is_not_false', 'is_not_null',
+                                     'is_not_true', 'is_null', 'is_present', 'is_true', 'like',
+                                     'lt', 'lte', 'nlike', 'noteq', 'notin', 'sw' ] } 
+                  ] 
+        },
+
+        /**
+         * Entity Column searching URL
+         */
+        gridSearchUrl: {
+          type: String,
+          computed: '_computeEntitySearchUrl(entityId)',
+        },
+
+        /**
+         * Entity Column save URL
+         */
+        gridSaveUrl: {
+          type: String,
+          computed: '_computeEntityColumnSaveUrl(entityId)'
+        },
+
+        /**
+         * 버튼 정보 
+         */
+        buttons: {
+          type: Array,
+          value: [ {
+            id: 'new-btn',
+            text: 'Add',
+            icon: 'icons:add'
+          }, {
+            id: 'save-btn',
+            text: 'Save',
+            icon: 'icons:save'
+          }, {
+            id: 'delete-btn',
+            text: 'Delete',
+            icon: 'icons:delete'
+          } ]
+        }
+      },
+
+      listeners: {
+        'grid.things-button-new-btn-tap' : 'addRow',
+        'grid.things-grid-save-success' : 'reloadGrid'
+      },
+
+      /**
+       * 코드 정보 변경시 
+       */
+      _entityColumnChange: function(lastResponse) {
+        this.items = lastResponse.items;
+      },
+
+      /**
+       * EntityColumn Search URL
+       *
+       * @param {String} entityId
+       * @return {String} entity search url
+       */
+      _computeEntitySearchUrl: function(entityId) {
+        return ['entities', entityId, 'entity_columns'].join('/');
+      },
+
+      /**
+       * Entity Id로 Entity Column Save URL 생성
+       *
+       * @param {String} entityId
+       * @return {String} entity column save url
+       */
+      _computeEntityColumnSaveUrl: function(entityId) {
+        return 'entities/' + entityId + '/update_multiple_entity_columns.json';
+      },
+
+      /**
+       * add grid row
+       */
+      addRow: function(e) {
+        this.$.grid.dataSet.insertRow(0, { id: null, name : '', description : '' });
+      },
+
+      /**
+       * reload grid data
+       */
+      reloadGrid: function(e) {
+        this.$['resource-search'].generateRequest();
+      },
+
+      /**
+       * detail view를 오픈과 detail title 초기화
+       *
+       * @param {Object} resource
+       */
+      showDetailView: function(resource) {
+        this.entityName = resource.name;
+        this.resource = resource;
+        this.openPopupView(this, true);
+        this.entityId = this.resource.id;
+      }
+
+    });
+  </script>
+</dom-module>
