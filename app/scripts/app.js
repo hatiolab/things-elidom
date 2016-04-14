@@ -19,9 +19,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 	app.getLocalizationInfo = function () {
 		var xhr = new XMLHttpRequest();
-		xhr.open('GET', 'http://192.168.35.225:9004/rest/terminologies', true);
+		xhr.open('POST', 'http://192.168.35.225:9004/rest/terminologies/resource', true);
+		xhr.setRequestHeader("Content-type", "application/json");
+
+
+		// xhr.method="POST"
 		xhr.withCredentials = true;
-		xhr.send(null);
+		var domain ={
+			"domain" : 1
+		};
+
+		console.log(JSON.stringify(domain));
+
+		xhr.send(JSON.stringify(domain));
 		xhr.onreadystatechange = function (Evt) {
 			if (xhr.readyState == 4) {
 				if(xhr.status == 200){
@@ -54,6 +64,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	// have resolved and content has been stamped to the page
 	app.addEventListener('dom-change', () => {
 		// console.log('Our app is ready to rock!');
+		// console.log(setting.globa)
 		app.getLocalizationInfo();
 		// app.localizationReady =true;
 	});
