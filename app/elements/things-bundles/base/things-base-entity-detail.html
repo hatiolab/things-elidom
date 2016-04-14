@@ -24,7 +24,7 @@
         config="[[gridConfig]]"
         model="[[gridModel]]" 
         columns="[[gridColumns]]"
-        data="[[items]]"
+        data="[[lastResponse.items]]"
         grid-save-action="[[gridSaveUrl]]"
         buttons="[[buttons]]"
         enable-toolbar>
@@ -51,6 +51,13 @@
         },
 
         /**
+         * Detail 클릭시 나타나는 detail title
+         */
+        entityName: {
+          type: String
+        },
+
+        /**
          * entity resource
          */
         resource: {
@@ -65,27 +72,11 @@
         },
 
         /**
-         * entity column return data
-         */
-        items: {
-          type: Array
-        },
-
-        /**
          * entity columns 조회 정보 
          */
         lastResponse: {
-          type: Object,
-          observer: '_entityColumnChange'
+          type: Object
         },        
-
-        /**
-         * Detail 클릭시 나타나는 detail title
-         * 
-         */
-        entityName: {
-          type: String
-        },
 
         /**
          * grid model
@@ -106,71 +97,112 @@
          */
         gridColumns: {
           type: Array,
-          value: [ { fieldName: 'id', width: 0 }, { fieldName: 'entity_id', width: 0 }, { fieldName: 'disp_rank', },
-                   { fieldName: 'name' }, { fieldName: 'description'}, { fieldName: 'term', width: 140 },
-                   { name: 'ref_type', // 코드를 받아 선택하는 필드 설정
-                     fieldName: 'ref_type',
-                     width: 100,
-                     header: { text: 'ref_type'},
-                     editor: { type: 'list', domainOnly: true },
-                     lookupDisplay: true,
-                     lookupValues: [ 'Entity', 'CommonCode' ], // TODO : 데이터 받아서 출력하도록 수정해야 합니다. 
-                     lookupLabels: [ 'Entity', 'CommonCode' ] },
-                   { fieldName: 'ref_name', width: 140 },
-                   { name: 'col_type', // 코드를 받아 선택하는 필드 설정
-                     fieldName: 'col_type',
-                     width: 100,
-                     header: { text: 'col_type'},
-                     editor: { type: 'list', domainOnly: true },
-                     lookupDisplay: true,
-                     lookupValues: [ 'binary', 'boolean', 'date' ,'datetime',
-                                     'decimal', 'double', 'float', 'integer',
-                                     'long', 'string', 'text', 'time', 'timestamp' ], // TODO : 데이터 받아서 출력하도록 수정해야 합니다. 
-                     lookupLabels: [ 'binary', 'boolean', 'date' ,'datetime',
-                                     'decimal', 'double', 'float', 'integer',
-                                     'long', 'string', 'text', 'time', 'timestamp' ] }, // TODO : 데이터 받아서 출력하도록 수정해야 합니다. 
-                   { fieldName: 'col_size', type: 'number' },
-                   { name: 'nullable',
-                     fieldName: 'nullable',
-                     width: 100,
-                     header: {text:'nullable'},
-                     validations: [],
-                     renderer: {'type':'check', 'editable':true, 'threeStates': false, 'trueValues': 'true', 'falseValues': 'false'}
-                   },
-                   { fieldName: 'def_val'},
-                   { fieldName: 'uniq_rank', type: 'number' }, { fieldName: 'list_rank', type: 'number' },
-                   { fieldName: 'search_rank', type: 'number' }, { fieldName: 'sort_rank', type: 'number' },
-                   { name: 'reverse_sort',
-                     fieldName: 'reverse_sort',
-                     width: 100,
-                     header: {text: 'reverse_sort'},
-                     validations: [],
-                     renderer: {'type':'check', 'editable':true, 'threeStates': false, 'trueValues': 'true', 'falseValues': 'false'}
-                   },
-                   { fieldName: 'editor', width: 140 }, { fieldName: 'width', type: 'number' },
-                   { name: 'align', // 코드를 받아 선택하는 필드 설정
-                     fieldName: 'align',
-                     width: 100,
-                     header: { text: 'align'},
-                     editor: { type: 'list', domainOnly: true },
-                     lookupDisplay: true,
-                     lookupValues: [ 'Center', 'Far', 'Right' ], // TODO : 데이터 받아서 출력하도록 수정해야 합니다. 
-                     lookupLabels: [ 'Center', 'Far', 'Right' ] }, 
-                   { fieldName: 'format' },
-                   { name: 'operator', // 코드를 받아 선택하는 필드 설정
-                     fieldName: 'operator',
-                     header: { text: 'operator'},
-                     editor: { type: 'list', domainOnly: true },
-                     lookupDisplay: true,
-                     lookupValues: [ 'contains', 'dnew', 'dnsw', 'eq', 'ew', 'gt', 'gte',
-                                     'in', 'is_blank', 'is_false', 'is_not_false', 'is_not_null',
-                                     'is_not_true', 'is_null', 'is_present', 'is_true', 'like',
-                                     'lt', 'lte', 'nlike', 'noteq', 'notin', 'sw' ], // TODO : 데이터 받아서 출력하도록 수정해야 합니다. 
-                     lookupLabels: [ 'contains', 'dnew', 'dnsw', 'eq', 'ew', 'gt', 'gte',
-                                     'in', 'is_blank', 'is_false', 'is_not_false', 'is_not_null',
-                                     'is_not_true', 'is_null', 'is_present', 'is_true', 'like',
-                                     'lt', 'lte', 'nlike', 'noteq', 'notin', 'sw' ] } 
-                  ] 
+          value: [ { 
+            fieldName: 'id', name: 'id', width: 0 
+          }, { 
+            fieldName: 'entity_id', name: 'entity_id', width: 0 
+          }, { 
+            fieldName: 'disp_rank', name: 'disp_rank', width: 50,
+            header: { text : 'Rank' }, 
+            styles: { textAlignment: 'far' }
+          }, { 
+            fieldName: 'name', name: 'name', width: 100,
+            header : { text : 'Name' }
+          }, { 
+            fieldName: 'description', name: 'description',
+            header : { text : 'Description' }
+          }, { 
+            fieldName: 'term', name: 'term', width: 140,
+            header : { text : 'Terminology' }
+          }, { 
+            fieldName: 'ref_type',
+            name: 'ref_type',
+            width: 110,
+            header: { text: 'Reference Type'},
+            editor: { type: 'list', domainOnly: true },
+            lookupDisplay: true,
+            lookupValues: [ 'Entity', 'CommonCode' ],
+            lookupLabels: [ 'Entity', 'CommonCode' ] 
+          }, { 
+            fieldName: 'ref_name', name: 'ref_name', width: 120,
+            header: { text: 'Reference Name'}
+          }, { 
+            name: 'col_type', fieldName: 'col_type', width: 100,
+            header: { text: 'Column Type'},
+            editor: { type: 'list', domainOnly: true },
+            lookupDisplay: true,
+            lookupValues: [ 'binary', 'boolean', 'date' ,'datetime',
+                            'decimal', 'double', 'float', 'integer',
+                            'long', 'string', 'text', 'time', 'timestamp' ],
+            lookupLabels: [ 'binary', 'boolean', 'date' ,'datetime',
+                           'decimal', 'double', 'float', 'integer',
+                           'long', 'string', 'text', 'time', 'timestamp' ] 
+          }, { 
+            fieldName: 'col_size', name: 'col_size', type: 'number', width: 90,
+            header: { text : 'Column Size' }, 
+            styles: { textAlignment: 'far' }
+          }, { 
+            name: 'nullable', fieldName: 'nullable', width: 70,
+            header: { text: 'Nullable' },
+            renderer: {
+              type:'check', editable: true, threeStates: false, 
+              trueValues: 'true', falseValues: 'false'
+            }
+          }, { 
+            fieldName: 'def_val', name: 'def_val', width: 100,
+            header: { text : 'Default Value' }
+          }, { 
+            fieldName: 'uniq_rank', name: 'uniq_rank', type: 'number',
+            header: { text : 'Unique Rank' },
+            styles: { textAlignment: 'far' }
+          }, { 
+            fieldName: 'list_rank', name: 'list_rank', type: 'number', width: 75,
+            header: { text : 'List Rank' },
+            styles: { textAlignment: 'far' }
+          }, { 
+            fieldName: 'search_rank', name: 'search_rank', type: 'number', width: 95,
+            header: { text : 'Search Rank' },
+            styles: { textAlignment: 'far' }
+          }, { 
+            fieldName: 'sort_rank', name: 'sort_rank', type: 'number', width: 80,
+            header: { text : 'Sort Rank' },
+            styles: { textAlignment: 'far' }
+          }, { 
+            name: 'reverse_sort', fieldName: 'reverse_sort', width: 95,
+            header: { text: 'Reverse Sort' },
+            renderer: {
+              type: 'check', editable:true, threeStates: false, 
+              trueValues: 'true', falseValues: 'false'
+            }
+          }, { 
+            fieldName: 'editor', name: 'editor', width: 140 
+          }, { 
+            fieldName: 'width', name: 'width', type: 'number', width: 60,
+            styles: { textAlignment: 'far' }
+          }, { 
+            name: 'align', fieldName: 'align', width: 60,
+            header: { text: 'align'},
+            editor: { type: 'list', domainOnly: true },
+            lookupDisplay: true,
+            lookupValues: [ 'Center', 'Far' ],
+            lookupLabels: [ 'Center', 'Far' ] 
+          },  { 
+            fieldName: 'format', name: 'format', width: 120,
+            header: { text: 'Format' },
+          }, { 
+            fieldName: 'operator', name: 'operator', width: 75,
+            header: { text: 'Operator'},
+            editor: { type: 'list', domainOnly: true },
+            lookupDisplay: true,
+            lookupValues: [ 'contains', 'dnew', 'dnsw', 'eq', 'ew', 'gt', 'gte',
+                          'in', 'is_blank', 'is_false', 'is_not_false', 'is_not_null',
+                          'is_not_true', 'is_null', 'is_present', 'is_true', 'like',
+                          'lt', 'lte', 'nlike', 'noteq', 'notin', 'sw' ],
+            lookupLabels: [ 'contains', 'dnew', 'dnsw', 'eq', 'ew', 'gt', 'gte',
+                          'in', 'is_blank', 'is_false', 'is_not_false', 'is_not_null',
+                          'is_not_true', 'is_null', 'is_present', 'is_true', 'like',
+                          'lt', 'lte', 'nlike', 'noteq', 'notin', 'sw' ] 
+            } ] 
         },
 
         /**
@@ -195,7 +227,7 @@
         buttons: {
           type: Array,
           value: [ {
-            id: 'new-btn',
+            id: 'add-btn',
             text: 'Add',
             icon: 'icons:add'
           }, {
@@ -211,15 +243,8 @@
       },
 
       listeners: {
-        'grid.things-button-new-btn-tap' : 'addRow',
+        'grid.things-grid-pre-save' : '_beforeColumnsSave',
         'grid.things-grid-save-success' : 'reloadGrid'
-      },
-
-      /**
-       * 코드 정보 변경시 
-       */
-      _entityColumnChange: function(lastResponse) {
-        this.items = lastResponse.items;
       },
 
       /**
@@ -243,11 +268,24 @@
       },
 
       /**
-       * add grid row
+       * Entity Column 저장 전에...
        */
-      addRow: function(e) {
-        this.$.grid.dataSet.insertRow(0, { id: null, name : '', description : '' });
-      },
+      _beforeColumnsSave: function(event) {
+        var grid = event.target;
+        var changedList = grid.writeData;
+
+        if(!changedList || changedList.length == 0)         
+          return event;
+
+        var entityId = this.resource.id;
+        changedList.forEach(function(changedData) {
+          if(changedData.cud_flag_ == 'c' && (!changedData.entity || !changedData.entity_id)) {
+            changedData.entity_id = entityId;
+          }
+        });
+
+        return event;
+      },      
 
       /**
        * reload grid data
