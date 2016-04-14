@@ -8,6 +8,7 @@
 <link rel="import" href="./things-signup.html">
 <link rel="import" href="./things-password-init.html">
 <link rel="import" href="../things-setting/things-global-behavior.html">
+<link rel="import" href="../things-i18n/things-i18n-behavior.html">
 
 <!--
 A things login form asking for login and password.
@@ -111,11 +112,11 @@ Example:
         </paper-input>
 
         <paper-button id="submitButton" raised disabled on-click="submitHandler">
-          <paper-spinner id="spinner" hidden></paper-spinner>[[submitLabel]]
+          <paper-spinner id="spinner" hidden></paper-spinner>{{getString("button","save")}}
         </paper-button>
         <!-- <paper-button id="signup" raised on-click="_onSignupTap"></paper-button> -->
         <div>
-          <a href="#" on-click="_onSignupTap">Register</a>
+          <a href="#" on-click="_onSignupTap">{{getString("button","sign_up")}}</a>
           <a href="#" on-click="_onRequestpInitPass">Reset Password</a>
         </div>
 
@@ -260,8 +261,7 @@ Example:
       submitLabel: {
         type: String,
         value: 'Submit'
-      },
-
+      }
       /**
        * Cancel for the login form
        * @type {Object}
@@ -275,7 +275,8 @@ Example:
 
     // Element Lifecycle
 
-    ready: function() {},
+    ready: function() {
+    },
 
     attached: function() {},
 
@@ -283,7 +284,8 @@ Example:
 
     // Element Behavior
     behaviors: [
-      Things.GlobalBehavior
+      Things.GlobalBehavior,
+      Things.I18nBehavior
     ],
 
     // Event listener

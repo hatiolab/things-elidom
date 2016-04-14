@@ -13,34 +13,45 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	// Grab a reference to our auto-binding template
 	// and give it some initial binding values
 	// Learn more about auto-binding templates at http://goo.gl/Dx1u2g
+	
+
 	let app = document.querySelector('#app');
 	
+	/**
+	 * localization start 
+	 */
+	
+	// for dom if binding, if localization data is not ready then main dom should not render
+	// just render setting and toast boxes 
 	app.localizationReady =false;
 
+	//for localization xhr request, use terminologies/resource 
 	app.getLocalizationInfo = function () {
+		var setting = document.querySelector('#setting');
 		var xhr = new XMLHttpRequest();
-		xhr.open('POST', 'http://192.168.35.225:9004/rest/terminologies/resource', true);
+		xhr.open('POST', setting.globals.basicUrl+'/terminologies/resource', true);
 		xhr.setRequestHeader("Content-type", "application/json");
-
-
 		// xhr.method="POST"
 		xhr.withCredentials = true;
 		var domain ={
 			"domain" : 1
 		};
 
-		console.log(JSON.stringify(domain));
-
 		xhr.send(JSON.stringify(domain));
+
 		xhr.onreadystatechange = function (Evt) {
 			if (xhr.readyState == 4) {
 				if(xhr.status == 200){
-					
-					var langs = JSON.parse(xhr.responseText);
-					console.log(langs);
+					// app.i18n={};
 
-					var userLang = navigator.languages// || navigator.userLanguage; 
-					console.log(userLang);
+					app.langs = JSON.parse(xhr.responseText);
+					
+					app.locale = navigator.language||navigator.userLanguage;
+
+					app.locale = app.locale=="ko"?"ko-KR": app.locale;
+					app.terminologies = app.langs[app.locale];
+
+
 					app.localizationReady =true;
 				}else{
 					// console.log('Error localization xhr page');
@@ -50,6 +61,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			}
 		};
 	};
+
+	/**
+	 * parameter with category and keyname
+	 * returns translated value, if there's not translated data return "categroy.keyname"
+	 */
+	app.getString = function (category, keyname){
+		var result = '"'+ category + '.'+ keyname+'"';
+		var lang = app.terminologies;
+
+		if(lang){
+			if(lang[category]&&lang[category][keyname]){
+				result = lang[category][keyname]
+			}
+		}else{
+			app.$.toast.text = 'Translate object is not assigned!!';
+			app.$.toast.open();
+		}
+		
+		return result;
+	};
+
+	/** localization finish*/
 
 
 	app.displayInstalledToast = () => {
