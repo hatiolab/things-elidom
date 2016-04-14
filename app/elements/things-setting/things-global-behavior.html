@@ -68,7 +68,9 @@ Things.GlobalBehavior = {
    */
   handleUnauthorized: function() {
     this.set('globals.user', null);
-    app.$.thingsHeader.toggleSidebar();
+    if(app.$.thingsHeader){
+      app.$.thingsHeader.toggleSidebar(); 
+    }
     page('/login');
     this.showToastMsg("Unauthorized, Signin First Please");
   },

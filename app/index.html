@@ -15,61 +15,62 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <span id="browser-sync-binding"></span>
 
-  <template is="dom-bind" id="app">
+	<template is="dom-bind" id="app">
 		<!-- Client Setting -->
-		<things-setting id="setting"></things-setting>
-		
-		<paper-drawer-panel id="paperDrawerPanel" responsive-width="599px">
+		<template is="dom-if" if={{localizationReady}}>
+			<things-setting id="setting"></things-setting>
+			<paper-drawer-panel id="paperDrawerPanel" responsive-width="599px">
 
-			<!-- Layout Sidebar -->
-			<things-sidebar drawer 
-				class="layout vertical" 
-				title="Elidom Framework" 
-				selected-menu=1 
-				screens="{{screens}}" 
-				action="menus.json?mode=auth">
-			</things-sidebar>
+				<!-- Layout Sidebar -->
+				<things-sidebar drawer 
+					class="layout vertical" 
+					title="Elidom Framework" 
+					selected-menu=1 
+					screens="{{screens}}" 
+					action="menus.json?mode=auth">
+				</things-sidebar>
 
-			<!-- Main Area -->
-			<paper-scroll-header-panel id="headerPanelMain" class="Main" main condenses keep-condensed-header>
-				<!-- Layout Header -->
-				<things-header id ="thingsHeader" drawer-id='paperDrawerPanel'></things-header>
+				<!-- Main Area -->
+				<paper-scroll-header-panel id="headerPanelMain" class="Main" main condenses keep-condensed-header>
+					<!-- Layout Header -->
+					<things-header id ="thingsHeader" drawer-id='paperDrawerPanel'></things-header>
+				
+<!-- 					<template is="dom-if" if={{localizationReady}}> -->
+					<!-- Main Content -->
+					<iron-pages attr-for-selected="data-route" selected="{{route}}" class="content">
 
-				<!-- Main Content -->
-				<iron-pages attr-for-selected="data-route" selected="{{route}}" class="content">
+						<!-- Dynamic Menu Page -->
+						<template is="dom-repeat" items="{{screens}}" as=screen filter="isDynamicScreen">
+							<!-- Dynamic Resource Screen -->
+						  <things-resource-content 
+								data-route="[[screen.routing]]"
+								title="[[screen.name]]"
+								current-route="[[route]]"
+								resource-type="[[screen.name]]"
+								resource-url="[[screen.routing]]"
+								detail-view="[[screen.detail_form_id]]"
+								layout="fullbleed layout vertical"
+								enable-detail-column>
+							</things-resource-content>
+						</template>
 
-					<!-- Dynamic Menu Page -->
-					<template is="dom-repeat" items="{{screens}}" as=screen filter="isDynamicScreen">
-						<!-- Dynamic Resource Screen -->
-					  <things-resource-content 
-							data-route="[[screen.routing]]"
-							title="[[screen.name]]"
-							current-route="[[route]]"
-							resource-type="[[screen.name]]"
-							resource-url="[[screen.routing]]"
-							detail-view="[[screen.detail_form_id]]"
-							layout="fullbleed layout vertical"
-							enable-detail-column>
-						</things-resource-content>
-					</template>
+						<template is="dom-repeat" items="{{screens}}" as=screen filter="isDiyScreen">
+							<!-- Dynamic Diy Screen -->
+						  <things-diy-content 
+								data-route="{{screen.routing}}"
+								current-route="[[route]]"
+								menu-id="{{screen.id}}"
+								resource-url="[[screen.routing]]"
+								layout="fullbleed layout vertical">
+							</things-diy-content>					  
+						</template>
 
-					<template is="dom-repeat" items="{{screens}}" as=screen filter="isDiyScreen">
-						<!-- Dynamic Diy Screen -->
-					  <things-diy-content 
-							data-route="{{screen.routing}}"
-							current-route="[[route]]"
-							menu-id="{{screen.id}}"
-							resource-url="[[screen.routing]]"
-							layout="fullbleed layout vertical">
-						</things-diy-content>					  
-					</template>
-
-					<!-- Static Menu Page -->
-					{% include "things-pages.html" %}
-				</iron-pages>
-			</paper-scroll-header-panel>
-		</paper-drawer-panel>
-
+						<!-- Static Menu Page -->
+						{% include "things-pages.html" %}
+					</iron-pages>			
+				</paper-scroll-header-panel>
+			</paper-drawer-panel>
+		</template>		
 		<!-- full dialog -->
 		<things-full-dialog id='common-full-dialog'></things-full-dialog>
 
@@ -110,8 +111,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 		app.isDiyScreen = function(screen) {
 			return screen.routing_type == 'DIY';
-		};		
-  </script>
+		};
+		
+	    // window.localizationReady =false;
+
+	    // window.getLocalizationInfo = function () {
+	    //   var xhr = new XMLHttpRequest();
+	    //   xhr.open('GET', 'http://192.168.35.225:9004/rest/terminologies', true);
+	    //   xhr.withCredentials = true;
+	    //   xhr.send(null);
+	    //   xhr.onreadystatechange = function (Evt) {
+	    //     if (xhr.readyState == 4) {
+	    //       if(xhr.status == 200){
+	    //         window.localizationReady =true;
+	    //       }
+	    //       else{
+	    //         console.log('Error localization xhr page');
+	    //       }
+	    //     }
+	    //   };
+	    // }
+  	</script>
   <!-- endbuild-->
 
   <!-- Google Analytics code -->
