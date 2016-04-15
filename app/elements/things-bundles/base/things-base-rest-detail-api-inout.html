@@ -1,0 +1,102 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/iron-icon/iron-icon.html">
+
+<link rel="import" href="../../things-combo/things-resource-selector-behavior.html">
+<link rel="import" href="../../things-content/things-load-view-behavior.html">
+<link rel="import" href="../../things-grid/things-resource-grid.html">
+<link rel="import" href="../../things-resource/things-resource.html">
+
+<dom-module id="things-base-rest-detail-api-inout">
+
+  <template>
+    <div class="[[layout]]">
+      <things-resource-grid 
+        id="grid"
+        config="[[gridConfig]]"
+        model="[[gridModel]]" 
+        columns="[[gridColumns]]"
+        data="[[items]]">
+      </things-resource-grid>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'things-base-rest-detail-api-inout',
+
+      properties: {
+
+        /**
+         * entity resource
+         */
+        resource: {
+          type: Object
+        },
+
+        /**
+         * entity columns 조회 정보 
+         */
+        items: {
+          type: Array
+        },        
+
+        /**
+         * in / out
+         */
+        mode: {
+          type: String
+        },
+
+        /**
+         * grid model
+         */
+        gridModel: {
+          type: Array,
+          value: [ { 
+            fieldName: 'name' 
+          }, { 
+            fieldName: 'type' 
+          } ]
+        },
+        
+        /**
+         * grid columns
+         */
+        gridColumns: {
+          type: Array,
+          value: [ { 
+            fieldName: 'name', name: 'name', width: 250,
+            header: { text : 'Name' }
+          }, { 
+            fieldName: 'type', name: 'type', width: 250,
+            header: { text : 'Type' }
+          } ] 
+        }
+      },
+
+      /***************************************************************************************
+       *                            Start detail item view interface
+       ***************************************************************************************/
+
+      /**
+       * detail item view를 구성하기 위한 필수 함수 
+       * item view를 구성한다.
+       *
+       * @return {Object} resource 리소스 데이터 (Object) 혹은 리소스 아이디 (Number)
+       */
+      loadDetailData: function(resource) {
+        if(resource) {
+          this.resource = resource;
+          this.items = [];
+          this.items = (this.mode == 'in') ? this.resource.input_type_list : this.resource.output_type_list;
+        }
+      }
+
+      /***************************************************************************************
+       *                            End detail item view interface
+       ***************************************************************************************/ 
+
+    });
+  </script>
+</dom-module>

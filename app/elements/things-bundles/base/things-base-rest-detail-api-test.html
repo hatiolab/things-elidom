@@ -1,0 +1,233 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../../../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../bower_components/paper-material/paper-material.html">
+
+<!--
+커스텀 서비스의 테스트 화면 
+커스텀 서비스에서는 생성한 서비스 로직의 테스트를 위해 테스트 화면을 제공한다.
+GET / DELETE는  Parameter Input을 나열하는 방식으로 PUT / POST는 JSON 편집하여 호출하는 방식으로 테스트 화면을 지원한다.
+
+Example:
+
+		<things-base-diy-service-detail-test id="diy-test">
+		</things-base-diy-service-detail-test>
+
+@demo demo/index.html
+-->
+
+<dom-module id="things-base-rest-detail-api-test">
+	<template>
+		<form is="iron-form" 
+			id="form" 
+			action="[[action]]"
+			headers="[[headers]]"
+			with-credentials
+			content-type="[[apiContentType]]"
+			method="[[resource.http_method]]"
+			last-response="{{lastResponse}}">
+			
+			<paper-input required id="invoke-url" name ="invokeUrl" label="Invoke URL" value="{{invokeUrl}}"></paper-input>
+
+			<div id="param-fields" class="layout vertical flex fields"></div>
+
+			<paper-textarea id="result" label="Result" rows=4></paper-textarea>
+		</form>
+
+		<paper-button raised on-click ="submitMyForm">invoke</paper-button>
+		<paper-button raised on-click ="_resetMyForm">reset</paper-button>
+	</template>
+
+	<script>
+		Polymer({
+
+			is: 'things-base-rest-detail-api-test',
+
+			properties: {
+				/**
+				 * Resource
+				 */
+				resource: {
+					type: Object,
+					observer: '_resourceChanged'
+				},
+
+				/**
+				 * Input Parameters
+				 */
+				inputParams: {
+					type: Array,
+					observer: '_inputParamsChanged'
+				},
+
+				/**
+				 * Content Type
+				 */
+				apiContentType: {
+					type: String
+				},
+
+				/**
+				 * Invoke URL
+				 */
+				invokeUrl: {
+					type: String
+				}
+			},
+			
+			behaviors: [
+				Things.FormBehavior
+			],
+
+			listeners : {
+				'iron-form-presubmit' :'_preSubmitHandler'
+			},
+
+			/**
+			 * Submit 전에 전처리
+			 * @param {Event} event
+			 */
+			_preSubmitHandler: function(event) {
+				var form = this.getMyForm();
+				var actionUrl = form.request.url;
+
+				if(actionUrl.indexOf('{id}') >= 0) {
+					actionUrl = actionUrl.substr(0, actionUrl.indexOf('/rest/'));
+					actionUrl += this.invokeUrl;
+					form.request.url = actionUrl;
+				}
+
+				if(this.resource.http_method == 'PUT' || this.resource.http_method == 'POST') {
+					form.request.body = form.request.body.input;
+				}
+			},
+
+			/**
+			 * resource가 변경되었을 경우
+			 * @param {Object} resource
+			 */
+			_resourceChanged: function(resource) {
+				if(resource && resource.url) {
+					var url = resource.url;
+					this.invokeUrl = url;
+					url = url.replace('/rest/', '');
+					this.actionUrl = url;
+
+					var method = resource.http_method;
+					if(method == 'GET' || method == 'get' || method == 'DELETE' || method == 'delete') {
+						this.apiContentType = 'application/x-www-form-urlencoded';
+					} else {
+						this.apiContentType = 'application/json';
+					}
+				}
+
+				this.$.result.value = '';
+			},
+
+			/**
+			 * inputParams가 변경되었을 경우
+			 * @param {Array} inputParams
+			 */
+			_inputParamsChanged: function(inputParams) {
+				var formFields = [];
+
+				if(this.resource.http_method == 'GET' || this.resource.http_method == 'DELETE') {
+					if(inputParams && inputParams.length > 0) {
+						formFields = inputParams.map(function(param) {
+							return { name : param.name, label : 'Parameter : ' + param.name, type : 'text' };
+						});
+					}
+				} else {
+					formFields.push({ name : 'input', label: 'Input JSON', type: 'textarea' });
+				}
+
+				this.formFields = formFields;
+			},
+
+			/**
+			 * 리소스 폼 화면을 구성. formFields 정보로 동적으로 폼 하위 엘리먼트를 생성하여 폼을 구성한다. 
+			 */
+			reconfigureMyForm: function() {
+				this._clearFormFields();
+
+				for(index in this.formFields) {
+					var field = this.formFields[index];
+					var newElement = this.createFormElement(field);
+					if(!newElement) continue;
+
+					this.$['param-fields'].appendChild(newElement);
+				}
+			},
+
+			/**
+			 * Clear Parameter element
+			 */
+			_clearFormFields: function() {
+				var children = this.$['param-fields'].childNodes;
+				if(children && children.length > 0) {
+					var childCount = children.length;
+					for(var i = 0 ; i < childCount ; i++) {
+						var childElement = this.$['param-fields'].childNodes[0];
+						this.$['param-fields'].removeChild(childElement);
+					}
+				}
+			},
+
+			/**
+			 * Invoke 후 성공시 핸들러
+			 * @param {Event} event
+			 */
+			_successResponseHandler: function (event) {
+				this.stopSpinner();
+
+				if(event.detail.xhr.response) {
+					this.$.result.value = JSON.stringify(event.detail.xhr.response, null, 4);
+				} else {
+					this.$.result.value = 'OK';
+				}
+			},
+			
+			/**
+			 * invoke 후 실패시 핸들러
+			 * @param {Event} event
+			 */			
+			_errorResponseHandler: function (event) {
+				this.stopSpinner();
+
+				if(event.detail.request.xhr.response) {
+					this.$.result.value = JSON.stringify(event.detail.request.xhr.response, null, 4);
+				} else {
+					this.$.result.value = 'unknown Error';
+				}
+			},
+			
+			/**
+			 * Reset Form
+			 */
+			_resetMyForm: function (event) {
+				this.resetMyForm();
+				this._resourceChanged(this.resource);
+			},
+
+			/***************************************************************************************
+			*                            Start detail item view interface
+			***************************************************************************************/
+			/**
+			 * detail item view를 구성하기 위한 필수 함수 
+			 * item view를 구성한다.
+			 *
+			 * @return {Object} resource 리소스 데이터 (Object) 혹은 리소스 아이디 (Number)
+			 */
+			loadDetailData: function(resource) {
+				if(resource) {
+					this.resource = resource;
+					this.inputParams = resource.input_type_list;
+				}
+			}
+			
+		});
+	</script>
+</dom-module>

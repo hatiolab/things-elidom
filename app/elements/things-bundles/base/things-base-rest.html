@@ -1,0 +1,155 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../../../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../../../bower_components/iron-iconset/iron-iconset.html">
+<link rel="import" href="../../../../bower_components/iron-iconset-svg/iron-iconset-svg.html">
+<link rel="import" href="../../../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="../../things-button/things-button.html">
+<link rel="import" href="../../things-form/things-search-form.html">
+<link rel="import" href="../../things-grid/things-diy-grid.html">
+<link rel="import" href="../../things-resource/things-resource.html">
+
+<link rel="import" href="../../things-content/things-load-view-behavior.html">
+<link rel="import" href="../../things-content/things-resource-meta-behavior.html">
+<link rel="import" href="../../things-content/things-route-content-behavior.html">
+<link rel="import" href="../../things-msg-box/things-msgbox-behavior.html">
+<link rel="import" href="../../things-setting/things-global-behavior.html">
+
+<!--
+서버에서 제공하는 모든 REST API를 확인 및 테스트 기능을 제공하는 화면 셋 
+
+	Example:
+
+	<things-base-rest 
+	  title="Attachment"
+	  resource-type="Attachment"
+	  resource-url="attachments"
+	  layout="fullbleed layout vertical">
+	</things-base-rest>
+
+@demo ./things-content/demo/demo-things-attach-content.html
+-->
+
+<dom-module id="things-base-rest">
+	<template>
+		<div class="[[layout]]">
+			<things-resource 
+				id="resource-meta"
+				method="GET"
+				action="[[resourceMetaUrl]]"
+				last-response="{{metaData}}">
+			</things-resource>
+
+			<things-search-form 
+				id="search-form"
+				class="flex"
+				active="[[active]]"
+				title="[[title]]"
+				form-fields="[[searchFormFields]]" 
+				action-url="[[resourceUrl]]" 
+				page="{{page}}"
+				per-page="[[perPage]]"
+				last-response="{{lastResponse}}">
+			</things-search-form>
+
+			<things-diy-grid 
+				id="grid"
+				config="[[gridConfig]]"
+				model="[[gridModel]]" 
+				columns="[[gridColumns]]"
+				data="[[lastResponse.items]]"
+				total-count="[[lastResponse.total]]"
+				current-page="{{page}}"
+				per-page="[[perPage]]"
+				export-file-name="[[title]]"
+				export-sheet-name="[[title]]"
+				buttons="[[buttons]]"
+				enable-detail-column
+				paginatable
+				enable-toolbar>
+			</things-diy-grid>
+
+		</div>
+	</template>
+
+	<script>
+		Polymer({
+			is: 'things-base-rest',
+
+			behaviors: [ 
+				Things.ResourceMetaBehavior,
+				Things.RouteContentBehavior,
+				Things.ResourceSelectorBehavior,
+				Things.GlobalBehavior,
+				Things.MsgBoxBehavior,
+				Things.LoadViewBehavior
+			],
+			
+			properties: {
+				/**
+				 * Screen layout
+				 */
+				layout: {
+					type: String
+				},
+
+				/**
+				 * 화면 타이틀 
+				 */
+				title: {
+					type: String
+				},
+
+				/**
+				 * 버튼 정보 
+				 */
+				buttons: {
+					type: Array,
+					value: [ {
+					  id: 'export',
+					  text: 'Export',
+					  icon: 'icons:swap-vert'
+					} ]
+				}
+			},
+
+			listeners : {
+				'grid.things-grid-detail-tap': '_showDetailView'
+			},
+
+			/**
+			 * research form
+			 */
+			refreshGridData: function(grid) {
+				this.$['search-form'].getMyForm().submit();
+			},
+
+			/**
+			 * 그리드 셀 선택이 변경되었을 경우 파일 다운로드  
+			 */
+			_showDetailView: function(e) {
+				// TODO 
+			},
+
+			/**
+			 * 메뉴에 등록된 자신의 routing 정보를 리턴한다.
+			 */
+			getMyRoute: function() {
+				return this.resourceUrl;
+			},
+
+			/**
+			 * 화면 초기화 함수 
+			 * 메타 데이터를 서버로 요청하여 화면을 구성한다.
+			 */
+			initializeContent: function() {
+				this.$['resource-meta'].generateRequest();
+			}
+
+		});
+	</script>
+</dom-module>

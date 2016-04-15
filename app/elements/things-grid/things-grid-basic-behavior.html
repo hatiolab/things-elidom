@@ -34,9 +34,17 @@ Things.GridBasicBehaviorImpl = {
          * data load mode
          * @type {Object}
          */
-        appending: {
+        infiniteScroll: {
             type: Boolean,
             value: false
+        },
+
+        /**
+         * config grid
+         */
+        config: {
+            type: Object,
+            observer: '_setGridConfig'
         },
 
         /**
@@ -55,14 +63,6 @@ Things.GridBasicBehaviorImpl = {
             observer: '_setGridColumns'
         },
         
-        /**
-         * config grid
-         */
-        config: {
-            type: Object,
-            observer: '_setGridConfig'
-        },
-
         /**
          * read data
          */
@@ -193,8 +193,8 @@ Things.GridBasicBehaviorImpl = {
         }
         
         // grid 구성 후 액션
-        if (this.afterGridInitiate && this.grid) {
-            this.afterGridInitiate();
+        if (this.afterGridInitiated && this.grid) {
+            this.afterGridInitiated();
         }
     },
 
@@ -409,7 +409,7 @@ Things.GridBasicBehaviorImpl = {
                 this.resizeGrid(this.parentNode, this.querySelector('div'));
             }
 
-            if (this.appending) {
+            if (this.infiniteScroll) {
                 this.dataSet.appendRows(data, 0, -1, false);
                 this.dataSet.clearRowStates();
             } else {

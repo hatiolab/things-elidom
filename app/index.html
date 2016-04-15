@@ -60,12 +60,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 						<template is="dom-repeat" items="{{screens}}" as=screen filter="isDiyScreen">
 							<!-- Dynamic Diy Screen -->
 						  <things-diy-content 
+						  	layout="fullbleed layout vertical"
 								data-route="{{screen.routing}}"
 								current-route="[[route]]"
 								menu-id="{{screen.id}}"
-								resource-url="[[screen.routing]]"
-								layout="fullbleed layout vertical">
-							</things-diy-content>					  
+								resource-url="[[screen.routing]]">
+							</things-diy-content>
 						</template>
 
 						<!-- Static Menu Page -->

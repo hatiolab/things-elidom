@@ -6,6 +6,8 @@
 <link rel="import" href="../../things-grid/things-resource-grid.html">
 <link rel="import" href="../../things-resource/things-resource.html">
 
+<link rel="import" href="./things-base-rest-detail-api.html">
+
 <dom-module id="things-base-rest-detail">
 
   <template>
@@ -14,22 +16,12 @@
         id="resource-search"
         method="GET"
         action="[[gridSearchUrl]]"
-        last-response="{{lastResponse}}"
-        auto>
+        last-response="{{lastResponse}}">
       </things-resource>
 
-      <things-resource-form
-        id='resource-form'
-        title="[[title]]"
-        resource-type="CommonCode"
-        resource-url="[[codeDetailUrl]]"
-        resource="[[resource]]"
-        form-fields="[[formFields]]">
-      </things-resource-form>
+      <span><paper-icon-button icon="icons:view-list"></paper-icon-button>[[resource.module]] : [[resource.name]] ([[resource.description]])</span>
 
-      <span><paper-icon-button icon="icons:view-list"></paper-icon-button>API List</span>
-
-      <things-resource-grid 
+      <things-basic-grid 
         id="grid"
         config="[[gridConfig]]"
         model="[[gridModel]]" 
@@ -37,8 +29,14 @@
         data="[[items]]"
         grid-save-action="[[gridSaveUrl]]"
         buttons="[[buttons]]"
-        enable-toolbar>
-      </things-resource-grid>
+        !show-grid-footer
+        enable-detail-column>
+      </things-basic-grid>
+
+      <span><paper-icon-button icon="icons:view-list"></paper-icon-button>[[apiTitle]]</span>
+
+      <things-base-rest-detail-api id="api-detail">
+      </things-base-rest-detail-api>
     </div>
   </template>
 
@@ -52,21 +50,6 @@
       ],
 
       properties: {
-
-        /**
-         * code id
-         */
-        codeId: {
-          type: String
-        },
-
-        /**
-         * code resource
-         */
-        resource: {
-          type: Object
-        },
-
         /**
          * 화면 타이틀 
          */
@@ -75,37 +58,25 @@
         },
 
         /**
-         * code list
+         * REST Resource
          */
-        items: {
-          type: Array
+        resource: {
+          type: Object
         },
 
         /**
-         * code 조회 정보 
+         * API 조회 정보 
          */
         lastResponse: {
           type: Object,
-          observer: '_codeMasterChanged'
+          observer: '_apiResultChanged'
         },
 
         /**
-         * grid search fields
+         * API List
          */
-        searchFields : {
-          type: String,
-          value: 'id,parent_id,name,description'
-        },
-
-        /**
-         * grid sort fields
-         */
-        sortFields : {
-          type: Array,
-          value: [ {
-            field : 'name',
-            ascending : true
-          } ]
+        items: {
+          type: Array
         },
 
         /**
@@ -113,14 +84,16 @@
          */
         gridModel: {
           type: Array,
-          value: [ {
-            fieldName : 'id'
-          }, {
-            fieldName : 'parent_id'
+          value: [ { 
+            fieldName: 'id' 
           }, { 
-            fieldName : 'name' 
+            fieldName: 'url' 
           }, { 
-            fieldName : 'description' 
+            fieldName: 'http_method' 
+          }, { 
+            fieldName: 'name' 
+          }, { 
+            fieldName: 'description'
           } ]
         },
         
@@ -129,132 +102,73 @@
          */
         gridColumns: {
           type: Array,
-          value: [ {
-            fieldName: 'id',
-            width: 0
-          }, {
-            fieldName: 'parent_id',
-            width: 0
-          }, {
-            fieldName: 'name',
-            width: 250
-          }, {
-            fieldName: 'description',
-            width: 350
-          } ]
+          value: [ { 
+            fieldName: 'id', name: 'id', width: 0 
+          }, { 
+            fieldName: 'name', name: 'name', width: 100,
+            header: { text : 'Name' }
+          }, { 
+            fieldName: 'http_method', name: 'http_method', width: 80,
+            header: { text : 'Method' }
+          }, { 
+            fieldName: 'url', name: 'url', width: 300,
+            header : { text : 'URL' }
+          }, { 
+            fieldName: 'description', name: 'description', width: 375,
+            header : { text : 'Description' }
+          } ] 
         },
 
         /**
-         * Code lsit search URL
+         * API search URL
          */
         gridSearchUrl: {
-          type: String,
-          computed: '_computeCodeSearchUrl(codeId)',
+          type: String
         },
 
         /**
-         * Code list save URL
+         * 그리드에서 선택한 API 타이틀  
          */
-        gridSaveUrl: {
-          type: String,
-          computed: '_computeCodeListSaveUrl(codeId)'
-        },
-
-        /**
-         * Code detail find/save URL
-         */
-        codeDetailUrl: {
-          type: String,
-          computed: '_computeCodeDetailUrl(codeId)'
-        },
-
-        /**
-         * 버튼 정보 
-         */
-        buttons: {
-          type: Array,
-          value: [ {
-            id: 'new-btn',
-            text: 'Add',
-            icon: 'icons:add'
-          }, {
-            id: 'save-btn',
-            text: 'Save',
-            icon: 'icons:save'
-          }, {
-            id: 'delete-btn',
-            text: 'Delete',
-            icon: 'icons:delete'
-          } ]
+        apiTitle: {
+          type: String
         }
+
       },
 
       listeners: {
-        'grid.things-button-new-btn-tap' : 'addRow',
-        'grid.things-grid-save-success' : 'reloadGrid'
+        'grid.things-grid-detail-tap': '_showApiDetail'
       },
 
       /**
-       * 코드 정보 변경시 
-       */
-      _codeMasterChanged: function(lastResponse) {
-        this.items = lastResponse.items;
-        this.resource = lastResponse;
-      },
-
-      /**
-       * Code Search URL
+       * API 상세 내용 표시 
        *
-       * @param {String} codeId
-       * @return {String} code search url
+       * @event {Event} event
        */
-      _computeCodeSearchUrl: function(codeId) {
-        return ['common_codes', codeId].join('/');
+      _showApiDetail: function(event) {
+        var api = event.detail;
+        this.apiTitle = api.name + ' : ' + api.url + ' (' + api.description + ')';
+        this.$['api-detail'].loadDetailData(api);
       },
 
       /**
-       * Code Id로 Code List Save URL 생성
+       * API 조회 결과가 변경되었을 경우 
        *
-       * @param {String} codeId
-       * @return {String} code save url
+       * @param {Object} lastResponse
        */
-      _computeCodeListSaveUrl: function(codeId) {
-        return 'common_codes/' + codeId + '/update_multiple_codes.json';
+      _apiResultChanged: function(lastResponse) {
+        this.items = lastResponse.api_list;
       },
 
       /**
-       * Code Id로 Code Master Save URL 생성
-       *
-       * @param {String} codeId
-       * @return {String} code save url
-       */
-      _computeCodeDetailUrl: function(codeId) {
-        return 'common_codes/' + codeId + '.json';
-      },
-
-      /**
-       * add grid row
-       */
-      addRow: function(e) {
-        this.$.grid.dataSet.insertRow(0, { id: null, name : '', description : '', parent_id : this.codeId });
-      },
-
-      /**
-       * reload grid data
-       */
-      reloadGrid: function(e) {
-        this.$['resource-search'].generateRequest();
-      },
-
-      /**
-       * detail view를 오픈 
+       * detail view를 오픈과 detail title 초기화
        *
        * @param {Object} resource
        */
       showDetailView: function(resource) {
         this.resource = resource;
         this.openPopupView(this, true);
-        this.codeId = this.resource.id;
+        this.$['resource-search'].action = 'rests/api?id=' + resource.bean_class_name;
+        this.$['resource-search'].generateRequest();
       }
 
     });

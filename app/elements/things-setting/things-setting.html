@@ -43,6 +43,10 @@
 
         behaviors: [Things.GlobalBehavior],
 
+        getGlobalValue: function(name) {
+          return this.get('globals.' + name);
+        },
+
         onBaseUrlEmpty: function() {
           this.showToastMsg('Base URL should not be empty.');
         },

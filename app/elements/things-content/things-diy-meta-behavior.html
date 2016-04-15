@@ -94,6 +94,13 @@ Things.DiyMetaBehaviorImpl = {
 		 */
 		gridColumns: {
 			type: Array
+		},
+
+		/**
+		 * 그리드에서 Detail 버튼으로 행 선택시 오픈될 Detail View ID
+		 */
+		detailView: {
+			type: String
 		}
 	},
 
@@ -125,6 +132,7 @@ Things.DiyMetaBehaviorImpl = {
 
 		// 0. Parse Form Meta Data
 		this.resourceUrl = metaData.url;
+		this.detailView = metaData.detailViewId;
 		this.layout = metaData.form.layout;
 		this.title = metaData.form.title;
 		// 1. Parse Search Form Fields

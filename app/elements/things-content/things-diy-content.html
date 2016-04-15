@@ -22,10 +22,13 @@
 
 	Example:
 
-	<things-diy-content 
-	  menu_id="1"
-	  layout="fullbleed layout vertical">
-	</things-diy-content>
+	  <things-diy-content 
+	  	menu-id="1"
+			data-route="users"
+			current-route="[[route]]"
+			resource-url="users"
+			layout="fullbleed layout vertical">
+		</things-diy-content>	
 
 @demo ./things-content/demo/index.html
 -->
@@ -60,30 +63,20 @@
 				last-response="{{lastResponse}}">
 			</things-search-form>
 
-			<things-resource-grid
+			<things-diy-grid
 				id="grid"
 				model="{{gridModel}}" 
 				columns="{{gridColumns}}"
-				config ="{{gridConfigs}}"
+				config="{{gridConfigs}}"
 				page="{{page}}"
-				limit="[[perPage]]"
-				data="[[lastResponse]]"
-				grid-save-action="[[gridSaveUrl]]"
-				selected-row-data="{{selectedRow}}"
+				per-page="[[perPage]]"
+				total-count="[[totalCount]]"
+				data="[[items]]"
 				export-file-name="[[title]]"
 				export-sheet-name="[[title]]"
-				readonly = "[[readonly]]"
-				enable-detail-column ="[[enableDetailColumn]]"
-				enable-check-box ="[[enableCheckBox]]">
-			</things-resource-grid>
-
-			<!--things-resource-form 
-				id="resource-form"
-				title="[[title]] Detail"
-				resource-url="[[memberResourceUrl]]"
-				form-fields="[[resourceFormFields]]" 
-				input="{{selectedRow}}">
-			</things-resource-form-->
+				readonly="[[readonly]]"
+				enable-detail-column>
+			</things-diy-grid>
 		</div>
 	</template>
 
@@ -98,20 +91,11 @@
 			
 			properties: {
 				/**
-				 * 그리드 저장 (Multiple Save) URL
-				 */
-				gridSaveUrl: {
-					type: String,
-					computed: '_computeGridSaveUrl(resourceUrl)'
-				},
-
-				/**
 				 * Search Form에서 검색 결과 Object 중에서 List를 나타내는 프로퍼티 
 				 * 검색 폼 프로퍼티와 그리드 프로퍼티의 연결 프로퍼티 
 				 */
 				rootProperty: {
-					type: String,
-					value: 'items'
+					type: String
 				},
 
 				/**
@@ -119,56 +103,63 @@
 				 * 검색 폼 프로퍼티와 그리드 프로퍼티의 연결 프로퍼티 
 				 */
 				totalProperty: {
-					type: String,
-					value: 'total'
+					type: String
 				},
 
 				/**
-				 * 그리드에서 선택된 Row Data
+				 * 조회 결과 
 				 */
-				selectedRow: {
-					type: Object
+				lastResponse: {
+					type: Object,
+					observer: '_searchResultChanged'
 				},
 
 				/**
-				 * Get/Update/Delete 등을 위한 {resourceUrl}/:id 형식 URL
+				 * 조회 결과 데이터 리스트 
 				 */
-				memberResourceUrl: {
-					type: String,
-					computed: '_computeMemberResourceUrl(resourceUrl)'
+				items: {
+					type: Array
+				},
+
+				/**
+				 * 조회 결과 데이터 개수
+				 */
+				totalCount: {
+					type: Number
 				}
 			},
 
 			listeners : {
-				'grid.things-grid-detail-tap': '_showResourceForm',
-				'grid.things-grid-save-success': '_refreshGridData',
-				//'resource-form.things-resource-form-saved' : '_refreshGridData'
+				'grid.things-grid-detail-tap': '_showDetailView',
+				'grid.things-grid-save-success': '_refreshGridData'
 			},
 
 			/**
-			 * resourceUrl로 grid save url을 생성
-			 * @param {String} resourceUrl
-			 * @return {String} grid save URL
+			 * 조회 결과 변경시 
 			 */
-			_computeGridSaveUrl: function(resourceUrl) {
-				return resourceUrl + '/update_multiple.json';
+			_searchResultChanged: function(lastResponse) {
+				if(lastResponse) {
+					this.items = this.rootProperty ? lastResponse[this.rootProperty] : lastResponse;
+					this.totalCount = this.totalProperty ? lastResponse[this.totalProperty] : this.items.length;
+				} else {
+					this.items = [];
+					this.totalCount = 0;
+				}
 			},
 
 			/**
-			 * resourceUrl로 grid save url을 생성
-			 * @param {String} resourceUrl
-			 * @return {String} grid save URL
-			 */
-			_computeMemberResourceUrl: function(resourceUrl) {
-				return resourceUrl + '/:id';
-			},
-
-			/**
-			 * open resource form dialog
+			 * show detail view
 			 * @param event 그리드에서 선택된 event
 			 */
-			_showResourceForm: function(event) {
-				this.$['resource-form'].openResourceForm(event.detail);
+			_showDetailView: function(event) {
+				if(!this.detailView) return;
+
+				var viewElement = document.createElement(this.detailView);
+				viewElement.id = 'detail-view';
+				viewElement.title = this.title + ' Detail';
+				viewElement.resourceUrl = this.resourceUrl;
+				viewElement.formFields = this.resourceFormFields;
+				viewElement.showDetailView(event.detail);
 			},
 
 			/**

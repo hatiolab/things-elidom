@@ -3,20 +3,15 @@
 <link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
 
 <link rel="import" href="../things-paginator/things-paginator.html">
-<link rel="import" href="./things-resource-grid.html">
+<link rel="import" href="./things-grid-basic-behavior.html">
 
 <!--
 서버에서 관리하는 DiyGrid 정보를 조회해서 그리드를 구성하는 동적 그리드. 
 
 	Example:
 
-	  <things-diy-content 
-	  	menu-id="1"
-			data-route="users"
-			current-route="[[route]]"
-			resource-url="users"
-			layout="fullbleed layout vertical">
-		</things-diy-content>	
+	  <things-diy-grid diy-grid-id="1">
+	  </things-diy-grid>	
 
 @demo ./things-grid/demo/demo-things-diy-grid.html
 -->
@@ -31,32 +26,31 @@
 				padding: 10px 0px 0px 0px;
 			}
 		</style>
-		
+	
+		<div id="{{gridContainerId}}"></div>
+
 		<things-resource 
+			auto
 			id="resource-meta"
 			method="GET"
 			action="[[resourceMetaUrl]]"
 			last-response="{{metaData}}">
 		</things-resource>
 
-		<things-resource-grid
-			id="grid"
-			model="[[metaData.fields]]" 
-			columns="[[metaData.columns]]"
-			config ="[[metaData.config]]"
-			data="[[data]]"
-			appending="[[appending]]"
-			total-count ="[[totalCount]]"
-			current-page="{{currentPage}}"
-			per-page="{{perPage}}"
-			pagenatable="[[pagenatable]]"
-			enableDetailColumn="[[enableDetailColumn]]"
-			grid-save-action="[[gridSaveUrl]]"
-			selected-row-data="{{selectedRow}}"
-			export-file-name="[[title]]"
-			export-sheet-name="[[title]]"
-			enable-detail-column ="[[enableDetailColumn]]">
-		</things-resource-grid>
+		<paper-toolbar class="white" hidden$="{{!enableToolbar}}">
+			<div id="gridToolbar" class="bottom fit" hidden$="{{!paginatable}}">
+				<things-paginator
+					id ="paginator"
+					per-page="{{perPage}}" 
+					current-page="{{currentPage}}" 
+					total-count="[[totalCount]]"
+					page-start-idx="[[pageStartIdx]]"
+					page-end-idx="[[pageEndIdx]]">
+				</things-paginator>
+
+				<content id="toolbarContent" select=".grid-toolbar-content"></content>
+			</div>
+		</paper-toolbar>
 
 	</template>
 
@@ -64,47 +58,38 @@
 		Polymer({
 			is: 'things-diy-grid',
 
+			behaviors: [
+				Things.GridBasicBehavior
+			],
+	
 			properties: {
 				/**
-				 * Boolean need to set false as defualt
+				 * diyGrid Id
 				 */
-				enableDetailColumn: {
-					type: Boolean,
-					value: false
+				diyGridId: {
+					type: String
 				},
 
 				/**
-				 * things resource meta url
+				 * Grid meta data search url
 				 */
 				resourceMetaUrl: {
-					type: String
+					type: String,
+					computed: '_computeDiyGridMetaUrl(diyGridId)'
 				},
 
 				/**
-				 * grid data
+				 * Grid meta data
 				 */
-				data: {
-					type: Object
-				},
-
-				/**
-				 * selected row data
-				 */
-				selectedRow: {
-					type: Object
-				},
-
-				/**
-				 * grid Save Url
-				 */
-				gridSaveUrl: {
-					type: String
+				metaData: {
+					type: Object,
+					observer: '_metaDataChanged'
 				},
 
 				/**
 				 * use page nate or not
 				 */
-				pagenatable: {
+				paginatable: {
 					type: Boolean,
 					value: false
 				},
@@ -135,7 +120,7 @@
 				},
 
 				/**
-				 * enable toolbar
+				 * if enable toolbar or not
 				 */
 				enableToolbar: {
 					type: Boolean,
@@ -143,22 +128,18 @@
 				},
 
 				/**
-				* data load mode
-				* @type {Object}
-				*/
-				appending: {
+				 * 그리드 footer를 보여줄 지 여부 
+				 */
+				showGridFooter: {
 					type: Boolean,
 					value: false
-				},
-				
-				/**
-				* grid save url
-				* @type {Object}
-				*/
-				gridSaveUrl: {
-					type: String
 				}
 
+				/**
+				 * 그리드가 구성되고 난 후 fire
+				 *
+				 * @event things-basic-grid-configured
+				 */
 				/**
 				 * 그리드 Row Data가 선택되었을 경우 fire
 				 *
@@ -170,27 +151,65 @@
 				 * @event things-grid-cell-data-select
 				 */
 				/**
-				 * 그리드 데이터 Save(저장/삭제/추가) 액션이 성공했을 경우 fire
+				 * 그리드 Cell 중에 Detail 아이콘이 선택되었을 경우 fire
 				 *
-				 * @event things-grid-save-success
-				 */
-				/**
-				 * 그리드 데이터 Save(저장/삭제/추가) 액션시 에러가 발생 했을 경우 fire
-				 *
-				 * @event things-grid-save-error
-				 */
-				/**
-				 * 그리드 detail이 클릭 되었을 경우 
 				 * @event things-grid-detail-tap
-				 */	
+				 */
 			},
 
 			/**
-			 * Diy Grid의 Configuration 정보를 다시 가져온다.
-			 * 이 정보를 다시 가져온 후 그리드는 다시 구성된다.
+			 * Life Cycle 
+			 */
+			created: function() {
+				this.events = {
+					onDataCellClicked : '_gridCellClicked',
+					onScrollToBottom :'_gridScrollToBottom'
+				};
+
+				DataLudi.setRootContext('');
+				DataLudi.setAssetRoot('../../../images/grid');
+			},
+
+			/**
+			 * Life Cycle 
+			 */
+			detached: function() {
+				this.clearGrid();
+			},
+
+			/**
+			 * diyGridId가 변경되었을 경우 Grid meta data 조회 URL이 결정된다.
+			 *
+			 * @param {String} diyGridId
+			 */
+			_computeDiyGridMetaUrl: function(diyGridId) {
+				return diyGrid ? 'diy_grids/' + diyGridId : null;
+			},
+
+			/**
+			 * Grid meta data가 변경되었을 경우
+			 *
+			 * @param {Object} metaData
+			 */
+			_metaDataChanged: function(metaData) {
+				this.config = (!metaData || !metaData.config || metaData.config.length <= 1) ? null :  JSON.parse(metaData.config);
+				this.model = (!metaData || !metaData.fields || metaData.fields.length <= 1) ? null : JSON.parse(metaData.fields);
+				this.columns = (!metaData || !metaData.columns || metaData.columns.length <= 1) ? null : JSON.parse(metaData.columns);
+			},
+
+			/**
+			 * grid 구성을 위한 meta data 조회 
 			 */
 			refreshMeta: function() {
 				this.$['resource-meta'].generateRequest();
+			},
+
+			/**
+			 * grid 구성 후 추가 액션 
+			 */
+			afterGridInitiated: function() {
+				this.grid.footer().setVisible(this.showGridFooter);
+				this.fire('things-basic-grid-configured', this.grid);
 			}
 
 		});
