@@ -1,0 +1,43 @@
+<!--
+A comment describing this element
+
+Example:
+
+    <my-elem></my-elem>
+
+Example:
+
+    <my-elem>
+      <h2>Hello my-elem</h2>
+    </my-elem>
+
+@demo demo/index.html
+-->
+
+<dom-module id="things-html-preview">
+	<template>
+		<style>
+			:host {
+				display: block;
+			}
+		</style>
+		<iframe name="result" srcdoc="[[srcdoc]]">
+			
+		</iframe>
+	</template>
+	<script>
+		Polymer({
+			is: 'things-html-preview',
+			properties:{
+				srcdoc:{
+					type:Object,
+					notify:true,
+					observer:'_onSrcdocChange'
+				}
+			},
+			_onSrcdocChange : function(srcdoc){
+				console.log(srcdoc);
+			}
+		});
+	</script>
+</dom-module>
