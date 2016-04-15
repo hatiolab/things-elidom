@@ -1,0 +1,345 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
+
+<link rel="import" href="../../things-code-editor/things-code-editor.html">
+<link rel="import" href="../../things-code-editor/things-template-editor.html">
+<link rel="import" href="../../things-content/things-detail-form-meta-behavior.html">
+<link rel="import" href="../../things-content/things-load-view-behavior.html">
+<link rel="import" href="../../things-attached-file/things-attached-file.html">
+<link rel="import" href="../../things-extension/things-extension.html">
+
+<dom-module id="things-base-role-detail">
+  <template>
+
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <things-resource 
+      id="get-resource"
+      method="GET"
+      action="[[memberResourceUrl]]"
+      last-response="{{resource}}">
+    </things-resource>
+
+    <paper-tabs id="tabGroup" selected="{{currentTabIdx}}" noink>
+      <template is="dom-repeat" items="{{_panels}}">
+        <paper-tab id="{{item.elementId}}">{{item.title}}</paper-tab>
+      </template>
+    </paper-tabs>
+
+    <iron-pages id="tabPages" selected="{{currentTabIdx}}">
+      <things-resource-form
+        id="resource-form" 
+        resource-url="[[memberResourceUrl]]"
+        resource="{{resource}}"
+        form-fields="[[formFields]]"
+        remove-fields-on-save="[[removeFieldsOnSave]]">
+      </things-resource-form>
+
+      <things-resource-grid 
+        id="menu-authorization"
+        model="[[authTabModel]]" 
+        columns="[[authTabColumns]]"
+        data="[[testArray]]"
+        buttons="[[buttons]]"
+        enable-toolbar>
+      </things-resource-grid>
+
+      <things-resource-grid 
+        id="users"
+        model="[[usersTabModel]]" 
+        columns="[[usersTabColumns]]"
+        data="[[resource]]"
+        buttons="[[buttons]]"
+        enable-toolbar>
+      </things-resource-grid>
+
+    </iron-pages>
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'things-base-role-detail',
+
+      behaviors: [ 
+        Things.DetailFormMetaBehavior,
+        Things.LoadViewBehavior
+      ],
+
+      properties: {
+        testTreeData: {
+          type: Array,
+          value:
+        },
+
+        testGridModel: {
+          type: Array,
+          value: [{
+            fieldName: 'id'
+          }, {
+            fieldName: 'name'
+          }, {
+            fieldName: 'parent_id'
+          }]
+        },
+
+        testGridColumns: {
+          type: Array,
+          value: [{
+            fieldName: 'id'
+          }, {
+            fieldName: 'name'
+          }, {
+            fieldName: 'parent_id'
+          }]
+        },
+
+        /**
+         * meta data for detail form
+         */
+        metaData: {
+          type: Array,
+          observer: '_parseMetaData'
+        },        
+
+        /**
+         * resource type
+         */
+        resourceType: {
+          type: String
+        },
+
+        /**
+         * resource id
+         */
+        resourceId: {
+          type: String
+        },
+
+        /**
+         * resource 대표 url
+         * User Resource라면 users
+         */
+        resourceUrl: {
+          type: String
+        },
+
+        /**
+         * resource member url, resource url과 resourceId로 memberResourceUrl을 구성한다.
+         */
+        memberResourceUrl: {
+          type: String,
+        },
+
+        /**
+         * 폼에 채우기 위한 리소스
+         * 최초 폼이 실행되는 시점에 서버에 요청하여 리턴받은 데이터
+         */
+        resource: {
+          type: Object
+        },
+
+        /**
+         * form fields
+         */
+        formFields: {
+          type: Array
+        },
+
+        /**
+         * Save 하기 전에 폼에는 있지만 Save하는데 필요 없는 필드를 삭제하기 위한 필드명
+         */
+        removeFieldsOnSave: {
+          type: Array,
+          value: ['creator', 'updater', 'creator_id', 'updater_id', 'created_at', 'updated_at']
+        },
+
+        /**
+         * 현재 선택된 탭 index
+         */
+        currentTabIdx: {
+          type: Number,
+          value: 0
+        },
+
+        /**
+         * default panel array
+         */
+        _panels: {
+          type: Array,
+          value: [ {
+            title: 'Basic Info', 
+            elementId: 'things-resource-form'
+          }, {
+            title: 'Menu Authorization', 
+            elementId: 'things-resource-grid'
+          }, {
+            title: 'User', 
+            elementId: 'things-resource-grid'
+          } ]
+        },
+
+        /**
+         * Authorization Tab Grid model
+         */
+        authTabModel: {
+          type: Array,
+          value: [ {
+            fieldName: 'id'
+          }, {
+            fieldName: 'name'
+          }, {
+            fieldName: 'parent_id'
+          } ]
+        },
+
+        /**
+         * Authorization Tab Grid columns
+         */
+        authTabColumns: {
+          type: Array,
+          value: [ {
+            fieldName: 'id',
+            width: 0
+          }, {
+            fieldName: 'name'
+          }, {
+            fieldName: 'parent_id',
+            width: 0
+          } ]
+        },
+
+        /**
+         * Users Tab Grid model
+         */
+        usersTabModel: {
+          type: Array,
+          value: [ {
+            fieldName: 'id'
+          }, {
+            fieldName: 'login'
+          }, {
+            fieldName: 'email'
+          }, {
+            fieldName: 'name'
+          } ]
+        },
+
+        /**
+         * Users Tab Grid Columns
+         */
+        usersTabColumns: {
+          type: Array,
+          value: [ {
+            fieldName: 'id',
+            width: 0
+          }, {
+            fieldName: 'login'
+          }, {
+            fieldName: 'email',
+            width: 160
+          }, {
+            fieldName: 'name'
+          } ]
+        }
+      },
+
+      observers: [
+        '_onResourceChanged(resource)',
+      ],
+
+      listeners: {
+        'tabPages.iron-select': '_onPageSelected'
+      },
+
+      /**
+       * Active Tab을 설정한다.
+       * @param {Number} currentTabIdx
+       */
+      setActiveTab: function(currentTabIdx) {
+        this.currentTabIdx = currentTabIdx;
+        this.showDetailView();
+      },
+
+      /**
+       * fire element id+selected event with page element detail
+       */
+      _onPageSelected: function(event) {
+        if(!this.resource) return;
+        this.generateUrl(this.resourceUrl, this.resourceId);
+        var detailItemView = event.detail.item;
+        this.$['get-resource'].generateRequest();
+
+        this.fire(detailItemView.id + '-selected', detailItemView);
+      },
+
+      /**
+       *  Tab 변경시 resource url을 재생성 합니다.
+       */
+      generateUrl: function(resourceUrl, resourceId) {
+        if (this.currentTabIdx == 0) {
+          this.memberResourceUrl = resourceUrl + '/' + resourceId;
+        } else if (this.currentTabIdx == 1) {
+          this.memberResourceUrl = resourceUrl + '/' + resourceId + '/permitted_resources.json';
+        } else {
+          this.memberResourceUrl = resourceUrl + '/' + resourceId + '/role_users.json';
+        }
+      },
+
+      /**
+       * resource가 변경되었을 경우 
+       *
+       * @param {Object} resource
+       */
+      _onResourceChanged: function(resource) {
+        if(resource && resource.id) {
+          this.resourceId = resource.id;
+          this.currentTabIdx = 0;
+        }
+      },
+
+      /**
+       * resourceUrl로 resource member url을 생성
+       *
+       * @param {String} resourceUrl
+       * @param {String} resourceId
+       * @return {String} resource member URL
+       */
+      // _computeMemberResourceUrl: function(resourceUrl, resourceId) {
+      //   return resourceUrl + '/' + resourceId;
+      // },
+      
+      /**
+       * meta data를 파싱한다.
+       *
+       * @param {Array} metaDataList
+       */
+      _parseMetaData: function(metaDataList) {
+        if(!metaDataList || metaDataList.length == 0) return;
+        this.formFields = this._parseResourceFormFields(metaDataList);
+      },
+
+      /**
+       * detail view를 오픈 
+       *
+       * @param {Object} resource
+       */
+      showDetailView: function(resource) {
+        if(resource) {
+          this.resourceId = resource.id;
+          this.memberResourceUrl = this.resourceUrl + '/' + this.resourceId;
+          this.$['get-resource'].generateRequest();
+        }
+
+        this.openPopupView(this, true);
+      }
+
+    });
+  </script>
+</dom-module>
