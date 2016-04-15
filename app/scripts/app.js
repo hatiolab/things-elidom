@@ -16,7 +16,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	
 
 	let app = document.querySelector('#app');
-	
 	/**
 	 * localization start 
 	 */
@@ -89,7 +88,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			if (xhr.readyState == 4) {
 				if(xhr.status == 200){
 					app.langs = JSON.parse(xhr.responseText);
-					app.terminologies = app.langs[app.locale];
+					app.terminologies = app.langs[app.getLocale()];
 					app.localizationReady =true;
 				}else{
 					// console.log('Error localization xhr page');
