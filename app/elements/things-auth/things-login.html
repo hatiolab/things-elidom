@@ -368,9 +368,10 @@ Example:
       var oriBasicUrl = this.get('globals.basicUrl');
       this.set('globals.basicUrl', '');
       this.set('globals.basicUrl', oriBasicUrl);
-      this.fire('things-login-succeed')
+      this.fire('things-login-succeed');
       // 4. move to page
       page(this.successRoute);
+      location.reload(true);
     },
 
     _failureResponse: function(event) {
