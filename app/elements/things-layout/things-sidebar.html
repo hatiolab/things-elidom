@@ -129,7 +129,7 @@
 				
 				<!-- {{item}} and {{index}} can be used in this binding scope -->
 				<paper-button aria-controls={{group.menuGroupId}} on-click="toggle">
-					<iron-icon icon="icons:folder-open"></iron-icon>{{getString("menu",group.name)}}
+					<iron-icon icon="icons:folder-open"></iron-icon>[[group.name]]
 				</paper-button>
 
 				<iron-collapse id="{{group.menuGroupId}}" tabindex="0">
@@ -137,7 +137,7 @@
 						<template is="dom-repeat" items="{{group.child}}" as=item>
 							<paper-item data$="{{item}}">
 								<iron-icon icon="icons:folder-open">
-								</iron-icon>{{getString("menu",item.name)}}	
+								</iron-icon>[[item.name]]	
 							</paper-item>
 						</template>
 					</paper-listbox>
@@ -216,8 +216,7 @@
 
 			behaviors: [
 				Things.RoutingBehavior,
-				Things.GlobalBehavior,
-				Things.I18nBehavior
+				Things.GlobalBehavior
 			],
 
 			attached: function() {

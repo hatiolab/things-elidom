@@ -114,16 +114,16 @@
 			<img src="[[img]]">
 			<div id="info">
 				<content>
-					<h2>{{getString("label","user_name")}} : [[globals.user.name]]</h2>
-					<h3>{{getString("label","email")}} : [[globals.user.email]]</h3>
+					<h2>{{t("label","user_name")}} : [[globals.user.name]]</h2>
+					<h3>{{t("label","email")}} : [[globals.user.email]]</h3>
 					<paper-card>
 						<div class="card-actions">
 							<paper-button raised 
 								class="custom indigo" 
-								on-click="_onRequestpInitPass">{{getString("button","change_password")}}
+								on-click="_onRequestpInitPass">{{t("button","change_password")}}
 							</paper-button>
 							<paper-button raised class="custom green" on-click="_onLogoutTap">
-								{{getString("button","logout")}}
+								{{t("button","logout")}}
 							</paper-button>
 							<things-logout 
 								id="logout" 

@@ -37,8 +37,8 @@ Things.AuthBehaviorImpl = {
   _signoutSuccess: function(event) {
     this.showToastMsg('Succeeded to Logout');
     this.set('globals.user', null);
-    this.fire('things-logout-succeed')
-    page('/login');
+    this.fire('things-logout-succeed');
+    location.reload(true);
   },
 
   _signoutFailure: function(event) {

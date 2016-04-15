@@ -113,7 +113,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	 * parameter with category and keyname
 	 * returns translated value, if there's not translated data return "categroy.keyname"
 	 */
-	app.getString = function (category, keyname){
+	app.getTransaltedString = function (category, keyname){
 		var result = '"'+ category + '.'+ keyname+'"';
 		var lang = app.terminologies;
 

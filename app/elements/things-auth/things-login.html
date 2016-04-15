@@ -112,12 +112,12 @@ Example:
         </paper-input>
 
         <paper-button id="submitButton" raised disabled on-click="submitHandler">
-          <paper-spinner id="spinner" hidden></paper-spinner>{{getString("button","sign_in")}}
+          <paper-spinner id="spinner" hidden></paper-spinner>{{t("button","sign_in")}}
         </paper-button>
         <!-- <paper-button id="signup" raised on-click="_onSignupTap"></paper-button> -->
         <div>
-          <a href="#" on-click="_onSignupTap">{{getString("label","sign_up")}}</a>
-          <a href="#" on-click="_onRequestpInitPass">{{getString("label","reset_password")}}</a>
+          <a href="#" on-click="_onSignupTap">{{t("label","sign_up")}}</a>
+          <a href="#" on-click="_onRequestpInitPass">{{t("label","reset_password")}}</a>
         </div>
 
 <!-- 

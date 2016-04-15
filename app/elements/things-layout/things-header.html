@@ -91,7 +91,7 @@
 		<!-- logout icon button -->
 		<things-logout id="logout" action="logout" icon="icons:exit-to-app"></things-logout>
 				<!-- locale setting -->
-		<things-locale-combo id="localeCombo" default-locale ="[[defaultLocale]]"></things-locale-combo>
+		<things-locale-combo id="localeCombo" default-locale ="[[defaultLocale]]" hidden="[[localeSeletable]]"></things-locale-combo>
 
 	</div>
 
@@ -137,13 +137,24 @@
 				value : function(){
 					return app.locale;
 				}
-			}
+			},
+			/**
+			 * enable locale selector
+			 */
+			localeSeletable:{
+				type: String,
+				notify:true,
+				readonly:true,
+				value : function(){
+					var value = app.user?false:true;
+					return value
+				}
+			},
 		},
 
 		listeners: {
 			'sidebar-toggler.tap': 'toggleSidebar',
 			'toggleSetting.tap': 'openSettingDialog',
-			'logout.things-logout-succeed': 'toggleSidebar',
 			'user.tap': 'showUserInfo'
 		},
 
@@ -177,6 +188,7 @@
 			var setting = document.querySelector("#setting");
 			setting.open();
 		}
+
 
 	  });
 	})();

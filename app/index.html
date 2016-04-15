@@ -20,9 +20,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	<template is="dom-bind" id="app">
 		<!-- Client Setting -->
 		<!-- <things-setting id="setting"></things-setting> -->
-
-		<template is="dom-if" if={{localizationReady}}>
-			<paper-drawer-panel id="paperDrawerPanel" responsive-width="599px">
+		<paper-drawer-panel id="paperDrawerPanel" responsive-width="599px">
+			<template is="dom-if" if={{localizationReady}}>
+			
 
 				<!-- Layout Sidebar -->
 				<things-sidebar drawer 
@@ -72,8 +72,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 						{% include "things-pages.html" %}
 					</iron-pages>			
 				</paper-scroll-header-panel>
-			</paper-drawer-panel>
-		</template>		
+			</template>		
+		</paper-drawer-panel>
 		<!-- full dialog -->
 		<things-full-dialog id='common-full-dialog'></things-full-dialog>
 
