@@ -26,24 +26,21 @@ Example:
 	    <things-code-selector 
 	      id="code-selector" 
 	      label="Language" 
-	      value="en-US" 
+	      value="[[defaultLocale]]" 
 	      code-name="LOCALE" 
 	      label-path="description" 
 	      value-path="name">
 	    </things-code-selector>
+	    
+	    <iron-localstorage name="setting.locale" value="{{selectedLocale}}">
+    	</iron-localstorage>
 	</template>
 	<script>
 		Polymer({
 			is: 'things-locale-combo',
 			properties:{
-				/**
-				 * localiztion Object
-				 * L+ 10 characters +N
-				 */
-				l10n :{
-					type: Object,
-					readonly:true,
-					notify:true
+				defaultLocale:{
+					type: String
 				}
 			},
 
@@ -52,12 +49,12 @@ Example:
 			},
 
 			_onComboValueChanged:function (event) {
-				this.requestLocale(event.detail.value);
+				this.set('selectedLocale',event.detail.value);
+				location.reload(true);
 			},
 
-			requestLocale:function (locale) {
-				this.l10n = document.l10n;
-				document.l10n.requestLocales(locale);
+			getLocale:function () {
+				return this.selectedLocale
 			}
 		});
 	</script>

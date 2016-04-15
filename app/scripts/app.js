@@ -24,16 +24,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	// just render setting and toast boxes 
 	app.localizationReady =false;
 
-	app.setGlobalValues = function(){
+	//get global variable
+	app.getGlobalValues = function(){
 		var setting = document.querySelector('#setting');
 		if(setting.globals){
+			// console.log(setting.globals);
 			app.basicUrl = setting.globals.basicUrl;
 			app.user = setting.globals.user;
+			app.locale = setting.globals.locale;
 		};
 	};
 	//get locale from user
 	app.getUserLocale = function () {
-		 return (app.user&&app.user.locale)?app.user.locale:null; 
+		 return app.locale?app.locale:null; 
 	};
 
 	//get locale from browser
@@ -45,14 +48,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 		return  locale;
 	};
-
-	//make locale value 
+	/**
+	 * make locale value
+	 */
 	app.getLocale = function (user) {
 		app.locale = app.getUserLocale()?app.getUserLocale():app.getBrowserLocale();
 		return app.locale;
 	};
 
-	//for localization xhr request, use terminologies/resource 
+	/**
+	 * for localization xhr request prameters, use terminologies/resource 
+	 */
 	app.getRequestValue = function(){
 		var requestValue= {};
 		if(app.user){
@@ -64,14 +70,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 		return JSON.stringify(requestValue);
 	};
-
+	/**
+	 * compute terminologies url with app.globals.basicUrl
+	 */
 	app.computeUrl = function(){
 		return app.basicUrl+'/terminologies/resource';
 	};
-
-	app.getLocalizationInfo = function () {
+	/**
+	 * get language information from server
+	 */
+	app.getLanguageInfo = function () {
 		//1. a sign global values to app;
-		app.setGlobalValues();
+		app.getGlobalValues();
 		
 		//2. create xhr requesst
 		var xhr = new XMLHttpRequest();
@@ -135,7 +145,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	app.addEventListener('dom-change', () => {
 		// console.log('Our app is ready to rock!');
 		// console.log(setting.globa)
-		app.getLocalizationInfo();
+		app.getLanguageInfo();
 		// app.localizationReady =true;
 	});
 

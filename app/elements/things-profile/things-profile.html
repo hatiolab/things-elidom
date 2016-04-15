@@ -1,136 +1,178 @@
+
+
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../bower_components/paper-card/paper-card.html">
-
+<link rel="import" href="../../../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
+<link rel="import" href="../things-setting/things-global-behavior.html">
+<link rel="import" href="../things-i18n/things-i18n-behavior.html">
 
 <!--
 `<things-profile>` Profile 
 
-  Example
+	Example
 
-    <things-profile name="elidom" email="elidom@example.com" img="../../images/profile.png"></things-profile>
+		<things-profile name="elidom" email="elidom@example.com" img="../../images/profile.png"></things-profile>
 
 @demo ./things-profile/demo/index.html
 -->
 <dom-module id="things-profile">
-  <template>
+	<template>
 
-    <style>
+		<style>
 
-      :host {
-        display: inline-flex;
-        border-radius: 3px;
-        border: 1px solid #ccc;
-        padding: 15px;
-        position: relative;        
-      }
+			:host {
+				display: inline-flex;
+				border-radius: 3px;
+				border: 1px solid #ccc;
+				padding: 15px;
+				position: relative;        
+			}
 
-      :host(:hover) {
-        box-shadow: 0 0 5px #ccc;
-      }
-      
-      :host > div {
-        display: flex; 
-      }
-      
-      a {
-        text-decoration: none;
-        font-size: 20px;
-        color: black;
-        text-align: right;
-      }
-      
-      img {
-        border-radius: 50%;
-        border: 7px solid #fff;
-        box-shadow: 0 0 7px #000;
-        width: 100px;
-        height: 100px;
-      }
-      
-      #info {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        margin-left: 45px;
-      }
-      
-      h2, h3 {
-        font-weight: 400;
-        margin: 0;
-        color: navy;
-      }
-      
-      h3 {
-        font-weight: 300;
-        color: #000000;
-        flex: 1;
-        margin: 10px 0 0 0;
-      }
+			:host(:hover) {
+				box-shadow: 0 0 5px #ccc;
+			}
+			
+			:host > div {
+				display: flex; 
+			}
+			
+			a {
+				text-decoration: none;
+				font-size: 20px;
+				color: black;
+				text-align: right;
+			}
+			
+			img {
+				border-radius: 50%;
+				border: 7px solid #fff;
+				box-shadow: 0 0 7px #000;
+				width: 100px;
+				height: 100px;
+			}
+			
+			#info {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				margin-left: 45px;
+			}
+			
+			h2, h3 {
+				font-weight: 400;
+				margin: 0;
+				color: navy;
+			}
+			
+			h3 {
+				font-weight: 300;
+				color: #000000;
+				flex: 1;
+				margin: 10px 0 0 0;
+			}
 
-      paper-button.custom {
-        --paper-button-ink-color: var(--paper-pink-a200);
-        /* These could also be individually defined for each of the
-          specific css classes, but we'll just do it once as an example */
-        --paper-button-flat-keyboard-focus: {
-          background-color: var(--paper-pink-a200);
-          color: white !important;
-        };
-        --paper-button-raised-keyboard-focus: {
-          background-color: var(--paper-pink-a200) !important;
-          color: white !important;
-        };
-      }
+			paper-button.custom {
+				--paper-button-ink-color: var(--paper-pink-a200);
+				/* These could also be individually defined for each of the
+					specific css classes, but we'll just do it once as an example */
+				--paper-button-flat-keyboard-focus: {
+					background-color: var(--paper-pink-a200);
+					color: white !important;
+				};
+				--paper-button-raised-keyboard-focus: {
+					background-color: var(--paper-pink-a200) !important;
+					color: white !important;
+				};
+			}
 
-      paper-button.custom:hover {
-        background-color: var(--paper-indigo-100);
-      }
+			paper-button.custom:hover {
+				background-color: var(--paper-indigo-100);
+			}
 
-      paper-button.indigo {
-        background-color: var(--paper-indigo-500);
-        color: white;
-        --paper-button-raised-keyboard-focus: {
-          background-color: var(--paper-pink-a200) !important;
-          color: white !important;
-        };
-      }
+			paper-button.indigo {
+				background-color: var(--paper-indigo-500);
+				color: white;
+				--paper-button-raised-keyboard-focus: {
+					background-color: var(--paper-pink-a200) !important;
+					color: white !important;
+				};
+			}
 
-      paper-button.green {
-        background-color: var(--paper-green-500);
-        color: white;
-      }
+			paper-button.green {
+				background-color: var(--paper-green-500);
+				color: white;
+			}
 
-      paper-button.green[active] {
-        background-color: var(--paper-red-500);
-      }
+			paper-button.green[active] {
+				background-color: var(--paper-red-500);
+			}
 
-    </style>
+		</style>
 
-    <div>
-      <img src="[[img]]">
-      <div id="info">
-        <content>
-          <h2>Name : [[name]]</h2>
-          <h3>E-Mail : [[email]]</h3>
-          <paper-card>
-            <div class="card-actions">
-              <paper-button raised class="custom indigo">비밀번호 변경</paper-button>
-              <paper-button raised class="custom green">로그아웃</paper-button>
-            </div>
-          </paper-card>
-        </content>
-      </div>      
-    </div>
-  </template>
+		<paper-card heading="Profile">
+			<img src="[[img]]">
+			<div id="info">
+				<content>
+					<h2>{{getString("label","user_name")}} : [[globals.user.name]]</h2>
+					<h3>{{getString("label","email")}} : [[globals.user.email]]</h3>
+					<paper-card>
+						<div class="card-actions">
+							<paper-button raised 
+								class="custom indigo" 
+								on-click="_onRequestpInitPass">{{getString("button","change_password")}}
+							</paper-button>
+							<paper-button raised class="custom green" on-click="_onLogoutTap">
+								{{getString("button","logout")}}
+							</paper-button>
+							<things-logout 
+								id="logout" 
+								action="logout" 
+								icon="icons:exit-to-app"
+								hidden>
+							</things-logout>
+						</div>
+					</paper-card>
+				</content>
+			</div>
+		</paper-card>
+	</template>
 
-  <script>
-    (function() {
-      'use strict';
+	<script>
+		(function() {
+			'use strict';
 
-      Polymer({
-        is: 'things-profile'
-      });
-    })();
-  </script>
+			Polymer({
+				is: 'things-profile',
+
+				properties : {
+					img : {
+						type: String,
+						value: '../../images/profile.png'
+					}
+				},
+
+				behaviors: [ 
+					Things.GlobalBehavior,
+					Things.I18nBehavior,
+					Polymer.PaperDialogBehavior 
+				],
+				_onRequestpInitPass:function (event) {
+					var element = document.createElement("things-password-init");
+					element.actionUrl="users/request_init_pass";
+					element.method="PUT";
+
+					var dialog = app.$['common-full-dialog'];
+					dialog.openBasicDialog(element,true,null);
+				},
+
+				_onLogoutTap:function (event) {
+					 this.$.logout.logout(); 
+					 this.close();
+				}
+			});
+
+		})();
+	</script>
 
 </dom-module>

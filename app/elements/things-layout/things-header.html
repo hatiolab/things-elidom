@@ -5,6 +5,9 @@
 <link rel="import" href="../things-setting/things-setting-dialog.html">
 <link rel="import" href="../things-setting/things-setting.html">
 <link rel="import" href="../things-auth/things-logout.html">
+<link rel="import" href="../things-i18n/things-i18n-behavior.html">
+<link rel="import" href="../things-i18n/things-locale-combo.html">
+<link rel="import" href="../things-profile/things-profile.html">
 
 <dom-module id="things-header">
   <template>
@@ -21,7 +24,7 @@
 	  }
 
 	  :host .side-toggle {
-	  	background-color:var(--paper-teal-700);
+		background-color:var(--paper-teal-700);
 	  }
 
 	  :host .side-toggle paper-icon-button {
@@ -55,7 +58,7 @@
 	  }
 
 	  :host .search {
-	  	padding:5px 0 3px 5px;
+		padding:5px 0 3px 5px;
 	  }
 
 	  :host .search input {
@@ -76,10 +79,20 @@
 	</style>
 
 	<div>
+		<!-- menu toggle -->
 		<paper-icon-button icon="icons:menu" id="sidebar-toggler">
 		</paper-icon-button>
+		<!-- profile -->
+		<iron-icon id="user" icon="icons:account-circle">
+		</iron-icon>{{globals.user.name }}
+		<things-profile id="profile"></things-profile>
+		<!-- setting dialog -->
 		<paper-icon-button icon="icons:settings" id="toggleSetting"></paper-icon-button>
+		<!-- logout icon button -->
 		<things-logout id="logout" action="logout" icon="icons:exit-to-app"></things-logout>
+				<!-- locale setting -->
+		<things-locale-combo id="localeCombo" default-locale ="[[defaultLocale]]"></things-locale-combo>
+
 	</div>
 
   </template>
@@ -91,7 +104,10 @@
 		Polymer({
 		is: 'things-header',
 
-		behaviors: [ Things.GlobalBehavior ],
+		behaviors: [ 
+			Things.GlobalBehavior ,
+			Things.I18nBehavior
+		],
 
 		properties: {
 			/**
@@ -110,14 +126,25 @@
 					name: '',
 					id: ''
 				}
+			},
+			/**
+			 * selectedLocale
+			 */
+			defaultLocale:{
+				type: String,
+				notify:true,
+				readonly:true,
+				value : function(){
+					return app.locale;
+				}
 			}
 		},
 
 		listeners: {
 			'sidebar-toggler.tap': 'toggleSidebar',
 			'toggleSetting.tap': 'openSettingDialog',
-			'logout.things-logout-succeed': 'toggleSidebar'
-			//'user.tap': 'showUserInfo'
+			'logout.things-logout-succeed': 'toggleSidebar',
+			'user.tap': 'showUserInfo'
 		},
 
 		/**
@@ -133,21 +160,22 @@
 			} else {
 				drawer.togglePanel();
 			}
-			//} else {
-			//	if(!drawer.narrow) {
-			//		drawer.forceNarrow = true
-			//	}
-			//}
 		},
-
+		/**
+		 * show profile inforamtion with dialog
+		 */
 		showUserInfo: function(e) {
-			app.$.profile.open();
+			var profileDialog = this.$.profile;
+			profileDialog.modal = true;
+			profileDialog.noCancelOnEscKey = false;
+			profileDialog.open();
 		},
-
+		/**
+		 * open setting dialog
+		 */
 		openSettingDialog: function(e) {
 			var setting = document.querySelector("#setting");
 			setting.open();
-			// app.$.setting.open();
 		}
 
 	  });
