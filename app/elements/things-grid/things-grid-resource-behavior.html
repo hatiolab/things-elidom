@@ -106,9 +106,9 @@ Things.GridResourceBehaviorImpl = {
 		var me = this;
 		importExcel.addEventListener('excel-process-finish', function(event){
 			// 1. clear grid
-			new DataLudi.DataLoader(me.dataSet).load("json", '', {});
+			new DataLudi.DataLoader(me.dataSet).load('json', '', {});
 			// 2. load excel data to grid
-			new DataLudi.DataLoader(me.dataSet).load("json", event.detail, {
+			new DataLudi.DataLoader(me.dataSet).load('json', event.detail, {
 				fillMode: 'insert', // 'insert', 'append', 'update', 기본은 'set'
 				fillPos: 0
 			});
