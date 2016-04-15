@@ -25,33 +25,71 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	// just render setting and toast boxes 
 	app.localizationReady =false;
 
-	//for localization xhr request, use terminologies/resource 
-	app.getLocalizationInfo = function () {
+	app.setGlobalValues = function(){
 		var setting = document.querySelector('#setting');
-		var xhr = new XMLHttpRequest();
-		xhr.open('POST', setting.globals.basicUrl+'/terminologies/resource', true);
-		xhr.setRequestHeader("Content-type", "application/json");
-		// xhr.method="POST"
-		xhr.withCredentials = true;
-		var domain ={
-			"domain" : 1
+		if(setting.globals){
+			app.basicUrl = setting.globals.basicUrl;
+			app.user = setting.globals.user;
 		};
+	};
+	//get locale from user
+	app.getUserLocale = function () {
+		 return (app.user&&app.user.locale)?app.user.locale:null; 
+	};
 
-		xhr.send(JSON.stringify(domain));
+	//get locale from browser
+	app.getBrowserLocale = function () {
+		var locale;
 
+		locale = navigator.language||navigator.userLanguage;
+		locale = locale=="ko"?"ko-KR": locale;
+
+		return  locale;
+	};
+
+	//make locale value 
+	app.getLocale = function (user) {
+		app.locale = app.getUserLocale()?app.getUserLocale():app.getBrowserLocale();
+		return app.locale;
+	};
+
+	//for localization xhr request, use terminologies/resource 
+	app.getRequestValue = function(){
+		var requestValue= {};
+		if(app.user){
+			requestValue = {"domain" : app.user.domain_id,
+							"locale" : app.getLocale()};
+		}else{
+			requestValue = {"domian":1}
+		}
+
+		return JSON.stringify(requestValue);
+	};
+
+	app.computeUrl = function(){
+		return app.basicUrl+'/terminologies/resource';
+	};
+
+	app.getLocalizationInfo = function () {
+		//1. a sign global values to app;
+		app.setGlobalValues();
+		
+		//2. create xhr requesst
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', app.computeUrl() , true);
+		xhr.setRequestHeader("Content-type", "application/json");
+		xhr.withCredentials = true;
+		
+		//3. make domain object and send request
+		xhr.send(app.getRequestValue());
+
+		//4. monitor xhr request response and status, change localization ready value to true and 
+		//   let index file to render menu and main contents
 		xhr.onreadystatechange = function (Evt) {
 			if (xhr.readyState == 4) {
 				if(xhr.status == 200){
-					// app.i18n={};
-
 					app.langs = JSON.parse(xhr.responseText);
-					
-					app.locale = navigator.language||navigator.userLanguage;
-
-					app.locale = app.locale=="ko"?"ko-KR": app.locale;
 					app.terminologies = app.langs[app.locale];
-
-
 					app.localizationReady =true;
 				}else{
 					// console.log('Error localization xhr page');
