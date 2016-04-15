@@ -66,7 +66,12 @@ Example:
 				id="out-params"
 				mode="out"
 				resource="[[resource]]">
-			</things-base-diy-service-detail-inout>			
+			</things-base-diy-service-detail-inout>
+
+			<things-base-diy-service-detail-test 
+				id="diy-test"
+				resource="[[resource]]">
+			</things-base-diy-service-detail-test>
 		</iron-pages>
 
 	</template>
@@ -175,10 +180,10 @@ Example:
 					}, {
 						title: 'Output Parameters', 
 						elementId: 'things-base-diy-service-detail-inout'
-					}/*, {
+					}, {
 						title: 'Test',
 						elementId: 'things-base-diy-service-detail-test'
-					}*/ ]
+					} ]
 				}
 			},
 

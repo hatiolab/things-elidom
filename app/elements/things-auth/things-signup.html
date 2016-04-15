@@ -5,7 +5,9 @@
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../../bower_components/gold-email-input/gold-email-input.html">
+
 <link rel="import" href="../things-form/things-form-behavior.html">
+
 <!--
 A comment describing this element
 
@@ -33,27 +35,28 @@ Example:
 			last-response="{{lastResponse}}">
 			
 			<paper-input required name ="name" label="username"></paper-input>
-
 			<gold-email-input auto-validate required name="email" label="your email address"></gold-email-input>
 
-<!-- 			<things-code-selector 
+ 			<!--things-code-selector 
 				id="code-selector" 
 				label="Language" 
 				value="en-US" 
 				code-name="LOCALE" 
 				label-path="description" 
 				value-path="name">
-			</things-code-selector> -->
+			</things-code-selector-->
+
 			<paper-input required name ="locale" label="Locale"></paper-input>
 			<paper-input required name ="timezone" label="Timezone"></paper-input>
 
 			<paper-input id="pw" required name="encrypted_password" type="password" label="password"></paper-input>
-			<paper-input id="confirmed-pw" auto-validate required name="confirmed-password" type="password" label="confirm password" validator ="_passwordValidate" errorMessage ="Password is not same"></paper-input>
+			<paper-input id="confirmed-pw" auto-validate required name="confirmed-password" type="password" label="confirm password" validator ="_passwordValidate" errorMessage ="Password mismatch password and confirmed password"></paper-input>
 
 			<paper-button raised on-click ="_submitMyForm">submit</paper-button>
 			<paper-button raised on-click ="_resetMyForm">reset</paper-button>
 		</form>
 	</template>
+
 	<script>
 		Polymer({
 			is: 'things-signup',
@@ -69,15 +72,14 @@ Example:
 			_errorResponseHandler:function (event) {
 				this.showToastMsg('Failure');
 			},
-			_submitMyForm:function(event){
-				if(this._passwordValidate())this.submitMyForm()
-				else { this.showToastMsg('Password is not same'); return;}
+			_submitMyForm:function(event) {
+				if(this._passwordValidate()) { this.submitMyForm() }
+				else { this.showToastMsg('Password mismatch password and confirmed password'); }
 			},
 			_resetMyForm:function (event) {
 				this.resetMyForm();
 			},
 			_passwordValidate:function () {
-				// console.
 				return this.$.pw.value ===this.$['confirmed-pw'].value;
 			}
 		});
