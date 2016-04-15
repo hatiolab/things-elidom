@@ -5,7 +5,7 @@
 <link rel="import" href="../things-button/things-button.html">
 <link rel="import" href="../things-button/things-button-group.html">
 <link rel="import" href="../things-button/things-button-bar.html">
-<link rel="import" href="../things-import-excel/things-import-excel-button.html">
+<link rel="import" href="../things-import-excel/things-import-excel.html">
 <link rel="import" href="../things-paginator/things-paginator.html">
 
 <link rel="import" href="./things-grid-basic-behavior.html">
@@ -96,11 +96,7 @@
 						page-end-idx="[[pageEndIdx]]">
 					</things-paginator>
 
-					<things-import-excel-button 
-						color="green" 
-						id="import-btn"
-						sheet-name="Sheet1">Import
-					</things-import-excel-button>
+					<things-import-excel id ="excelImport" sheet-name="Sheet1"></things-import-excel>
 
 					<!--things-button-bar id="button-group" buttons="[[buttons]]"></things-button-bar-->
 
@@ -160,6 +156,10 @@
 							id: 'save-btn',
 							text: 'Save',
 							icon: 'icons:save'
+						},{
+							id: 'import-btn',
+							text: 'Import',
+							icon: 'icons:file-upload'
 						}]
 				},
 
@@ -233,8 +233,7 @@
 			listeners: {
 				'button-group.things-button-tap' : '_onButtonTap',		
 				'save-resource.things-resource-ajax-success' : '_successSaveHandler',
-				'save-resource.things-resource-ajax-error' : '_errorSaveHandler',
-				'import-btn.excel-process-finish': '_loadExcelData'
+				'save-resource.things-resource-ajax-error' : '_errorSaveHandler'
 
 			},
 
@@ -293,22 +292,12 @@
 				} else if(buttonId == 'save-btn') {
 					this.saveGridData();
 
-				} else {
+				} else if(buttonId == 'import-btn'){
+					this.importExcel();
+				}
+				else {
 					this.fire('things-button-' + buttonId + '-tap', e.detail);
 				}
-			},
-
-			/**
-			 * load excel data to grid
-			 */
-			_loadExcelData : function(event) {
-				// 1. clear grid
-				new DataLudi.DataLoader(this.dataSet).load("json", '', {});
-				// 2. load excel data to grid
-				new DataLudi.DataLoader(this.dataSet).load("json", event.detail, {
-					fillMode: 'insert', // 'insert', 'append', 'update', 기본은 'set'
-					fillPos: 0
-				});
 			},
 
 			/**

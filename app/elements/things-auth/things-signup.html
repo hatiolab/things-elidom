@@ -63,14 +63,16 @@ Example:
 			properties:{
 			},
 			behaviors: [
-				Things.FormBehavior
+				Things.FormBehavior,
+				Things.SpinnerBehavior
 			],
 			_successResponseHandler:function (event) {
-				this.showToastMsg('Success');
-				page('/');
+				this.stopSpinner()
+				this.fire("things-signup-success",this.serializeMyForm());
 			},
 			_errorResponseHandler:function (event) {
-				this.showToastMsg('Failure');
+				this.stopSpinner()
+				this.fire("things-signup-failure",event.detail);
 			},
 			_submitMyForm:function(event) {
 				if(this._passwordValidate()) { this.submitMyForm() }

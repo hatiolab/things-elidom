@@ -6,6 +6,7 @@
 <link rel="import" href="../../../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
 <link rel="import" href="../things-setting/things-global-behavior.html">
 <link rel="import" href="../things-i18n/things-i18n-behavior.html">
+<link rel="import" href="../things-auth/things-change-password.html">
 
 <!--
 `<things-profile>` Profile 
@@ -120,7 +121,8 @@
 						<div class="card-actions">
 							<paper-button raised 
 								class="custom indigo" 
-								on-click="_onRequestpInitPass">{{t("button","change_password")}}
+								on-click="_onRequestpChangePass">
+								{{t("button","change_password")}}
 							</paper-button>
 							<paper-button raised class="custom green" on-click="_onLogoutTap">
 								{{t("button","logout")}}
@@ -157,19 +159,28 @@
 					Things.I18nBehavior,
 					Polymer.PaperDialogBehavior 
 				],
-				_onRequestpInitPass:function (event) {
-					var element = document.createElement("things-password-init");
-					element.actionUrl="users/request_init_pass";
-					element.method="PUT";
-
-					var dialog = app.$['common-full-dialog'];
-					dialog.openBasicDialog(element,true,null);
-				},
 
 				_onLogoutTap:function (event) {
 					 this.$.logout.logout(); 
 					 this.close();
-				}
+				},
+			    _onRequestpChangePass:function (event) {
+					var element = document.createElement("things-change-password");
+					var dialog = app.$['common-full-dialog'];
+					console.log(this.globals);
+					element.actionUrl="users/change_pass/"+ this.globals.user.id;
+					element.method="POST";
+
+					element.addEventListener("things-change-password-success", function(event){
+						dialog.closeBasicDialog();
+					});
+
+					element.addEventListener("things-change-password-failure", function(event){
+						var response = event.detail.request.xhr.response;
+						this.openResponseError(response);
+					})
+					dialog.openBasicDialog(element,true,null);
+			    }
 			});
 
 		})();

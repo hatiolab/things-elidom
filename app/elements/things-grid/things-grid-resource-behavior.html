@@ -39,7 +39,13 @@ Things.GridResourceBehaviorImpl = {
 			type: Array,
 			notify: true
 		},
-
+		/**
+		 * import Sheet Name
+		 */
+		sheetName:{
+			type:String,
+			value :'Sheet1'
+		},
 		/**
 		 * file name to export
 		 */
@@ -91,7 +97,24 @@ Things.GridResourceBehaviorImpl = {
 	addGridRow: function() {
 		this.dataSet.insertRow(0, {});
 	},
-
+	/**
+	 * import 버튼이 클릭 될때 excel import 화면 열기 
+	 */
+	importExcel :function(sheetName){
+		var importExcel = document.createElement('things-import-excel');
+		importExcel.sheetName = this.sheetName;
+		var me = this;
+		importExcel.addEventListener('excel-process-finish', function(event){
+			// 1. clear grid
+			new DataLudi.DataLoader(me.dataSet).load("json", '', {});
+			// 2. load excel data to grid
+			new DataLudi.DataLoader(me.dataSet).load("json", event.detail, {
+				fillMode: 'insert', // 'insert', 'append', 'update', 기본은 'set'
+				fillPos: 0
+			});
+		});
+		importExcel.import();
+	},
 	/**
 	 * 그리드의 변경된 데이터를 감지하여 서버로 한꺼번에 Create/Update/Delete 요청을 한다.
 	 */

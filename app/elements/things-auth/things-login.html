@@ -285,7 +285,8 @@ Example:
     // Element Behavior
     behaviors: [
       Things.GlobalBehavior,
-      Things.I18nBehavior
+      Things.I18nBehavior,
+      Things.MsgBoxBehavior
     ],
 
     // Event listener
@@ -303,18 +304,38 @@ Example:
 
     _onSignupTap:function (event) {
       var element = document.createElement("things-signup");
+      var dialog = app.$['common-full-dialog'];
+      
       element.actionUrl ='users/register';
       element.method='POST';
 
-      var dialog = app.$['common-full-dialog'];
+      element.addEventListener("things-signup-success", function(event){
+        dialog.closeBasicDialog();
+      });
+
+      element.addEventListener("things-signup-failure", function(event){
+        var response = event.detail.request.xhr.response;
+        this.openResponseError(response);
+      })
+
       dialog.openBasicDialog(element,true,null);
     },
+
     _onRequestpInitPass:function (event) {
       var element = document.createElement("things-password-init");
-      element.actionUrl="users/request_init_pass";
-      element.method="PUT";
-
       var dialog = app.$['common-full-dialog'];
+
+      element.actionUrl="users/request_init_pass";
+      element.method="POST";
+
+      element.addEventListener("things-password-init-success", function(event){
+        dialog.closeBasicDialog();
+      });
+
+      element.addEventListener("things-password-init-failure", function(event){
+        var response = event.detail.request.xhr.response;
+        this.openResponseError(response);
+      })
       dialog.openBasicDialog(element,true,null);
     },
 

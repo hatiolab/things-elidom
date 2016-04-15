@@ -1,0 +1,175 @@
+<script src='../../../bower_components/jszip/dist/jszip.min.js'></script>
+<script src='../../../lib/js-xlsx/ods.js'></script>
+<script src='../../../lib/js-xlsx/xlsx.js'></script>
+<script src='shim.js'></script>
+
+<!--
+A comment describing this element
+
+Example:
+
+	<my-elem></my-elem>
+
+Example:
+
+	<my-elem>
+	  <h2>Hello my-elem</h2>
+	</my-elem>
+
+@demo demo/index.html
+-->
+
+<dom-module id="things-import-excel">
+	
+	<template>
+		<input type="file" id="fileInput" on-change="_handleFile" hidden 
+		accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+	</template>
+
+	<script>
+		Polymer({
+
+			is: 'things-import-excel',
+
+			properties: {
+				/**
+				 * handel excel as json/csv
+				 * defualt uses json
+				 */
+				handleAs:{
+					type:String,
+					value:'json'
+				},
+				/**
+				 * XLSX Object, can not set from out side of this componet
+				 */
+				excel:{
+					type : Object,
+					value: XLSX,
+					readonly:true
+				},
+				
+				/**
+				 * parsed data result
+				 */
+				parsedResult:{
+					type:Object,
+					notify:true
+				},
+				/**
+				 * sheet name that you wanna to parse, if not will parse all
+				 * sheet in work book
+				 */
+				sheetName:{
+					type:String
+				}
+			},
+
+			/**
+			 * transfer workbook to json data
+			 */
+			_toJson: function (workbook) {
+				var result = {};
+				var me = this;
+				if(me.sheetName){
+					var items = me.excel.utils.sheet_to_row_object_array(workbook.Sheets[me.sheetName]);
+					var total = items.length;
+					if(me.rootProperty)
+					{
+						result[me.rootProperty] = items;
+						result[me.totalProperty] = total;
+					}else{
+						result = items;
+					}
+					return result;
+				}else{
+					workbook.SheetNames.forEach(function(sheetName) {
+						var roa = me.excel.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+						var total = roa.length;
+						if(roa.length > 0){
+							result[sheetName]={};
+							if(me.rootProperty)
+							{
+								result[sheetName][this.rootProperty] = roa;
+								result[sheetName][this.totalProperty] = total
+							}else{
+								result[sheetName] = roa;
+							}
+						}
+					});
+					return result;
+				}
+			},
+			/**
+			 * transfer workbood data to csv data
+			 */
+			_toCsv : function (workbook) {
+				var result = [];
+				var me = this;
+				if(me.sheetName){
+					var csv = me.excel.utils.sheet_to_csv(workbook.Sheets[me.sheetName]);
+					if(csv.length>0){
+						result.push(csv);
+					}
+				}else{
+					var csv = me.excel.utils.sheet_to_csv(workbook.Sheets[sheetName]);
+					if(csv.length > 0){
+						result.push("SHEET: " + sheetName);
+						result.push("");
+						result.push(csv);
+					}
+				}
+				return result.join("\n");
+			},
+			/**
+			 * transfer xlsx to json and csv
+			 *
+			 * when finished transfer event excel-process-finish will be called
+			 * 
+			 * @event excel-process-finish
+			 */
+			_processWorkbook : function (workbook) {
+				var output = "";
+				switch(this.handleAs) {
+					case "csv":
+						output = this._toCsv(workbook);
+						break;
+					default:
+						output = JSON.stringify(this._toJson(workbook), 2, 2);
+				}
+				this.parsedResult = JSON.parse(output);
+				this.fire('excel-process-finish',this.parsedResult);
+			},
+
+			/**
+			 * read and register handler when file loaded
+			 */
+			_handleFile :function (event) {
+				var file = event.target.files[0];
+				var reader = new FileReader();
+				var me = this;
+
+				//register event listner
+				reader.onload = function(event) {
+					var data = event.target.result;
+					workbook = me.excel.read(data, {type: 'binary'});
+					me._processWorkbook(workbook);
+				};
+				//read file as binary string
+				reader.readAsBinaryString(file);
+			},
+			/**
+			 * Clicks the invisible file input
+			*/
+			import: function() {
+				var elem = this.$.fileInput;
+				if (elem && document.createEvent) {
+					var event = document.createEvent('MouseEvents');
+					event.initEvent("click", true, false);
+					elem.dispatchEvent(event);
+				}
+			}
+
+		});
+	</script>
+</dom-module>
