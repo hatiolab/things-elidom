@@ -19,7 +19,7 @@
       </things-resource>
 
       <span><paper-icon-button icon="icons:view-list"></paper-icon-button>[[entityName]]</span>
-      <things-tree-grid 
+      <things-resource-grid 
         id="grid"
         config="[[gridConfig]]"
         model="[[gridModel]]" 
@@ -28,7 +28,7 @@
         grid-save-action="[[gridSaveUrl]]"
         buttons="[[buttons]]"
         enable-toolbar>
-      </things-tree-grid>
+      </things-resource-grid>
     </div>
   </template>
 
@@ -87,6 +87,8 @@
           value: [ {
             fieldName: 'id'
           }, {
+            fieldName: 'name'
+          }, {
             fieldName: 'check_all',
             dataType: 'boolean'
           }, {
@@ -112,6 +114,9 @@
           value: [ {
             fieldName: 'id'
           }, {
+            fieldName: 'name'
+          },
+          {
             name: 'check_all', fieldName: 'check_all', width: 70,
             header: { text: 'check_all' },
             renderer: {
@@ -213,20 +218,71 @@
 
       _authDataChanged: function(lastResponse) {
         console.log(lastResponse);
+/*action_name:"delete"
+id:21
+name:"ModbusReadCoil"
+parent_id:109
+resource_id:21
+resource_type:"Menu"*/
+        
+        var newItems = [];
+        var parents = this.extractParents(lastResponse.items);
+        var parentCount = parents.length;
+        var itemCount = lastResponse.items.length;
 
-        this.items = [  {
-          id: "1", name: "menu name1", check_all: false, show: true, create: true, update: true, delete: true,
-          rows: [{
-            id: "2", name: "menu name1", check_all: "false", show: "true", create: "true", update: "true", delete: "true"
-          }, {
-            id: "3", name: "menu name1", check_all: "false", show: "true", create: "true", update: "true", delete: "true"
-          }, {
-            id: "4", name: "menu name1", check_all: "false", show: "true", create: "true", update: "true", delete: "true"
-          }]
-        }, {
-          id: "10", name: "menu name10", check_all: false, show: true, create: true, update: true, delete: true,
-        } ];
-      },
+        // parents loop
+        for(var i = 0 ; i < parentCount ; i++) {
+          var parent = parents[i];
+          newItems.push(parent);
+
+          // items loop
+          for(var j = 0 ; j < itemCount ; j++) {
+            var item = lastResponse.items[j];
+            if(item.parent_id != parent.id) continue;
+
+            var actionFlag = item.action_name;
+            var temp = null;
+            var ti = newItems.filter(function(ni) { return ni.id == item.id; });
+
+            if(!ti || ti.length == 0) {
+              temp = item;
+              newItems.push(temp);
+            } else {
+              temp = ti[0];
+            }
+
+            temp[actionFlag] = true;
+            delete temp['action_name'];
+          }
+        }
+
+        console.log(newItems);
+
+        this.items = newItems;
+      }, 
+
+      extractParents : function(permittedItems) {
+        var tmpParents = permittedItems.filter(function(item) { return !item.parent_id; });
+        var parents = [];
+
+        tmpParents.forEach(function(item) {
+          var actionFlag = item.action_name;
+          var p = null;
+
+          var parent = parents.filter(function(p) { return p.id == item.id; });
+          if(!parent || parent.length == 0) {
+            p = item;
+            parents.push(p);
+          } else {
+            p = parent[0];
+          }
+
+          p[actionFlag] = true;
+          delete p['action_name'];
+        });
+
+        return parents;        
+      },   
 
       /**
        * Entity Column 저장 전에...

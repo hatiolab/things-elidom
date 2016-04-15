@@ -339,7 +339,28 @@
         }
 
         this.openPopupView(this, true);
+      },
+
+      /***************************************************************************************
+       *                            Start detail item view interface
+       ***************************************************************************************/
+
+      /**
+       * detail item view를 구성하기 위한 필수 함수 
+       * item view를 구성한다.
+       *
+       * @return {Object} resource 리소스 데이터 (Object) 혹은 리소스 아이디 (Number)
+       */
+      loadDetailData: function(resource) {
+        if(resource) {
+          this.resource = resource;
+          this.entityId = resource.id;
+        }
       }
+
+      /***************************************************************************************
+       *                            End detail item view interface
+       ***************************************************************************************/         
 
     });
   </script>

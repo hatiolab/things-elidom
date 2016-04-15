@@ -423,16 +423,15 @@ Things.GridTreeBehaviorImpl = {
                 this.dataSet.clearRowStates();
             } else {
                 //this.dataSet.setRows(data);
-                // DataLudi.loadJsonData(this.dataSet, data, {
-                  // rows: "",
-                  // childRows: "rows"
-                // });
-
-            new DataLudi.DataLoader(this.dataSet).load('json', data, {
+                DataLudi.loadJsonData(this.dataSet, data, {
                   rows: "",
                   childRows: "rows"
-
-            });                                
+                });
+                
+                // new DataLudi.DataLoader(this.dataSet).load('json', data, {
+                //     rows: "",
+                //     childRows: "rows"
+                // });
             }
         }
     },
