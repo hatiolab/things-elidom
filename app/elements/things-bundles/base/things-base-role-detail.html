@@ -6,8 +6,8 @@
 <link rel="import" href="../../things-code-editor/things-template-editor.html">
 <link rel="import" href="../../things-content/things-detail-form-meta-behavior.html">
 <link rel="import" href="../../things-content/things-load-view-behavior.html">
-<link rel="import" href="../../things-attached-file/things-attached-file.html">
-<link rel="import" href="../../things-extension/things-extension.html">
+<link rel="import" href="./things-base-role-detail-auth.html">
+
 
 <dom-module id="things-base-role-detail">
   <template>
@@ -40,14 +40,14 @@
         remove-fields-on-save="[[removeFieldsOnSave]]">
       </things-resource-form>
 
-      <things-resource-grid 
+      <things-base-role-detail-auth
         id="menu-authorization"
         model="[[authTabModel]]" 
         columns="[[authTabColumns]]"
         data="[[testArray]]"
         buttons="[[buttons]]"
         enable-toolbar>
-      </things-resource-grid>
+      </things-base-role-detail-auth>
 
       <things-resource-grid 
         id="users"
@@ -75,7 +75,6 @@
       properties: {
         testTreeData: {
           type: Array,
-          value:
         },
 
         testGridModel: {
@@ -275,7 +274,9 @@
         this.generateUrl(this.resourceUrl, this.resourceId);
         var detailItemView = event.detail.item;
         this.$['get-resource'].generateRequest();
-
+        
+        var detailItemView = event.detail.item;
+        detailItemView.loadDetailData(this.resource);
         this.fire(detailItemView.id + '-selected', detailItemView);
       },
 

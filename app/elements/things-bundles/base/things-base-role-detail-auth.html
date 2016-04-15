@@ -1,0 +1,283 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/iron-icon/iron-icon.html">
+
+<link rel="import" href="../../things-combo/things-resource-selector-behavior.html">
+<link rel="import" href="../../things-content/things-load-view-behavior.html">
+<link rel="import" href="../../things-grid/things-tree-grid.html">
+<link rel="import" href="../../things-resource/things-resource.html">
+
+<dom-module id="things-base-role-detail-auth">
+
+  <template>
+    <div class="[[layout]]">
+      <things-resource 
+        id="resource-search"
+        method="GET"
+        action="[[gridSearchUrl]]"
+        last-response="{{lastResponse}}"
+        auto>
+      </things-resource>
+
+      <span><paper-icon-button icon="icons:view-list"></paper-icon-button>[[entityName]]</span>
+      <things-tree-grid 
+        id="grid"
+        config="[[gridConfig]]"
+        model="[[gridModel]]" 
+        columns="[[gridColumns]]"
+        data="[[items]]"
+        grid-save-action="[[gridSaveUrl]]"
+        buttons="[[buttons]]"
+        enable-toolbar>
+      </things-tree-grid>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'things-base-role-detail-auth',
+
+      behaviors: [ 
+        Things.LoadViewBehavior
+      ],
+
+      properties: {
+
+        /**
+         * entity id
+         */
+        entityId: {
+          type: String
+        },
+
+        /**
+         * Detail 클릭시 나타나는 detail title
+         */
+        entityName: {
+          type: String
+        },
+
+        /**
+         * entity resource
+         */
+        resource: {
+          type: Object
+        },
+
+        /**
+         * 화면 타이틀 
+         */
+        title: {
+          type: String
+        },
+
+        /**
+         * entity columns 조회 정보 
+         */
+        lastResponse: {
+          type: Object,
+          observer: '_authDataChanged'
+        },        
+
+        /**
+         * grid model
+         */
+        gridModel: {
+          type: Array,
+          value: [ {
+            fieldName: 'id'
+          }, {
+            fieldName: 'check_all',
+            dataType: 'boolean'
+          }, {
+            fieldName: 'show',
+            dataType: 'boolean'
+          }, {
+            fieldName: 'create',
+            dataType: 'boolean'
+          }, {
+            fieldName: 'update',
+            dataType: 'boolean'
+          }, {
+            fieldName: 'delete',
+            dataType: 'boolean'
+          } ]
+        },
+        
+        /**
+         * grid columns
+         */
+        gridColumns: {
+          type: Array,
+          value: [ {
+            fieldName: 'id'
+          }, {
+            name: 'check_all', fieldName: 'check_all', width: 70,
+            header: { text: 'check_all' },
+            renderer: {
+              type:'check', editable: true, threeStates: false, 
+              trueValues: 'true', falseValues: 'false'
+            }
+          }, {
+            name: 'show', fieldName: 'show', width: 70,
+            header: { text: 'show' },
+            renderer: {
+              type:'check', editable: true, threeStates: false, 
+              trueValues: 'true', falseValues: 'false'
+            }
+          }, {
+            name: 'create', fieldName: 'create', width: 70,
+            header: { text: 'create' },
+            renderer: {
+              type:'check', editable: true, threeStates: false, 
+              trueValues: 'true', falseValues: 'false'
+            }
+          }, {
+            name: 'update', fieldName: 'update', width: 70,
+            header: { text: 'update' },
+            renderer: {
+              type:'check', editable: true, threeStates: false, 
+              trueValues: 'true', falseValues: 'false'
+            }
+          }, {
+            name: 'delete', fieldName: 'delete', width: 70,
+            header: { text: 'delete' },
+            renderer: {
+              type:'check', editable: true, threeStates: false, 
+              trueValues: 'true', falseValues: 'false'
+            }
+          } ]
+        },
+
+        /**
+         * Entity Column searching URL
+         */
+        gridSearchUrl: {
+          type: String,
+          computed: '_computeEntitySearchUrl(entityId)',
+        },
+
+        /**
+         * Entity Column save URL
+         */
+        gridSaveUrl: {
+          type: String,
+          computed: '_computeEntityColumnSaveUrl(entityId)'
+        },
+
+        /**
+         * 버튼 정보 
+         */
+        buttons: {
+          type: Array,
+          value: [ {
+            id: 'add-btn',
+            text: 'Add',
+            icon: 'icons:add'
+          }, {
+            id: 'save-btn',
+            text: 'Save',
+            icon: 'icons:save'
+          }, {
+            id: 'delete-btn',
+            text: 'Delete',
+            icon: 'icons:delete'
+          } ]
+        }
+      },
+
+      listeners: {
+        'grid.things-grid-pre-save' : '_beforeColumnsSave',
+        'grid.things-grid-save-success' : 'reloadGrid'
+      },
+
+      /**
+       * EntityColumn Search URL
+       *
+       * @param {String} entityId
+       * @return {String} entity search url
+       */
+      _computeEntitySearchUrl: function(entityId) {
+        return 'roles/'+ entityId +'/permitted_resources.json?resource_type=Menu';
+      },
+
+      /**
+       * Entity Id로 Entity Column Save URL 생성
+       *
+       * @param {String} entityId
+       * @return {String} entity column save url
+       */
+      _computeEntityColumnSaveUrl: function(entityId) {
+        return 'roles/' + entityId + '/update_permissions.json';
+      },
+
+      _authDataChanged: function(lastResponse) {
+        console.log(lastResponse);
+
+        this.items = [  {
+          id: "1", name: "menu name1", check_all: false, show: true, create: true, update: true, delete: true,
+          rows: [{
+            id: "2", name: "menu name1", check_all: "false", show: "true", create: "true", update: "true", delete: "true"
+          }, {
+            id: "3", name: "menu name1", check_all: "false", show: "true", create: "true", update: "true", delete: "true"
+          }, {
+            id: "4", name: "menu name1", check_all: "false", show: "true", create: "true", update: "true", delete: "true"
+          }]
+        }, {
+          id: "10", name: "menu name10", check_all: false, show: true, create: true, update: true, delete: true,
+        } ];
+      },
+
+      /**
+       * Entity Column 저장 전에...
+       */
+      _beforeColumnsSave: function(event) {
+        var grid = event.target;
+        var changedList = grid.writeData;
+
+        if(!changedList || changedList.length == 0)         
+          return event;
+
+        var entityId = this.resource.id;
+        changedList.forEach(function(changedData) {
+          if(changedData.cud_flag_ == 'c' && (!changedData.entity || !changedData.entity_id)) {
+            changedData.entity_id = entityId;
+          }
+        });
+
+        return event;
+      },      
+
+      /**
+       * reload grid data
+       */
+      reloadGrid: function(e) {
+        this.$['resource-search'].generateRequest();
+      },
+
+      /***************************************************************************************
+       *                            Start detail item view interface
+       ***************************************************************************************/
+
+      /**
+       * detail item view를 구성하기 위한 필수 함수 
+       * item view를 구성한다.
+       *
+       * @return {Object} resource 리소스 데이터 (Object) 혹은 리소스 아이디 (Number)
+       */
+      loadDetailData: function(resource) {
+        if(resource) {
+          this.resource = resource;
+          this.entityId = resource.id;
+        }
+      }
+
+      /***************************************************************************************
+       *                            End detail item view interface
+       ***************************************************************************************/       
+      
+
+
+    });
+  </script>
+</dom-module>
