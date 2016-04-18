@@ -1,3 +1,4 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
 <!--
 A comment describing this element
 
@@ -21,22 +22,18 @@ Example:
 				display: block;
 			}
 		</style>
-		<iframe name="result" srcdoc="[[srcdoc]]">
-			
-		</iframe>
+		<iframe name="result" srcdoc="[[srcdoc]]" height ="[[height]]" width="[[width]]"></iframe>
 	</template>
 	<script>
 		Polymer({
 			is: 'things-html-preview',
 			properties:{
 				srcdoc:{
-					type:Object,
-					notify:true,
-					observer:'_onSrcdocChange'
-				}
+					type:String,
+					notify:true				}
 			},
-			_onSrcdocChange : function(srcdoc){
-				console.log(srcdoc);
+			loadHtmlCode: function(srcdoc){
+				this.srcdoc = srcdoc;
 			}
 		});
 	</script>

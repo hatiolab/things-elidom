@@ -34,12 +34,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 				id="eval-editor"
 				theme="ace/theme/monokai"
 				mode="ace/mode/html"
-				resource='{{code_resource}}'
+				resource="{{code_resource}}"
 				code-field ="source"
 				save-url ="hi">
 			</things-code-editor>
-			<things-html-preview srcdoc='{{code_resource}}'>
+			<things-html-preview id="html-preview" srcdoc="{{code_resource.source}}">
 			</things-html-preview>
+			<things-button id="loadHTMLPreview"> Run</things-button>
 		</paper-material>
 
 		<!-- others -->
@@ -273,7 +274,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		  'ws.onopen' : 'onWsMessageReceive',
 		  'ws.onclose' : 'onWsMessageReceive',
 		  'combo.things-combo-value-changed' : 'onComboValueChanged',
-		  'code-selector.things-combo-value-changed' : 'onComboValueChanged'
+		  'code-selector.things-combo-value-changed' : 'onComboValueChanged',
+		  'loadHTMLPreview.tap':'onTapLoadHTMLPreview'
 		},
 
 		onTapSetting: function(e) {
@@ -366,6 +368,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			this.codeName = e.detail.value;
 			this.codeDesc = e.detail.item ? e.detail.item.description : '';
 		  }
+		},
+
+		onTapLoadHTMLPreview: function(e){
+			this.$['html-preview'].srcdoc=this.code_resource.source;
 		}
 
 	  });

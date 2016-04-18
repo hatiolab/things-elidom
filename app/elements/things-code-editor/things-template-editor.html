@@ -1,4 +1,5 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../things-html-preview/things-html-preview.html">
 
 <dom-module id="things-template-editor">
   <template>
@@ -29,8 +30,8 @@
         softtabs$="{{softtabs}}" 
         tabsize$="{{tabsize}}" 
         wrapmode$="{{wrapmode}}">{{source}}</juicy-ace-editor>
-
       <things-button-bar id="button-bar" buttons="[[buttons]]"></things-button-bar>
+      <things-html-preview id="html-preview" width = "94%" height="430px" hidden></things-html-preview>
     </div>
 
     <things-resource 
@@ -154,7 +155,7 @@
           value: [ {
             id: 'save-btn',
             text: 'Save'
-          } ]
+          }]
         }
       },
 
@@ -165,7 +166,8 @@
       },
 
       observers: [
-        '_onResourceChanged(resource,templateField)'
+        '_onResourceChanged(resource,templateField)',
+        '_onModeChange(mode,buttons)'
       ],
 
       /**
@@ -185,7 +187,21 @@
           this.source = resource[templateField]
         }
       },
+      /**
+       * 모드가 ace/mode/html일경우 preview버튼 표시
+       */
+      _onModeChange: function(mode,buttons){
+        var result = buttons.filter(function(button) {
+          return button.id === 'viewHTML-btn'; // Filter out the appropriate one
+        })[0];
 
+        if(mode==="ace/mode/html"&&!result){
+          this.push('buttons',{
+            id:'viewHTML-btn',
+            text:'Preview'
+          });
+        }
+      },
       /**
        * on form fields change
        * @param {Array} formFields
@@ -219,7 +235,9 @@
         if (buttonId == 'save-btn') {
           this._saveCode();
 
-        } else {
+        } else if(buttonId=="viewHTML-btn"){
+          this._showPreview();
+        }else {
           this.fire('things-button-' + buttonId + '-tap', e.detail);
         }
       },
@@ -234,6 +252,15 @@
         this.$['save-code'].generateRequest();
       },
 
+      /**
+       * show preview
+       */
+      _showPreview :function(event){
+        if(this.mode ==="ace/mode/html"){
+          this.$['html-preview'].hidden = false;
+          this.$['html-preview'].srcdoc = this.$['template-editor'].editor.getValue();
+        }
+      },
       /***************************************************************************************
        *                            Start detail item view interface
        ***************************************************************************************/
