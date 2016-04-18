@@ -14,6 +14,7 @@
 <link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
 <link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
 
+<link rel="import" href="../things-fullscreen/things-fullscreen-behavior.html">
 <link rel="import" href="./things-form-behavior.html">
 
 <!--
@@ -84,10 +85,15 @@
       <paper-toolbar>
         <paper-icon-button icon="menu"></paper-icon-button>
         <span class="title">[[title]]</span>
-        <paper-icon-button icon="search" id="search-btn" on-tap="_searchButtonHandler"></paper-icon-button>
-        <paper-icon-button icon="refresh" id="reset-btn" on-tap="resetMyForm"></paper-icon-button>
+        <paper-icon-button icon="search" id="search-btn" on-tap="_searchButtonHandler">
+        </paper-icon-button>
+        <paper-icon-button icon="refresh" id="reset-btn" on-tap="resetMyForm">
+        </paper-icon-button>
+        <paper-icon-button icon="icons:fullscreen" id="fullscreen-btn" on-tap="toggleFullscreen">
+        </paper-icon-button>
         <paper-tooltip for="search-btn" offset="0">Search</paper-tooltip>
         <paper-tooltip for="reset-btn" offset="0">Reset</paper-tooltip>
+        <paper-tooltip for="fullscreen-btn" offset="0">Full Screen</paper-tooltip>
       </paper-toolbar>
 
       <div class="layout vertical flex">
@@ -191,7 +197,10 @@
        */
     },
     
-    behaviors: [ Things.FormBehavior ],
+    behaviors: [ 
+      Things.FormBehavior,
+      Things.FullscreenBehavior
+    ],
 
     listeners : {
       'iron-form-presubmit' :'_preSubmitHandler'
