@@ -1,196 +1,229 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
 
-<link rel="import" href="../things-setting/things-global-behavior.html">
-<link rel="import" href="../things-setting/things-setting-dialog.html">
-<link rel="import" href="../things-setting/things-setting.html">
 <link rel="import" href="../things-auth/things-logout.html">
 <link rel="import" href="../things-i18n/things-i18n-behavior.html">
 <link rel="import" href="../things-i18n/things-locale-combo.html">
 <link rel="import" href="../things-profile/things-profile.html">
+<link rel="import" href="../things-setting/things-global-behavior.html">
+<link rel="import" href="../things-setting/things-setting-dialog.html">
+<link rel="import" href="../things-setting/things-setting.html">
 
 <dom-module id="things-header">
   <template>
 	<style>
-	  :host {
-			display: block;
-			background-color:var(--paper-blue-grey-800);
-			color:#fff;
-	  }
-	  
-	  :host iron-icon {
-			width:15px;height:15px;
-			margin-right:4px;
-	  }
+      :host {
+        display: block;
+        background-color:var(--paper-blue-grey-800);
+        color:#fff;
+      }
 
-	  :host .side-toggle {
-		background-color:var(--paper-teal-700);
-	  }
+      :host iron-icon {
+        width:15px;height:15px;
+        margin-right:4px;
+      }
+      
+      :host .side-toggle {
+      	background-color:var(--paper-teal-700);
+      }
+      
+      :host .side-toggle paper-icon-button {
+        width:31px;height:31px;
+        margin-left:3px;
+        padding:0 4px 0 2px;
+      }
+      
+      :host .user-menu {
+        padding:7px 5px 0 0;
+        color:var(--paper-blue-grey-400);
+        font-size:13px;
+      }
 
-	  :host .side-toggle paper-icon-button {
-			width:31px;height:31px;
-			margin-left:3px;
-			padding:0 4px 0 2px;
-	  }
+      :host .user-menu paper-icon-button {
+        width:18px;height:18px;
+        position:relative;
+        top:-1px;
+        margin-left:5px;
+        padding:1px;
+        color:var(--paper-blue-grey-200);
+      }
 
-	  :host .user-menu {
-			padding:7px 5px 0 0;
-			color:var(--paper-blue-grey-400);
-			font-size:13px;
-	  }
+      :host .user-menu things-logout::shadow paper-icon-button {
+        width:18px;height:18px;
+        position:relative;
+        top:-1px;
+        margin-left:1px;
+        padding:0px;
+        color:var(--paper-blue-grey-200);
+      }
 
-	  :host .user-menu paper-icon-button {
-			width:18px;height:18px;
-			position:relative;
-			top:-1px;
-			margin-left:5px;
-			padding:1px;
-			color:var(--paper-blue-grey-200);
-	  }
+      :host .search {
+      	padding:5px 0 3px 5px;
+      }
+      
+      :host .search input {
+        background-color:rgba(255,255,255,.1);
+        border-radius:3px;
+        border:1px solid rgba(255,255,255,.15);
+        padding:1px 3px;
+        max-width:120px;
+        color:#fff;
+        font-size:13px;
+      }
 
-	  :host .user-menu things-logout::shadow paper-icon-button {
-			width:18px;height:18px;
-			position:relative;
-			top:-1px;
-			margin-left:1px;
-			padding:0px;
-			color:var(--paper-blue-grey-200);
-	  }
-
-	  :host .search {
-		padding:5px 0 3px 5px;
-	  }
-
-	  :host .search input {
-			background-color:rgba(255,255,255,.1);
-			border-radius:3px;
-			border:1px solid rgba(255,255,255,.15);
-			padding:1px 3px;
-			max-width:120px;
-			color:#fff;
-			font-size:13px;
-	  }
-
-	  :host .search paper-icon-button {
-			width:22px;height:22px;
-			margin-left:3px;
-			padding:1px;
-		}
+      :host .search paper-icon-button {
+        width:22px;height:22px;
+        margin-left:3px;
+        padding:1px;
+      }
 	</style>
 
 	<div>
 		<!-- menu toggle -->
 		<paper-icon-button icon="icons:menu" id="sidebar-toggler">
 		</paper-icon-button>
-		<!-- profile -->
-		<iron-icon id="user" icon="icons:account-circle">
-		</iron-icon>{{globals.user.name }}
-		<things-profile id="profile"></things-profile>
-		<!-- setting dialog -->
-		<paper-icon-button icon="icons:settings" id="toggleSetting"></paper-icon-button>
-		<!-- logout icon button -->
-		<things-logout id="logout" action="logout" icon="icons:exit-to-app"></things-logout>
-				<!-- locale setting -->
-		<things-locale-combo id="localeCombo" default-locale ="[[defaultLocale]]" hidden="[[localeSeletable]]"></things-locale-combo>
+		<paper-tooltip for="sidebar-toggler">{{t("label", "toggle_sidebar")}}</paper-tooltip>
 
+		<!-- locale -->
+		<paper-icon-button id="locale" icon="icons:language" hidden="[[buttonEnable]]">
+		</paper-icon-button>
+		<paper-tooltip for="locale">{{t("button", "locale")}}</paper-tooltip>
+
+		<!-- profile -->
+		<paper-icon-button id="account" icon="icons:account-box" hidden="[[buttonEnable]]">
+		</paper-icon-button>{{userName}}
+		<things-profile id="profile" hidden="[[buttonEnable]]"></things-profile>
+
+		<paper-tooltip for="account">{{t("button", "user_profile")}}</paper-tooltip>
+		
+		<!-- setting -->
+		<paper-icon-button icon="icons:settings" id="setting-toggler"></paper-icon-button>
+
+		<paper-tooltip for="setting-toggler">{{t("button", "setting")}}</paper-tooltip>
+
+		<!-- logout -->
+		<things-logout id="logout" action="logout" icon="icons:exit-to-app" hidden="[[buttonEnable]]">
+		</things-logout>
+
+		<paper-tooltip for="logout">{{t("button", "logout")}}</paper-tooltip>
+
+		<!-- locale selector -->
+		<things-locale-combo id="locale-selector" default-locale ="[[defaultLocale]]" hidden>
+		</things-locale-combo>
 	</div>
 
   </template>
 
   <script>
-	(function() {
-	  'use strict';
-
 		Polymer({
-		is: 'things-header',
+			is: 'things-header',
 
-		behaviors: [ 
-			Things.GlobalBehavior ,
-			Things.I18nBehavior
-		],
+			behaviors: [ 
+				Things.GlobalBehavior,
+				Things.I18nBehavior
+			],
 
-		properties: {
-			/**
-			 * drawer id
-			 */
-			drawerId: {
-				type: String
+			properties: {
+				/**
+				 * drawer id
+				 */
+				drawerId: {
+					type: String
+				},
+
+				/**
+				 * signed-in user object
+				 */
+				user: {
+					type: Object,
+					value: { name: '', id: '' }
+				},
+
+				/**
+				 * 사용자 이름 
+				 */
+				userName: {
+					type: String,
+					value: function() {
+						return app.user ? app.user.name : '';
+					}
+				},
+
+				/**
+				 * Locale
+				 */
+				defaultLocale: {
+					type: String,
+					notify: true,
+					readonly: true,
+					value : function() {
+						return app.locale
+					}
+				},
+				
+				/**
+				 * Enable buttons
+				 */
+				buttonEnable: {
+					type: String,
+					notify: true,
+					readonly: true,
+					value : function() {
+						return app.user ? false : true;
+					}
+				},
+			},
+
+			listeners: {
+				'sidebar-toggler.tap': 'toggleSidebar',
+				'setting-toggler.tap': 'showSetting',
+				'account.tap': 'showProfile',
+				'locale.tap': 'toggleLocale'
 			},
 
 			/**
-			 * signed-in user object
+			 * Toggle Sidebar. 로그인 이후에만 toggle이 적용됨 
 			 */
-			user: {
-				type: Object,
-				value: {
-					name: '',
-					id: ''
+			toggleSidebar: function(e) {
+				var drawer = app.$[this.drawerId];
+				
+				if(this.isSignedIn()) {
+					if(drawer.forceNarrow) {
+						drawer.forceNarrow = false
+					} else if(!drawer.narrow) {
+						drawer.forceNarrow = true
+					} else {
+						drawer.togglePanel();
+					}
 				}
 			},
-			/**
-			 * selectedLocale
-			 */
-			defaultLocale:{
-				type: String,
-				notify:true,
-				readonly:true,
-				value : function(){
-					return app.locale;
-				}
-			},
-			/**
-			 * enable locale selector
-			 */
-			localeSeletable:{
-				type: String,
-				notify:true,
-				readonly:true,
-				value : function(){
-					var value = app.user?false:true;
-					return value
-				}
-			},
-		},
 
-		listeners: {
-			'sidebar-toggler.tap': 'toggleSidebar',
-			'toggleSetting.tap': 'openSettingDialog',
-			'user.tap': 'showUserInfo'
-		},
+			/**
+			 * Show profile dialog
+			 */
+			showProfile: function(e) {
+				var profileDialog = this.$.profile;
+				profileDialog.modal = true;
+				profileDialog.noCancelOnEscKey = false;
+				profileDialog.open();
+			},
+			
+			/**
+			 * Show setting dialog
+			 */
+			showSetting: function(e) {
+				var setting = document.querySelector("#setting");
+				setting.open();
+			},
 
-		/**
-		* 로그인 이후에만 toggle이 적용됨 
-		*/
-		toggleSidebar: function(e) {
-			var drawer = app.$[this.drawerId];
-			//if(this.isSignedIn()) {
-			if(drawer.forceNarrow) {
-				drawer.forceNarrow = false
-			} else if(!drawer.narrow) {
-				drawer.forceNarrow = true
-			} else {
-				drawer.togglePanel();
+			/**
+			 * Toggle Locale Selector
+			 */
+			toggleLocale: function(e) {
+				this.$['locale-selector'].hidden = !this.$['locale-selector'].hidden;
 			}
-		},
-		/**
-		 * show profile inforamtion with dialog
-		 */
-		showUserInfo: function(e) {
-			var profileDialog = this.$.profile;
-			profileDialog.modal = true;
-			profileDialog.noCancelOnEscKey = false;
-			profileDialog.open();
-		},
-		/**
-		 * open setting dialog
-		 */
-		openSettingDialog: function(e) {
-			var setting = document.querySelector("#setting");
-			setting.open();
-		}
-
 
 	  });
-	})();
   </script>
 </dom-module>
