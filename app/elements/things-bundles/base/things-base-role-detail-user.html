@@ -17,7 +17,7 @@
         auto>
       </things-resource>
 
-      <span><paper-icon-button icon="icons:view-list"></paper-icon-button>[[entityName]]</span>
+      <span><paper-icon-button icon="icons:view-list"></paper-icon-button>[[roleName]]</span>
       <things-resource-grid 
         id="grid"
         config="[[gridConfig]]"
@@ -45,28 +45,28 @@
       properties: {
 
         /**
-         * entity id
+         * role id
          */
-        entityId: {
+        roleId: {
           type: String
         },
 
         /**
          * Detail 클릭시 나타나는 detail title
          */
-        entityName: {
+        roleName: {
           type: String
         },
 
         /**
-         * entity resource
+         * role detail user resource
          */
         resource: {
           type: Object
         },
 
         /**
-         * entity columns 조회 정보 
+         * role detail user columns 조회 정보 
          */
         lastResponse: {
           type: Array,
@@ -81,14 +81,14 @@
           value: [ {
             fieldName: 'id'
           }, {
-            fieldName: 'name'
-          }, {
-            fieldName: 'email'
+            fieldName: 'user',
+            dataType: 'object'            
           }, {
             fieldName: 'login'
           }, {
-            fieldName: 'user',
-            dataType: 'object'
+            fieldName: 'email'
+          }, {
+            fieldName: 'name'
           } ]
         },
 
@@ -120,31 +120,47 @@
               resourceType: "User",
               resourceUrl: "users",
               valueField: "user"
-            }
+            },
+            imageList: 'images',
+            renderer: {
+              type: 'icon'
+            },
+            styles: {
+              iconLocation: 'center'
+            },
+            styleCallback: function (index, styles) {
+              var rowData = index.getRow().getRowObject();
+              if(rowData.id) {
+                styles.setIconIndex('menu_button.png');
+              } else {
+                styles.setIconIndex('menu_button_hover.png');
+              }
+            }            
           }, {
             fieldName: 'login'
           }, {
             fieldName: 'email',
             width: 160
           }, {
-            fieldName: 'name'
+            fieldName: 'name',
+            width: 160
           } ]
         },
 
         /**
-         * Entity Column searching URL
+         * Role detail User searching URL
          */
         gridSearchUrl: {
           type: String,
-          computed: '_computeEntitySearchUrl(entityId)',
+          computed: '_computeUserSearchUrl(roleId)',
         },
 
         /**
-         * Entity Column save URL
+         * Role detail User Save URL
          */
         gridSaveUrl: {
           type: String,
-          computed: '_computeEntityColumnSaveUrl(entityId)'
+          computed: '_computeUserColumnSaveUrl(roleId)'
         },
 
         /**
@@ -176,6 +192,9 @@
         'grid.things-grid-resource-column-edit' : '_openResourceSelector'        
       },
 
+      /**
+       * Resource Selector의 선택된 detail 정보
+       */
       _onResourceSelectorSelected: function(event) {
         var resource = event.detail.resource;
         var rowObj = event.detail.rowObj;
@@ -200,6 +219,10 @@
         }
       },      
 
+      /**
+       * role users detail 정보가 변경 되었을 시
+       * role id와 role name을 초기화 
+       */
       _rolesUsersChanged: function(lastResponse) {
         if(lastResponse && lastResponse.length > 0) {
           this.items = lastResponse.map(function(item) {
@@ -220,23 +243,20 @@
 
       /**
        * Role User Search URL
-       *
-       * @param {String} entityId
-       * @return {String} entity search url
        */
-      _computeEntitySearchUrl: function(entityId) {
-        return 'roles/'+ entityId +'/role_users.json';
+      _computeUserSearchUrl: function(roleId) {
+        return 'roles/'+ roleId +'/role_users.json';
       },
 
       /**
-       * Entity Id로 Role User Column Save URL 생성
+       * Role Id로 Role User Column Save URL 생성
        */
-      _computeEntityColumnSaveUrl: function(entityId) {
-        return 'roles/' + entityId + '/update_users.json';
+      _computeUserColumnSaveUrl: function(roleId) {
+        return 'roles/' + roleId + '/update_users.json';
       },
 
       /**
-       * Entity Column 저장 전에...
+       * Role User Column 저장 전에...
        */
       _beforeColumnsSave: function(event) {
         var grid = event.target;
@@ -272,8 +292,8 @@
       loadDetailData: function(resource) {
         if(resource) {
           this.resource = resource;
-          this.entityId = resource.id;
-          this.entityName = resource.name;
+          this.roleId = resource.id;
+          this.roleName = resource.name;
         }
       }
 

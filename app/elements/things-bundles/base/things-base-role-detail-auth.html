@@ -3,6 +3,7 @@
 
 <link rel="import" href="../../things-combo/things-resource-selector-behavior.html">
 <link rel="import" href="../../things-content/things-load-view-behavior.html">
+<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 <link rel="import" href="../../things-grid/things-tree-grid.html">
 <link rel="import" href="../../things-resource/things-resource.html">
 
@@ -18,7 +19,7 @@
         auto>
       </things-resource>
 
-      <span><paper-icon-button icon="icons:view-list"></paper-icon-button>[[entityName]]</span>
+      <span><paper-icon-button icon="icons:view-list"></paper-icon-button>[[roleName]]</span>
       <things-resource-grid 
         id="grid"
         config="[[gridConfig]]"
@@ -29,6 +30,7 @@
         buttons="[[buttons]]"
         enable-toolbar>
       </things-resource-grid>
+      
     </div>
 
   </template>
@@ -39,27 +41,28 @@
       is: 'things-base-role-detail-auth',
 
       behaviors: [ 
-        Things.LoadViewBehavior
+        Things.LoadViewBehavior,
+        Things.MsgBoxBehavior
       ],
 
       properties: {
 
         /**
-         * entity id
+         * role id
          */
-        entityId: {
+        roleId: {
           type: String
         },
 
         /**
          * Detail 클릭시 나타나는 detail title
          */
-        entityName: {
+        roleName: {
           type: String
         },
 
         /**
-         * entity resource
+         * role resource
          */
         resource: {
           type: Object
@@ -80,6 +83,8 @@
           type: Array,
           value: [ {
             fieldName: 'id'
+          }, {
+            fieldName: 'parent_id'
           }, {
             fieldName: 'name'
           }, {
@@ -109,9 +114,24 @@
             fieldName: 'id',
             width: 0
           }, {
+            fieldName: 'parent_id',
+            width: 0
+          }, {
             fieldName: 'name',
             editable: false,
-            width: 250
+            width: 250,
+            imageList: 'images',
+            renderer: {
+              type: 'icon'
+            },
+            styleCallback: function (index, styles) {
+              var rowData = index.getRow().getRowObject();
+              if(!rowData.parent_id) {
+                styles.setIconIndex('indicator_insert.png');
+              } else {
+                styles.setIconIndex('menu_button.png');
+              }
+            }
           }, {
             name: 'check_all', fieldName: 'check_all', width: 100, editable: false,
             header: { text: 'Check All' },
@@ -155,7 +175,7 @@
          */
         gridSearchUrl: {
           type: String,
-          computed: '_computeEntitySearchUrl(entityId)',
+          computed: '_computeAuthSearchUrl(roleId)',
         },
 
         /**
@@ -163,7 +183,7 @@
          */
         gridSaveUrl: {
           type: String,
-          computed: '_computeEntityColumnSaveUrl(entityId)'
+          computed: '_computeAuthColumnSaveUrl(roleId)'
         },
 
         /**
@@ -185,6 +205,10 @@
         'grid.things-button-update-btn-tap' : '_updatePermission'
       },
 
+      /**
+       * check_all 컬럼이 true가 되었을 때
+       * 다른 check box들을 모두 true로 변환
+       */
       _onGridConfigured: function(event) {
         var grid = event.detail;
         grid.onEditCellUpdated = function (grid, rowIndex, fieldIndex, newValue, oldValue) {
@@ -200,6 +224,9 @@
         };
       },
 
+      /**
+       * Update multiple & Delete All 기능
+       */
       _updatePermission: function(event) {
         var thingsGrid = this.$.grid;
         var grid = thingsGrid.getGridObject();
@@ -230,35 +257,27 @@
           } else {
             thingsGrid._gridSaveAction();
           }
-
         } else {
-          // TODO
-          console.log('No data changed');
+          this.openInfoMsg({ title : 'Nothing to Save', text : 'There\'s nothing to save', type : 'info', timer : 3000 });
         }
       },
 
       /**
-       * menu autholization Search URL
-       *
-       * @param {String} entityId
-       * @return {String} entity search url
+       * role id를 통한 searching URL 생성
        */
-      _computeEntitySearchUrl: function(entityId) {
-        return 'roles/' + entityId + '/permitted_resources.json?resource_type=Menu';
+      _computeAuthSearchUrl: function(roleId) {
+        return 'roles/' + roleId + '/permitted_resources.json?resource_type=Menu';
       },
 
       /**
-       * Entity Id로 menu autholization URL 생성
-       *
-       * @param {String} entityId
-       * @return {String} entity column save url
+       * role id를 통해 menu authorization save URL 생성
        */
-      _computeEntityColumnSaveUrl: function(entityId) {
-        return 'roles/' + entityId + '/update_permissions';
+      _computeAuthColumnSaveUrl: function(roleId) {
+        return 'roles/' + roleId + '/update_permissions';
       },
 
       /**
-       * lastResponse에서  parent parent와 child를 추출하여
+       * lastResponse에서 parent와 child를 추출하여
        * items에 초기화
        */
       _authDataChanged: function(lastResponse) {
@@ -288,7 +307,9 @@
               temp = ti[0];
             }
 
-            temp[actionFlag] = true;
+            if(actionFlag)
+              temp[actionFlag] = true;
+
             delete temp['action_name'];
           }
         }
@@ -315,7 +336,9 @@
             p = parent[0];
           }
 
-          p[actionFlag] = true;
+          if(actionFlag)
+            p[actionFlag] = true;
+
           delete p['action_name'];
         });
 
@@ -342,8 +365,8 @@
       loadDetailData: function(resource) {
         if(resource) {
           this.resource = resource;
-          this.entityId = resource.id;
-          this.entityName = resource.name;
+          this.roleId = resource.id;
+          this.roleName = resource.name;
         }
       }
 
