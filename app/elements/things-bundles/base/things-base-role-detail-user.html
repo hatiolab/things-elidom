@@ -6,7 +6,7 @@
 <link rel="import" href="../../things-grid/things-tree-grid.html">
 <link rel="import" href="../../things-resource/things-resource.html">
 
-<dom-module id="things-base-role-detail-auth">
+<dom-module id="things-base-role-detail-user">
 
   <template>
     <div class="[[layout]]">
@@ -24,22 +24,18 @@
         config="[[gridConfig]]"
         model="[[gridModel]]" 
         columns="[[gridColumns]]"
-        data="[[items]]"
+        data="[[lastResponse]]"
         grid-save-action="[[gridSaveUrl]]"
         buttons="[[buttons]]"
         enable-toolbar>
       </things-resource-grid>
-    </div>
-
-    <div>
-      <paper-button on-tap="test">FIRE</paper-button>
     </div>
   </template>
 
   <script>
     Polymer({
 
-      is: 'things-base-role-detail-auth',
+      is: 'things-base-role-detail-user',
 
       behaviors: [ 
         Things.LoadViewBehavior
@@ -69,11 +65,10 @@
         },
 
         /**
-         * menu authorization 조회 결과 
+         * entity columns 조회 정보 
          */
         lastResponse: {
-          type: Object,
-          observer: '_authDataChanged'
+          type: Object
         },        
 
         /**
@@ -84,25 +79,14 @@
           value: [ {
             fieldName: 'id'
           }, {
+            fieldName: 'login'
+          }, {
+            fieldName: 'email'
+          }, {
             fieldName: 'name'
-          }, {
-            fieldName: 'check_all',
-            dataType: 'boolean'
-          }, {
-            fieldName: 'show',
-            dataType: 'boolean'
-          }, {
-            fieldName: 'create',
-            dataType: 'boolean'
-          }, {
-            fieldName: 'update',
-            dataType: 'boolean'
-          }, {
-            fieldName: 'delete',
-            dataType: 'boolean'
           } ]
         },
-        
+
         /**
          * grid columns
          */
@@ -112,48 +96,17 @@
             fieldName: 'id',
             width: 0
           }, {
-            fieldName: 'name',
+            fieldName: 'login'
+          }, {
+            fieldName: 'email',
             width: 160
           }, {
-            name: 'check_all', fieldName: 'check_all', width: 70, editable: false,
-            header: { text: 'check_all' },
-            renderer: {
-              type:'check', editable: true, editOnClick: true, threeStates: false, 
-              trueValues: 'true', falseValues: 'false'
-            }
-          }, {
-            name: 'show', fieldName: 'show', width: 70, editable: false,
-            header: { text: 'show' },
-            renderer: {
-              type:'check', editable: true, editOnClick: true, threeStates: false, 
-              trueValues: 'true', falseValues: 'false'
-            }
-          }, {
-            name: 'create', fieldName: 'create', width: 70, editable: false,
-            header: { text: 'create' },
-            renderer: {
-              type:'check', editable: true, editOnClick: true, threeStates: false, 
-              trueValues: 'true', falseValues: 'false'
-            }
-          }, {
-            name: 'update', fieldName: 'update', width: 70, editable: false,
-            header: { text: 'update' },
-            renderer: {
-              type:'check', editable: true, editOnClick: true, threeStates: false, 
-              trueValues: 'true', falseValues: 'false'
-            }
-          }, {
-            name: 'delete', fieldName: 'delete', width: 70, editable: false,
-            header: { text: 'delete' },
-            renderer: {
-              type:'check', editable: true, editOnClick: true, threeStates: false, 
-              trueValues: 'true', falseValues: 'false'
-            }
+            fieldName: 'name'
           } ]
         },
 
         /**
-         * menu autholization search url
+         * Entity Column searching URL
          */
         gridSearchUrl: {
           type: String,
@@ -161,7 +114,7 @@
         },
 
         /**
-         * menu autholization save URL
+         * Entity Column save URL
          */
         gridSaveUrl: {
           type: String,
@@ -195,88 +148,20 @@
       },
 
       /**
-       * menu autholization Search URL
+       * Role User Search URL
        *
        * @param {String} entityId
        * @return {String} entity search url
        */
       _computeEntitySearchUrl: function(entityId) {
-        return 'roles/' + entityId + '/permitted_resources.json?resource_type=Menu';
+        return 'roles/'+ entityId +'/role_users.json';
       },
 
       /**
-       * Entity Id로 menu autholization URL 생성
-       *
-       * @param {String} entityId
-       * @return {String} entity column save url
+       * Entity Id로 Role User Column Save URL 생성
        */
       _computeEntityColumnSaveUrl: function(entityId) {
-        return 'roles/' + entityId + '/update_permissions.json';
-      },
-
-      /**
-       * lastResponse에서  parent parent와 child를 추출하여
-       * items에 초기화
-       */
-      _authDataChanged: function(lastResponse) {
-        var newItems = [];
-        var parents = this.extractParents(lastResponse.items);
-        var parentCount = parents.length;
-        var itemCount = lastResponse.items.length;
-
-        // parents loop
-        for(var i = 0 ; i < parentCount ; i++) {
-          var parent = parents[i];
-          newItems.push(parent);
-
-          // items loop
-          for(var j = 0 ; j < itemCount ; j++) {
-            var item = lastResponse.items[j];
-            if(item.parent_id != parent.id) continue;
-
-            var actionFlag = item.action_name;
-            var temp = null;
-            var ti = newItems.filter(function(ni) { return ni.id == item.id; });
-
-            if(!ti || ti.length == 0) {
-              temp = item;
-              newItems.push(temp);
-            } else {
-              temp = ti[0];
-            }
-
-            temp[actionFlag] = true;
-            delete temp['action_name'];
-          }
-        }
-
-        this.items = newItems;
-      }, 
-
-      /**
-       * permittedItems에서 parents rows만 추출해서 리턴
-       */
-      extractParents : function(permittedItems) {
-        var tmpParents = permittedItems.filter(function(item) { return !item.parent_id; });
-        var parents = [];
-
-        tmpParents.forEach(function(item) {
-          var actionFlag = item.action_name;
-          var p = null;
-
-          var parent = parents.filter(function(p) { return p.id == item.id; });
-          if(!parent || parent.length == 0) {
-            p = item;
-            parents.push(p);
-          } else {
-            p = parent[0];
-          }
-
-          p[actionFlag] = true;
-          delete p['action_name'];
-        });
-
-        return parents;        
+        return 'roles/' + entityId + '/update_users.json';
       },
 
       /**
