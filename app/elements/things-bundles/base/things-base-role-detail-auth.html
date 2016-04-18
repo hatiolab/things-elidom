@@ -212,7 +212,7 @@
       _onGridConfigured: function(event) {
         var grid = event.detail;
         grid.onEditCellUpdated = function (grid, rowIndex, fieldIndex, newValue, oldValue) {
-          if(fieldIndex == 2) {
+          if(fieldIndex == 3) {
             grid.commit();
             var rowObj = grid.focusedRow().getRowObject();
             rowObj['show'] = newValue;
