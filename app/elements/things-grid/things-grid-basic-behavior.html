@@ -125,6 +125,14 @@ Things.GridBasicBehaviorImpl = {
         },
 
         /**
+         * Height Of Grid
+         */
+        gridHeight: {
+            type: Number,
+            value: 300
+        },
+
+        /**
          * enable detail column or not
          */
         enableDetailColumn: {
@@ -237,7 +245,7 @@ Things.GridBasicBehaviorImpl = {
      */
     resizeGrid: function(parentNode, gridContainer) {
         gridContainer.style.width = (parentNode.offsetWidth - 20) + 'px';
-        gridContainer.style.height = '300px';
+        gridContainer.style.height = this.gridHeight + 'px';
         this.grid.resetSize();
     },
 
