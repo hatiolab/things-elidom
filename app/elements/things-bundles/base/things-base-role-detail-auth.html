@@ -113,38 +113,39 @@
             width: 0
           }, {
             fieldName: 'name',
-            width: 160
+            editable: false,
+            width: 250
           }, {
-            name: 'check_all', fieldName: 'check_all', width: 70, editable: false,
-            header: { text: 'check_all' },
+            name: 'check_all', fieldName: 'check_all', width: 100, editable: false,
+            header: { text: 'Check All' },
             renderer: {
               type:'check', editable: true, editOnClick: true, threeStates: false, 
               trueValues: 'true', falseValues: 'false'
             }
           }, {
-            name: 'show', fieldName: 'show', width: 70, editable: false,
-            header: { text: 'show' },
+            name: 'show', fieldName: 'show', width: 80, editable: false,
+            header: { text: 'Show' },
             renderer: {
               type:'check', editable: true, editOnClick: true, threeStates: false, 
               trueValues: 'true', falseValues: 'false'
             }
           }, {
-            name: 'create', fieldName: 'create', width: 70, editable: false,
-            header: { text: 'create' },
+            name: 'create', fieldName: 'create', width: 80, editable: false,
+            header: { text: 'Create' },
             renderer: {
               type:'check', editable: true, editOnClick: true, threeStates: false, 
               trueValues: 'true', falseValues: 'false'
             }
           }, {
-            name: 'update', fieldName: 'update', width: 70, editable: false,
-            header: { text: 'update' },
+            name: 'update', fieldName: 'update', width: 80, editable: false,
+            header: { text: 'Update' },
             renderer: {
               type:'check', editable: true, editOnClick: true, threeStates: false, 
               trueValues: 'true', falseValues: 'false'
             }
           }, {
-            name: 'delete', fieldName: 'delete', width: 70, editable: false,
-            header: { text: 'delete' },
+            name: 'delete', fieldName: 'delete', width: 80, editable: false,
+            header: { text: 'Delete' },
             renderer: {
               type:'check', editable: true, editOnClick: true, threeStates: false, 
               trueValues: 'true', falseValues: 'false'
@@ -174,24 +175,69 @@
         buttons: {
           type: Array,
           value: [ {
-            id: 'add-btn',
-            text: 'Add',
-            icon: 'icons:add'
-          }, {
-            id: 'save-btn',
+            id: 'update-btn',
             text: 'Save',
             icon: 'icons:save'
-          }, {
-            id: 'delete-btn',
-            text: 'Delete',
-            icon: 'icons:delete'
           } ]
         }
       },
 
       listeners: {
-        'grid.things-grid-pre-save' : '_beforeColumnsSave',
-        'grid.things-grid-save-success' : 'reloadGrid'
+        'grid.things-resource-grid-configured' : '_onGridConfigured',
+        'grid.things-grid-save-success' : 'reloadGrid',
+        'grid.things-button-update-btn-tap' : '_updatePermission'
+      },
+
+      _onGridConfigured: function(event) {
+        var grid = event.detail;
+        grid.onEditCellUpdated = function (grid, rowIndex, fieldIndex, newValue, oldValue) {
+          if(fieldIndex == 2) {
+            grid.commit();
+            var rowObj = grid.focusedRow().getRowObject();
+            rowObj['show'] = newValue;
+            rowObj['create'] = newValue;
+            rowObj['update'] = newValue;
+            rowObj['delete'] = newValue;
+            grid.dataSource().updateRow(rowIndex._dataIndex, rowObj);
+          }
+        };
+      },
+
+      _updatePermission: function(event) {
+        var thingsGrid = this.$.grid;
+        var grid = thingsGrid.getGridObject();
+        grid.commit();
+
+        var count = grid.dataSource().rowCount();
+        var dataList = grid.dataSource().getRowObjects(0, count);
+        var updateList = [];
+
+        if(dataList && dataList.length > 0) {
+          dataList.forEach(function(data) {
+            if(data.show || data.create || data.update || data.delete) {
+              var clonedObj = JSON.parse(JSON.stringify(data));
+              clonedObj.menu_id = clonedObj.id;
+              delete clonedObj['id'];
+              delete clonedObj['name'];
+              updateList.push(clonedObj);
+            }
+          });
+
+          thingsGrid.writeData = updateList;
+
+          if(!thingsGrid.writeData || thingsGrid.writeData.length == 0) {
+            var oriSaveAction = thingsGrid.gridSaveAction;
+            thingsGrid.gridSaveAction = oriSaveAction + '?delete_all=true';
+            thingsGrid._gridSaveAction();
+            thingsGrid.gridSaveAction = oriSaveAction;
+          } else {
+            thingsGrid._gridSaveAction();
+          }
+
+        } else {
+          // TODO
+          console.log('No data changed');
+        }
       },
 
       /**
@@ -211,7 +257,7 @@
        * @return {String} entity column save url
        */
       _computeEntityColumnSaveUrl: function(entityId) {
-        return 'roles/' + entityId + '/update_permissions.json';
+        return 'roles/' + entityId + '/update_permissions';
       },
 
       /**
@@ -278,26 +324,6 @@
 
         return parents;        
       },
-
-      /**
-       * Entity Column 저장 전에...
-       */
-      _beforeColumnsSave: function(event) {
-        var grid = event.target;
-        var changedList = grid.writeData;
-
-        if(!changedList || changedList.length == 0)         
-          return event;
-
-        var entityId = this.resource.id;
-        changedList.forEach(function(changedData) {
-          if(changedData.cud_flag_ == 'c' && (!changedData.entity || !changedData.entity_id)) {
-            changedData.entity_id = entityId;
-          }
-        });
-
-        return event;
-      },      
 
       /**
        * reload grid data
