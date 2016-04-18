@@ -167,7 +167,9 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 				 * 폼 타이틀 
 				 */
 				title: {
-					type: String
+					type: String,
+					value: 'Detail Form',
+					computed: '_computeTitle(resourceType)'
 				},
 
 				/**
@@ -453,7 +455,11 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 				}
 
 				this.fire('things-resource-form-error', response);
-			}			
+			},
+
+			_computeTitle: function(resourceType)	{
+				return resourceType + ' Detail';
+			}
 
 		});
 	</script>
