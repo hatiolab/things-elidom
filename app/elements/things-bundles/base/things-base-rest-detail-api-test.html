@@ -6,6 +6,8 @@
 <link rel="import" href="../../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../../bower_components/paper-material/paper-material.html">
 
+<link rel="import" href="../../things-resource/things-resource.html">
+
 <!--
 커스텀 서비스의 테스트 화면 
 커스텀 서비스에서는 생성한 서비스 로직의 테스트를 위해 테스트 화면을 제공한다.
@@ -21,6 +23,13 @@ Example:
 
 <dom-module id="things-base-rest-detail-api-test">
 	<template>
+		<things-resource 
+			id="put-resource"
+			method="PUT"
+			content-type="application/json"
+			last-response="{{lastResponse}}">
+		</things-resource>
+
 		<form is="iron-form" 
 			id="form" 
 			action="[[action]]"
@@ -37,8 +46,8 @@ Example:
 			<paper-textarea id="result" label="Result" rows=4></paper-textarea>
 		</form>
 
-		<paper-button raised on-click ="submitMyForm">invoke</paper-button>
-		<paper-button raised on-click ="_resetMyForm">reset</paper-button>
+		<paper-button raised on-click ="_invoke">invoke</paper-button>
+		<paper-button raised on-click ="_resetForm">reset</paper-button>
 	</template>
 
 	<script>
@@ -83,7 +92,9 @@ Example:
 			],
 
 			listeners : {
-				'iron-form-presubmit' :'_preSubmitHandler'
+				'put-resource.things-resource-ajax-success': '_successResponseHandler',
+				'put-resource.things-resource-ajax-error': '_errorResponseHandler',
+				'iron-form-presubmit': '_preSubmitHandler'
 			},
 
 			/**
@@ -141,7 +152,7 @@ Example:
 						});
 					}
 				} else {
-					formFields.push({ name : 'input', label: 'Input JSON', type: 'textarea' });
+					formFields.push({ id: 'input-json', name : 'input', label: 'Input JSON', type: 'textarea' });
 				}
 
 				this.formFields = formFields;
@@ -182,12 +193,19 @@ Example:
 			 */
 			_successResponseHandler: function (event) {
 				this.stopSpinner();
+				var responseValue = null;
 
-				if(event.detail.xhr.response) {
-					this.$.result.value = JSON.stringify(event.detail.xhr.response, null, 4);
+				if(this.resource.http_method == 'PUT') {
+					if(event.detail) {
+						responseValue = JSON.stringify(event.detail, null, 4);
+					}
 				} else {
-					this.$.result.value = 'OK';
+					if(event.detail.xhr.response) {
+						responseValue = JSON.stringify(event.detail.xhr.response, null, 4);
+					}
 				}
+
+				this.$.result.value = responseValue ? responseValue : 'OK';
 			},
 			
 			/**
@@ -196,20 +214,81 @@ Example:
 			 */			
 			_errorResponseHandler: function (event) {
 				this.stopSpinner();
+				var errorInfo = null;
 
-				if(event.detail.request.xhr.response) {
-					this.$.result.value = JSON.stringify(event.detail.request.xhr.response, null, 4);
+				if(this.resource.http_method == 'PUT') {
+					if(event.detail) {
+						errorInfo = JSON.stringify(event.detail, null, 4);
+					}
 				} else {
-					this.$.result.value = 'unknown Error';
+					if(event.detail.request.xhr.response) {
+						errorInfo = JSON.stringify(event.detail.request.xhr.response, null, 4);
+					}
 				}
+
+				this.$.result.value = errorInfo ? errorInfo : 'Unknown Error';
 			},
 			
 			/**
 			 * Reset Form
 			 */
-			_resetMyForm: function (event) {
+			_resetForm: function (event) {
 				this.resetMyForm();
 				this._resourceChanged(this.resource);
+			},
+
+			/**
+			 * Invoke
+			 */
+			_invoke: function(event) {
+				var validResult = this._validateInput();
+				if(validResult) {
+					if(this.resource.http_method == 'PUT') {
+						this._invokePutApi(validResult);
+					} else {
+						this.submitMyForm();
+					}					
+				}
+			},
+
+			/**
+			 * validate input json
+			 */
+			_validateInput: function() {
+				if(this.invokeUrl.indexOf('{id}') >= 0) {
+					this.$.result.value = 'Error : Invalid Invoke Url - "{id}" must be replaced by resource id';
+					return false;
+				}
+
+				if(!((this.resource.http_method == 'POST' && 
+					    this.apiContentType.toLowerCase().indexOf('application/json') >= 0) || 
+					    this.resource.http_method == 'PUT')) return true;
+
+				var formParams = this.$.form.serialize();
+
+				if(formParams.input) {
+					try {
+						var params = JSON.parse(formParams.input);
+						return params;
+					} catch(e) {
+						this.$.result.value = 'Error : Invalid Input JSON - \nDetails :' + e.toString();
+						return false;
+					}
+				}
+
+				return true;
+			},
+
+			/**
+			 * Invoke PUT API
+			 */
+			_invokePutApi: function(params) {
+				var putResource = this.$['put-resource'];
+				var url = this.invokeUrl.substr(this.invokeUrl.indexOf('/rest/') + 6);
+				putResource.action = url;
+				putResource.resource = '';
+				putResource.params = (params === true) ? null : params;
+				putResource.generateRequest();
 			},
 
 			/***************************************************************************************
