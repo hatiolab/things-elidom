@@ -56,11 +56,11 @@ Things.ResourceSearchBehavior = {
 		}
 	},
 
-  /**
-   * 서버에 보낼 파라미터를 재구성한다.
-   * @param reqParams Ajax 요청 파라미터 
-   */
-  handleRequestParams: function(reqParams) {
+	/**
+	 * 서버에 보낼 파라미터를 재구성한다.
+	 * @param reqParams Ajax 요청 파라미터 
+	 */
+	handleRequestParams: function(reqParams) {
 		var newReqParams = { select : this.selectFields ? this.selectFields : '' };
 
 		if(this.sortFields && this.sortFields.length > 0) {
@@ -86,7 +86,7 @@ Things.ResourceSearchBehavior = {
 		if(this.page) newReqParams.page = this.page;
 		if(this.limit) newReqParams.limit = this.limit;
 		return newReqParams;
-  }
+	}
 
 };
 
