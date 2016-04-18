@@ -71,6 +71,7 @@ Things.ResourceSelectorBehavior = {
         selectedObj.id = e.detail.id;
         selectedObj[delegateColumn] = e.detail[delegateColumn];
         rowObj[valueField] = selectedObj;
+        me.fire('things-resource-selector-selected', { rowObj: rowObj, resource : e.detail } );
         dataSet.updateRow(parentRowIdx, rowObj);
         // popup 닫기 
         me._getResourceSelectorDialog().closeResourceDialog();

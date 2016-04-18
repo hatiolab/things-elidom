@@ -23,7 +23,7 @@
         config="[[gridConfig]]"
         model="[[gridModel]]" 
         columns="[[gridColumns]]"
-        data="[[lastResponse]]"
+        data="[[items]]"
         grid-save-action="[[gridSaveUrl]]"
         buttons="[[buttons]]"
         enable-toolbar>
@@ -38,6 +38,7 @@
       is: 'things-base-role-detail-user',
 
       behaviors: [ 
+        Things.ResourceSelectorBehavior,
         Things.LoadViewBehavior
       ],
 
@@ -68,7 +69,8 @@
          * entity columns 조회 정보 
          */
         lastResponse: {
-          type: Object
+          type: Array,
+          observer: '_rolesUsersChanged'
         },        
 
         /**
@@ -79,11 +81,14 @@
           value: [ {
             fieldName: 'id'
           }, {
-            fieldName: 'login'
+            fieldName: 'name'
           }, {
             fieldName: 'email'
           }, {
-            fieldName: 'name'
+            fieldName: 'login'
+          }, {
+            fieldName: 'user',
+            dataType: 'object'
           } ]
         },
 
@@ -95,6 +100,27 @@
           value: [ {
             fieldName: 'id',
             width: 0
+          }, {
+            fieldName: 'user',
+            name: 'user',
+            valueType: 'text',
+            type: 'calced',
+            valueCallback : function(column, row) {
+              var obj = row.getValue(column._name);
+              return obj ? obj['name'] : '';
+            }
+          }, {
+            fieldName: 'user_id',
+            name: 'user_id',
+            header: { text : '...' },
+            width: 30,
+            editable: false,
+            userObj: {
+              delegateColumn: 'name', 
+              resourceType: "User",
+              resourceUrl: "users",
+              valueField: "user"
+            }
           }, {
             fieldName: 'login'
           }, {
@@ -127,7 +153,7 @@
         buttons: {
           type: Array,
           value: [ {
-            id: 'add-btn',
+            id: 'new-btn',
             text: 'Add',
             icon: 'icons:add'
           }, {
@@ -143,9 +169,54 @@
       },
 
       listeners: {
+        'things-resource-selector-selected' : '_onResourceSelectorSelected',
+        'grid.things-button-new-btn-tap' : 'addRow',
         'grid.things-grid-pre-save' : '_beforeColumnsSave',
-        'grid.things-grid-save-success' : 'reloadGrid'
+        'grid.things-grid-save-success' : 'reloadGrid',
+        'grid.things-grid-resource-column-edit' : '_openResourceSelector'        
       },
+
+      _onResourceSelectorSelected: function(event) {
+        var resource = event.detail.resource;
+        var rowObj = event.detail.rowObj;
+        rowObj.login = resource.login;
+        rowObj.email = resource.email;
+        rowObj.id = resource.id;
+        rowObj.name = resource.name;
+      },
+
+      /**
+       * Open Resource Selector Dialog
+       *
+       * @param {Object} event
+       */
+      _openResourceSelector: function(event) {
+        var index = event.detail.index;
+        var grid = index._grid;
+        var rowObj = grid.focusedRow().getRowObject();
+
+        if(!rowObj.id) {
+          this.openResourceSelectorByGrid(index._grid, index.rowIndex, event.detail.userObj, true);  
+        }
+      },      
+
+      _rolesUsersChanged: function(lastResponse) {
+        if(lastResponse && lastResponse.length > 0) {
+          this.items = lastResponse.map(function(item) {
+            item.user = { id : item.id, name : item.name };
+            return item;
+          });
+        } else {
+          this.items = [];
+        }
+      },
+
+      /**
+       * add grid row
+       */
+      addRow: function(e) {
+        this.$.grid.dataSet.insertRow(0, { id: null, name : '', login : '', email : this.resourceType, user : {} });
+      },      
 
       /**
        * Role User Search URL
@@ -174,11 +245,8 @@
         if(!changedList || changedList.length == 0)         
           return event;
 
-        var entityId = this.resource.id;
-        changedList.forEach(function(changedData) {
-          if(changedData.cud_flag_ == 'c' && (!changedData.entity || !changedData.entity_id)) {
-            changedData.entity_id = entityId;
-          }
+        grid.writeData = changedList.map(function(changedData) {
+          return {id : changedData.id, cud_flag_ : changedData.cud_flag_};
         });
 
         return event;
