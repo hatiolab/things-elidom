@@ -183,10 +183,13 @@ If an appropriate message file can't be found, the `textContent` of the element 
      * the instance's `msgid` property is used.
      * @return {string|null} Translated message or `null` if not found.
      */
-    getMsg: function(opt_msgId) {
+    getMsg: function(opt_msgId,dataset) {
       var msgId = opt_msgId || this.msgid;
       var lang = this.locales[this.language];
       if (lang && lang[msgId]) {
+        if(dataset){
+          return this._replaceVariable(lang[msgId], dataset);
+        }
         return lang[msgId];
       }
       return null;
@@ -282,7 +285,7 @@ If an appropriate message file can't be found, the `textContent` of the element 
     _updateElementMessage: function(opt_instance) {
       var instance = opt_instance || this;
 
-      var msg = instance.locales[instance.language][instance.msgid];
+      var msg = this._replaceVariable(instance.locales[instance.language][instance.msgid], instance.dataset);
       if (msg) {
         instance.innerHTML = msg;
       }
@@ -299,6 +302,14 @@ If an appropriate message file can't be found, the `textContent` of the element 
 
         this._updateElementMessage(instance);
       }
+    },
+    _replaceVariable: function (message, dataset) {
+      Object.keys(dataset).forEach(function(data){
+        var bracedData = '{'+data.replace(/\$/, '\\$')+'}'
+        var regEx = new RegExp(bracedData, "gi");
+        message = message.replace(regEx, dataset[data]);
+      })
+      return message;
     }
 
   });
