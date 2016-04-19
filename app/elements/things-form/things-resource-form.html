@@ -173,7 +173,7 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 				},
 
 				/**
-				 * Entity Type
+				 * Resource Type
 				 */
 				resourceType: {
 					type: String
@@ -234,7 +234,7 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			 * @event things-resource-form-created
 			 */
 			 /**
-			  * 조회/생성/업데이트 후 fire
+			  * 조회/생성/업데이트 에러 발생 후 fire
 			  *
 			  * @event things-resource-form-error
 			  */
@@ -351,7 +351,17 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			},
 
 			/**
+			* Submit 전에 전처리. TODO
+			*
+			* @param {Event} event
+			*/
+			_preSubmitHandler: function(event) {
+				// TODO
+			},
+
+			/**
 			 * FormFields가 변경될 때 
+			 *
 			 * @param {Array} formFields 
 			 */
 			_onFormFieldsChanged: function(formFields) {
@@ -359,7 +369,8 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			},
 
 			/**
-			 * Resource가 변경될 때 
+			 * resource가 변경될 때 
+			 *
 			 * @param {Object} 리소스 
 			 */
 			_resourceChanged: function(resource) {
@@ -371,6 +382,7 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 
 			/**
 			 * resource로 elements에 각각 바인딩한다.
+			 *
 			 * @param {Array} elements
 			 * @param {Object} resource
 			 */
@@ -393,7 +405,8 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 
 			/**
 			 * 서버에 저장 요청할 파라미터 중에서 Save 전에 저장에 불필요한 컬럼들을 필터링한다.
-			 * @param params 서버에 저장 요청할 파라미터 
+			 *
+			 * @param {Object} params 서버에 저장 요청할 파라미터 
 			 */
 			_filterResourceColumns: function(params) {
 				for(var name in params) {
@@ -437,6 +450,8 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			/**
 			* Error response handler After form submits.
 			* Fires a 'things-resource-form-error' in this function
+			*
+			* @param {Event} event
 			*/
 			_errorResponseHandler: function(event) {
 				this.stopSpinner();
@@ -457,6 +472,9 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 				this.fire('things-resource-form-error', response);
 			},
 
+			/**
+			 * compute title
+			 */
 			_computeTitle: function(resourceType)	{
 				return resourceType + ' Detail';
 			}

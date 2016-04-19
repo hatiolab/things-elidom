@@ -125,6 +125,7 @@ Things.GridMetaBehavior = {
 					field.lookupLabels = metaData.code_list.map(function(code) { return code.description });
 
 				} else if(metaData.editor == 'checkbox') {
+					field.editable = false;
 					field.renderer = { type: 'check', editable: true, threeStates: false, trueValues: 'true', falseValues: 'false' };
 
 				} else if(metaData.editor == 'number') {
@@ -141,8 +142,6 @@ Things.GridMetaBehavior = {
 
 				} else if(metaData.editor.indexOf('resource-selector') >= 0) {
 					var delegateColumn = me._newResourceColumn(metaData, field);
-					field.styles.iconIndex ='ellipsis_hover.png';
-					field.styles.iconLocation ='rightSide';
 					me._setResourceEditorColumn(metaData, field, resourceSelectorColumns, delegateColumn);
 
 				} else if(metaData.editor == 'download-link') {
@@ -220,13 +219,21 @@ Things.GridMetaBehavior = {
 			fieldName: metaData.name, 
 			width: 30,
 			editable: false,
+			header: { text: '...' },
+			imageList: 'images',
+			renderer: {
+				type: 'icon'
+			},
+			styles: {
+				iconIndex: 'menu_button.png',
+				iconLocation: 'center'
+			},
 			userObj: {
 				resourceType: metaData.ref_name,
 				resourceUrl: metaData.format,
 				valueField: field.name,
 				delegateColumn: delegateColumn
-			},
-			header: { text: '...' }
+			}
 		};
 
 		resourceSelectorColumns.push(editorField);

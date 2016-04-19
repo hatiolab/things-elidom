@@ -116,13 +116,13 @@
             header: { text : '...' },
             width: 30,
             editable: false,
+            imageList: 'images',
             userObj: {
               delegateColumn: 'name', 
-              resourceType: "User",
-              resourceUrl: "users",
-              valueField: "user"
+              resourceType: 'User',
+              resourceUrl: 'users',
+              valueField: 'user'
             },
-            imageList: 'images',
             renderer: {
               type: 'icon'
             },
@@ -136,7 +136,7 @@
               } else {
                 styles.setIconIndex('menu_button_hover.png');
               }
-            }            
+            }
           }, {
             fieldName: 'login'
           }, {

@@ -85,7 +85,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
       </paper-input>
 
       <div class="buttons">
-        <things-button color="green" id="button-demo-1">Search Button</things-button>
+        <things-button  id="button-demo-1" color="green">Search Button</things-button>
         <things-button id="button-demo-2" color="indigo" confirm=true title="Demo Title" message="Demo Message">Save Button</things-button>
       </div>
     </template>
@@ -101,7 +101,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 
         listeners: {
           'button-demo-1.tap' : 'onTapThingsButton1',
-          'button-demo-2.confirm' : 'onConfirmMsgBox',
+          'button-demo-2.things-button-confirm' : 'onConfirmMsgBox',
         },
 
         onTapThingsButton1: function(e) {

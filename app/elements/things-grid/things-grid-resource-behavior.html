@@ -1,9 +1,9 @@
+<script src='../../../bower_components/jszip/dist/jszip.min.js'></script>
+
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 <link rel="import" href="./things-grid-basic-behavior.html">
-
-<script src='../../../bower_components/jszip/dist/jszip.min.js'></script>
 
 <script>
 
@@ -42,9 +42,9 @@ Things.GridResourceBehaviorImpl = {
 		/**
 		 * import Sheet Name
 		 */
-		sheetName:{
-			type:String,
-			value :'Sheet1'
+		sheetName: {
+			type: String,
+			value: 'Sheet1'
 		},
 		/**
 		 * file name to export
@@ -66,10 +66,10 @@ Things.GridResourceBehaviorImpl = {
 	 */
 	exportGridData: function() {
 		new DataLudi.GridExcelExporter().export(this.grid, {
-			target: "local",
+			target: 'local',
 			fileName: this.exportFileName,
-			numberFormat: "#,##0.00",
-			datetimeFormat: "yyyy.mm.dd"
+			numberFormat: '#,##0.00',
+			datetimeFormat: 'yyyy.mm.dd'
 		});
 	},
 
@@ -97,13 +97,15 @@ Things.GridResourceBehaviorImpl = {
 	addGridRow: function() {
 		this.dataSet.insertRow(0, {});
 	},
+
 	/**
 	 * import 버튼이 클릭 될때 excel import 화면 열기 
 	 */
-	importExcel :function(sheetName){
+	importExcel :function() {
 		var importExcel = document.createElement('things-import-excel');
 		importExcel.sheetName = this.sheetName;
 		var me = this;
+
 		importExcel.addEventListener('excel-process-finish', function(event){
 			// 1. clear grid
 			new DataLudi.DataLoader(me.dataSet).load('json', '', {});
@@ -113,8 +115,10 @@ Things.GridResourceBehaviorImpl = {
 				fillPos: 0
 			});
 		});
+
 		importExcel.import();
 	},
+
 	/**
 	 * 그리드의 변경된 데이터를 감지하여 서버로 한꺼번에 Create/Update/Delete 요청을 한다.
 	 */
@@ -141,6 +145,10 @@ Things.GridResourceBehaviorImpl = {
 
 	/**
 	 * 변경 타입(created, updated, deleted)에 따라 변경데이터를 구성한다.
+	 *
+	 * @param {Object} changedData
+	 * @param {String} changeType 'created', 'updated', 'deleted'
+	 * @param {String} changeFlag 'c', 'u', 'd'
 	 */
 	_configureChangedData: function(changedData, changeType, changeFlag) {
 		var changed = this.dataSet.getStateRows(changeType);

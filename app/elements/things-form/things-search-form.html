@@ -45,6 +45,8 @@
 <dom-module id="things-search-form">
   <template>
     <style is="custom-style" include="iron-flex iron-flex-alignment">
+    </style>
+
     <style>
     :host {
       display: block;
@@ -78,7 +80,6 @@
     :host .fields {
       padding: 0px 10px 0px 0px;
     }
-    
     </style>
 
     <paper-material elevation="1" class="flex" on-keypress="_keyPressHandler">
@@ -179,12 +180,7 @@
       /**
        * Fires before handle parameters before form submit
        *
-       * @event things-form-submit-prehandle-params
-      /**
-       * Fires after handle parameters before form submit
-       *
-       * @event things-form-submit-prehandle-params
-       */
+       * @event things-form-pre-submit
       /**
        * Fires when the successful response is arrived after submit
        *
@@ -236,11 +232,13 @@
     /**
      * Submit 전에 전처리. 
      * Pagination을 사용하는 경우에 currentPage, perPage 정보를 파라미터에 추가한다.
-     * @param {Event}
+     *
+     * @param {Event} event
      */
     _preSubmitHandler: function(event) {
       var form = this.getMyForm();
-      this.fire('things-form-submit-prehandle-params', form);
+      var evt = this.fire('things-form-pre-submit', form, { cancelable : true });
+      if(evt.defaultPrevented) return;
 
       form.request.params || {};
 
@@ -251,21 +249,19 @@
       form.request.params.select = this.selectFields ? this.selectFields : '';
       form.request.params.page = this.page;
       form.request.params.limit = this.perPage;
-
-      this.fire('things-form-submit-posthandle-params', form);
     },
 
     /**
-     * handle submit params 
      * 서버에 보낼 파라미터를 재구성한다.
+     * 
      * @param {Object} params
      */
     _handleSubmitParams: function(params) {
       var newParams = this.sortFields ? { 
         sort : (typeof(this.sortFields) == 'string' ? this.sortFields : JSON.stringify(this.sortFields))
       } : {};
+      
       var queries = [];
-
       for(prop in params) {
         if(params[prop]) {
           var fieldModel = this.formFields.filter(function(formField) { return formField.name == prop })[0];

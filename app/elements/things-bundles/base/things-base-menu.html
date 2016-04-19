@@ -204,7 +204,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			},
 
 			listeners : {
-				'search-form.things-form-submit-posthandle-params' : '_beforeSearchMenu', 
+				'search-form.things-form-pre-submit' : '_beforeSearchMenu', 
 				'grid.things-grid-detail-tap': '_showSubMenus',
 				'grid.things-grid-save-success': '_reloadMainMenus',
 				'grid.things-grid-resource-column-edit' : '_openResourceSelector',
@@ -238,10 +238,12 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 * @param {Event} event Form Submit Event
 			 */			
 			_beforeSearchMenu: function(event) {
-				var form = event.detail;
+				event.preventDefault();
 
+				var form = event.detail;
 				if(!form.request.params.query) {
 					form.request.params.query = "[{'name': 'parent_id', 'operator': 'is_null'}]";
+					
 				} else {
 					var query = form.request.params.query;
 					var queryArr = JSON.parse(query);

@@ -268,8 +268,10 @@
 				// header가 ...인 경우 Resource Selector
 				var me = this;
 				this.grid.onDataCellDblClicked = function (grid, index) {
-					if(index.column._header && index.column._header._text == '...') {
-						var matchColumn = me.columns.filter(function(col) { return (index.column._name == col.name); });
+					var column = index.column;
+					if(column._header && column._header._text == '...' && 
+						 column._renderer && column._renderer.type && column._renderer.type == 'icon') {
+						var matchColumn = me.columns.filter(function(col) { return (column._name == col.name); });
 						me.fire('things-grid-resource-column-edit', { 
 							userObj : matchColumn ? matchColumn[0].userObj : null, 
 							index: index 
