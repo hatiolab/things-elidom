@@ -1,0 +1,64 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<dom-module id="things-input-field">
+	<style>
+		.paper-font-caption {
+			margin-bottom: 0pt;
+		}
+	</style>
+
+	<template>
+		<p class="paper-font-caption">[[label]]</p>
+
+		<input is="iron-input" 
+			name="[[name]]" 
+			allowed-pattern=["[[allowedPattern]]"]
+			bind-value=[[bindValue]]
+			value="[[value]]"
+			placeholder="[[placeholder]]">
+	</template>
+
+	<script>
+		Polymer({
+			is: "things-input-field",
+
+			properties: {
+				
+				/**
+				 * label string
+				 */
+				label: {
+					type: String
+				},
+
+				name: {
+					type: String
+				},
+
+				/**
+				 * input field에 입력 가능한 문자열을 정의 할 수 있다.
+				 * ex: [a-zA-Z0-9] a ~ z, A ~ Z, 0 ~ 9
+				 */
+				allowedPattern: {
+					type: String
+				},
+
+				/**
+				 * Two Way binding value
+				 */
+				bindValue: {
+					type: String
+				},
+
+				value: {
+					type: String
+				},
+
+				placeholder: {
+					type: String
+				}
+			}
+		});
+	</script>
+
+</dom-module>

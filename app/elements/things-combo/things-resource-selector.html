@@ -29,15 +29,14 @@ Resource Selector. 서버에 저장되어 있는 리소스 정보를 조회하�
       margin-bottom: 0px;
     }
   </style>
+  
   <template>
     <input is="iron-input" name="[[name]]" bind-value="[[value]]" hidden>
-    <div>
+    
     <p class="paper-font-caption">[[label]]</p>
     <input is="iron-input" bind-value="[[display]]" readonly>
-    
-      <iron-icon icon="icons:list" prefix on-tap="openResourceSelector"></iron-icon>
-      <paper-icon-button suffix on-tap="clearValue" icon="clear" alt="clear" title="clear"></paper-icon-button>
-    </div>
+    <iron-icon icon="icons:list" prefix on-tap="openResourceSelector"></iron-icon>
+    <paper-icon-button suffix on-tap="clearValue" icon="clear" alt="clear" title="clear"></paper-icon-button>
   </template>
 
   <script type="text/javascript">
