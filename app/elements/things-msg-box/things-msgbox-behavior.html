@@ -2,6 +2,37 @@
 
 window.Things = window.Things || {};
 
+/**
+ * 메시지 박스를 표시하는 Behavior 
+ * 메시지 박스는 크게 information, confirmation, prompt 형으로 구분된다.
+ * information은 단순히 메시지를 표시하는 형식이고 confirmation은 사용자에게 확인을 받는 형식, 그리고 Prompt는 사용자에게 값을 받아오는 형식이다.
+ * 각 메시지 박스 타입의 Function은 information - openInfoMsg, confirmation - openConfirmMsg, prompt - openPromptMsg로 구성된다.
+ * 각 Function은 config로 메시지 박스를 구성하는데 config의 요소는 다음과 같다.
+ * 1) type : 메시지 박스의 아이콘 - info, success, warning, error, input, prompt (input과 prompt는 동일) 중 하나 
+ * 2) title : 메시지 박스의 타이틀
+ * 3) text : 메시지 박스의 본문 메시지
+ * 4) html : 메시지 박스의 본문을 Html 형식으로 구성할 지 여부, 기본값은 false이고 값이 true일 경우 text 값은 html로 구성되어야 한다.
+ * 5) allowOutsideClick: 메시지 박스 창이 modal인 지 여부, 기본값은 false
+ * 6) showConfirmButton: Confirm 버튼을 표시할 지 여부. 기본값은 true
+ * 7) showCancelButton: Cancel 버튼을 표시할 지 여부, false
+ * 8) closeOnConfirm: Confirm 버튼 클릭시 메시지 박스 창이 close될 지 여부, 기본값은 true
+ * 9) closeOnCancel: Cancel 버튼을 클릭시 메시지 박스 창이 close될 지 여부, 기본값은 true
+ * 10) confirmButtonText: Confirm 버튼의 텍스트 값, 기본값은 'OK'
+ * 11) confirmButtonColor: Confirm 버튼의 색깔, 기본값은 '#8CD4F5'
+ * 12) cancelButtonText: Cancel 버튼의 텍스트 값, 기본값은'Cancel'
+ * 13) imageUrl: 삽입하고자 하는 이미지 URL, 기본값은 null,
+ * 14) imageSize: 삽입하고자 하는 이미지의 사이즈, 기본값은 null,
+ * 15) timer: 얼마 후에 자동으로 메시지 창이 close될 지 여부, (ex: 3초 후에 자동으로 닫혀야 한다면 3000), null,
+ * 16) customClass: '',
+ * 17) animation: 창이 열리고 닫힐 때 애니메이션 효과 여부, 기본값은 true,
+ * 18) allowEscapeKey: esc키를 누를 때 창이 close될 지 여부, 기본값은 true,
+ * 19) inputType: type이 input이나 prompt일 경우 Input 값의 타입, 기본값은 'text',
+ * 20) inputPlaceholder: '',
+ * 21) inputValue: type이 input이나 prompt일 경우 Input 값,
+ * 22) showLoaderOnConfirm: ? false
+ *
+ * @demo ./things-grid/demo/index.html
+ */
 Things.MsgBoxBehavior = {
   
   /**
@@ -11,7 +42,7 @@ Things.MsgBoxBehavior = {
    * @title
    * @text
    * @imageUrl
-   * @type info, success, warning, ...
+   * @type info, success, warning, error ...
    * @timer Number 1000 mean 1 second
    * @html Boolean
    * @showConfirmButton Boolean
@@ -23,6 +54,10 @@ Things.MsgBoxBehavior = {
 
   /**
    * Open Confirmation Message Box
+   *
+   * @param {Object} config
+   * @param {Function} okCallback
+   * @param {Function} cancelCallback
    */
   openConfirmMsg: function(config, okCallback, cancelCallback) {
     swal(config, function(isConfirm) {
@@ -40,17 +75,17 @@ Things.MsgBoxBehavior = {
 
   /**
    * Open Prompt Message Box
+   *
+   * @param {Object} config
+   * @param {Function} promptCallback
    */
   openPromptMsg: function(config, promptCallback) {
     swal(config, function(inputValue) {
-
       if (inputValue === '') {
         swal.showInputError('Empty value is not allowed!');
       }
 
-      if(!inputValue) {
-        return false;
-      }
+      if(!inputValue) return false;
 
       if(promptCallback) {
         promptCallback(inputValue);
@@ -58,23 +93,44 @@ Things.MsgBoxBehavior = {
     });
   },
 
+  /**
+   * Show response error
+   *
+   * @param {Object} response
+   */
   openResponseError: function(response) {
     if(response.body) {
       response = response.body;
     }
 
+    var htmlText = '<span>Code : ' + response.code + '<br/><br/><span>Status</span> : ' + response.status + '<br/><br/><p><span>Message</span> : ' + response.msg;
+
     this.openInfoMsg({
       type : 'warning',
       title : 'Error (' + response.error_id + ')',
-      text : '<span>Code : ' + response.code + '<br/><br/><span>Status</span> : ' + response.status + '<br/><br/><p><span>Message</span> : ' + response.msg,
+      text : htmlText,
       html : true
     });
   },
 
+  /**
+   * Show unkown error
+   *
+   * @param {Object} response
+   */
   openUnkownError: function(response) {
-    this.openInfoMsg({ title : 'Error', text : 'Something went wrong, Please ask to administrator', type : 'warning' });
+    this.openInfoMsg({ 
+      title : 'Error', 
+      text : 'Something went wrong, Please ask to administrator', 
+      type : 'error' 
+    });
   },
 
+  /**
+   * Show toast message
+   *
+   * @param {Object} response
+   */
   showToastMsg: function(msg) {
     if(typeof(app) !== 'undefined') {
       app.$.toast.text = msg;

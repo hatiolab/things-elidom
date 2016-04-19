@@ -18,7 +18,7 @@
 <dom-module id="things-time-picker">
 	<template>
     <input type="text" name="{{name}}" value="{{selectedTime}}" readOnly placeholder="{{label}}">
-    <paper-icon-button class="Navigation-icon" icon="info" on-tap="showTimePicker"></paper-icon-button>
+    <paper-icon-button class="Navigation-icon" icon="date-range" on-tap="showTimePicker"></paper-icon-button>
     <paper-dialog id="timeDialog" modal class="paper-time-picker-dialog">
       <paper-time-picker id="timePicker" time="{{time}}"></paper-time-picker>
       <div class="buttons">

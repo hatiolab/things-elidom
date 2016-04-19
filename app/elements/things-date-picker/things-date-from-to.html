@@ -1,0 +1,127 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-date-picker/paper-date-picker.html">
+<link rel="import" href="../../../bower_components/paper-date-picker/paper-date-picker-dialog-style.html">
+
+<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
+
+<dom-module id="things-date-from-to">
+
+  <template>
+    <input type="text" name="fromDate" value={{selectedFromDate}} readOnly>
+    <paper-icon-button class="Navigation-icon" icon="date-range" on-tap="showFromPicker"></paper-icon-button>
+    <paper-dialog id="fromDateDialog" modal class="paper-date-picker-dialog">
+      <paper-date-picker date="{{fromDate}}"></paper-date-picker>
+      <div class="buttons">
+        <paper-button raised dialog-confirm on-tap="selectFromDate">Select</paper-button>
+        <paper-button raised dialog-dismiss>Cancel</paper-button>
+      </div>
+    </paper-dialog>
+
+    <input type="text" name="toDate" value={{selectedToDate}} readOnly>
+    <paper-icon-button class="Navigation-icon" icon="date-range" on-tap="showToPicker"></paper-icon-button>
+    <paper-dialog id="toDateDialog" modal class="paper-date-picker-dialog">
+      <paper-date-picker date="{{toDate}}"></paper-date-picker>
+      <div class="buttons">
+        <paper-button raised dialog-confirm on-tap="selectToDate">Select</paper-button>
+        <paper-button raised dialog-dismiss>Cancel</paper-button>
+      </div>
+    </paper-dialog>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'things-date-from-to',
+
+      behaviors: [ 
+        Things.MsgBoxBehavior
+      ],      
+
+      properties: {
+
+        fromDate: {
+          type: String
+        },
+
+        toDate: {
+          type: String
+        },
+
+        /**
+         * Date picker의 기준이 되는 locale을 설정한다.
+         */
+        locale: {
+          type: String,
+          notify: true,
+          value: 'en'
+        },
+
+        /**
+         * date의 읽기전용 format을 설정한다.
+         */
+        readFormat: {
+          type: String,
+          notify: true,
+          value: 'YYYY-MM-DD'
+        },
+
+        /**
+         * date의 쓰기전용 format을 설정한다.
+         */
+        writeFormat: {
+          type: String,
+          value: 'YYYY-MM-DD'
+        }
+      },
+
+      /**
+       * 버튼 클릭시 Date picker를 dialog 타입으로 나타나게 한다.
+       */
+      showFromPicker: function() {
+        this.$.fromDateDialog.toggle();
+      },
+
+      showToPicker: function() {
+        this.$.toDateDialog.toggle();
+      },      
+
+      /**
+       * date picker에서 날짜를 결정하면 해당 날짜를 selectedFromDate에 초기화 한다.
+       * dateValidation 함수를 통해 from date와 to date 간의 validation check, false return시 selectedFromDate를 Clear
+       */
+      selectFromDate: function() {
+        this.selectedFromDate = moment(this.fromDate).locale(this.locale).format(this.readFormat);
+        var isValid = this.dateValidation();
+        if(!isValid)
+          this.selectedFromDate = '';
+      },
+
+      /**
+       * date picker에서 날짜를 결정하면 해당 날짜를 selectedToDate에 초기화 한다.
+       * dateValidation 함수를 통해 from date와 to date 간의 validation check, false return시 selectedToDate를 Clear
+       */
+      selectToDate: function() {
+        this.selectedToDate = moment(this.toDate).locale(this.locale).format(this.readFormat);
+        var isValid = this.dateValidation();
+        if(!isValid)
+          this.selectedToDate = '';
+      },
+
+      /**
+       * from date와 to date 간의 범위 validation check, valid = true return, invalid = false return
+       */
+      dateValidation: function() {
+        if(this.selectedFromDate && this.selectedToDate && this.selectedFromDate > this.selectedToDate)  {
+          this.openInfoMsg({ title : 'Invalid Date Range!', text : 'Please Select Proper Date.', type : 'info', timer : 5000 });
+          return false;
+        }
+        return true;
+      }
+    });
+  </script>
+
+</dom-module>

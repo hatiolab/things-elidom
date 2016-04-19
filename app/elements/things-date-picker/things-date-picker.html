@@ -18,7 +18,7 @@
 <dom-module id="things-date-picker">
 	<template>
 		<input type="text" name="{{name}}" value={{selectedDate}} readOnly placeholder="{{label}}">
-		<paper-icon-button class="Navigation-icon" icon="info" on-tap="showDatePicker"></paper-icon-button>
+		<paper-icon-button class="Navigation-icon" icon="date-range" on-tap="showDatePicker"></paper-icon-button>
     <paper-dialog id="dateDialog" modal class="paper-date-picker-dialog">
       <paper-date-picker date="{{date}}"></paper-date-picker>
       <div class="buttons">
