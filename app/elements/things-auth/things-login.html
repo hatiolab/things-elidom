@@ -76,7 +76,10 @@ Example:
     </style>
 
     <paper-material elevation="[[elevation]]" on-keypress="keypressHandler">
-      <h3>[[title]]</h3>
+      <h3>
+      <!-- [[title]] -->
+        <things-i18n-msg msgid="title.[[title]]">[[title]]</things-i18n-msg>
+      </h3>
 
       <content select="[avatar]"></content>
 
@@ -113,23 +116,16 @@ Example:
 
         <paper-button id="submitButton" raised disabled on-click="submitHandler">
           <paper-spinner id="spinner" hidden></paper-spinner>
-          <!-- {{t("button","sign_in")}} -->
+          <things-i18n-msg msgid="button.sign_in">Sign In</things-i18n-msg>
         </paper-button>
-        <!-- <paper-button id="signup" raised on-click="_onSignupTap"></paper-button> -->
         <div>
           <a href="#" on-click="_onSignupTap">
-            <!-- {{t("label","sign_up")}} -->
+            <things-i18n-msg msgid="label.sign_up">Sign Up</things-i18n-msg>
           </a>
           <a href="#" on-click="_onRequestpInitPass">
-            <!-- {{t("label","reset_password")}} -->
+            <things-i18n-msg msgid="label.reset_password">Reset Password</things-i18n-msg>
           </a>
         </div>
-
-<!-- 
-        <paper-button id="resetbutton" raised on-click="resetHandler">
-          [[resetLabel]]
-        </paper-button> -->
-
       </form>
     </paper-material>
   </template>
@@ -154,7 +150,7 @@ Example:
        */
       title: {
         type: String,
-        value: 'Login'
+        value: 'login'
       },
 
       /**
@@ -267,15 +263,6 @@ Example:
         type: String,
         value: 'Submit'
       }
-      /**
-       * Cancel for the login form
-       * @type {Object}
-       * @default Cancel
-       */
-      // resetLabel: {
-      //   type: String,
-      //   value: 'Reset'
-      // }
     },
 
     // Element Lifecycle

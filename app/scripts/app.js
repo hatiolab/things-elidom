@@ -154,7 +154,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		I18nMsg.lang = dataGlobal.locale || document.documentElement.lang;
 		I18nMsg.url = dataGlobal.basicUrl
 		I18nMsg.domain = dataGlobal.user.domain_id||'1';
-    	Platform.performMicrotaskCheckpoint();
+    	// Platform.performMicrotaskCheckpoint();
 		/* imports are loaded and elements have been registered */
 		// console.log('Our web components are ready!');
 	});

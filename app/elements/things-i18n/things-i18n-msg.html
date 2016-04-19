@@ -1,10 +1,8 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <script src="../../../bower_components/observe-js/src/observe.js"></script>
 
-<!-- Copyright Eric Bidelman <ebidel@gmail.com> -->
-
 <!--
-`<i18n-msg>` is a client-side solution for i18n message string replacement. It is modeled off the [Chrome extension i18n API](https://developer.chrome.com/extensions/i18n), which uses a `messages.json` file format.
+`<things-i18n-msg>` is a client-side solution for i18n message string replacement. It is modeled off the [Chrome extension i18n API](https://developer.chrome.com/extensions/i18n), which uses a `messages.json` file format.
 The file contains localized strings for the language in question.
 
 To set the language across your site, define `I18nMsg.lang` in your main page:
@@ -25,15 +23,15 @@ of `Object.observe()`.
 
 ### Message files
 
-Setting a language instructs `<i18n-msg>` to read message ids from a predefined
+Setting a language instructs `<things-i18n-msg>` to read message ids from a predefined
 file on your server. For example, `I18nMsg.lang = 'es'` will use `locales/es.json`.
 `I18nMsg.lang = 'fr'` would use message strings from `locales/fr.json`.
 
 The directory name can be configured by using the `messagesUrl` property, but the file
-cannot. `<i18n-msg>` will always attempt to use messages from `<messagesUrl>/<LANG_YOU_SET>.json`.
+cannot. `<things-i18n-msg>` will always attempt to use messages from `<messagesUrl>/<LANG_YOU_SET>.json`.
 You can also set and/or change this location globally, at any time, by setting `I18nMsg.url`.
 
-<b>Example</b> - using a custom locales folder, setting it globally for all `<i18n-msg>` instances:
+<b>Example</b> - using a custom locales folder, setting it globally for all `<things-i18n-msg>` instances:
 
     I18nMsg.url = 'locales';
 
@@ -41,7 +39,7 @@ You can also set and/or change this location globally, at any time, by setting `
 
     <i18n-msg messages-url="path/to/locales">fallback text</i18n-msg>
 
-<b>Note:</b> message files are read once and reused for all instances of `<i18n-msg>`.
+<b>Note:</b> message files are read once and reused for all instances of `<things-i18n-msg>`.
 
 ### Fallback text
 
@@ -89,10 +87,23 @@ If an appropriate message file can't be found, the `textContent` of the element 
     is: 'things-i18n-msg',
 
     /**
-     * The `i18n-language-ready` is fired after the locale was fetched and all `<i18n-msg>` elements were updated.
+     * The `i18n-language-ready` is fired after the locale was fetched and all `<things-i18n-msg>` elements were updated.
      *
      * @event i18n-language-ready
      * @detail {{language: String}}
+     */
+    
+    /**
+     * The `i18n-load-language-failure` is fired when xhr status is not 200 or 0
+     *
+     * @event  i18n-load-language-failure
+     * @detail e.target
+     */
+    
+    /**
+     * The `i18n-load-language-failure` is fired when xhr.onerror event fired
+     * @event  i18n-load-language-error
+     * @detail e.target
      */
 
     properties: {
@@ -176,7 +187,7 @@ If an appropriate message file can't be found, the `textContent` of the element 
       var msgId = opt_msgId || this.msgid;
       var lang = this.locales[this.language];
       if (lang && lang[msgId]) {
-        return lang[msgId].message;
+        return lang[msgId];
       }
       return null;
     },
@@ -208,14 +219,18 @@ If an appropriate message file can't be found, the `textContent` of the element 
     },
 
     _fetchLanguage: function() {
-      // if (_fetching) {
-      //   return;
-      // }
+      if (_fetching) {
+        return;
+      }
 
       _fetching = true;
 
       if(!this.messagesUrl){
         _fetching= false;
+        return;
+      }
+
+      if(this.locales[this.language]){
         return;
       }
 
@@ -229,14 +244,16 @@ If an appropriate message file can't be found, the `textContent` of the element 
 
       //add response event
       xhr.onload = function(e) {
-        _fetching = false;
+       
         if (e.target.status !== 200 && e.target.status !== 0) {
           console.log('i18n-load-language-failure');
           this.fire('i18n-load-language-failure', e.target);
           return;
         }
 
-        var resp = JSON.parse(e.target.response);
+        var resp = JSON.parse(e.target.response)[this.language];
+
+
         if (!this.msgid in resp) {
           console.warn(this.localName + ': "' + this.msgid + '" message id was not found in ' + url);
           return;
@@ -247,6 +264,7 @@ If an appropriate message file can't be found, the `textContent` of the element 
         this._notifyInstances();
 
         this.fire('i18n-language-ready', {language: this.language});
+        _fetching = false;
       }.bind(this);
 
       // add error event
@@ -265,8 +283,8 @@ If an appropriate message file can't be found, the `textContent` of the element 
       var instance = opt_instance || this;
 
       var msg = instance.locales[instance.language][instance.msgid];
-      if (msg && msg.message) {
-        instance.innerHTML = msg.message;
+      if (msg) {
+        instance.innerHTML = msg;
       }
     },
 

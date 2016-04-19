@@ -121,25 +121,25 @@
 			<div id="info">
 				<content>
 					<h2>
-						<!-- {{t("label","user_name")}} : [[globals.user.name]] -->
+						<things-i18n-msg msgid="label.user_name">Name</things-i18n-msg>: [[globals.user.name]] 
 					</h2>
 					<h3>
-						<!-- {{t("label","email")}} : [[globals.user.email]] -->
+						<things-i18n-msg msgid="label.email">Email</things-i18n-msg>: [[globals.user.email]] 
 					</h3>
 					<paper-card>
 						<div class="card-actions">
 							<paper-button raised 
 								class="custom indigo" 
 								on-click="showChangePasswordScreen">
-								<!-- {{t("button","change_password")}} -->
+								<things-i18n-msg msgid="button.change_password">Change Password</things-i18n-msg>
 							</paper-button>
 
 							<paper-button raised class="custom indigo" on-tap="logout">
-								<!-- {{t("button","logout")}} -->
+								<things-i18n-msg msgid="button.logout">Logout</things-i18n-msg>
 							</paper-button>
 							
 							<paper-button raised class="custom green" on-tap="closeProfile">
-								<!-- {{t("button","close")}} -->
+								<things-i18n-msg msgid="button.close">Close</things-i18n-msg>
 							</paper-button>							
 							
 							<things-logout 
