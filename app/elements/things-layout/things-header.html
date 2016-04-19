@@ -94,15 +94,13 @@
 		<things-profile id="profile" hidden="[[buttonEnable]]"></things-profile>
 
 		<paper-tooltip for="account">
-			<!-- {{t("button", "user_profile")}} -->
-			<things-i18n-msg msgid="label.user_profile">Toggle Sidebar</things-i18n-msg>
+			<things-i18n-msg msgid="button.user_profile">User Profile</things-i18n-msg>
 		</paper-tooltip>
 		
 		<!-- setting -->
 		<paper-icon-button icon="icons:settings" id="setting-toggler"></paper-icon-button>
 
 		<paper-tooltip for="setting-toggler">
-			<!-- {{t("button", "setting")}} -->
 			<things-i18n-msg msgid="button.setting">Setting</things-i18n-msg>
 		</paper-tooltip>
 
@@ -110,7 +108,9 @@
 		<things-logout id="logout" action="logout" icon="icons:exit-to-app" hidden="[[buttonEnable]]">
 		</things-logout>
 
-		<paper-tooltip for="logout"><!-- {{t("button", "logout")}} --></paper-tooltip>
+		<paper-tooltip for="logout">
+			<things-i18n-msg msgid="button.logout">Logout</things-i18n-msg>
+		</paper-tooltip>
 	</div>
 
   </template>
