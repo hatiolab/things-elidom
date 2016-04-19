@@ -1,6 +1,5 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
 
 <link rel="import" href="./things-resource-selector-behavior.html">
@@ -26,13 +25,11 @@ Resource Selector. 서버에 저장되어 있는 리소스 정보를 조회하�
 
 <dom-module id="things-resource-selector">
   <template>
-    <paper-input label="" name="[[name]]" value="[[value]]" hidden></paper-input>
+    <input is="iron-input" name="[[name]]" bind-value="[[value]]" hidden>
 
-    <paper-input label="[[label]]" value="[[display]]" readonly>
+    <input is="iron-input" bind-value="[[display]]" placeholder="[[label]]" readonly>
       <iron-icon icon="icons:list" prefix on-tap="openResourceSelector"></iron-icon>
-      <paper-icon-button suffix on-tap="clearValue" icon="clear" alt="clear" title="clear">
-      </paper-icon-button>
-    </paper-input>
+      <paper-icon-button suffix on-tap="clearValue" icon="clear" alt="clear" title="clear"></paper-icon-button>
   </template>
 
   <script type="text/javascript">
