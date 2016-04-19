@@ -7,7 +7,10 @@ window.Things = window.Things || {};
  * 메시지 박스는 크게 information, confirmation, prompt 형으로 구분된다.
  * information은 단순히 메시지를 표시하는 형식이고 confirmation은 사용자에게 확인을 받는 형식, 그리고 Prompt는 사용자에게 값을 받아오는 형식이다.
  * 각 메시지 박스 타입의 Function은 information - openInfoMsg, confirmation - openConfirmMsg, prompt - openPromptMsg로 구성된다.
- * 각 Function은 config로 메시지 박스를 구성하는데 config의 요소는 다음과 같다.
+ * confirmation과 prompt 타입은 사용자 응답이 'OK' 성일 경우 Callback 함수를 넘길 수 있다. (API 참조)
+ * 각 Function은 config로 메시지 박스를 구성하는데 configuration 요소는 다음과 같다.
+ *
+ * config
  * 1) type : 메시지 박스의 아이콘 - info, success, warning, error, input, prompt (input과 prompt는 동일) 중 하나 
  * 2) title : 메시지 박스의 타이틀
  * 3) text : 메시지 박스의 본문 메시지
@@ -20,16 +23,16 @@ window.Things = window.Things || {};
  * 10) confirmButtonText: Confirm 버튼의 텍스트 값, 기본값은 'OK'
  * 11) confirmButtonColor: Confirm 버튼의 색깔, 기본값은 '#8CD4F5'
  * 12) cancelButtonText: Cancel 버튼의 텍스트 값, 기본값은'Cancel'
- * 13) imageUrl: 삽입하고자 하는 이미지 URL, 기본값은 null,
- * 14) imageSize: 삽입하고자 하는 이미지의 사이즈, 기본값은 null,
- * 15) timer: 얼마 후에 자동으로 메시지 창이 close될 지 여부, (ex: 3초 후에 자동으로 닫혀야 한다면 3000), null,
- * 16) customClass: '',
- * 17) animation: 창이 열리고 닫힐 때 애니메이션 효과 여부, 기본값은 true,
- * 18) allowEscapeKey: esc키를 누를 때 창이 close될 지 여부, 기본값은 true,
- * 19) inputType: type이 input이나 prompt일 경우 Input 값의 타입, 기본값은 'text',
- * 20) inputPlaceholder: '',
- * 21) inputValue: type이 input이나 prompt일 경우 Input 값,
- * 22) showLoaderOnConfirm: ? false
+ * 13) imageUrl: 삽입하고자 하는 이미지 URL, 기본값은 null
+ * 14) imageSize: 삽입하고자 하는 이미지의 사이즈, 기본값은 null
+ * 15) timer: 얼마 후에 자동으로 메시지 창이 close될 지 여부, (ex: 3초 후에 자동으로 닫혀야 한다면 3000, null이면 사용자 반응에 창이 닫힘), null,
+ * 16) customClass: 커스터마이징 스타일을 구성할 경우 설정, 가본값은 ''
+ * 17) animation: 창이 열리고 닫힐 때 애니메이션 효과 여부, 기본값은 true
+ * 18) allowEscapeKey: esc키를 누를 때 창이 close될 지 여부, 기본값은 true
+ * 19) inputType: type이 input이나 prompt일 경우 사용자에게 입력받을 Input 값의 타입, 기본값은 'text'
+ * 20) inputPlaceholder: type이 input이나 prompt일 경우 사용자에게 입력받을 Input의 Placeholder, 기본값은 ''
+ * 21) inputValue: type이 input이나 prompt일 경우 사용자에게 입력받은 Input 값
+ * 22) showLoaderOnConfirm: 값이 true이면 Cancel과 Confirm 버튼을 비활성화한다. 기본값은 false
  *
  * @demo ./things-grid/demo/index.html
  */
@@ -38,15 +41,7 @@ Things.MsgBoxBehavior = {
   /**
    * Open Information Message Box
    *
-   * @param config
-   * @title
-   * @text
-   * @imageUrl
-   * @type info, success, warning, error ...
-   * @timer Number 1000 mean 1 second
-   * @html Boolean
-   * @showConfirmButton Boolean
-   * @closeOnConfirm Boolean
+   * @param {Object} config
    */
   openInfoMsg: function(config) {
     swal(config);
@@ -55,20 +50,16 @@ Things.MsgBoxBehavior = {
   /**
    * Open Confirmation Message Box
    *
-   * @param {Object} config
-   * @param {Function} okCallback
-   * @param {Function} cancelCallback
+   * @param {Object} config MessageBox 구성을 위한 Configuration
+   * @param {Function} okCallback OK 버튼 클릭시 콜백 함수 
+   * @param {Function} cancelCallback Cancel 버튼 클릭시 콜백 함수 
    */
   openConfirmMsg: function(config, okCallback, cancelCallback) {
     swal(config, function(isConfirm) {
       if (isConfirm) {
-        if (okCallback) {
-          okCallback();
-        }
+        if(okCallback) okCallback();
       } else {
-        if(cancelCallback) {
-          cancelCallback();
-        }
+        if(cancelCallback) cancelCallback();
       }
     });
   },
@@ -76,27 +67,24 @@ Things.MsgBoxBehavior = {
   /**
    * Open Prompt Message Box
    *
-   * @param {Object} config
+   * @param {Object} config MessageBox 구성을 위한 Configuration
    * @param {Function} promptCallback
    */
   openPromptMsg: function(config, promptCallback) {
     swal(config, function(inputValue) {
-      if (inputValue === '') {
+      if(!inputValue) {
         swal.showInputError('Empty value is not allowed!');
+        return false;
       }
 
-      if(!inputValue) return false;
-
-      if(promptCallback) {
-        promptCallback(inputValue);
-      }
+      if(promptCallback) promptCallback(inputValue);
     });
   },
 
   /**
    * Show response error
    *
-   * @param {Object} response
+   * @param {Object} response Ajax 호출 후 Error Response
    */
   openResponseError: function(response) {
     if(response.body) {
@@ -106,7 +94,7 @@ Things.MsgBoxBehavior = {
     var htmlText = '<span>Code : ' + response.code + '<br/><br/><span>Status</span> : ' + response.status + '<br/><br/><p><span>Message</span> : ' + response.msg;
 
     this.openInfoMsg({
-      type : 'warning',
+      type : 'error',
       title : 'Error (' + response.error_id + ')',
       text : htmlText,
       html : true
@@ -116,7 +104,7 @@ Things.MsgBoxBehavior = {
   /**
    * Show unkown error
    *
-   * @param {Object} response
+   * @param {Object} response Ajax 호출 후 Error Response
    */
   openUnkownError: function(response) {
     this.openInfoMsg({ 

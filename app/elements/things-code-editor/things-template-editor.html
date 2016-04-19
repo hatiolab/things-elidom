@@ -155,14 +155,15 @@
           value: [ {
             id: 'save-btn',
             text: 'Save'
-          }]
+          } ]
         }
       },
 
       listeners: {
         'template-editor.editor-ready': '_onEditorReady',
         'template-editor.change': '_onEditorChange',
-        'button-bar.things-button-tap': '_onButtonTap',
+        'button-bar.save-btn-tap': '_saveCode',
+        'button-bar.preview-btn-tap': '_showPreview'
       },
 
       observers: [
@@ -187,21 +188,18 @@
           this.source = resource[templateField]
         }
       },
-      /**
-       * 모드가 ace/mode/html일경우 preview버튼 표시
-       */
-      _onModeChange: function(mode,buttons){
-        var result = buttons.filter(function(button) {
-          return button.id === 'viewHTML-btn'; // Filter out the appropriate one
-        })[0];
 
-        if(mode==="ace/mode/html"&&!result){
-          this.push('buttons',{
-            id:'viewHTML-btn',
-            text:'Preview'
-          });
+      /**
+       * 모드가 ace/mode/html 일 경우 preview 버튼 표시
+       */
+      _onModeChange: function(mode,buttons) {
+        var result = buttons.filter(function(button) { return button.id === 'preview-btn'; })[0];
+
+        if(mode === 'ace/mode/html' && !result) {
+          this.push('buttons', { id:'preview-btn', text:'Preview' });
         }
       },
+
       /**
        * on form fields change
        * @param {Array} formFields
@@ -227,25 +225,14 @@
       },
 
       /**
-       * when group button tap register button event
+       * Save template code
+       *
+       * @param {Object} e
        */
-      _onButtonTap: function(e) {
-        var buttonId = e.detail.id;
+      _saveCode: function(e) {
+        var evt = this.fire('things-template-editor-handle-save', e.detail, { cancelable: true });
+        if(evt.defaultPrevented) return;
 
-        if (buttonId == 'save-btn') {
-          this._saveCode();
-
-        } else if(buttonId=="viewHTML-btn"){
-          this._showPreview();
-        }else {
-          this.fire('things-button-' + buttonId + '-tap', e.detail);
-        }
-      },
-
-      /**
-       * save code
-       */
-      _saveCode: function() {
         this.resource[this.templateField] = this.$['template-editor'].editor.getValue();
         this.saveResource = { id: this.resource.id };
         this.saveResource[this.templateField] = this.resource[this.templateField];
@@ -253,14 +240,20 @@
       },
 
       /**
-       * show preview
+       * Show preview
+       *
+       * @param {Object} e
        */
-      _showPreview :function(event){
-        if(this.mode ==="ace/mode/html"){
+      _showPreview :function(e) {
+        var evt = this.fire('things-template-editor-handle-preview', e.detail, { cancelable: true });
+        if(evt.defaultPrevented) return;
+
+        if(this.mode === "ace/mode/html") {
           this.$['html-preview'].hidden = false;
           this.$['html-preview'].srcdoc = this.$['template-editor'].editor.getValue();
         }
       },
+
       /***************************************************************************************
        *                            Start detail item view interface
        ***************************************************************************************/

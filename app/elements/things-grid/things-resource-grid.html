@@ -141,26 +141,29 @@
 				buttons : {
 					type: Array,
 					value: [{
-							id: 'export-btn',
-							text: 'Export',
-							icon: 'icons:swap-vert'
-						}, {
-							id: 'add-btn',
-							text: 'Add',
-							icon: 'icons:add'
-						}, {
-							id: 'delete-btn',
-							text: 'Delete',
-							icon: 'icons:delete'
-						}, {
-							id: 'save-btn',
-							text: 'Save',
-							icon: 'icons:save'
-						},{
-							id: 'import-btn',
-							text: 'Import',
-							icon: 'icons:file-upload'
-						}]
+						id: 'export-btn',
+						text: 'Export',
+						icon: 'icons:swap-vert'
+					}, {
+						id: 'add-btn',
+						text: 'Add',
+						icon: 'icons:add'
+					}, {
+						id: 'delete-btn',
+						text: 'Delete',
+						icon: 'icons:delete'
+					}, {
+						id: 'save-btn',
+						text: 'Save',
+						icon: 'icons:save',
+						confirm: true,
+						title: 'Confirmation',
+						message: 'Are you sure to save?'
+					},{
+						id: 'import-btn',
+						text: 'Import',
+						icon: 'icons:file-upload'
+					}]
 				},
 
 				/**
@@ -231,17 +234,26 @@
 			},
 
 			listeners: {
-				'button-group.things-button-tap' : '_onButtonTap',		
 				'save-resource.things-resource-ajax-success' : '_successSaveHandler',
-				'save-resource.things-resource-ajax-error' : '_errorSaveHandler'
-
+				'save-resource.things-resource-ajax-error' : '_errorSaveHandler',
+				'button-group.export-btn-tap' : '_exportGridDataHandler',
+				'button-group.add-btn-tap' : '_addGridRowHandler',
+				'button-group.delete-btn-tap' : '_removeGridRowHandler',
+				'button-group.save-btn-tap' : '_saveGridDataHandler',
+				'button-group.import-btn-tap' : '_importExcelHandler'
 			},
 
+			/**
+			 * Life Cycle - Create
+			 */
 			created: function() {
 				DataLudi.setRootContext('');
 				DataLudi.setAssetRoot('images/grid');
 			},
 
+			/**
+			 * Life Cycle - Detached
+			 */
 			detached: function() {
 				this.clearGrid();
 			},
@@ -277,7 +289,7 @@
 			/**
 			 * when group button tap register button event
 			 */
-			_onButtonTap: function(e) {
+			/*_onButtonTap: function(e) {
 				var buttonId = e.detail.id;
 
 				if(buttonId == 'export-btn') {
@@ -292,13 +304,53 @@
 				} else if(buttonId == 'save-btn') {
 					this.saveGridData();
 
-				} else if(buttonId == 'import-btn'){
+				} else if(buttonId == 'import-btn') {
 					this.importExcel();
-				}
-				else {
+					
+				} else {
 					this.fire('things-button-' + buttonId + '-tap', e.detail);
 				}
+			},*/
+
+			/**
+			 * export
+			 */
+			_exportGridDataHandler: function(e) {
+				var evt = this.fire('things-grid-handle-export', e.detail, { cancelable: true });
+				if(!evt.defaultPrevented) this.exportGridData();
 			},
+
+			/**
+			 * add grid row
+			 */
+			_addGridRowHandler: function(e) {
+				var evt = this.fire('things-grid-handle-addrow', e.detail, { cancelable: true });
+				if(!evt.defaultPrevented) this.addGridRow();
+			},
+
+			/**
+			 * remove grid row
+			 */
+			_removeGridRowHandler: function(e) {
+				var evt = this.fire('things-grid-handle-removerow', e.detail, { cancelable: true });
+				if(!evt.defaultPrevented) this.removeGridRow();
+			},
+
+			/**
+			 * save grid data
+			 */
+			_saveGridDataHandler: function(e) {
+				var evt = this.fire('things-grid-handle-savegrid', e.detail, { cancelable: true });
+				if(!evt.defaultPrevented) this.saveGridData();
+			},
+
+			/**
+			 * import
+			 */
+			_importExcelHandler: function(e) {
+				var evt = this.fire('things-grid-handle-import', e.detail, { cancelable: true });
+				if(!evt.defaultPrevented) this.importExcel();
+			},			
 
 			/**
 			 * Dataludi grid cell click 이벤트 핸들러 

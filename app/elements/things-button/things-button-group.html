@@ -4,11 +4,11 @@
 <link rel="import" href="../../../bower_components/paper-fab-transitions/paper-fab-speed-dial.html">
 
 <!--
-  버튼 그룹 
+  버튼을 여러 개 관리하는 버튼 그룹
 
   Example
 
-    var buttons = [{
+    var buttons = [ {
       id: 'import',
       text: 'Import',
       icon: 'icons:import'
@@ -28,7 +28,7 @@
       id: 'save',
       text: 'Save',
       icon: 'icons:save'
-    }];
+    } ];
 
     ...
 
@@ -47,7 +47,6 @@
     
 @demo ./things-button/demo/demo-things-button-group.html
 -->
-
 <dom-module id="things-button-group">
   <template>
     <style>
@@ -68,7 +67,7 @@
         bottom:15px;
       }
       
-      .fab-wrap .fab-text{
+      .fab-wrap .fab-text {
         position:absolute;
         margin-top:-35px;margin-left:-55px;
         padding:2px 3px;
@@ -83,7 +82,7 @@
         box-shadow: 0px 2px 1px 0px rgba(0,0,0,0.2);
       }
       
-      .fab-wrap .fab-text:after{
+      .fab-wrap .fab-text:after {
         content:"";
         position: absolute;
         left: 100%;
@@ -111,59 +110,56 @@
   </template>
 
   <script>
-    (function() {
-      'use strict';
+    Polymer({
+      is: 'things-button-group',
 
-      Polymer({
-        is: 'things-button-group',
-
-        properties: {
-          /**
-           * button 정보 리스트. 
-           *
-           * (example) :
-           *
-           * [{
-                id: 'import',
-                text: 'Import',
-                icon: 'icons:import'
-              }, {
-                id: 'export',
-                text: 'Export',
-                icon: 'icons:export'
-              }, {
-                id: 'add',
-                text: 'add',
-                icon: 'icons:add'
-              }, {
-                id: 'delete',
-                text: 'Delete',
-                icon: 'icons:delete'
-              }, {
-                id: 'save',
-                text: 'Save',
-                icon: 'icons:save'
-              }]
-           */
-          buttons : {
-            type: Array
-          }
-
-          /**
-           * 버튼이 클릭되면 things-button-tap 이벤트가 발생한다. 이 때 buttons에 설정한 버튼 정보가 파라미터로 날아간다.
-           *
-           * @event things-button-tap
-           */
-        },
-
+      properties: {
         /**
-         * 버튼이 클릭되면 things-button-tap 이벤트가 발생한다. 이 때 buttons에 설정한 버튼 정보가 파라미터로 날아간다. 
+         * button 정보 리스트. 
+         *
+         * (example) :
+         *
+         * [ {
+         *    id: 'import',
+         *    text: 'Import',
+         *    icon: 'icons:import',
+         *  }, {
+         *    id: 'export',
+         *    text: 'Export',
+         *    icon: 'icons:export'
+         *  }, {
+         *    id: 'add',
+         *    text: 'add',
+         *    icon: 'icons:add'
+         *  }, {
+         *    id: 'delete',
+         *    text: 'Delete',
+         *    icon: 'icons:delete'
+         *  }, {
+         *    id: 'save',
+         *    text: 'Save',
+         *    icon: 'icons:save'
+         *  } ]
          */
-        _onTabButton: function(e) {
-          this.fire('things-button-tap', e.model._config.button);
+        buttons : {
+          type: Array
         }
 
-      });
-    })();
+        /**
+         * 버튼이 클릭되면 {button-id}-tap 이벤트가 발생한다. 이 때 buttons에 설정한 버튼 정보가 파라미터로 날아간다.
+         *
+         * @event {button-id}-tap
+         */
+      },
+
+      /**
+       * 버튼이 클릭되면 things-button-tap 이벤트가 발생한다. 이 때 buttons에 설정한 버튼 정보가 파라미터로 날아간다. 
+       * @param {Object} event
+       */
+      _onTabButton: function(e) {
+        e.currentTarget.fire(e.currentTarget.id + '-tap', e.model._config.button);
+      }
+
+    });
   </script>
 </dom-module>

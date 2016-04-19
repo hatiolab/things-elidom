@@ -17,7 +17,8 @@
       color="indigo" 
       confirm=true 
       title="Confirm" 
-      message="This is message field">Button name
+      message="This is message field">
+      Button name
     </things-button>
     
 @demo ./things-button/demo/index.html
@@ -85,7 +86,7 @@
 
       properties: {
         /**
-         *  버튼 색깔
+         * 버튼 색깔
          */
         color: {
           type: String,
@@ -115,6 +116,12 @@
           type: String,
           value: ''
         }
+
+        /**
+         * confirm값이 true인 경우 사용자가 'OK' 버튼 클릭시 'ok', Cancel 버튼 클릭시 'cancel' 값이 fire
+         *
+         * @event things-button-confirm
+         */
       },
 
       /**
@@ -127,16 +134,21 @@
         }
       },
 
+      /**
+       * 버튼 클릭시 핸들러, PaperButtonBehavior 함수 구현
+       */
       _tapHandler: function() {
         if(this.confirm) {
           var self = this;
           this.openConfirmMsg({ 
-            type: 'warning',
+            type: 'info',
             title: this.title,
             text: this.message,
             showCancelButton: true
           }, function() { 
-            self.fire('confirm', true); 
+            self.fire('things-button-confirm', 'ok'); 
+          }, function() {
+            self.fire('things-button-confirm', 'cancel'); 
           });
 
         } else {

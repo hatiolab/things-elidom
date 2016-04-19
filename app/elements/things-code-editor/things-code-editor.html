@@ -161,7 +161,7 @@
       listeners: {
         'code-editor.editor-ready': '_onEditorReady',
         'code-editor.change': '_onEditorChange',
-        'button-bar.things-button-tap': '_onButtonTap',
+        'button-bar.save-btn-tap': '_saveCode'
       },
 
       observers: [
@@ -211,23 +211,12 @@
       },
 
       /**
-       * when group button tap register button event
-       */
-      _onButtonTap: function(e) {
-        var buttonId = e.detail.id;
-
-        if (buttonId == 'save-btn') {
-          this._saveCode();
-
-        } else {
-          this.fire('things-button-' + buttonId + '-tap', e.detail);
-        }
-      },
-
-      /**
        * save code
        */
-      _saveCode: function() {
+      _saveCode: function(e) {
+        var evt = this.fire('things-template-editor-handle-save', e.detail, { cancelable: true });
+        if(evt.defaultPrevented) return;
+
         this.resource[this.codeField] = this.$['code-editor'].editor.getValue();
         this.saveResource = { id: this.resource.id };
         this.saveResource[this.codeField] = this.resource[this.codeField];

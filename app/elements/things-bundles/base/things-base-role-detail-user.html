@@ -18,6 +18,7 @@
       </things-resource>
 
       <span><paper-icon-button icon="icons:view-list"></paper-icon-button>[[roleName]]</span>
+
       <things-resource-grid 
         id="grid"
         config="[[gridConfig]]"
@@ -143,7 +144,7 @@
             width: 160
           }, {
             fieldName: 'name',
-            width: 160
+            width: 0
           } ]
         },
 
@@ -169,7 +170,7 @@
         buttons: {
           type: Array,
           value: [ {
-            id: 'new-btn',
+            id: 'add-btn',
             text: 'Add',
             icon: 'icons:add'
           }, {
@@ -186,10 +187,10 @@
 
       listeners: {
         'things-resource-selector-selected' : '_onResourceSelectorSelected',
-        'grid.things-button-new-btn-tap' : 'addRow',
-        'grid.things-grid-pre-save' : '_beforeColumnsSave',
         'grid.things-grid-save-success' : 'reloadGrid',
-        'grid.things-grid-resource-column-edit' : '_openResourceSelector'        
+        'grid.things-grid-resource-column-edit' : '_openResourceSelector',
+        'grid.things-grid-handle-addrow' : '_addRow',
+        'grid.things-grid-pre-save' : '_beforeColumnsSave'
       },
 
       /**
@@ -237,9 +238,13 @@
       /**
        * add grid row
        */
-      addRow: function(e) {
-        this.$.grid.dataSet.insertRow(0, { id: null, name : '', login : '', email : this.resourceType, user : {} });
-      },      
+      _addRow: function(e) {
+        e.preventDefault();
+        
+        this.$.grid.dataSet.insertRow(0, { 
+          id: null, name : '', login : '', email : this.resourceType, user : { id: null, name : '' } 
+        });
+      },
 
       /**
        * Role User Search URL

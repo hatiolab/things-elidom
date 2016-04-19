@@ -20,6 +20,7 @@
       </things-resource>
 
       <span><paper-icon-button icon="icons:view-list"></paper-icon-button>[[roleName]]</span>
+
       <things-resource-grid 
         id="grid"
         config="[[gridConfig]]"
@@ -126,7 +127,7 @@
             },
             styleCallback: function (index, styles) {
               var rowData = index.getRow().getRowObject();
-              if(!rowData.parent_id) {
+              if(!rowData.parent_id || rowData.parent_id == '0' || rowData.parent_id == 0) {
                 styles.setIconIndex('indicator_insert.png');
               } else {
                 styles.setIconIndex('menu_button.png');
@@ -192,7 +193,7 @@
         buttons: {
           type: Array,
           value: [ {
-            id: 'update-btn',
+            id: 'save-btn',
             text: 'Save',
             icon: 'icons:save'
           } ]
@@ -202,7 +203,7 @@
       listeners: {
         'grid.things-resource-grid-configured' : '_onGridConfigured',
         'grid.things-grid-save-success' : 'reloadGrid',
-        'grid.things-button-update-btn-tap' : '_updatePermission'
+        'grid.things-grid-handle-savegrid' : '_updatePermission',
       },
 
       /**
@@ -228,6 +229,8 @@
        * Update multiple & Delete All 기능
        */
       _updatePermission: function(event) {
+        event.preventDefault();
+
         var thingsGrid = this.$.grid;
         var grid = thingsGrid.getGridObject();
         grid.commit();
@@ -258,7 +261,12 @@
             thingsGrid._gridSaveAction();
           }
         } else {
-          this.openInfoMsg({ title : 'Nothing to Save', text : 'There\'s nothing to save', type : 'info', timer : 3000 });
+          this.openInfoMsg({ 
+            title : 'Nothing to Save', 
+            text : "There's nothing to save", 
+            type : 'info', 
+            timer : 3000 
+          });
         }
       },
 
@@ -340,6 +348,7 @@
             p[actionFlag] = true;
 
           delete p['action_name'];
+          p.name = '[Main Menu] ' + p.name;
         });
 
         return parents;        

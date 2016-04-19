@@ -8,6 +8,7 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/juicy-ace-editor/juicy-ace-editor.html">
 
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 <link rel="import" href="../things-setting/things-global-behavior.html">
@@ -15,10 +16,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../things-file-upload/things-file-upload.html">
 <link rel="import" href="../things-card/things-card-list.html">
 <link rel="import" href="../things-card/things-img-card.html">
-<link rel="import" href="../things-code-editor/things-code-editor.html">
-<link rel="import" href="../things-html-preview/things-html-preview.html">
-<link rel="import" href="../../../bower_components/juicy-ace-editor/juicy-ace-editor.html">
-
+<link rel="import" href="../things-code-editor/things-template-editor.html">
 
 <dom-module id="things-demo">
 	<template>
@@ -26,22 +24,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		<style>
 			@import "things-demo";
 		</style>
-
-		<!-- code Editor -->
-		<paper-material elevation="1">
-			<h2>things Code Editor</h2>
-			<things-code-editor 
-				id="eval-editor"
-				theme="ace/theme/monokai"
-				mode="ace/mode/html"
-				resource="{{code_resource}}"
-				code-field ="source"
-				save-url ="hi">
-			</things-code-editor>
-			<things-html-preview id="html-preview" srcdoc="{{code_resource.source}}">
-			</things-html-preview>
-			<things-button id="loadHTMLPreview"> Run</things-button>
-		</paper-material>
 
 		<!-- others -->
 		<paper-material class="Page-paper" elevation="1">
@@ -51,6 +33,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		</paper-material>
 
 		<paper-material class="Page-paper" elevation="1">
+			<h2 class="Page-title">Things Component API & Docs</h2>
 			<p class="paper-font-subhead"><a href="/elements/index.html" target="_blank">Component API & Demo</a></p>
 		</paper-material>
 
@@ -94,7 +77,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 					title="Confirm" 
 					message="Are you sure to save?">Save Button</things-button>
 
-				<things-button id="things-btn-3" color="pink" confirm=true title="Confirm" message="Are you sure to delete?">Delete Button</things-button>
+				<things-button 
+					id="things-btn-3" 
+					color="pink" 
+					confirm=true 
+					title="Confirm" 
+					message="Are you sure to delete?">Delete Button</things-button>
 			</div>
 		</paper-material>
 
@@ -211,176 +199,191 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 		<things-websocket id="ws" url="{{wsUrl}}"></things-websocket>
 
-  </template>
+		<!-- code Editor -->
+		<paper-material elevation="1">
+			<h2>Things Template Editor</h2>
+			<things-template-editor 
+				id="template-editor"
+				theme="ace/theme/monokai"
+				mode="ace/mode/html"
+				resource="{{code_resource}}"
+				template-field ="source"
+				save-url ="hi">
+			</things-template-editor>
+		</paper-material>		
 
-  <!--script src="things-demo.js"></script-->
+	</template>
 
-  <script>
-	(function() {
-	  'use strict';
+	<!--script src="things-demo.js"></script-->
 
-	  Polymer({
-		is: 'things-demo',
+	<script>
+		Polymer({
+			is: 'things-demo',
 
-		properties: {
-		  title: {
-			value: 'Title'
-		  },
-		  wsUrl: {
-			value: 'ws://localhost:9004/ws'
-		  },
-		  wsStatus: {
-			value: 'disconnected'
-		  },
-		  comboItems: {
-			type: Array,
-			value: [{
-			  name : 'ko-KR', description: '한글'
-			}, {
-			  name : 'en-US', description: 'English'
-			}, {
-			  name : 'zh-CN', description: 'Chinese'
-			}],
-			notify: true
-		  },
-		  code_resource:{
-		  	type:Object,
-		  	value:function () {
-		  		return {
-					"name" : "test",
-					"source" :"<body><h2>hi</h2></body>"
-				};
-		  	}
-		  }
-		},
+			properties: {
+				title: {
+					value: 'Title'
+				},
 
-		behaviors : [
-		  Things.MsgBoxBehavior, 
-		  Things.GlobalBehavior,
-		  Things.SpinnerBehavior,
-		],
+				wsUrl: {
+					value: 'ws://localhost:9004/ws'
+				},
+			  
+				wsStatus: {
+					value: 'disconnected'
+				},
 
-		listeners: {
-		  'setting-btn.tap' : 'onTapSetting',
-		  'things-btn-1.tap' : 'onTapThingsButton1',
-		  'things-btn-2.confirm' : 'onConfirmMsgBox',
-		  'things-btn-3.confirm' : 'onConfirmMsgBox',
-		  'msg-button.tap' : 'onTapMsgButton',
-		  'confirm-button.tap' : 'onTapConfirmButton',
-		  'prompt-button.tap' : 'onTapPromptButton',
-		  'spn-button.tap' : 'onTapSpnButton',
-		  'evt-button.tap' : 'onTapEvtButton',
-		  'ws-open-button.tap' : 'onTapWsOpenButton',
-		  'ws-send-button.tap' : 'onTapWsSendButton',
-		  'ws-close-button.tap' : 'onTapWsCloseButton',
-		  'msg-box.confirm' : 'onConfirmMsgBox',
-		  'ws.onmessage' : 'onWsMessageReceive',
-		  'ws.onerror' : 'onWsMessageReceive',
-		  'ws.onopen' : 'onWsMessageReceive',
-		  'ws.onclose' : 'onWsMessageReceive',
-		  'combo.things-combo-value-changed' : 'onComboValueChanged',
-		  'code-selector.things-combo-value-changed' : 'onComboValueChanged',
-		  'loadHTMLPreview.tap':'onTapLoadHTMLPreview'
-		},
+				comboItems: {
+					type: Array,
+					value: [ {
+						name : 'ko-KR', description: '한글'
+					}, {
+						name : 'en-US', description: 'English'
+					}, {
+						name : 'zh-CN', description: 'Chinese'
+					} ],
+					notify: true
+			  },
 
-		onTapSetting: function(e) {
-		  this.$.setting.open();
-		},
+				code_resource: {
+					type: Object,
+					value: {
+						name: 'test',
+						source: '<body><h2>Things Template Editor</h2></body>'
+					}
+			  }
+			},
 
-		onTapThingsButton1: function(e) {
-		  this.thingsButtonMessage = 'Search Button Pressesd';
-		},
+			behaviors : [
+				Things.MsgBoxBehavior, 
+				Things.GlobalBehavior,
+				Things.SpinnerBehavior,
+			],
 
-		onTapMsgButton: function(e) {
-		  this.openInfoMsg({ title : 'Info Title', text : 'Info Message', type : 'info', timer : 3000 });
-		},
+			listeners: {
+				'setting-btn.tap' : 'onTapSetting',
+				'things-btn-1.tap' : 'onTapThingsButton1',
+				'things-btn-2.things-button-confirm' : 'onConfirmMsgBox',
+				'things-btn-3.things-button-confirm' : 'onConfirmMsgBox',
+				'msg-button.tap' : 'onTapMsgButton',
+				'confirm-button.tap' : 'onTapConfirmButton',
+				'prompt-button.tap' : 'onTapPromptButton',
+				'spn-button.tap' : 'onTapSpnButton',
+				'evt-button.tap' : 'onTapEvtButton',
+				'ws-open-button.tap' : 'onTapWsOpenButton',
+				'ws-send-button.tap' : 'onTapWsSendButton',
+				'ws-close-button.tap' : 'onTapWsCloseButton',
+				'msg-box.confirm' : 'onConfirmMsgBox',
+				'ws.onmessage' : 'onWsMessageReceive',
+				'ws.onerror' : 'onWsMessageReceive',
+				'ws.onopen' : 'onWsMessageReceive',
+				'ws.onclose' : 'onWsMessageReceive',
+				'combo.things-combo-value-changed' : 'onComboValueChanged',
+				'code-selector.things-combo-value-changed' : 'onComboValueChanged',
+				'loadHTMLPreview.tap':'onTapLoadHTMLPreview'
+			},
 
-		onTapConfirmButton: function(e) {
-		  this.openConfirmMsg( { title: 'Are you sure?',
-						  text: 'You will not be able to recover this imaginary file!',
-						  type: 'warning',
-						  showCancelButton: true,
-						  confirmButtonColor: '#DD6B55',
-						  confirmButtonText: 'Yes, delete it!',
-						  cancelButtonText: 'No, cancel plx!',
-						  closeOnConfirm: false,
-						  closeOnCancel: false }, this.okCallback, this.cancelCallback);
-		},
+			onTapSetting: function(e) {
+				this.$.setting.open();
+			},
 
-		okCallback: function() {
-		  swal('Deleted!', 'Your imaginary file has been deleted', 'success');
-		},
+			onTapThingsButton1: function(e) {
+				this.thingsButtonMessage = e.srcElement.innerText + ' Pressesd';
+			},
 
-		cancelCallback: function() {
-		  swal('Cancelled', 'Your imaginary file is safe.', 'error');
-		},
+			onTapMsgButton: function(e) {
+				this.openInfoMsg({ title : 'Info Title', text : 'Info Message', type : 'info', timer : 3000 });
+			},
 
-		onTapPromptButton: function(e) {
-		  this.openPromptMsg( { title : 'An input!',
-						 text : 'Write something interesting!',
-						 type : 'input',
-						 showCancelButton: true,
-						 closeOnConfirm : false,
-						 animation : 'slide-from-too',
-						 inputPlaceholder : 'Write Something' }, this.promptCallback);
-		},
+			onTapConfirmButton: function(e) {
+			  this.openConfirmMsg({ 
+			  	title: 'Are you sure?',
+					text: 'You will not be able to recover this imaginary file!',
+					type: 'warning',
+					showCancelButton: true,
+					confirmButtonColor: '#DD6B55',
+					confirmButtonText: 'Yes, delete it!',
+					cancelButtonText: 'No, cancel plx!',
+					closeOnConfirm: false,
+					closeOnCancel: false 
+				}, this.okCallback, this.cancelCallback);
+			},
 
-		promptCallback: function(inputValue) {
-		  swal("Nice!", "You wrote: " + inputValue, "success");
-		},
+			okCallback: function() {
+				swal('Deleted!', 'Your imaginary file has been deleted', 'success');
+			},
 
-		onTapSpnButton: function(e) {
-		  this.toggleSpinner();
-		},
+			cancelCallback: function() {
+				swal('Cancelled', 'Your imaginary file is safe.', 'error');
+			},
 
-		onTapEvtButton: function(e) {
-		  // index.html에 event-handler 추가
-		  app.$['event-handler'].fire('showMessage', { title : 'This is Title', message : 'This is Message!' });
-		},
+			onTapPromptButton: function(e) {
+			  this.openPromptMsg({ 
+					title : 'An input!',
+					text : 'Write something interesting!',
+					type : 'input',
+					showCancelButton: true,
+					closeOnConfirm : false,
+					animation : 'slide-from-too',
+					inputPlaceholder : 'Write Something' 
+				}, this.promptCallback);
+			},
 
-		onTapWsOpenButton: function(e) {
-		  this.$.ws.open();
-		},
+			promptCallback: function(inputValue) {
+				swal("Nice!", "You wrote: " + inputValue, "success");
+			},
 
-		onTapWsSendButton: function(e) {
-		  this.$.ws.send(this.wsSendMessage);
-		},
+			onTapSpnButton: function(e) {
+				this.toggleSpinner();
+			},
 
-		onTapWsCloseButton: function(e) {
-		  this.wsSendMessage = '';
-		  this.$.ws.close();  
-		},
+			onTapEvtButton: function(e) {
+				// index.html에 event-handler 추가
+				app.$['event-handler'].fire('showMessage', { title : 'This is Title', message : 'This is Message!' });
+			},
 
-		onConfirmMsgBox: function(e) {
-		  if(e.detail == 'ok') {
-			this.thingsButtonMessage = e.detail + ' pressed';
-		  } else {
-			this.thingsButtonMessage = e.detail + ' pressed';
-		  }
-		},
+			onTapWsOpenButton: function(e) {
+				this.$.ws.open();
+			},
 
-		onWsMessageReceive: function(e) {
-		  if(typeof(e.detail) == "string") {
-			this.wsReceiveMessage = e.detail;  
-		  } else {
-			this.wsReceiveMessage = e.type;
-			this.wsStatus = this.$.ws.status();
-		  }
-		},
+			onTapWsSendButton: function(e) {
+				this.$.ws.send(this.wsSendMessage);
+			},
 
-		onComboValueChanged: function(e) {
-		  if(e.detail) {
-			this.codeName = e.detail.value;
-			this.codeDesc = e.detail.item ? e.detail.item.description : '';
-		  }
-		},
+			onTapWsCloseButton: function(e) {
+				this.wsSendMessage = '';
+				this.$.ws.close();  
+			},
 
-		onTapLoadHTMLPreview: function(e){
-			this.$['html-preview'].srcdoc=this.code_resource.source;
-		}
+			onConfirmMsgBox: function(e) {
+				if(e.detail == 'ok') {
+					this.thingsButtonMessage = e.detail + ' pressed';
+				} else {
+					this.thingsButtonMessage = e.detail + ' pressed';
+				}
+			},
 
-	  });
-	})();
-  </script>  
+			onWsMessageReceive: function(e) {
+				if(typeof(e.detail) == "string") {
+					this.wsReceiveMessage = e.detail;  
+				} else {
+					this.wsReceiveMessage = e.type;
+					this.wsStatus = this.$.ws.status();
+				}
+			},
+
+			onComboValueChanged: function(e) {
+				if(e.detail) {
+					this.codeName = e.detail.value;
+					this.codeDesc = e.detail.item ? e.detail.item.description : '';
+				}
+			},
+
+			onTapLoadHTMLPreview: function(e){
+				this.$['html-preview'].srcdoc = this.code_resource.source;
+			}
+
+		});
+	</script>  
 
 </dom-module>
