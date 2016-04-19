@@ -19,6 +19,7 @@
 <link rel="import" href="../things-combo/things-resource-field.html">
 <link rel="import" href="../things-date-picker/things-date-picker.html">
 <link rel="import" href="../things-date-picker/things-time-picker.html">
+<link rel="import" href="../things-input-field/things-input-field.html">
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 <link rel="import" href="../things-setting/things-global-behavior.html">
 <link rel="import" href="../things-spinner/things-spinner-behavior.html">
@@ -333,8 +334,10 @@ Things.FormBehaviorImpl = {
 				break;
 
 			default:
-				newElement = document.createElement('paper-input');
-				newElement = this.bindAttributes(newElement, element);
+				newElement = document.createElement('things-input-field');
+				//newElement = this.bindAttributes(newElement, element);
+				newElement.setAttribute('name', element.name);
+				newElement.setAttribute('label', element.label);
 		}
 
 		if(!newElement) return null;
