@@ -1,20 +1,27 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-
+<link rel="import" href="../../../bower_components/iron-dropdown/iron-dropdown.html">
 <link rel="import" href="../../../bower_components/vaadin-combo-box/vaadin-combo-box.html">
 
 <dom-module id="things-combo">
-	<template>
-  
-    <vaadin-combo-box 
-      id="combo" 
-      name="{{name}}"
-      label="{{label}}" 
-      items="{{items}}" 
-      item-label-path="{{labelPath}}" 
-      item-value-path="{{valuePath}}" 
-      value="{{value}}">
-    </vaadin-combo-box>
+	<style>
+    .dropdown-content {
+      background-color: white;
+    }
+  </style>
 
+  <template>  
+    <input is="iron-input" name="display" placeholder="[[label]]" value="[[display]]" disabled>
+    <input is="iron-input" name="{{name}}" value="[[value]]" hidden>
+
+    <iron-icon icon="icons:list" on-tap="spreadContents"></iron-icon>
+    <paper-icon-button suffix on-tap="clearValue" icon="clear" alt="clear" title="clear"></paper-icon-button>
+    <iron-dropdown id="dropdownList" horizontal-align="left" vertical-align="top">
+      <div class="dropdown-content">
+        <template is="dom-repeat" items="[[items]]">
+          <paper-item on-tap="_valueChanged" value="[[item.name]]">[[item.description]]&nbsp;<span>([[item.name]])</span></paper-item>
+        </template>
+      </div>
+    </iron-dropdown>
 	</template>
 
   <script type="text/javascript">
@@ -29,24 +36,62 @@
             value: []
           },
 
+          labelPath: {
+            type: String,
+            value: 'description'
+          },
+
+          valuePath: {
+            type: String,
+            value: 'name'
+          },
+
+          display: {
+            type: String
+          },
+
           value: {
             type: String,
-            notify: true
+            observer: '_valueChangeHandler'
           }
         },
 
-        listeners: {
-          'combo.value-changed' : '_valueChangeHandler'
-        },
-
+        /**
+         * value가 변경될 시 발생하는 event handler
+         */
         _valueChangeHandler: function(e) {
           if(this.valuePath) {
-            if(e.detail.value) {
-              this.fire('things-combo-value-changed', { value : e.detail.value, item : this.$.combo.selectedItem });
+            if(this.value) {
+              this.fire('things-combo-value-changed', { value : this.value, item : { name : this.value, description : this.display } });
             } else {
               this.fire('things-combo-value-changed', { value : '', item : {} });
             }
           }
+        },
+
+        /**
+         * Spreading Drop down list
+         */
+        spreadContents: function() {
+          this.$['dropdownList'].toggle();
+        },
+
+        /**
+         * input field의 값이 변경 될 시 drop down list를 닫고 value(검색에 필요한 실제 값)와 display(UI에 나타나는 값)를 초기화
+         */
+        _valueChanged: function(e) {
+          this.$['dropdownList'].toggle();
+          this.value = e.model.item[this.valuePath];
+          this.display = e.model.item[this.labelPath];
+          console.log(e);
+        },
+
+        /**
+         * 값을 리셋
+         */
+        clearValue: function(e) {
+          this.display = '';
+          this.value = '';
         }
 
       })
