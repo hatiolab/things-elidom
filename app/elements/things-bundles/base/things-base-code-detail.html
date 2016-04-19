@@ -27,7 +27,7 @@
         form-fields="[[formFields]]">
       </things-resource-form>
 
-      <span><paper-icon-button icon="icons:view-list"></paper-icon-button>Code List</span>
+      <span><paper-icon-button icon="icons:view-list"></paper-icon-button>Sub Codes</span>
 
       <things-resource-grid 
         id="grid"
@@ -175,7 +175,7 @@
         buttons: {
           type: Array,
           value: [ {
-            id: 'new-btn',
+            id: 'add-btn',
             text: 'Add',
             icon: 'icons:add'
           }, {
@@ -191,7 +191,7 @@
       },
 
       listeners: {
-        'grid.things-button-new-btn-tap' : 'addRow',
+        'grid.things-grid-handle-addrow' : 'addRow',
         'grid.things-grid-save-success' : 'reloadGrid'
       },
 
@@ -237,7 +237,11 @@
        * add grid row
        */
       addRow: function(e) {
-        this.$.grid.dataSet.insertRow(0, { id: null, name : '', description : '', parent_id : this.codeId });
+        event.preventDefault();
+        
+        this.$.grid.dataSet.insertRow(0, { 
+          id: null, name : '', description : '', parent_id : this.codeId 
+        });
       },
 
       /**
