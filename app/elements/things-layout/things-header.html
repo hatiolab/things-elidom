@@ -5,6 +5,7 @@
 <link rel="import" href="../things-auth/things-logout.html">
 <link rel="import" href="../things-i18n/things-i18n-behavior.html">
 <link rel="import" href="../things-i18n/things-locale-combo.html">
+<!-- <link rel="import" href="../things-i18n/things-i18n-msg.html"> -->
 <link rel="import" href="../things-profile/things-profile.html">
 <link rel="import" href="../things-setting/things-global-behavior.html">
 <link rel="import" href="../things-setting/things-setting-dialog.html">
@@ -83,34 +84,33 @@
 		<!-- menu toggle -->
 		<paper-icon-button icon="icons:menu" id="sidebar-toggler">
 		</paper-icon-button>
-		<paper-tooltip for="sidebar-toggler">{{t("label", "toggle_sidebar")}}</paper-tooltip>
-
-		<!-- locale -->
-		<paper-icon-button id="locale" icon="icons:language" hidden="[[buttonEnable]]">
-		</paper-icon-button>
-		<paper-tooltip for="locale">{{t("button", "locale")}}</paper-tooltip>
+		<paper-tooltip for="sidebar-toggler">
+			<things-i18n-msg msgid="label.toggle_sidebar">Toggle Sidebar</things-i18n-msg>
+		</paper-tooltip>
 
 		<!-- profile -->
 		<paper-icon-button id="account" icon="icons:account-box" hidden="[[buttonEnable]]">
-		</paper-icon-button>{{userName}}
+		</paper-icon-button>{{globals.user.name}}
 		<things-profile id="profile" hidden="[[buttonEnable]]"></things-profile>
 
-		<paper-tooltip for="account">{{t("button", "user_profile")}}</paper-tooltip>
+		<paper-tooltip for="account">
+			<!-- {{t("button", "user_profile")}} -->
+			<things-i18n-msg msgid="label.user_profile">Toggle Sidebar</things-i18n-msg>
+		</paper-tooltip>
 		
 		<!-- setting -->
 		<paper-icon-button icon="icons:settings" id="setting-toggler"></paper-icon-button>
 
-		<paper-tooltip for="setting-toggler">{{t("button", "setting")}}</paper-tooltip>
+		<paper-tooltip for="setting-toggler">
+			<!-- {{t("button", "setting")}} -->
+			<things-i18n-msg msgid="button.setting">Setting</things-i18n-msg>
+		</paper-tooltip>
 
 		<!-- logout -->
 		<things-logout id="logout" action="logout" icon="icons:exit-to-app" hidden="[[buttonEnable]]">
 		</things-logout>
 
-		<paper-tooltip for="logout">{{t("button", "logout")}}</paper-tooltip>
-
-		<!-- locale selector -->
-		<things-locale-combo id="locale-selector" default-locale ="[[defaultLocale]]" hidden>
-		</things-locale-combo>
+		<paper-tooltip for="logout"><!-- {{t("button", "logout")}} --></paper-tooltip>
 	</div>
 
   </template>
@@ -121,7 +121,7 @@
 
 			behaviors: [ 
 				Things.GlobalBehavior,
-				Things.I18nBehavior
+				// Things.I18nBehavior
 			],
 
 			properties: {
@@ -140,48 +140,33 @@
 					value: { name: '', id: '' }
 				},
 
-				/**
-				 * 사용자 이름 
-				 */
+				// /**
+				//  * 사용자 이름 
+				//  */
 				userName: {
-					type: String,
-					value: function() {
-						return app.user ? app.user.name : '';
-					}
-				},
-
-				/**
-				 * Locale
-				 */
-				defaultLocale: {
-					type: String,
-					notify: true,
-					readonly: true,
-					value : function() {
-						return app.locale
-					}
+					type: String
 				},
 				
 				/**
 				 * Enable buttons
 				 */
 				buttonEnable: {
-					type: String,
+					type: Boolean,
 					notify: true,
 					readonly: true,
-					value : function() {
-						return app.user ? false : true;
-					}
+					computed:'isButtonEnable(globals.user)'
 				},
 			},
 
 			listeners: {
 				'sidebar-toggler.tap': 'toggleSidebar',
 				'setting-toggler.tap': 'showSetting',
-				'account.tap': 'showProfile',
-				'locale.tap': 'toggleLocale'
+				'account.tap': 'showProfile'
 			},
+			// attached:function () {
+			// 	 this.userName = this.globals.user.name;
 
+			// }
 			/**
 			 * Toggle Sidebar. 로그인 이후에만 toggle이 적용됨 
 			 */
@@ -217,11 +202,8 @@
 				setting.open();
 			},
 
-			/**
-			 * Toggle Locale Selector
-			 */
-			toggleLocale: function(e) {
-				this.$['locale-selector'].hidden = !this.$['locale-selector'].hidden;
+			isButtonEnable:function(user){
+				return user ? false : true;
 			}
 
 	  });

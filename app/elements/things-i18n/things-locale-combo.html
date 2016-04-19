@@ -32,13 +32,16 @@ Example:
 	      value-path="name">
 	    </things-code-selector>
 	    
-	    <iron-localstorage name="setting.locale" value="{{selectedLocale}}">
-    	</iron-localstorage>
+	    <iron-localstorage name="[[storageName]]" value="{{selectedLocale}}"></iron-localstorage>
 	</template>
 	<script>
 		Polymer({
 			is: 'things-locale-combo',
 			properties:{
+				storageName :{
+					type:String,
+					value:'setting.locale'
+				},
 				defaultLocale:{
 					type: String
 				}
@@ -50,7 +53,9 @@ Example:
 
 			_onComboValueChanged:function (event) {
 				this.set('selectedLocale',event.detail.value);
-				location.reload(true);
+				I18nMsg.lang = dataGlobal.language || document.documentElement.lang
+				I18nMsg.lang = event.detail.value;
+        		Platform.performMicrotaskCheckpoint();
 			},
 
 			getLocale:function () {

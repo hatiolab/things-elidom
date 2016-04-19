@@ -14,7 +14,11 @@
     <h2>Setting (Only Client Side Setting)</h2>
 
     <paper-input label="Base URL (ex: http://www.elidom.xyz:80/rest)" value="{{globals.basicUrl}}"></paper-input>
-
+    <!-- locale selector -->
+    <things-locale-combo id="locale-selector" 
+      storage-name="setting.locale" 
+      default-locale ="{{globals.locale}}">
+    </things-locale-combo>
   </template>
 
   <script>

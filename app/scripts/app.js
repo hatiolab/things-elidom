@@ -20,114 +20,114 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	 * localization start 
 	 */
 	
-	// for dom if binding, if localization data is not ready then main dom should not render
-	// just render setting and toast boxes 
-	app.localizationReady =false;
+	// // for dom if binding, if localization data is not ready then main dom should not render
+	// // just render setting and toast boxes 
+	// app.localizationReady =false;
 
-	//get global variable
-	app.getGlobalValues = function(){
-		var setting = document.querySelector('#setting');
-		if(setting.globals){
-			// console.log(setting.globals);
-			app.basicUrl = setting.globals.basicUrl;
-			app.user = setting.globals.user;
-			app.locale = setting.globals.locale;
-		};
-	};
-	//get locale from user
-	app.getUserLocale = function () {
-		 return app.locale?app.locale:null; 
-	};
+	// //get global variable
+	// app.getGlobalValues = function(){
+	// 	var setting = document.querySelector('#setting');
+	// 	if(setting.globals){
+	// 		// console.log(setting.globals);
+	// 		app.basicUrl = setting.globals.basicUrl;
+	// 		app.user = setting.globals.user;
+	// 		app.locale = setting.globals.locale;
+	// 	};
+	// };
+	// //get locale from user
+	// app.getUserLocale = function () {
+	// 	 return app.locale?app.locale:null; 
+	// };
 
-	//get locale from browser
-	app.getBrowserLocale = function () {
-		var locale;
+	// //get locale from browser
+	// app.getBrowserLocale = function () {
+	// 	var locale;
 
-		locale = navigator.language||navigator.userLanguage;
-		locale = locale=="ko"?"ko-KR": locale;
+	// 	locale = navigator.language||navigator.userLanguage;
+	// 	locale = locale=="ko"?"ko-KR": locale;
 
-		return  locale;
-	};
-	/**
-	 * make locale value
-	 */
-	app.getLocale = function (user) {
-		app.locale = app.getUserLocale()?app.getUserLocale():app.getBrowserLocale();
-		return app.locale;
-	};
+	// 	return  locale;
+	// };
+	// /**
+	//  * make locale value
+	//  */
+	// app.getLocale = function (user) {
+	// 	app.locale = app.getUserLocale()?app.getUserLocale():app.getBrowserLocale();
+	// 	return app.locale;
+	// };
 
-	/**
-	 * for localization xhr request prameters, use terminologies/resource 
-	 */
-	app.getRequestValue = function(){
-		var requestValue= {};
-		if(app.user){
-			requestValue = {"domain" : app.user.domain_id,
-							"locale" : app.getLocale()};
-		}else{
-			requestValue = {"domian":1}
-		}
+	// /**
+	//  * for localization xhr request prameters, use terminologies/resource 
+	//  */
+	// app.getRequestValue = function(){
+	// 	var requestValue= {};
+	// 	if(app.user){
+	// 		requestValue = {"domain" : app.user.domain_id,
+	// 						"locale" : app.getLocale()};
+	// 	}else{
+	// 		requestValue = {"domian":1}
+	// 	}
 
-		return JSON.stringify(requestValue);
-	};
-	/**
-	 * compute terminologies url with app.globals.basicUrl
-	 */
-	app.computeUrl = function(){
-		return app.basicUrl+'/terminologies/resource';
-	};
-	/**
-	 * get language information from server
-	 */
-	app.getLanguageInfo = function () {
-		//1. a sign global values to app;
-		app.getGlobalValues();
+	// 	return JSON.stringify(requestValue);
+	// };
+	// /**
+	//  * compute terminologies url with app.globals.basicUrl
+	//  */
+	// app.computeUrl = function(){
+	// 	return app.basicUrl+'/terminologies/resource';
+	// };
+	// *
+	//  * get language information from server
+	 
+	// app.getLanguageInfo = function () {
+	// 	//1. a sign global values to app;
+	// 	app.getGlobalValues();
 		
-		//2. create xhr requesst
-		var xhr = new XMLHttpRequest();
-		xhr.open('POST', app.computeUrl() , true);
-		xhr.setRequestHeader("Content-type", "application/json");
-		xhr.withCredentials = true;
+	// 	//2. create xhr requesst
+	// 	var xhr = new XMLHttpRequest();
+	// 	xhr.open('POST', app.computeUrl() , true);
+	// 	xhr.setRequestHeader("Content-type", "application/json");
+	// 	xhr.withCredentials = true;
 		
-		//3. make domain object and send request
-		xhr.send(app.getRequestValue());
+	// 	//3. make domain object and send request
+	// 	xhr.send(app.getRequestValue());
 
-		//4. monitor xhr request response and status, change localization ready value to true and 
-		//   let index file to render menu and main contents
-		xhr.onreadystatechange = function (Evt) {
-			if (xhr.readyState == 4) {
-				if(xhr.status == 200){
-					app.langs = JSON.parse(xhr.responseText);
-					app.terminologies = app.langs[app.getLocale()];
-					app.localizationReady =true;
-				}else{
-					// console.log('Error localization xhr page');
-					app.$.toast.text = 'Error localization xhr page';
-    				app.$.toast.open();
-				}
-			}
-		};
-	};
+	// 	//4. monitor xhr request response and status, change localization ready value to true and 
+	// 	//   let index file to render menu and main contents
+	// 	xhr.onreadystatechange = function (Evt) {
+	// 		if (xhr.readyState == 4) {
+	// 			if(xhr.status == 200){
+	// 				app.langs = JSON.parse(xhr.responseText);
+	// 				app.terminologies = app.langs[app.getLocale()];
+	// 				app.localizationReady =true;
+	// 			}else{
+	// 				// console.log('Error localization xhr page');
+	// 				app.$.toast.text = 'Error localization xhr page';
+ //    				app.$.toast.open();
+	// 			}
+	// 		}
+	// 	};
+	// };
 
-	/**
-	 * parameter with category and keyname
-	 * returns translated value, if there's not translated data return "categroy.keyname"
-	 */
-	app.getTransaltedString = function (category, keyname){
-		var result = '"'+ category + '.'+ keyname+'"';
-		var lang = app.terminologies;
+	// /**
+	//  * parameter with category and keyname
+	//  * returns translated value, if there's not translated data return "categroy.keyname"
+	//  */
+	// app.getTransaltedString = function (category, keyname){
+	// 	var result = '"'+ category + '.'+ keyname+'"';
+	// 	var lang = app.terminologies;
 
-		if(lang){
-			if(lang[category]&&lang[category][keyname]){
-				result = lang[category][keyname]
-			}
-		}else{
-			app.$.toast.text = 'Translate object is not assigned!!';
-			app.$.toast.open();
-		}
+	// 	if(lang){
+	// 		if(lang[category]&&lang[category][keyname]){
+	// 			result = lang[category][keyname]
+	// 		}
+	// 	}else{
+	// 		app.$.toast.text = 'Translate object is not assigned!!';
+	// 		app.$.toast.open();
+	// 	}
 		
-		return result;
-	};
+	// 	return result;
+	// };
 
 	/** localization finish*/
 
@@ -145,12 +145,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	app.addEventListener('dom-change', () => {
 		// console.log('Our app is ready to rock!');
 		// console.log(setting.globa)
-		app.getLanguageInfo();
+		// app.getLanguageInfo();
 		// app.localizationReady =true;
 	});
 
 	// See https://github.com/Polymer/polymer/issues/1381
 	window.addEventListener('WebComponentsReady', () => {
+		I18nMsg.lang = dataGlobal.locale || document.documentElement.lang;
+		I18nMsg.url = dataGlobal.basicUrl
+		I18nMsg.domain = dataGlobal.user.domain_id||'1';
+    	Platform.performMicrotaskCheckpoint();
 		/* imports are loaded and elements have been registered */
 		// console.log('Our web components are ready!');
 	});

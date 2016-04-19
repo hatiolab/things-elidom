@@ -15,13 +15,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <span id="browser-sync-binding"></span>
   
-  	<things-setting id="setting"></things-setting>
 
 	<template is="dom-bind" id="app">
 		<!-- Client Setting -->
+  		<things-setting id="setting"></things-setting>
+
 		<!-- <things-setting id="setting"></things-setting> -->
 		<paper-drawer-panel id="paperDrawerPanel" responsive-width="599px">
-			<template is="dom-if" if={{localizationReady}}>
+			<!-- <template is="dom-if" if={{localizationReady}}> -->
 			
 
 				<!-- Layout Sidebar -->
@@ -72,7 +73,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 						{% include "things-pages.html" %}
 					</iron-pages>			
 				</paper-scroll-header-panel>
-			</template>		
+			<!-- </template>		 -->
 		</paper-drawer-panel>
 		<!-- full dialog -->
 		<things-full-dialog id='common-full-dialog'></things-full-dialog>
