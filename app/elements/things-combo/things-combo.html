@@ -7,10 +7,14 @@
     .dropdown-content {
       background-color: white;
     }
+    .paper-font-caption {
+      margin-bottom: 0px;
+    }
   </style>
 
-  <template>  
-    <input is="iron-input" name="display" placeholder="[[label]]" value="[[display]]" disabled>
+  <template> 
+    <p class="paper-font-caption">[[label]]</p>
+    <input is="iron-input" name="display"  value="[[display]]" disabled>
     <input is="iron-input" name="{{name}}" value="[[value]]" hidden>
 
     <iron-icon icon="icons:list" on-tap="spreadContents"></iron-icon>
@@ -63,9 +67,23 @@
           if(this.valuePath) {
             if(this.value) {
               this.fire('things-combo-value-changed', { value : this.value, item : { name : this.value, description : this.display } });
+              this._findDisplay(this.value);
             } else {
               this.fire('things-combo-value-changed', { value : '', item : {} });
             }
+          }
+        },
+
+        /**
+         * value가 변경 되었을 시 value를 통해 display 값을 얻고 detail form field에 표시하기 위한 display 초기화
+         */
+        _findDisplay: function(value) {
+          var founds = this.items.filter(function(item) {
+            return item.name == value;
+          });
+
+          if(founds && founds.length > 0) {
+            this.display = founds[0].description;
           }
         },
 
