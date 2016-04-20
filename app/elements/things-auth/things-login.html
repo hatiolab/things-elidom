@@ -372,7 +372,7 @@ Example:
       // 1. save user information
       this.set('globals.user', user);
       // this.showToast('Welcome to Things System.');
-      this.showToastMsg('Welcome to Things System.');
+      this.openInfoMsg('Welcome to Things System.');
 
       // 2. reset login form
       loginForm.reset();      
@@ -388,7 +388,7 @@ Example:
     },
 
     _failureResponse: function(event) {
-      this.showToastMsg('Login failure.');
+      this.openInfoMsg('Login failure.');
     }
 
   });

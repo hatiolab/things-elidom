@@ -112,18 +112,6 @@ Things.MsgBoxBehavior = {
       text : 'Something went wrong, Please ask to administrator', 
       type : 'error' 
     });
-  },
-
-  /**
-   * Show toast message
-   *
-   * @param {Object} response
-   */
-  showToastMsg: function(msg) {
-    if(typeof(app) !== 'undefined') {
-      app.$.toast.text = msg;
-      app.$.toast.open();
-    }
   }
 
 };

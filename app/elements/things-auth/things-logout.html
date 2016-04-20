@@ -1,7 +1,6 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../things-setting/things-global-behavior.html">
-<link rel="import" href="./things-auth-behavior.html">
 
 <dom-module id="things-logout">
   <template>
@@ -16,7 +15,8 @@
         is: 'things-logout',
 
         behaviors: [ 
-          Things.AuthBehavior 
+          Things.GlobalBehavior,
+          Things.MsgBoxBehavior
         ],
 
         properties: {
@@ -30,6 +30,11 @@
             computed: '_computeLogoutUrl(globals.basicUrl, action)'
           },
 
+          signoutAjax: {
+            type: Object,
+            value: {}
+          },
+
           icon: {
             type: String,
             value: 'exit-to-app'
@@ -40,6 +45,12 @@
           'logout.tap' : 'logout'
         },
 
+        ready: function() {
+          this.signoutAjax = document.createElement('iron-ajax');
+          this.signoutAjax.id = 'signout';
+          this.listen(this.signoutAjax, 'response', '_signoutSuccess');
+          this.listen(this.signoutAjax, 'error', '_signoutFailure');
+        },
         _computeLogoutUrl: function(basicUrl, url) {
           return basicUrl + '/' + url;
         },
@@ -48,8 +59,37 @@
           if(this.isSignedIn()) {
             this.signout(this.logoutUrl);
           }
-        }
+        },
+        isSignedIn:function () {
+          return this.get('globals.user') ? true : false; 
+        },
 
+        detached: function() {
+          this.unlisten(this.signoutAjax, 'response', '_signoutSuccess');
+          this.unlisten(this.signoutAjax, 'error', '_signoutFailure');
+        },
+
+        signout: function(logoutUrl) {
+          this.signoutAjax.url = logoutUrl;
+          this.signoutAjax.method = 'POST';
+          this.signoutAjax.withCredentials = true;
+          this.signoutAjax.generateRequest();
+        },
+
+        _signoutSuccess: function(event) {
+          this.set('globals.user', null);
+          this.fire('things-logout-succeed');
+          location.reload(true);
+          this.openInfoMsg('Succeeded to Logout');
+        },
+
+        _signoutFailure: function(event) {
+          if(event && event.detail && event.detail.error && event.detail.error.target && event.detail.error.target.statusText) {
+            this.openInfoMsg(event.detail.error.target.statusText);
+          } else {
+            this.openInfoMsg('Failed to Logout');
+          }
+        }
       });
     })();
   </script>

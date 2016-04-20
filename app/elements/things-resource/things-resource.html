@@ -252,7 +252,7 @@
 				this.fire('things-resource-ajax-success', this.lastResponse);
 
 				if(this.method && this.method != 'GET') {
-					this.showToastMsg('Success');
+					// this.openInfoMsg('Success');
 					// app.$.thingsHeader.toggleSidebar();
 				}
 			},
@@ -314,7 +314,17 @@
 						this.startSpinner();
 					}
 				}
-			}
+			},
+			/**
+			* ajax 호출 후 에러 발생시 unauthorized 에러이면 로그인 페이지로 이동 
+			*/
+			handleUnauthorized: function() {
+				this.set('globals.user', null);
+				if(app.$.thingsHeader){
+				  app.$.thingsHeader.toggleSidebar(); 
+				}
+				page('/login');
+			},
 			
 		});
 	</script>
