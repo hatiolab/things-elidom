@@ -73,39 +73,34 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 <body unresolved>
 
   <dom-module id="sample">
-	    <template>
-			<things-setting id="setting"></things-setting>
-			<things-resource
-				auto
-				id="resource"
-				resource="attachments" 
-				method="GET"
-				last-response="{{items}}">
-			</things-resource>
+    <template>
+      <things-setting id="setting"></things-setting>
+      <things-resource
+        auto
+        id="resource"
+        resource="attachments" 
+        method="GET"
+        last-response="{{items}}">
+      </things-resource>
 
-		<things-card-list items="[[items]]" selected="selectedItem"></things-card-list>
+      <things-card-list items="[[items]]" selected="selectedItem"></things-card-list>
+    </template>
 
     <script>
       Polymer({
-
         is: 'sample'
-
       });
     </script>
   </dom-module>
 
   <template is="dom-bind" id="app">
-
     <section>
       <h4>Things card</h4>
-
       <sample></sample>
     </section>
 
     <things-spinner id="spinner" loading=false></things-spinner>
-    
     <paper-toast id="toast" class="Toast" duration="8000"></paper-toast>
-
   </template>
 
 </body>
