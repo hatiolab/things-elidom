@@ -13,8 +13,9 @@
 		<input is="iron-input" 
 			name="[[name]]" 
 			allowed-pattern=["[[allowedPattern]]"]
-			bind-value=[[bindValue]]
+			prevent-invalid-input="[[prevent-invalid-input]]"
 			value="[[value]]"
+			bind-value="[[bind-value]]"
 			placeholder="[[placeholder]]">
 	</template>
 
@@ -37,6 +38,7 @@
 
 				/**
 				 * input field에 입력 가능한 문자열을 정의 할 수 있다.
+				 * allowedPattern의 value가 없고 preventInvalidInput이 true이면 모든 입력을 받지 않는다.
 				 * ex: [a-zA-Z0-9] a ~ z, A ~ Z, 0 ~ 9
 				 */
 				allowedPattern: {
@@ -44,13 +46,22 @@
 				},
 
 				/**
-				 * Two Way binding value
+				 * allowedPattern 적용 여부
+				 * true/false = allowedPattern 활성화/allowedPattern 비활성화
 				 */
-				bindValue: {
-					type: String
+				preventInvalidInput: {
+					type: Boolean,
+					value: false
 				},
 
 				value: {
+					type: String
+				},
+
+				/**
+				 * Value for Using two-way binding
+				 */
+				bindValue: {
 					type: String
 				},
 
