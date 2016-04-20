@@ -477,7 +477,17 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			 */
 			_computeTitle: function(resourceType)	{
 				return resourceType + ' Detail';
-			}
+			},
+			/**
+			* ajax 호출 후 에러 발생시 unauthorized 에러이면 로그인 페이지로 이동 
+			*/
+			handleUnauthorized: function() {
+				this.set('globals.user', null);
+				if(app.$.thingsHeader){
+				  app.$.thingsHeader.toggleSidebar(); 
+				}
+				page('/login');
+			},
 
 		});
 	</script>

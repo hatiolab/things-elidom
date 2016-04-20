@@ -56,35 +56,35 @@ Things.GlobalBehavior = {
     }
   },
 
-  /**
-   * check signed-in 
-   */
-  isSignedIn: function() {
-    return this.get('globals.user') ? true : false;
-  },
+  // /**
+  //  * check signed-in 
+  //  */
+  // isSignedIn: function() {
+  //   return this.get('globals.user') ? true : false;
+  // },
 
-  /**
-   * ajax 호출 후 에러 발생시 unauthorized 에러이면 로그인 페이지로 이동 
-   */
-  handleUnauthorized: function() {
-    this.set('globals.user', null);
-    if(app.$.thingsHeader){
-      app.$.thingsHeader.toggleSidebar(); 
-    }
-    page('/login');
-    this.showToastMsg("Unauthorized, Signin First Please");
-  },
+  // /**
+  //  * ajax 호출 후 에러 발생시 unauthorized 에러이면 로그인 페이지로 이동 
+  //  */
+  // handleUnauthorized: function() {
+  //   this.set('globals.user', null);
+  //   if(app.$.thingsHeader){
+  //     app.$.thingsHeader.toggleSidebar(); 
+  //   }
+  //   page('/login');
+  //   this.showToastMsg("Unauthorized, Signin First Please");
+  // },
 
-  /**
-   * message를 toast로 표시한다.
-   * @param {string} msg 
-   */
-  showToastMsg: function(msg) {
-    if(typeof(app) !== 'undefined') {
-      app.$.toast.text = msg;
-      app.$.toast.open();
-    }
-  }
+  // /**
+  //  * message를 toast로 표시한다.
+  //  * @param {string} msg 
+  //  */
+  // showToastMsg: function(msg) {
+  //   if(typeof(app) !== 'undefined') {
+  //     app.$.toast.text = msg;
+  //     app.$.toast.open();
+  //   }
+  // }
 
 };
 </script>

@@ -173,7 +173,7 @@
 			toggleSidebar: function(e) {
 				var drawer = app.$[this.drawerId];
 				
-				if(this.isSignedIn()) {
+				if(this.$.logout.isSignedIn()) {
 					if(drawer.forceNarrow) {
 						drawer.forceNarrow = false
 					} else if(!drawer.narrow) {

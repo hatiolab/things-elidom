@@ -13,7 +13,10 @@
 
     <h2>Setting (Only Client Side Setting)</h2>
 
-    <paper-input label="Base URL (ex: http://www.elidom.xyz:80/rest)" value="{{globals.basicUrl}}"></paper-input>
+    <paper-input 
+      label="Base URL (ex: http://www.elidom.xyz:80/rest)" 
+      value="{{basicUrl}}">
+    </paper-input>
     <!-- locale selector -->
     <things-locale-combo id="locale-selector" 
       storage-name="setting.locale" 
@@ -31,7 +34,20 @@
         behaviors: [
           Polymer.PaperDialogBehavior, 
           Things.GlobalBehavior
-        ]
+        ],
+        ready:function () {
+          this.addEventListener('iron-overlay-closed', function (event) {
+            this.set('globals.basicUrl', this.basicUrl);
+          })
+        },
+        observers:[
+          '_onBasicUrlChanged(globals.basicUrl)'
+        ],
+        _onBasicUrlChanged:function (basicUrl) {
+          if(basicUrl){
+            this.set('basicUrl', basicUrl);
+          }
+        }
 
       });
     })();
