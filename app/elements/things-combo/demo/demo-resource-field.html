@@ -15,7 +15,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
 
-  <title>things-code-selector demo</title>
+  <title>things-resource-field-demo</title>
 
   <script src="../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
   
@@ -30,7 +30,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <link rel="import" href="../../things-spinner/things-spinner.html">
   <link rel="import" href="../../things-setting/things-setting.html">
 
-  <link rel="import" href="../things-code-selector.html">
+  <link rel="import" href="../things-resource-field.html">
 
   <link rel="stylesheet" href="../../../bower_components/paper-styles/demo.css">
 
@@ -71,58 +71,30 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 </head>
 <body unresolved>
 
-  <dom-module id="sample-code-selector">
-    <template>      
-      <things-setting id="setting"></things-setting>
-
-      <section>
-
-        <paper-input label="Selected Value" value="{{codeName}}"></paper-input>
-
-        <paper-input label="Selected Description" value="{{codeDesc}}"></paper-input>      
-
-        <things-code-selector 
-          id="code-selector" 
-          label="Language" 
-          value="en-US" 
-          code-name="LOCALE" 
-          label-path="description" 
-          value-path="name">
-        </things-code-selector>
-
-      </section>
+  <dom-module id="sample-resource-field">
+    <template>
+      <things-resource-field 
+        id="resource-selector" 
+        label="Label" 
+        name="name"
+        resource-type="User" 
+        resource-url="users"
+        delegate-column="name"> 
+      </things-resource-field>
     </template>
 
     <script>
       Polymer({
-
-        is: 'sample-code-selector',
-
-        listeners: {
-          'code-selector.things-combo-value-changed' : 'valueChanged'
-        },
-
-        valueChanged: function(e) {
-          this.codeName = e.detail.item.name;
-          this.codeDesc = e.detail.item.description;
-        }
-
+        is: "sample-resource-field"
       });
     </script>
   </dom-module>
 
   <template is="dom-bind" id="app">
-
     <section>
-      <h4>Things Code Selector</h4>
-
-      <sample-code-selector></sample-code-selector>
-    </section>
-
-    <things-spinner id="spinner" loading=false></things-spinner>
-    
-    <paper-toast id="toast" class="Toast" duration="8000"></paper-toast>
-
+      <h4>Things Resource Field</h4>
+      <sample-resource-field></sample-resource-field>
+    </section>    
   </template>
 
 </body>

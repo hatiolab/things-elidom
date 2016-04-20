@@ -2,6 +2,19 @@
 <link rel="import" href="../../../bower_components/iron-dropdown/iron-dropdown.html">
 <link rel="import" href="../../../bower_components/vaadin-combo-box/vaadin-combo-box.html">
 
+<!--
+things-combo. items로 받은 데이터들을 콤보박스로 출력하고 선택한 값을 필드에 표시하는 컴퍼넌트
+
+  Example:
+    
+    <things-combo
+      items="[{name: 'item1', descrption: 'First Item'}, {name: 'itme2', description: 'Second Item'}]"
+      label-path="description"
+      value=path="name">
+    </things-combo>
+
+@demo ./things-combo/demo/demo-combo.html
+-->
 <dom-module id="things-combo">
 	<style>
     .dropdown-content {
@@ -34,29 +47,51 @@
         is: "things-combo",
 
         properties: {
+          /**
+           * Drop down list에 포함될 items array
+           */
           items: {
             type: Array,
             notify: true,
             value: []
           },
 
+          /**
+           * item에서 display 값을 추출하기 위한 labelPath
+           */
           labelPath: {
             type: String,
             value: 'description'
           },
 
+          /**
+           * item에서 value 값을 추출하기 위한 valuePath
+           */
           valuePath: {
             type: String,
             value: 'name'
           },
-
+          
+          /**
+           * 화면에 출력 할 값
+           */
           display: {
             type: String
           },
 
+          /**
+           * 호출에 사용 될 실제 값
+           */
           value: {
             type: String,
             observer: '_valueChangeHandler'
+          },
+
+          /**
+           * input field 상단에 표시되는 label
+           */
+          label: {
+            type: String,
           }
         },
 
