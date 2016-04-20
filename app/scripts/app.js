@@ -20,8 +20,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	app.displayInstalledToast = () => {
 		// Check to make sure caching is actually enabled—it won't be in the dev environment.
 		if (!Polymer.dom(document).querySelector('platinum-sw-cache').disabled) {
-			Polymer.dom(document).querySelector('#toast').text = 'Caching complete! This app will work offline.';
-			Polymer.dom(document).querySelector('#toast').show();
+			console.log('Caching complete! This app will work offline.');
+			// Polymer.dom(document).querySelector('#toast').text = 'Caching complete! This app will work offline.';
+			// Polymer.dom(document).querySelector('#toast').show();
 		}
 	};
 
@@ -35,10 +36,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	window.addEventListener('WebComponentsReady', () => {
 		I18nMsg.lang = dataGlobal.locale || document.documentElement.lang;
 		I18nMsg.url = dataGlobal.basicUrl
-		I18nMsg.domain = dataGlobal.user.domain_id||'1';
-    	// Platform.performMicrotaskCheckpoint();
-		/* imports are loaded and elements have been registered */
-		// console.log('Our web components are ready!');
+		if(dataGlobal.user){
+			I18nMsg.domain = dataGlobal.user.domain_id||'1';
+		}
+    	Platform.performMicrotaskCheckpoint();
 	});
 
 	// Main area's paper-scroll-header-panel custom condensing transformation of
