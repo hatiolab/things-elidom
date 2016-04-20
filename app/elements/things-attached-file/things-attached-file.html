@@ -20,10 +20,23 @@
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 <link rel="import" href="../things-setting/things-global-behavior.html">
 
+<!--
+things-attached-file. 첨부파일 목록을 서버로 부터 받아와 출력하고 파일을 다운로드 및 업로드 할 수 있는 컴퍼넌트
+
+  Example:
+
+    <things-attached-file
+      target-url="upload/attach"
+      method="POST"
+      resource-id="1"
+      resource-type="Alarm">
+    </things-attached-file>
+
+@demo ./things-attached-file/demo/demo-attached-file.html
+-->
 <dom-module id="things-attached-file">
   <template>
     <div class="[[layout]]">
-
       <things-file-upload 
         id="resouce-file-upload"
         target="[[targetUrl]]"
@@ -58,9 +71,7 @@
         enable-detail-column
         enable-toolbar>
       </things-resource-grid>
-      
     </div>
-
   </template>
 
   <script>    
@@ -89,9 +100,7 @@
         },
 
         /**
-         * Button Setting
-         * 
-         * @type {Array}
+         * 버튼 리스트 세팅
          */
         buttons : {
           type: Array,
@@ -108,8 +117,6 @@
 
         /**
          * Grid Model
-         * 
-         * @type {Array}
          */
         gridModel: {
           type: Array,
@@ -137,8 +144,6 @@
 
         /**
          * Grid Columns
-         * 
-         * @type {Array}
          */
         gridColumns: {
           type: Array,
