@@ -10,7 +10,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <html>
 <head>
 
-  <title>things-resource</title>
+  <title>things-ajax</title>
 
   <script src="../../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
   <link rel="import" href="../../../../bower_components/paper-input/paper-input.html">
@@ -35,39 +35,193 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 </head>
 
 <body unresolved>
-  <h1>Things Resource</h1>
+  <h1>Things Ajax</h1>
 
-  <dom-module id="sample-things-ajax">
+  <dom-module id="list-things-ajax">
     <template>
-      <things-setting id="setting"></things-setting>
-
-      <things-resource
+      <things-ajax
         id="ajax"
-        action="{{invokeUrl}}"
-        params='{"page":1, "limit": 10}'
+        resource-url="{{resourceUrl}}"
+        resource-action="index"
+        page=1
+        limit=10
+        select-fields="id,locale,category,name,display"
+        query-fields='[{"name" : "locale", "value" : "ko-KR"}, {"name" : "category", "value" : "button"}]'
+        sort-fields='[{"field" : "name", "ascending" : false}]'
         handle-as="json"
         last-response="{{ajaxResponse}}">
-      </things-resource>
+      </things-ajax>
 
       <form>
         <paper-button raised on-tap="invoke">invoke</paper-button>
         <paper-button raised on-tap="reset">reset</paper-button>
 
-        <paper-input required id="invoke-url" label="Invoke URL" value="{{invokeUrl}}">
+        <paper-input label="Resource URL" value="{{resourceUrl}}">
         </paper-input>
 
-        <paper-textarea id="result" label="Result" rows=16></paper-textarea>
+        <paper-textarea label="List Result" value="{{resultJson}}" rows=4>
+        </paper-textarea>
       </form>
     </template>
 
     <script>
       Polymer({
-        is: 'sample-things-ajax',
+        is: 'list-things-ajax',
 
         properties: {
-          invokeUrl : {
+
+          resourceUrl : {
             type: String,
-            value: 'http://192.168.35.225:9002/rest/terminologies'
+            value: 'terminologies'
+          },
+
+          ajaxResponse: {
+            type: Object,
+            observer: '_responseChanged'
+          },
+
+          resultJson: {
+            type: String
+          }
+        },
+
+        invoke: function() {
+          this.$.ajax.generateRequest();
+        },
+
+        reset: function() {
+          this.resultJson = '';
+        },
+
+        _responseChanged: function(ajaxResponse) {
+          if(ajaxResponse && ajaxResponse.items) {
+            this.resultJson = JSON.stringify(ajaxResponse.items, null, 4);
+          } else {
+            this.reset();
+          }
+        }
+      });
+    </script>
+  </dom-module>
+
+  <dom-module id="one-things-ajax">
+    <template>
+      <things-ajax
+        id="ajax"
+        resource-url="{{resourceUrl}}"
+        resource-action="find"
+        resource-id="{{resourceId}}"
+        handle-as="json"
+        last-response="{{ajaxResponse}}">
+      </things-ajax>
+
+      <form>
+        <paper-button raised on-tap="invoke">invoke</paper-button>
+        <paper-button raised on-tap="reset">reset</paper-button>
+
+        <paper-input label="Resource URL" value="{{resourceUrl}}">
+        </paper-input>
+
+        <paper-input label="Resource ID" value="{{resourceId}}">
+        </paper-input>        
+
+        <paper-textarea label="One Result" value="{{resultJson}}" rows=4>
+        </paper-textarea>
+      </form>
+    </template>
+
+    <script>
+      Polymer({
+        is: 'one-things-ajax',
+
+        properties: {
+
+          resourceUrl : {
+            type: String,
+            value: 'terminologies/:id'
+          },
+
+          resourceId: {
+            type: String,
+            value: '1'
+          },
+
+          ajaxResponse: {
+            type: Object,
+            observer: '_responseChanged'
+          },
+
+          resultJson: {
+            type: String
+          }
+        },
+
+        invoke: function() {
+          if(this.resourceId && this.resourceId.length > 0) {
+            this.$.ajax.generateRequest();
+          } else {
+            this.resultJson = 'Invalid Resource ID';
+          }
+        },
+
+        reset: function() {
+          this.resultJson = '';
+        },
+
+        _responseChanged: function(ajaxResponse) {
+          if(ajaxResponse) {
+            this.resultJson = JSON.stringify(ajaxResponse, null, 4);
+          } else {
+            this.reset();
+          }
+        }
+      });
+    </script>
+  </dom-module>  
+
+  <dom-module id="create-things-ajax">
+    <template>
+      <things-ajax
+        id="ajax"
+        resource-url="{{resourceUrl}}"
+        resource-action="create"
+        body="{{createJson}}"
+        last-response="{{ajaxResponse}}">
+      </things-ajax>
+
+      <form>
+        <paper-button raised on-tap="invoke">invoke</paper-button>
+        <paper-button raised on-tap="reset">reset</paper-button>
+
+        <paper-input label="Resource URL" value="{{resourceUrl}}">
+        </paper-input>
+
+        <paper-textarea label="Create Data" value="{{createJson}}" rows=4>
+        </paper-textarea>
+
+        <paper-textarea label="Create Result" value="{{resultJson}}" rows=4>
+        </paper-textarea>
+      </form>
+    </template>
+
+    <script>
+      Polymer({
+        is: 'create-things-ajax',
+
+        properties: {
+
+          resourceUrl : {
+            type: String,
+            value: 'terminologies'
+          },
+
+          createJson: {
+            type: String,
+            value: "{\n}"
+          },
+
+          resultJson: {
+            type: String
           },
 
           ajaxResponse: {
@@ -77,16 +231,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         invoke: function() {
-          this.$.ajax.generateRequest();
+          if(this.createJson && this.createJson.length >= 10) {
+            try {
+              JSON.parse(this.createJson);
+              this.$.ajax.generateRequest();
+            } catch(e) {
+              this.resultJson = "Error - Invalid JSON - " + e;
+            }
+          } else {
+            this.resultJson = "Error - Empty JSON";
+          }
         },
 
         reset: function() {
-          this.$.result.value = '';
+          this.resultJson = '';
         },
 
         _responseChanged: function(ajaxResponse) {
-          if(ajaxResponse && ajaxResponse.items) {
-            this.$.result.value = JSON.stringify(ajaxResponse.items, null, 4);
+          if(ajaxResponse) {
+            this.resultJson = JSON.stringify(ajaxResponse, null, 4);
           } else {
             this.reset();
           }
@@ -95,12 +258,234 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </script>
   </dom-module>
 
+  <dom-module id="update-things-ajax">
+    <template>
+      <things-ajax
+        id="get-ajax"
+        resource-url="{{resourceUrl}}"
+        resource-action="get"
+        resource-id="{{resourceId}}"
+        last-response="{{responseGet}}">
+      </things-ajax>
+
+      <things-ajax
+        id="put-ajax"
+        resource-url="{{resourceUrl}}"
+        resource-action="update"
+        resource-id="{{resourceId}}"
+        body="{{updateJson}}"
+        last-response="{{responsePut}}">
+      </things-ajax>
+
+      <form>
+        <paper-button raised on-tap="get">get</paper-button>
+        <paper-button raised on-tap="update">update</paper-button>
+        <paper-button raised on-tap="reset">reset</paper-button>
+
+        <paper-input label="Resource URL" value="{{resourceUrl}}">
+        </paper-input>
+
+        <paper-input label="Resource Id" value="{{resourceId}}">
+        </paper-input>        
+
+        <paper-textarea label="Found Data" value="{{updateJson}}" rows=4>
+        </paper-textarea>
+
+        <paper-textarea label="Update Result" value="{{resultJson}}" rows=4>
+        </paper-textarea>
+      </form>
+    </template>
+
+    <script>
+      Polymer({
+        is: 'update-things-ajax',
+
+        properties: {
+
+          resourceUrl : {
+            type: String,
+            value: 'terminologies/:id'
+          },
+
+          resourceId: {
+            type: String
+          },
+
+          updateJson: {
+            type: String
+          },
+
+          resultJson: {
+            type: String
+          },
+
+          responseGet: {
+            type: Object,
+            observer: '_responseGetChanged'
+          },
+
+          responsePut: {
+            type: Object,
+            observer: '_responsePutChanged'
+          }
+        },
+
+        get: function() {
+          if(this.resourceId && this.resourceId.length > 0) {
+            this.$['get-ajax'].generateRequest();
+          } else {
+            this.resultJson = 'Invalid Resource ID';
+          }
+        },
+
+        update: function() {
+          if(this.resourceId && this.resourceId.length > 0) {
+            if(this.updateJson && this.updateJson != '') {
+              try {
+                JSON.parse(this.updateJson);
+                this.$['put-ajax'].generateRequest();
+              } catch(e) {
+                this.resultJson = "Error - Invalid JSON - " + e;
+              }
+            } else {
+              this.resultJson = "Error - Empty JSON";
+            }
+          } else {
+            this.resultJson = 'Invalid Resource ID';
+          }
+        },
+
+        reset: function() {
+          this.updateJson = '';
+          this.resultJson = '';
+        },
+
+        _responseGetChanged: function(responsePut) {
+          if(responsePut) {
+            this.updateJson = JSON.stringify(responsePut, null, 4);
+          } else {
+            this.updateJson = '';
+          }
+        },
+
+        _responsePutChanged: function(responsePut) {
+          if(responsePut) {
+            this.resultJson = JSON.stringify(responsePut, null, 4);
+          } else {
+            this.reset();
+          }
+        }
+      });
+    </script>
+  </dom-module>
+
+  <dom-module id="delete-things-ajax">
+    <template>
+      <things-ajax
+        id="ajax"
+        resource-url="{{resourceUrl}}"
+        resource-action="delete"
+        resource-id="{{resourceId}}"
+        last-response="{{ajaxResponse}}">
+      </things-ajax>
+
+      <form>
+        <paper-button raised on-tap="invoke">invoke</paper-button>
+        <paper-button raised on-tap="reset">reset</paper-button>
+
+        <paper-input label="Resource URL" value="{{resourceUrl}}">
+        </paper-input>
+
+        <paper-input label="Resource Id" value="{{resourceId}}">
+        </paper-input>        
+
+        <paper-textarea label="Delete Result" value="{{resultJson}}" rows=4>
+        </paper-textarea>
+      </form>
+    </template>
+
+    <script>
+      Polymer({
+        is: 'delete-things-ajax',
+
+        properties: {
+
+          resourceUrl : {
+            type: String,
+            value: 'terminologies/:id'
+          },
+
+          resourceId: {
+            type: String
+          },
+
+          ajaxResponse: {
+            type: Object,
+            observer: '_responseChanged'
+          },
+
+          resultJson: {
+            type: String
+          }
+        },
+
+        invoke: function() {
+          if(this.resourceId && this.resourceId.length > 0) {
+            this.$.ajax.generateRequest();
+          } else {
+            this.resultJson = 'Invalid Resource ID';
+          }
+        },
+
+        reset: function() {
+          this.resultJson = '';
+        },
+
+        _responseChanged: function(ajaxResponse) {
+          if(ajaxResponse) {
+            this.resultJson = JSON.stringify(ajaxResponse, null, 4);
+            if(!this.resultJson || this.resultJson.length == 0) {
+              this.resultJson = 'OK';
+            }
+          } else {
+            this.reset();
+          }
+        }
+      });
+    </script>
+  </dom-module>  
+
   <template is="dom-bind" id="app">
-    <section>
-      <sample-things-ajax></sample-things-ajax>
-    </section>  
+    <things-setting id="setting"></things-setting>
 
     <things-spinner id="spinner" loading=false></things-spinner>
+
+    <section>
+      <h3>Things Ajax - Resource GET (List)</h3>
+      <list-things-ajax></list-things-ajax>
+    </section>
+
+    <section>
+      <h3>Things Ajax - Resource GET (One)</h3>
+      <one-things-ajax></one-things-ajax>
+    </section>
+
+    <section>
+      <h3>Things Ajax - Resource Create</h3>
+      <create-things-ajax></create-things-ajax>
+    </section>
+
+    <section>
+      <h3>Things Ajax - Resource Update</h3>
+      <update-things-ajax></update-things-ajax>
+    </section>
+
+    <section>
+      <h3>Things Ajax - Resource Delete</h3>
+      <delete-things-ajax></delete-things-ajax>
+    </section>
+
+    <paper-toast id="toast" class="Toast" duration="8000"></paper-toast>
   </template>
 
 </body>
