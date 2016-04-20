@@ -7,7 +7,7 @@
 <link rel="import" href="./things-combo.html">
 
 <!--
-Resource Selector. 서버에 저장되어 있는 리소스 정보를 조회하여 사용자가 리스트에서 선택할 수 있도록 표시하는 컴포넌트 
+Resource field. 서버에 저장되어 있는 리소스 정보를 조회하여 input field에 표시하는 컴포넌트 
 
   Example:
 
@@ -17,11 +17,11 @@ Resource Selector. 서버에 저장되어 있는 리소스 정보를 조회하�
       name="user_id"
       resource-type="User" 
       resource-url="users"
-      delegate-column="name"
+      delegate-column="name">
     </things-resource-field>
 
 
-@demo ./things-combo/demo/index.html
+@demo ./things-combo/demo/demo-resource-field.html
 -->
 
 <dom-module id="things-resource-field">
@@ -65,7 +65,7 @@ Resource Selector. 서버에 저장되어 있는 리소스 정보를 조회하�
           },
 
           /**
-           * element에 표시할 라벨 
+           * input field 상단에 표시할 라벨 
            */
           label: {
             type: String
