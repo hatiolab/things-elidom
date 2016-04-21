@@ -119,8 +119,8 @@ things-combo. items로 받은 데이터들을 콤보박스로 출력하고 선�
         /**
          * value가 변경 되었을 시 value를 통해 display 값을 얻고 detail form field에 표시하기 위한 display 초기화
          */
-        _findDisplay: function(items,value) {
-          var dispaly;
+        _findDisplay: function(items, value) {
+          var display = '';
           var founds = items.filter(function(item) {
             return item.name == value;
           });

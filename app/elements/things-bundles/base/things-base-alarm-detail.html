@@ -18,17 +18,12 @@ Example:
     <things-ajax 
       auto
       id="resource-meta"
-      method="GET"
-      resource-mode
       resource-url="entities/Alarm/resource_columns"
       last-response="{{metaData}}">
     </things-ajax>
 
     <things-ajax
       auto
-      content-type="application/json"
-      method="GET"
-      resource-mode
       resource-url="alarms/:id"
       resource-id="1"
       last-response="{{detailViewData}}">
@@ -59,8 +54,6 @@ Example:
 
     <things-ajax 
       id="get-resource"
-      method="GET"
-      resource-mode
       resource-url="[[memberResourceUrl]]"
       last-response="{{resource}}">
     </things-ajax>

@@ -41,25 +41,24 @@
 
 <!-- sample page -->
 <section class="Page" data-route="image_viewer">
-    <paper-material class="Page-paper" elevation="1">
-      <things-resource
-        auto
-        content-type="application/json"
-        resource="attachments"
-        action="list/image"
-        method="get"
-        select-fields="id,name"
-        last-response="{{cardItems}}">
-      </things-resource>
+  <paper-material class="Page-paper" elevation="1">
+    <things-ajax
+      auto
+      query-support
+      resource-url="attachments/list/image"        
+      select-fields="id,name"
+      last-response="{{cardResult}}">
+    </things-ajax>
 
-      <things-card-list items="[[cardItems.items]]" ></things-card-list>
-    </paper-material>
+    <things-card-list items="[[cardResult.items]]"></things-card-list>
+  </paper-material>
 </section>
 
 <!-- API Document page -->
 <section class="Page" data-route="apidoc">
   <paper-material class="Page-paper" elevation="1">
-    <a href="elements/index.html">apiDoc</a>
+    <h2 class="Page-title">Things Component API & Docs</h2>
+    <p class="paper-font-subhead"><a href="/elements/index.html" target="_blank">Component API & Demo</a></p>
   </paper-material>
 </section>
 
@@ -67,21 +66,19 @@
 <section class="Page" data-route="resource_selector">
   <paper-material elevation="1">
     <div>
-      <things-resource 
+      <things-ajax 
         auto
         id="resource-meta"
-        method="GET"
-        action="entities/Alarm/resource_columns"
+        resource-url="entities/Alarm/resource_columns"
         last-response="{{metaData}}">
-      </things-resource>
+      </things-ajax>
 
-      <things-resource
+      <things-ajax
         auto
-        content-type="application/json"
-        method="get"
-        action="alarms/1"
+        resource-url="alarms/:id"
+        resource-id="1"
         last-response="{{detailViewData}}">
-      </things-resource>
+      </things-ajax>
 
       <things-resource-tabs 
         search-meta
@@ -92,21 +89,27 @@
         attachable 
         prop-extensible>
       </things-resource-tabs>
-    </div>    
+    </div>
   </paper-material>
 </section>
 
 <!-- Extension Property Page -->
 <section class="Page" data-route="extension_property">
   <paper-material class="Page-paper" elevation="1">
-    <things-extension entity-id="1" entity-type="Alarm"></things-extension>
+    <things-extension 
+      resource-id="1" 
+      resource-type="Alarm">
+    </things-extension>
   </paper-material>
 </section>
 
 <!-- Attached file  -->
 <section class="Page" data-route="attached_file">
   <paper-material class="Page-paper" elevation="1">
-    <things-attached-file entity-id="1" entity-type="Alarm"></things-attached-file>
+    <things-attached-file 
+      resource-id="1" 
+      resource-type="Alarm">
+    </things-attached-file>
   </paper-material>
 </section>
 

@@ -13,7 +13,8 @@
       <things-ajax 
         id="resource-search"
         method="GET"
-        resource-url="[[gridSearchUrl]]"
+        resource-url="entities/:id/entity_columns"
+        resource-id="{{entityId}}"
         last-response="{{lastResponse}}"
         auto>
       </things-ajax>
@@ -207,14 +208,6 @@
         },
 
         /**
-         * Entity Column searching URL
-         */
-        gridSearchUrl: {
-          type: String,
-          computed: '_computeEntitySearchUrl(entityId)',
-        },
-
-        /**
          * Entity Column save URL
          */
         gridSaveUrl: {
@@ -246,16 +239,6 @@
       listeners: {
         'grid.things-grid-pre-save' : '_beforeColumnsSave',
         'grid.things-grid-save-success' : 'reloadGrid'
-      },
-
-      /**
-       * EntityColumn Search URL
-       *
-       * @param {String} entityId
-       * @return {String} entity search url
-       */
-      _computeEntitySearchUrl: function(entityId) {
-        return ['entities', entityId, 'entity_columns'].join('/');
       },
 
       /**

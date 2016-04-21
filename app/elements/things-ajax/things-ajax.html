@@ -300,12 +300,12 @@ element.
        * Elidom server와 연동을 고려한 동작 방식을 지원하는 지 여부
        * 값이 false인 경우는 기존 iron-ajax와 동일한 동작 방식
        * true이면 elidom server와 연동을 고려한 동작 방식
-       * Elidom Server의 REST API를 사용하려면 반드시 resourceMode를 true인 상태로 사용해야 하고 
+       * Elidom Server의 REST API를 사용하려면 반드시 querySupport를 true인 상태로 사용해야 하고 
        * 그렇지 않은 경우는 false로 사용한다. 
-       * 직접 변경하지 않아도 resourceUrl 값이 설정되면 resourceMode값이 true로 변경된다.
+       * 직접 변경하지 않아도 resourceUrl 값이 설정되면 querySupport값이 true로 변경된다.
        * 기본값은 false
        */
-      resourceMode: {
+      querySupport: {
         type: Boolean,
         value: false
       },
@@ -403,7 +403,9 @@ element.
      * @param {String} resourceAction
      */
     _resourceActionChanged: function(resourceAction) {
-      this.resourceMode = true;
+      if(resourceAction == 'index') {
+        this.querySupport = true;
+      }
 
       if(this.resourceAction && this.resourceAction.length > 0) {
         var resAct = this.resourceAction;
@@ -426,7 +428,7 @@ element.
       var tempParams = null;
 
       // Resource Mode이고 검색 조건으로 조회시에 파라미터 조작 
-      if(this.resourceMode === true && this.resourceAction == 'index') {
+      if(this.querySupport === true && this.resourceAction == 'index') {
         tempParams = this.handleRequestParams(this.params);
       } else {
         tempParams = this.params;

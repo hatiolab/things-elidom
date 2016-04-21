@@ -44,7 +44,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         id="list-ajax"
         auto="{{auto}}"
         resource-url="{{resourceUrl}}"
-        resource-mode="{{resourceMode}}"
+        query-support="{{querySupport}}"
         method="GET"
         content-type="application/x-www-form-urlencoded"
         page=1
@@ -59,7 +59,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-button raised on-tap="invoke">invoke</paper-button>
         <paper-button raised on-tap="reset">reset</paper-button>
         <paper-checkbox checked="{{auto}}" class="green">Auto</paper-checkbox>
-        <paper-checkbox checked="{{resourceMode}}" class="green">Resource Mode</paper-checkbox>
+        <paper-checkbox checked="{{querySupport}}" class="green">Query Support</paper-checkbox>
 
         <paper-input label="Resource URL" value="{{resourceUrl::change}}">
         </paper-input>
@@ -80,7 +80,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             value: false
           },
 
-          resourceMode: {
+          querySupport: {
             type: Boolean,
             value: false
           },
