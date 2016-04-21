@@ -581,7 +581,7 @@ element.
       this.fire('things-ajax-response', request.response, { bubbles: this.bubbles });
 
       // Show Toast Message
-      this.showToastMsg('Success');      
+      this.showToastMsg('Success');
     },
     
     _handleError: function(request, error) {
@@ -594,16 +594,22 @@ element.
         this._setLastResponse(null);
         this._setLoading(false);
       }
-      
-      this.fire('things-ajax-error', {
-        request: request,
-        error: error
-      }, {
-      	bubbles: this.bubbles
-      });
 
-      // Show Error Message Box
-      this.openResponseError(request.xhr.response);      
+      var response = request.xhr.response;
+
+      if(response.status == 401) {
+        this.handleUnauthorized();
+
+      } else {
+        this.fire('things-ajax-error', {
+          request: request,
+          error: error
+        }, {
+          bubbles: this.bubbles
+        });
+
+        this.openResponseError(response);
+      }      
     },
     
     _discardRequest: function(request) {

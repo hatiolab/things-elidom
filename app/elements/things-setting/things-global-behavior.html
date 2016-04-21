@@ -55,17 +55,22 @@ Things.GlobalBehavior = {
       instances.splice(i, 1);
     }
   },
+
+  /**
+  * ajax 호출 후 에러 발생시 unauthorized 에러이면 로그인 페이지로 이동 
+  */
+  handleUnauthorized: function() {
+    this.set('globals.user', null);
+    page('/login');
+  },
+
   /**
    * Show toast message
-   * @Event things-show-tost
-   * 
-   * Show toast message
-   * @param message information
+   * @param msg information
    */
   showToastMsg: function(msg) {
-    var eventDetail = {'msg':msg};
-    var event = new CustomEvent('things-show-tost', { 'detail': eventDetail });
-    document.dispatchEvent(event);
+    document.dispatchEvent(new CustomEvent('things-show-tost', { 'detail': { 'msg': msg } }));
   }
+  
 };
 </script>
