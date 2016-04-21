@@ -125,10 +125,9 @@ Things.MsgBoxBehavior = {
    * @param {Object} response
    */
   showToastMsg: function(msg) {
-    if(typeof(app) !== 'undefined' && app.$.toast && app.$.toast.open) {
-      app.$.toast.text = msg;
-      app.$.toast.open();
-    }
+    var eventDetail = {'msg':msg};
+    var event = new CustomEvent('things-show-tost', { 'detail': eventDetail });
+    document.dispatchEvent(event);
   }
 
 };
