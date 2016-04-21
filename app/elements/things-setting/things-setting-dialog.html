@@ -3,40 +3,37 @@
 <link rel="import" href="../../../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
 <link rel="import" href="../../../bower_components/paper-dialog-behavior/paper-dialog-shared-styles.html">
 
+<link rel="import" href="../things-i18n/things-locale-combo.html">
 <link rel="import" href="./things-global-behavior.html">
 
 <dom-module id="things-setting-dialog">
   <template>
-
-    <style include="paper-dialog-shared-styles">
-    </style>
+    <style include="paper-dialog-shared-styles"></style>
 
     <h2>Setting (Only Client Side Setting)</h2>
 
+    <!-- Base URL -->
     <paper-input 
       label="Base URL (ex: http://www.elidom.xyz:80/rest)" 
       value="{{globals.baseUrl::change}}" autoValidate required>
     </paper-input>
+
     <!-- locale selector -->
-    <things-locale-combo id="locale-selector" 
+    <things-locale-combo 
+      id="locale-selector" 
       storage-name="setting.locale" 
       default-locale ="{{globals.locale}}">
     </things-locale-combo>
   </template>
 
   <script>
-    (function() {
-      'use strict';
+    Polymer({
+      is: 'things-setting-dialog',
 
-      Polymer({
-        is: 'things-setting-dialog',
-
-        behaviors: [
-          Polymer.PaperDialogBehavior, 
-          Things.GlobalBehavior
-        ]
-
-      });
-    })();
+      behaviors: [
+        Polymer.PaperDialogBehavior, 
+        Things.GlobalBehavior
+      ]
+    });
   </script>
 </dom-module>

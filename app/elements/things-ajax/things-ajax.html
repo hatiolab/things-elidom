@@ -426,8 +426,7 @@ element.
       var tempParams = null;
 
       // Resource Mode이고 검색 조건으로 조회시에 파라미터 조작 
-      if(this.resourceMode === true && (this.resourceAction == 'index' || 
-        (this.selectFields || this.sortFields || this.queryFields || this.page || this.limit))) {
+      if(this.resourceMode === true && this.resourceAction == 'index') {
         tempParams = this.handleRequestParams(this.params);
       } else {
         tempParams = this.params;
@@ -577,7 +576,7 @@ element.
         this._setLoading(false);
       }
 
-      this.fire('things-ajax-response', request, { bubbles: this.bubbles });
+      this.fire('things-ajax-response', request.response, { bubbles: this.bubbles });
 
       // Show Toast Message
       this.showToastMsg('Success');      

@@ -1,17 +1,18 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-localstorage/iron-localstorage.html">
+
 <link rel="import" href="../things-combo/things-code-selector.html">
+
 <!--
-A comment describing this element
+다국어 설정을 위한 Locale Selector 
 
 Example:
 
-    <my-elem></my-elem>
-
-Example:
-
-    <my-elem>
-      <h2>Hello my-elem</h2>
-    </my-elem>
+  <things-locale-combo 
+		id="locale-selector" 
+		storage-name="setting.locale" 
+		default-locale="{{globals.locale}}">
+  </things-locale-combo>
 
 @demo demo/index.html
 -->
@@ -23,44 +24,68 @@ Example:
 				display: block;
 			}
 		</style>
-	    <things-code-selector 
-	      id="code-selector" 
-	      label="Language" 
-	      value="[[defaultLocale]]" 
-	      code-name="LOCALE" 
-	      label-path="description" 
-	      value-path="name">
-	    </things-code-selector>
-	    
-	    <iron-localstorage name="[[storageName]]" value="{{selectedLocale}}"></iron-localstorage>
+
+		<things-code-selector 
+			id="code-selector" 
+			label="Language" 
+			value="[[defaultLocale]]" 
+			code-name="LOCALE" 
+			label-path="description" 
+			value-path="name">
+		</things-code-selector>
+
+		<iron-localstorage name="[[storageName]]" value="{{selectedLocale}}"></iron-localstorage>
 	</template>
+
 	<script>
 		Polymer({
 			is: 'things-locale-combo',
-			properties:{
-				storageName :{
-					type:String,
-					value:'setting.locale'
+
+			properties: {
+				/**
+				 * Local Storage Name
+				 */
+				storageName: {
+					type: String,
+					value: 'setting.locale'
 				},
-				defaultLocale:{
+
+				/**
+				 * Default Locale
+				 */
+				defaultLocale: {
+					type: String
+				},
+
+				/**
+				 * 선택된 Locale 값 
+				 */
+				selectedLocale: {
 					type: String
 				}
 			},
 
 			listeners: {
-			  'code-selector.things-combo-value-changed' : '_onComboValueChanged'
+				'code-selector.things-combo-value-changed' : '_onComboValueChanged'
 			},
 
-			_onComboValueChanged:function (event) {
+			/**
+			 * Combo 값이 변경될 때 
+			 */
+			_onComboValueChanged: function(event) {
 				this.set('selectedLocale',event.detail.value);
 				I18nMsg.lang = dataGlobal.language || document.documentElement.lang
 				I18nMsg.lang = event.detail.value;
-        		Platform.performMicrotaskCheckpoint();
+				Platform.performMicrotaskCheckpoint();
 			},
 
-			getLocale:function () {
+			/**
+			 * 선택된 Locale 값을 리턴 
+			 */
+			getLocale: function() {
 				return this.selectedLocale
 			}
+
 		});
 	</script>
 </dom-module>

@@ -1,5 +1,6 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../things-ajax/things-ajax.html">
 <link rel="import" href="./things-combo.html">
 
 <!--
@@ -15,7 +16,6 @@
       label-path="description" 
       value-path="name">
     </things-code-selector>
-
 
 @demo ./things-combo/demo/demo-code-selector.html
 -->
@@ -35,7 +35,7 @@
     <things-ajax
       auto
       id="resource" 
-      resource-url="common_codes"
+      resource-url="common_codes/show_by_name"
       resource-action="show_by_name"
       params="[[params]]">
     </things-ajax>
@@ -43,86 +43,87 @@
 	</template>
 
   <script type="text/javascript">
-  	(function() {
-      Polymer({
-        is: "things-code-selector",
+    Polymer({
+      is: "things-code-selector",
 
-        properties: {
-          /**
-           * element name, Form 안에 들어가는 경우 Ajax 요청시 name : value 형식으로 서버에 요청된다.
-           */
-          name : {
-            type: String
-          },
-
-          /**
-           * element에 표시할 라벨 
-           */
-          label: {
-            type: String
-          },
-
-          /**
-           * element value, Form 안에 들어가는 경우 Ajax 요청시 name : value 형식으로 서버에 요청된다.
-           */
-          value: {
-            type: String
-          },
-
-          /**
-           * 코드 데이터 중에서 Code Selector에 표시할 데이터 패스.
-           */
-          labelPath: {
-            type: String
-          },
-
-          /**
-           * 코드 데이터 중에서 Code Selector가 가질 값에 대한 데이터 패스.
-           */
-          valuePath: {
-            type: String
-          },
-
-          /**
-           * code 명. code name으로 code 정보를 조회하는 URL을 구성한다.
-           */
-          codeName: {
-            type: String,
-            notify: true
-          },
-
-          /**
-           * code items
-           */
-          items: {
-            type: Array
-          },
-
-          /**
-           * Code 조회시 서버에 넘어가는 파라미터 (codeName)
-           */
-          params: {
-            type: String,
-            computed: '_computeParams(codeName)'
-          }
-        },
-
-        listeners: {
-          'resource.things-ajax-response' : '_onResponse'
+      properties: {
+        /**
+        * element name, Form 안에 들어가는 경우 Ajax 요청시 name : value 형식으로 서버에 요청된다.
+        */
+        name : {
+          type: String
         },
 
         /**
-         * parameter
-         */
-        _computeParams: function(codeName) {
-          return { name : codeName };
+        * element에 표시할 라벨 
+        */
+        label: {
+          type: String
         },
 
-        _onResponse: function(e) {
-          this.items = e.detail.items;
-        }
+        /**
+        * element value, Form 안에 들어가는 경우 Ajax 요청시 name : value 형식으로 서버에 요청된다.
+        */
+        value: {
+          type: String
+        },
 
-      })
-  	})();
+        /**
+        * 코드 데이터 중에서 Code Selector에 표시할 데이터 패스.
+        */
+        labelPath: {
+          type: String
+        },
+
+        /**
+        * 코드 데이터 중에서 Code Selector가 가질 값에 대한 데이터 패스.
+        */
+        valuePath: {
+          type: String
+        },
+
+        /**
+        * code 명. code name으로 code 정보를 조회하는 URL을 구성한다.
+        */
+        codeName: {
+          type: String,
+          notify: true
+        },
+
+        /**
+        * code items
+        */
+        items: {
+          type: Array
+        },
+
+        /**
+        * Code 조회시 서버에 넘어가는 파라미터 (codeName)
+        */
+        params: {
+          type: String,
+          computed: '_computeParams(codeName)'
+        }
+      },
+
+      listeners: {
+        'resource.things-ajax-response' : '_onResponse'
+      },
+
+      /**
+      * parameter
+      */
+      _computeParams: function(codeName) {
+        return { name : codeName };
+      },
+
+      /**
+      * 코드 조회 결과 응답이 도착했을 경우
+      */
+      _onResponse: function(e) {
+        this.items = e.detail.items;
+      }
+
+    });
   </script>
 </dom-module>

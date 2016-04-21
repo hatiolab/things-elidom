@@ -1,6 +1,7 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../bower_components/iron-dropdown/iron-dropdown.html">
-<link rel="import" href="../../../bower_components/vaadin-combo-box/vaadin-combo-box.html">
+<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
 
 <!--
 things-combo. items로 받은 데이터들을 콤보박스로 출력하고 선택한 값을 필드에 표시하는 컴퍼넌트
@@ -31,7 +32,7 @@ things-combo. items로 받은 데이터들을 콤보박스로 출력하고 선�
     <input is="iron-input" name="[[name]]" bind-value="[[value]]" hidden>
 
     <iron-icon icon="icons:list" on-tap="spreadContents"></iron-icon>
-    <!-- <paper-icon-button suffix on-tap="clearValue" icon="clear" alt="clear" title="clear"></paper-icon-button> -->
+    
     <iron-dropdown id="dropdownList" horizontal-align="left" vertical-align="top">
       <div class="dropdown-content">
         <template is="dom-repeat" items="[[items]]">

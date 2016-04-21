@@ -8,15 +8,7 @@
 
   Example:
 
-    <things-code-selector 
-      id="code-selector" 
-      label="Language" 
-      value="en-US" 
-      code-name="LOCALE" 
-      label-path="description" 
-      value-path="name">
-    </things-code-selector>
-
+    <things-storage-selector id="storage" hidden="{{selectorHidden}}"></things-storage-selector>
 
 @demo ./things-combo/demo/index.html
 -->
@@ -114,7 +106,7 @@
          */
         _dropdownOpenHandler: function(e) {
           if(!this.items || this.items.length == 0) {
-            this.$.storage.action='index';
+            this.$.storage.action = 'index';
             this.$.storage.generateRequest();
           }
         },
