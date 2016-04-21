@@ -7,6 +7,17 @@
 <link rel="import" href="../../../bower_components/iron-icons/notification-icons.html">
 <link rel="import" href="../../../bower_components/iron-icons/places-icons.html">
 
+<!--
+things-alarm-badge. count 횟수를 badge 형태로 출력하고 openAlarm()을 통해 count를 초기화 하는 컴퍼넌트
+
+  Example:
+    
+    <things-alarm-badge
+      count="10">
+    </things-alarm-badge>
+
+@demo ./things-alarm/demo/demo-alarm-badge.html
+-->
 <dom-module id="things-alarm-badge">
 	<template>
 		<paper-icon-button id="alarm-button" src="https://assets-cdn.github.com/images/modules/logos_page/Octocat.png" alt="alarm">
@@ -23,6 +34,10 @@
         	'tap' : 'openAlarm' 
         },
 
+        /**
+         * badge 클릭시 실행되는 function,
+         * cout를 0으로 초기화 합니다.
+         */
         openAlarm: function (e) {
         	this.count = 0;
         }
