@@ -54,7 +54,16 @@ Things.GlobalBehavior = {
     if (i >= 0) {
       instances.splice(i, 1);
     }
+  },
+  /**
+   * Show toast message
+   *
+   * @param {Object} response
+   */
+  showToastMsg: function(msg) {
+    var eventDetail = {'msg':msg};
+    var event = new CustomEvent('things-show-tost', { 'detail': eventDetail });
+    document.dispatchEvent(event);
   }
-
 };
 </script>

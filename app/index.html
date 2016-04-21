@@ -116,30 +116,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			return screen.routing_type == 'DIY';
 		};
 		
-	    // window.localizationReady =false;
-
-	    // window.getLocalizationInfo = function () {
-	    //   var xhr = new XMLHttpRequest();
-	    //   xhr.open('GET', 'http://192.168.35.225:9004/rest/terminologies', true);
-	    //   xhr.withCredentials = true;
-	    //   xhr.send(null);
-	    //   xhr.onreadystatechange = function (Evt) {
-	    //     if (xhr.readyState == 4) {
-	    //       if(xhr.status == 200){
-	    //         window.localizationReady =true;
-	    //       }
-	    //       else{
-	    //         console.log('Error localization xhr page');
-	    //       }
-	    //     }
-	    //   };
-	    // }
+		document.addEventListener('things-show-tost', function(event){
+			app.$.toast.text = event.detail.msg;
+			app.$.toast.open();
+		});
   	</script>
-  <!-- endbuild-->
-
-  <!-- Google Analytics code -->
-  <!--start-google-analytics-tracker code="UA-XXXXX-Y"></start-google-analytics-tracker-->
-
 </body>
 
 </html>
