@@ -31,7 +31,7 @@ Custom property | Description | Default
 > This element applies the mixin `--paper-font-common-base` but does not import `paper-styles/typography.html`.
 > In order to apply the `Roboto` font to this element, make sure you've imported `paper-styles/typography.html`.
 @element tristate-checkbox
-@demo demo/index.html
+@demo ./things-tristate-checkbox/demo/demo-tristate-checkbox.html
 -->
 
 <dom-module id="things-tristate-checkbox">
@@ -328,6 +328,8 @@ Custom property | Description | Default
         } else {
           this.state = null;
         }
+
+        console.log(this.state);
       },
 
       // Computed methods.

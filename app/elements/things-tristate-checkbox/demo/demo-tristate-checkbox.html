@@ -15,16 +15,15 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
 
-  <title>things-html-preview demo</title>
+  <title>things-tristate-checkbox demo</title>
 
   <script src="../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
   
-  <link rel="import" href="../../../../bower_components/polymer/polymer.html">
-  <link rel="import" href="../../../../bower_components/paper-input/paper-input.html">
-  <link rel="import" href="../../../../bower_components/paper-button/paper-button.html">
-  
-  <link rel="import" href="../things-html-preview.html">
-  
+  <link rel="import" href="../../../bower_components/polymer/polymer.html">
+  <link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+
+  <link rel="import" href="../things-tristate-checkbox.html">
+
   <link rel="stylesheet" href="../../../bower_components/paper-styles/demo.css">
 
   <style is="custom-style">
@@ -64,28 +63,24 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 </head>
 <body unresolved>
 
-  <dom-module id="sample-html-preview">
+  <dom-module id="sample-tristate-checkbox">
     <template>
-      <paper-input value="{{srcdoc}}" label="srcdoc"></paper-input>
-      <paper-button on-tap="preview">Preview</paper-button>
+      <paper-input value="{{state}}"></paper-input>
 
-      <things-html-preview
-        id="previewer"
-        srcdoc="{{srcdoc}}"
-        height="600"
-        width="450">
-      </things-html-preview>
+      <things-tristate-checkbox
+        label="Tristate Checkbox"
+        state="{{state}}">
+      </things-tristate-checkbox>
     </template>
 
     <script>
       Polymer({
-        is: "sample-html-preview",
+        is: "sample-tristate-checkbox",
 
-        properties: {
-          srcdoc: {
-            type: String,
-            notify: true
-          }
+        state: {
+          type: String,
+          value: false,
+          notify: true
         }
       });
     </script>
@@ -93,8 +88,8 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 
   <template is="dom-bind" id="app">
     <section>
-      <h4>Things HTML Previewer</h4>
-      <sample-html-preview></sample-html-preview>
+      <h4>Things Tristate Checkbox</h4>
+      <sample-tristate-checkbox></sample-tristate-checkbox>
     </section>    
   </template>
 
