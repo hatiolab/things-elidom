@@ -168,7 +168,7 @@
       showDetailView: function(resource) {
         this.resource = resource;
         this.openPopupView(this, true);
-        this.$['resource-search'].action = 'rests/api?id=' + resource.bean_class_name;
+        this.$['resource-search'].resourceUrl = 'rests/api?id=' + resource.bean_class_name;
         this.$['resource-search'].generateRequest();
       }
 

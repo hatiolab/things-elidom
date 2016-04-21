@@ -463,7 +463,7 @@ element.
       var queryString = this.queryString;
       var tempUrl = this.url;
 
-      if(tempUrl && tempUrl.indexOf(':id') > 0 && this.resourceId && this.resourceId.length > 0) {
+      if(tempUrl && tempUrl.indexOf(':id') > 0 && this.resourceId) {
         tempUrl = tempUrl.replace(':id', this.resourceId);
       }
 

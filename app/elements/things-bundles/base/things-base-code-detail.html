@@ -6,17 +6,22 @@
 <link rel="import" href="../../things-content/things-load-view-behavior.html">
 <link rel="import" href="../../things-grid/things-resource-grid.html">
 
+<!--
+공통 코드 디테일 화면 
+-->
 <dom-module id="things-base-code-detail">
 
   <template>
     <div class="[[layout]]">
       <things-ajax 
-        id="resource-search"
+        auto
+        id="subcode-list"
         resource-url="[[gridSearchUrl]]"
         resource-action="index"
         resource-id="{{codeId}}"
-        last-response="{{lastResponse}}"
-        auto>
+        query-fields="[[queryFields]]"
+        sort-fields="[[sortFields]]"
+        last-response="{{lastResponse}}">
       </things-ajax>
 
       <things-resource-form
@@ -84,7 +89,7 @@
         },
 
         /**
-         * code 조회 정보 
+         * code 조회 결과 (response) 정보 
          */
         lastResponse: {
           type: Object,
@@ -152,7 +157,6 @@
         gridSearchUrl: {
           type: String,
           value: 'common_codes/:id'
-          //computed: '_computeCodeSearchUrl(codeId)'
         },
 
         /**
@@ -206,16 +210,6 @@
       },
 
       /**
-       * Code Search URL
-       *
-       * @param {String} codeId
-       * @return {String} code search url
-       */
-      _computeCodeSearchUrl: function(codeId) {
-        return ['common_codes', codeId].join('/');
-      },
-
-      /**
        * Code Id로 Code List Save URL 생성
        *
        * @param {String} codeId
@@ -250,7 +244,7 @@
        * reload grid data
        */
       reloadGrid: function(e) {
-        this.$['resource-search'].generateRequest();
+        this.$['subcode-list'].generateRequest();
       },
 
       /**

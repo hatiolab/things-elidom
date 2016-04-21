@@ -22,20 +22,9 @@
 <link rel="import" href="../../things-content/things-route-content-behavior.html">
 
 <!--
-하나의 리소스에 대한 기본 액션 (List, Create, Find, Upate, Delete) 및 Import, Export 등의 기능을 제공하는 화면 셋 
-
-Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그리드에서 레코드 하나를 선택할 경우 해당 레코드에 대한 Detail Form이 출력된다.
-
-	Example:
-
-	<things-base-menu 
-	  title="Menu"
-	  resource-type="Menu"
-	  resource-url="menus"
-	  layout="fullbleed layout vertical">
-	</things-base-menu>
-
-@demo ./things-content/demo/index.html
+메뉴 관리 화면 셋. 
+두 개의 그리드로 구성되는데 하나는 메인 메뉴 표시용이고 
+다른 하나는 메인 메뉴를 선택했을 때 서브 메뉴 리스트를 표시하는데 사용된다.
 -->
 
 <dom-module id="things-base-menu">
@@ -90,8 +79,8 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 
 			<things-ajax 
 				id="search-submenus"
-				method="GET"
-				resource-url="menus/:id/sub_menus"
+				resource-url="menus/:id/sub_menus?showall=true"
+				resource-action="index"
 				last-response="{{subMenus}}">
 			</things-ajax>
 
@@ -259,7 +248,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 */
 			_showSubMenus: function(event) {
 				this.$['search-submenus'].selectFields = this.selectFields;
-				this.$['search-submenus'].action = 'menus/' + event.detail.id + '/sub_menus?showall=true';
+				this.$['search-submenus'].resourceId = event.detail.id;
 				this._reloadSubMenus();
 			},
 
