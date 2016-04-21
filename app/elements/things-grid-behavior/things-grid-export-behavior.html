@@ -1,0 +1,44 @@
+<script src='../../../bower_components/jszip/dist/jszip.min.js'></script>
+
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<script>
+
+	window.Things = window.Things || {};
+
+	/**
+	 * 그리드 정보를 Excel로 Export 하는 기능을 제공하는 그리드 Behavior
+	 */
+	Things.GridExportBehavior = {
+
+		properties: {
+			/**
+			 * Export 파일 이름 
+			 */
+			exportFileName: {
+				type: String
+			},
+
+			/**
+			 * Export 파일 Sheet 이름 
+			 */
+			exportSheetName: {
+				type: String
+			}
+		},
+
+		/**
+		 * export to excel
+		 */
+		exportGridData: function() {
+			new DataLudi.GridExcelExporter().export(this.grid, {
+				target: 'local',
+				fileName: this.exportFileName,
+				numberFormat: '#,##0.00',
+				datetimeFormat: 'yyyy.mm.dd'
+			});
+		}
+
+	};
+
+</script>

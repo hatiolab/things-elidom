@@ -1,0 +1,45 @@
+<script src='../../../bower_components/jszip/dist/jszip.min.js'></script>
+
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../things-import-excel/things-import-excel.html">
+
+<script>
+
+	window.Things = window.Things || {};
+
+	/**
+	 * 그리드에 Import 기능을 제공하는 그리드 Behavior 
+	 */
+	Things.GridImportBehavior = {
+
+		properties: {
+			/**
+			 * import Sheet Name
+			 */
+			sheetName: {
+				type: String,
+				value: 'Sheet1'
+			}
+		},
+
+		/**
+		 * import 버튼이 클릭 될때 excel import 화면 열기 
+		 */
+		importExcel :function() {
+			var excelImport = document.createElement('things-import-excel');
+			excelImport.sheetName = this.sheetName;
+			var me = this;
+
+			excelImport.addEventListener('excel-process-finish', function(event) {
+				// 1. clear grid
+				new DataLudi.DataLoader(me.dataSet).load('json', '', {});
+				// 2. load excel data to grid, fillMode : 'insert', 'append', 'update', 기본은 'set'
+				new DataLudi.DataLoader(me.dataSet).load('json', event.detail, { fillMode: 'insert', fillPos: 0 });
+			});
+
+			excelImport.import();
+		}
+
+	};
+
+</script>

@@ -1,0 +1,143 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
+
+<script>
+
+  window.Things = window.Things || {};
+
+  /**
+   * 그리드 이벤트 관련 Behavior
+   */
+  Things.GridEventBehaviorImpl = {
+
+    properties: {
+      
+      /**
+       * read data
+       */
+      data: {
+        type: Object,
+        observer: '_afterGridConfigured'
+      },
+
+      /**
+       * configure event 
+       */
+      events: {
+        type: Object
+      },
+
+      /**
+       * 선택된 row data
+       */
+      selectedRowData: {
+        type: Object,
+        notify: true,
+        readonly: true
+      },
+
+      /**
+       * 선택된 cell data
+       */
+      selectedCellData: {
+        type: Object,
+        notify: true,
+        readonly: true
+      }
+    },
+
+    listeners: {
+      'things-grid-configured' : '_afterGridConfigured',
+      'iron-resize': '_gridScreenResizeHandler'
+    },
+
+    _afterGridConfigured: function(e) {
+      if (this.data && this.dataSet) {
+        if (!this.grid) {
+          this.initialGrid();
+          this.resizeGrid(this.parentNode, this.querySelector('div'));
+        }
+
+        if (this.infiniteScroll) {
+          this.dataSet.appendRows(data, 0, -1, false);
+          this.dataSet.clearRowStates();
+        } else {
+          this.dataSet.setRows(this.data);
+        }
+      }
+    },
+
+    /**
+     * Dataludi 그리드 이벤트를 추가한다.
+     * attribute 중에 Event 값이 설정되어 있다면 그것으로 이벤트 핸들러를 등록한다.
+     */
+    registerGridEvent: function() {
+      if (this.events) {
+        for (var eventName in this.events) {
+          this.grid[eventName] = this[this.events[eventName]];
+        }
+      }
+    },
+
+    /**
+     * parentNode 사이즈에 따라 그리드를 resize
+     * @param parentNode
+     * @param gridContainer
+     */
+    resizeGrid: function(parentNode, gridContainer) {
+      gridContainer.style.width = (parentNode.offsetWidth - 20) + 'px';
+      gridContainer.style.height = this.gridHeight + 'px';
+      this.grid.resetSize();
+    },    
+
+    /**
+     * resize handler
+     */
+    _gridScreenResizeHandler: function(e) {
+      if (this.parentNode.offsetWidth > 0 && this.grid == null) {
+        this.initialGrid();
+      }
+
+      if (this.grid != null && this.grid._container) {
+        //this.resizeGrid(this.parentNode, this.grid._container);
+        this.resizeGrid(this.parentNode, this.querySelector('div'));
+      }
+    },
+
+    /**
+     * Dataludi grid cell click 이벤트 핸들러 
+     */
+    _gridCellClicked: function(grid, cellData) {
+      var thingsGrid = grid._container_;
+
+      if (cellData && cellData.dataColumn() && cellData.getDataIndex(grid) >= 0) {
+        var rowIndex = cellData.getDataIndex(grid);
+        var colIndex = cellData.dataField();
+        var row = grid.focusedRow();
+
+        if(row && row.dataIndex() >= 0) {
+          thingsGrid.selectedRowData = row.getRowObject();
+          thingsGrid.fire('things-grid-row-data-select', thingsGrid.selectedRowData);
+        }
+
+        if(cellData.dataField() >= 0) {
+          thingsGrid.selectedCellData = thingsGrid.dataSet.getValue(rowIndex, colIndex);
+          thingsGrid.fire('things-grid-cell-data-select', thingsGrid.selectedCellData);
+        }
+        
+        if(thingsGrid.enableDetailColumn && cellData.column._name == 'Detail' && 
+          cellData.column._renderer && cellData.column._renderer.type == 'icon') {
+          thingsGrid.selectedRowData = row.getRowObject();
+          thingsGrid.fire('things-grid-detail-tap', thingsGrid.selectedRowData);
+        }
+      }
+    }
+
+  };
+
+  Things.GridEventBehavior = [
+    Things.GridEventBehaviorImpl,
+    Polymer.IronResizableBehavior
+  ];
+
+</script>
