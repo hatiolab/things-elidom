@@ -7,8 +7,12 @@
 <link rel="import" href="../things-button/things-button-bar.html">
 <link rel="import" href="../things-import-excel/things-import-excel.html">
 <link rel="import" href="../things-paginator/things-paginator.html">
-<link rel="import" href="../things-grid-behavior/things-grid-basic-behavior.html">
-<link rel="import" href="../things-grid-behavior/things-grid-resource-behavior.html">
+
+<link rel="import" href="../things-grid-behavior/things-grid-config-behavior.html">
+<link rel="import" href="../things-grid-behavior/things-grid-event-behavior.html">
+<link rel="import" href="../things-grid-behavior/things-grid-export-behavior.html">
+<link rel="import" href="../things-grid-behavior/things-grid-import-behavior.html">
+<link rel="import" href="../things-grid-behavior/things-grid-save-behavior.html">
 
 <!--
 기본 라소스 그리드. Pagination을 지원하고 import, export, add, delete, save가 가능한 그리드
@@ -120,7 +124,11 @@
 			is: 'things-resource-grid',
 
 			behaviors: [
-				Things.GridResourceBehavior
+				Things.GridConfigBehavior,
+				Things.GridEventBehavior,
+				Things.GridSaveBehavior,
+				Things.GridImportBehavior,
+				Things.GridExportBehavior
 			],
 	
 			properties: {
@@ -329,6 +337,8 @@
 			},			
 
 			/**
+			 * TODO Things.GridEventBehavior와 중복 
+			 * 
 			 * Dataludi grid cell click 이벤트 핸들러 
 			 *
 			 * @param {Object} grid

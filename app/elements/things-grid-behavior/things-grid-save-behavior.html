@@ -1,0 +1,108 @@
+<script src='../../../bower_components/jszip/dist/jszip.min.js'></script>
+
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
+<link rel="import" href="../things-grid-behavior/things-grid-basic-behavior.html">
+
+<script>
+
+	window.Things = window.Things || {};
+
+	/**
+	 * 그리드에 행을 추가하거나 삭제하거나 셀 편집을 통해 데이터를 업데이트해서 한꺼번에 저장(Create, Update, Delete)하는 
+	 * 기능을 제공하는 그리드 Behavior 
+	 */
+	Things.GridSaveBehavior = {
+
+		properties: {
+			/**
+			 * 저장 가능한 지 여부 
+			 */
+			writable: {
+				type: Boolean,
+				value: true
+			},
+
+			/**
+			 * 저장(Multiple Update)할 서버 측 URL
+			 */
+			gridSaveAction: {
+				type: String
+			},
+
+			/**
+			 * 저장(Multiple Update)할 데이터
+			 */
+			writeData: {
+				type: Array,
+				notify: true
+			}
+		},
+
+		/**
+		 * remove grid row. 실제 삭제하지 않고 플래그 처리한 후 save시 서버에서 일괄 처리한다.
+		 */
+		removeGridRow: function() {
+			var rows = this.grid.getCheckedRows();
+			if (rows && rows.length > 0) {
+				var ds = this.dataSet;
+
+				rows.forEach(function(row) {
+					if (ds.getRowState(row.dataIndex()) == 'created') {
+						ds.setRowState(row.dataIndex(), 'createAndDeleted');
+					} else {
+						ds.setRowState(row.dataIndex(), 'deleted');
+					}
+				});
+			}
+		},
+
+		/**
+		 * add grid row
+		 */
+		addGridRow: function() {
+			this.dataSet.insertRow(0, {});
+		},
+
+		/**
+		 * 그리드의 변경된 데이터를 감지하여 서버로 한꺼번에 Create/Update/Delete 요청을 한다.
+		 */
+		saveGridData: function() {
+			var changedDataList = [];
+			try {
+				this.grid.commit();
+				this._configureChangedData(changedDataList, 'created', 'c');
+				this._configureChangedData(changedDataList, 'updated', 'u');
+				this._configureChangedData(changedDataList, 'deleted', 'd');
+				this.writeData = changedDataList;
+				this._gridSaveAction();
+			} catch (err) {
+				this.openInfoMsg({
+					type : 'warning',
+					title : 'Validation Error',
+					text : err.message,
+					html : false
+				});
+			}
+		},
+
+		/**
+		 * 변경 타입(created, updated, deleted)에 따라 변경데이터를 구성한다.
+		 *
+		 * @param {Object} changedData
+		 * @param {String} changeType 'created', 'updated', 'deleted'
+		 * @param {String} changeFlag 'c', 'u', 'd'
+		 */
+		_configureChangedData: function(changedData, changeType, changeFlag) {
+			var changed = this.dataSet.getStateRows(changeType);
+			for (var i = 0; i < changed.length; i++) {
+				var changedRow = this.dataSet.getRowObject(changed[i]);
+				changedRow.cud_flag_ = changeFlag;
+				changedData.push(changedRow);
+			}
+		}
+		
+	};
+
+</script>
