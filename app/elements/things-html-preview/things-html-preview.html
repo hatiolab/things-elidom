@@ -1,20 +1,18 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
+
 <!--
-A comment describing this element
+things-html-preview. html previewer
 
-Example:
+  Example:
+		<things-html-preview
+			srcdoc="<marquee>Things HTML Preview</marquee>"
+			height="600"
+			width="450">
+		</things-html-preview>
+		
 
-    <my-elem></my-elem>
-
-Example:
-
-    <my-elem>
-      <h2>Hello my-elem</h2>
-    </my-elem>
-
-@demo demo/index.html
+@demo ./things-html-preview/demo/demo-html-preview.html
 -->
-
 <dom-module id="things-html-preview">
 	<template>
 		<style>
@@ -28,12 +26,14 @@ Example:
 		Polymer({
 			is: 'things-html-preview',
 			properties:{
+
+				/**
+				 * html code before rendering
+				 */
 				srcdoc:{
 					type:String,
-					notify:true				}
-			},
-			loadHtmlCode: function(srcdoc){
-				this.srcdoc = srcdoc;
+					notify:true
+				}
 			}
 		});
 	</script>
