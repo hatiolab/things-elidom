@@ -25,8 +25,8 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <link rel="import" href="../../../bower_components/paper-styles/demo-pages.html">
   <link rel="import" href="../../../bower_components/paper-toast/paper-toast.html">
   
+  <link rel="import" href="../../things-ajax/things-ajax.html">
   <link rel="import" href="../../things-button/things-button.html">
-  <link rel="import" href="../../things-resource/things-resource.html">
   <link rel="import" href="../../things-spinner/things-spinner.html">
   <link rel="import" href="../../things-setting/things-setting.html">
 
@@ -100,14 +100,13 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
           selected-row-data="{{selectedRow}}">
         </things-diy-grid>
         <!--resource="diy_services/GridTestData/query.json"-->
-        <things-resource 
+        <things-ajax 
           id="search-resource"
-          resource ="{{customServiceUrl}}"
-          action=""
           method="GET"
           content-type="application/json"
+          resource-url="{{customServiceUrl}}"
           last-response="{{gridData}}">
-        </things-resource>
+        </things-ajax>
       </section>
     </template>
 

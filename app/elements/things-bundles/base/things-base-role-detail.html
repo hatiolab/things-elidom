@@ -17,12 +17,12 @@
       }
     </style>
 
-    <things-resource 
+    <things-ajax 
       id="get-resource"
       method="GET"
-      action="[[memberResourceUrl]]"
+      resource-url="[[memberResourceUrl]]"
       last-response="{{resource}}">
-    </things-resource>
+    </things-ajax>
 
     <paper-tabs id="tabGroup" selected="{{currentTabIdx}}" noink>
       <template is="dom-repeat" items="{{_panels}}">

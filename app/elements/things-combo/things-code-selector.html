@@ -32,13 +32,13 @@
       value-path="[[valuePath]]">
     </things-combo>
 
-    <things-resource
+    <things-ajax
       auto
       id="resource" 
-      resource="common_codes"
-      action="show_by_name"
+      resource-url="common_codes"
+      resource-action="show_by_name"
       params="[[params]]">
-    </things-resource>
+    </things-ajax>
 
 	</template>
 
@@ -108,7 +108,7 @@
         },
 
         listeners: {
-          'resource.things-resource-ajax-success' : '_onResponse'
+          'resource.things-ajax-response' : '_onResponse'
         },
 
         /**

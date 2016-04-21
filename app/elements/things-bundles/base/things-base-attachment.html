@@ -13,7 +13,7 @@
 <link rel="import" href="../../things-grid/things-resource-grid.html">
 <link rel="import" href="../../things-file-upload/things-file-upload.html">
 <link rel="import" href="../../things-form/things-search-form.html">
-<link rel="import" href="../../things-resource/things-resource.html">
+<link rel="import" href="../../things-ajax/things-ajax.html">
 
 <link rel="import" href="../../things-content/things-load-view-behavior.html">
 <link rel="import" href="../../things-content/things-resource-meta-behavior.html">
@@ -41,12 +41,12 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 <dom-module id="things-base-attachment">
 	<template>
 		<div class="[[layout]]">
-			<things-resource 
+			<things-ajax 
 				id="resource-meta"
 				method="GET"
-				action="[[resourceMetaUrl]]"
+				resource-url="[[resourceMetaUrl]]"
 				last-response="{{metaData}}">
-			</things-resource>
+			</things-ajax>
 
 			<things-search-form 
 				id="search-form"

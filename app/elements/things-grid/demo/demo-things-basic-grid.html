@@ -25,15 +25,15 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <link rel="import" href="../../../bower_components/paper-styles/demo-pages.html">
   <link rel="import" href="../../../bower_components/paper-toast/paper-toast.html">
   
+  <link rel="import" href="../../things-ajax/things-ajax.html">
   <link rel="import" href="../../things-button/things-button.html">
-  <link rel="import" href="../../things-resource/things-resource.html">
   <link rel="import" href="../../things-spinner/things-spinner.html">
   <link rel="import" href="../../things-setting/things-setting.html">
 
-<link rel="import" href="../../things-button/things-button.html">
-<link rel="import" href="../../things-button/things-button-group.html">
-<link rel="import" href="../../things-button/things-button-bar.html">
-<link rel="import" href="../../things-import-excel/things-import-excel-button.html">
+  <link rel="import" href="../../things-button/things-button.html">
+  <link rel="import" href="../../things-button/things-button-group.html">
+  <link rel="import" href="../../things-button/things-button-bar.html">
+  <link rel="import" href="../../things-import-excel/things-import-excel-button.html">
 
   <link rel="import" href="../things-basic-grid.html">
 
@@ -83,13 +83,14 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
       <things-button color="green" id="search">Search</things-button>
 
       <section>
-        <things-resource 
+        <things-ajax 
           id="resource-meta"
           auto
-          method="GET"
-          action="diy_grids/2.json"
+          resource-url="diy_grids/:id"
+          resource-action="find"
+          resource-id="2"
           last-response="{{metaData}}">
-        </things-resource>
+        </things-ajax>
 
         <things-basic-grid 
           id="grid"
@@ -112,23 +113,23 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 
             <things-button-bar id="button-group" buttons="[[buttons]]"></things-button-bar>
 
-            <things-resource 
+            <things-ajax 
               id="save-resource"
               content-type="application/json"
-              action="{{gridSaveAction}}" 
+              resource-url="{{gridSaveAction}}" 
               method = "POST"
               params="{{writeData}}">
-            </things-resource>
+            </things-ajax>
           </div>
         </things-basic-grid>
 
-        <things-resource 
+        <things-ajax 
           id="search-resource"
-          resource="diy_services/DynamicScreen/query.json"
-          action=""
+          resource-url="diy_services/DynamicScreen/query.json"
+          method="GET"
           content-type="application/json"
           last-response="{{gridData}}">
-        </things-resource>
+        </things-ajax>
 
       </section>
     </template>

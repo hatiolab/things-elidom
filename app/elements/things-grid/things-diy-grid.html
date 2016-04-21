@@ -29,13 +29,13 @@
 	
 		<div id="{{gridContainerId}}"></div>
 
-		<things-resource 
+		<things-ajax 
 			auto
 			id="resource-meta"
 			method="GET"
-			action="[[resourceMetaUrl]]"
+			resource-url="[[resourceMetaUrl]]"
 			last-response="{{metaData}}">
-		</things-resource>
+		</things-ajax>
 
 		<paper-toolbar class="white" hidden$="{{!enableToolbar}}">
 			<div id="gridToolbar" class="bottom fit" hidden$="{{!paginatable}}">

@@ -22,11 +22,12 @@
 
   Example
 
-    <things-resource 
+    <things-ajax 
       auto
-      action="diy_services/ElidomSearchForm/query.json" 
+      method="GET"
+      resource-url="diy_services/ElidomSearchForm/query.json" 
       last-response="{{formFields}}">
-    </things-resource>
+    </things-ajax>
 
     <things-search-form 
       id="search-form"

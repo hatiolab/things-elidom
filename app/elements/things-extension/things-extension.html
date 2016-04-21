@@ -1,21 +1,23 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../things-ajax/things-ajax.html">
 <link rel="import" href="../things-combo/things-resource-selector-behavior.html">
 <link rel="import" href="../things-grid/things-resource-grid.html">
-<link rel="import" href="../things-resource/things-resource.html">
 
 <dom-module id="things-extension">
 
   <template>
     <div class="[[layout]]">
-      <things-resource 
+      <things-ajax 
         id="resource-search"
-        method="GET"
-        action="[[gridSearchUrl]]"
+        resource-url="[[gridSearchUrl]]"
+        resource-action="index"
         select-fields="[[searchFields]]"
         sort-fields="[[sortFields]]"
+        page=1
+        limit=1000
         last-response="{{extProps}}">
-      </things-resource>
+      </things-ajax>
 
       <things-resource-grid 
         id="grid"

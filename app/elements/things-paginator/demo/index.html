@@ -22,16 +22,16 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
   <link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
 
-  <link rel="import" href="../../things-resource/things-resource.html">
-  <link rel="import" href="../../things-spinner/things-spinner.html">
-  <link rel="import" href="../../things-setting/things-setting.html">
-  <link rel="import" href="../../things-setting/things-setting-dialog.html">
-  <link rel="import" href="../../things-setting/things-global-behavior.html">
+  <link rel="import" href="../../things-ajax/things-ajax.html">
   <link rel="import" href="../../things-button/things-button.html">
   <link rel="import" href="../../things-form/things-form-behavior.html">
   <link rel="import" href="../../things-form/things-search-form.html">
-  <link rel="import" href="../../things-spinner/things-spinner-behavior.html">
   <link rel="import" href="../../things-msg-box/things-msgbox-behavior.html">
+  <link rel="import" href="../../things-setting/things-global-behavior.html">
+  <link rel="import" href="../../things-setting/things-setting.html">
+  <link rel="import" href="../../things-setting/things-setting-dialog.html">
+  <link rel="import" href="../../things-spinner/things-spinner.html">
+  <link rel="import" href="../../things-spinner/things-spinner-behavior.html">
 
   <link rel="import" href="../things-paginator.html">
 
@@ -85,11 +85,12 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
         } 
       </style>
       <div>
-        <things-resource 
+        <things-ajax 
           auto
-          action="diy_services/ElidomSearchForm/query.json" 
+          method="GET"
+          resource-url="diy_services/ElidomSearchForm/query.json" 
           last-response="{{formFields}}">
-        </things-resource>
+        </things-ajax>
 
         <things-search-form 
           id="search-form"

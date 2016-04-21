@@ -8,9 +8,9 @@
 <link rel="import" href="../../../bower_components/iron-iconset-svg/iron-iconset-svg.html">
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
 
+<link rel="import" href="../things-ajax/things-ajax.html">
 <link rel="import" href="../things-button/things-button.html">
 <link rel="import" href="../things-combo/things-resource-selector-behavior.html">
-<link rel="import" href="../things-resource/things-resource.html">
 <link rel="import" href="../things-grid/things-basic-grid.html">
 <link rel="import" href="../things-grid/things-resource-grid.html">
 <link rel="import" href="../things-form/things-resource-form.html">
@@ -48,12 +48,12 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 		</style>
 
 		<div class="[[layout]]">
-			<things-resource 
+			<things-ajax 
 				id="resource-meta"
 				method="GET"
-				action="[[resourceMetaUrl]]"
+				resource-url="[[resourceMetaUrl]]"
 				last-response="{{metaData}}">
-			</things-resource>
+			</things-ajax>
 
 			<things-search-form 
 				id="search-form"

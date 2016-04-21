@@ -1,28 +1,28 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/iron-icon/iron-icon.html">
 
+<link rel="import" href="../../things-ajax/things-ajax.html">
 <link rel="import" href="../../things-combo/things-resource-selector-behavior.html">
 <link rel="import" href="../../things-content/things-load-view-behavior.html">
 <link rel="import" href="../../things-grid/things-resource-grid.html">
 <link rel="import" href="../../things-msg-box/things-msgbox-behavior.html">
-<link rel="import" href="../../things-resource/things-resource.html">
 <link rel="import" href="../../things-setting/things-global-behavior.html">
 
 <dom-module id="things-base-storage-detail">
 
   <template>
     <div class="[[layout]]">
-      <things-resource 
+      <things-ajax 
         id="resource-search"
-        method="GET"
-        action="[[gridSearchUrl]]"
+        resource-url="[[gridSearchUrl]]"
+        resource-action="index"
         select-fields="[[selectFields]]"
         sort-fields="[[sortFields]]"
         query-fields="{{queryFields}}"
         page="[[page]]"
         limit="[[limit]]"
         last-response="{{lastResponse}}">
-      </things-resource>
+      </things-ajax>
 
       <span><paper-icon-button icon="icons:view-list"></paper-icon-button>[[storageName]]</span>
 

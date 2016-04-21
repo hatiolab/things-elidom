@@ -1,7 +1,7 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../things-ajax/things-ajax.html">
 <link rel="import" href="../things-combo/things-combo.html">
-<link rel="import" href="../things-resource/things-resource.html">
 
 <!--
 코드 셀렉터. 서버에 저장되어 있는 코드 정보를 조회하여 콤보로 표시하는 컴포넌트 
@@ -33,13 +33,13 @@
       value-path="name">
     </things-combo>
 
-    <things-resource
+    <things-ajax
       id="storage" 
-      resource="storage_infos"
+      resource-url="storage_infos"
+      resource-action="index"
       select-fields="id,name,description"
-      sort-fields="[[sortFields]]"
-      method="GET">
-    </things-resource>
+      sort-fields="[[sortFields]]">
+    </things-ajax>
 
 	</template>
 
@@ -106,7 +106,7 @@
 
         listeners: {
           'combo.vaadin-dropdown-opened' : '_dropdownOpenHandler',
-          'storage.things-resource-ajax-success' : '_responseHandler'
+          'storage.things-ajax-response' : '_responseHandler'
         },
 
         /**

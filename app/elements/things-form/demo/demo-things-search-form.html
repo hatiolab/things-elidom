@@ -21,7 +21,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   
   <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
-  <link rel="import" href="../../things-resource/things-resource.html">
+  <link rel="import" href="../../things-ajax/things-ajax.html">
   <link rel="import" href="../../things-spinner/things-spinner.html">
   <link rel="import" href="../../things-setting/things-setting.html">
   <link rel="import" href="../../things-button/things-button.html">
@@ -70,11 +70,12 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <dom-module id="sample-search-form">
     <template>
       <div>
-        <things-resource 
+        <things-ajax 
           auto
-          action="diy_services/ElidomSearchForm/query.json" 
+          method="GET"
+          resource-url="diy_services/ElidomSearchForm/query.json" 
           last-response="{{formFields}}">
-        </things-resource>
+        </things-ajax>
 
         <things-search-form 
           id="search-form"

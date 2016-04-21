@@ -1,21 +1,21 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/iron-icon/iron-icon.html">
 
+<link rel="import" href="../../things-ajax/things-ajax.html">
 <link rel="import" href="../../things-combo/things-resource-selector-behavior.html">
 <link rel="import" href="../../things-content/things-load-view-behavior.html">
 <link rel="import" href="../../things-grid/things-resource-grid.html">
-<link rel="import" href="../../things-resource/things-resource.html">
 
 <dom-module id="things-base-diy-service-detail-inout">
 
   <template>
     <div class="[[layout]]">
-      <things-resource 
+      <things-ajax 
         id="get-params"
         method="GET"
-        action="[[gridSearchUrl]]"
+        resource-url="[[gridSearchUrl]]"
         last-response="{{items}}">
-      </things-resource>
+      </things-ajax>
 
       <things-resource-grid 
         id="grid"
@@ -151,7 +151,7 @@
       },
 
       listeners: {
-        'get-params.things-resource-ajax-success': '_onParametersSaved',        
+        'get-params.things-ajax-response': '_onParametersSaved',        
         'grid.things-grid-pre-save' : '_beforeParamsSave',
         'grid.things-grid-save-success' : 'reloadGrid'
       },

@@ -13,21 +13,21 @@ A comment describing this element
 Example:
 
   <div>
-    <things-resource 
+    <things-ajax 
       auto
       id="resource-meta"
       method="GET"
-      action="entities/Alarm/resource_columns"
+      resource-url="entities/Alarm/resource_columns"
       last-response="{{metaData}}">
-    </things-resource>
+    </things-ajax>
 
-    <things-resource
+    <things-ajax
       auto
-      content-type="application/json"
-      method="get"
-      action="alarms/1"
+      resource-url="alarms/:id"
+      resource-action="index"
+      resource-id="1"
       last-response="{{detailViewData}}">
-    </things-resource>
+    </things-ajax>
 
     <things-resource-tabs 
       search-meta
@@ -52,12 +52,12 @@ Example:
 			}
 		</style>
 
-		<things-resource 
+		<things-ajax 
 			id="get-resource"
 			method="GET"
-			action="[[memberResourceUrl]]"
+			resource-url="[[memberResourceUrl]]"
 			last-response="{{resource}}">
-		</things-resource>
+		</things-ajax>
 
 		<paper-tabs id="tabGroup" selected="{{currentTabIdx}}" noink>
 			<template is="dom-repeat" items="{{_panels}}">

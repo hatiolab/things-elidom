@@ -12,24 +12,26 @@ pagination을 지원하고 데이터를 표시한 후 저장이나 삭제 등의
 
 	Example:
 
-	  <things-resource 
+	  <things-ajax 
 	    auto
-	    action="diy_services/ElidomGridModel/query.json" 
-	    last-response="{{gridModel}}">
-	  </things-resource>
-
-	  <things-resource 
-	    auto
-	    action="diy_services/ElidomGridColumn/query.json" 
-	    last-response="{{gridColumns}}">
-	  </things-resource>
-
-	  <things-resource 
-	    id="search-resource"
-	    action="terminologies" 
 	    method="GET"
+	    resource-url="diy_services/ElidomGridModel/query.json" 
+	    last-response="{{gridModel}}">
+	  </things-ajax>
+
+	  <things-ajax 
+	    auto
+	    method="GET"
+	    resource-url="diy_services/ElidomGridColumn/query.json" 
+	    last-response="{{gridColumns}}">
+	  </things-ajax>
+
+	  <things-ajax 
+	    id="search-resource"
+	    method="GET"
+	    resource-url="terminologies" 
 	    last-response="{{gridData}}">
-	  </things-resource>
+	  </things-ajax>
 
 	  <things-basic-grid 
 	    id="grid"

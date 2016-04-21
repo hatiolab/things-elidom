@@ -8,11 +8,10 @@
 <link rel="import" href="../../../bower_components/iron-iconset-svg/iron-iconset-svg.html">
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
 
+<link rel="import" href="../things-ajax/things-ajax.html">
 <link rel="import" href="../things-button/things-button.html">
 <link rel="import" href="../things-form/things-resource-form.html">
 <link rel="import" href="../things-form/things-search-form.html">
-<!-- <link rel="import" href="../things-grid/things-grid.html"> -->
-<link rel="import" href="../things-resource/things-resource.html">
 <link rel="import" href="../things-paginator/things-paginator.html">
 
 <!--
@@ -41,11 +40,12 @@ Example:
 		</style>
 
 		<div class="[[layout]]">
-			<things-resource 
+			<things-ajax 
 				auto
-				action="[[searchFieldUrl]]" 
+				resource-url="[[searchFieldUrl]]" 
+				method="GET"
 				last-response="{{searchFormFields}}">
-			</things-resource>
+			</things-ajax>
 
 			<things-search-form 
 				id="search-form"
@@ -61,17 +61,19 @@ Example:
 				total-count="{{totalCount}}">
 			</things-search-form>
 
-			<things-resource 
+			<things-ajax 
 				auto
-				action="[[gridFieldUrl]]" 
+				resource-url="[[gridFieldUrl]]" 
+				method="GET"
 				last-response="{{gridFields}}">
-			</things-resource>
+			</things-ajax>
 
-			<things-resource 
+			<things-ajax 
 				auto
-				action="[[gridColumnUrl]]" 
+				resource-url="[[gridColumnUrl]]" 
+				method="GET"
 				last-response="{{gridColumns}}">
-			</things-resource>
+			</things-ajax>
 
 			<things-grid 
 				id="grid"
@@ -88,11 +90,12 @@ Example:
 				total-count="{{totalCount}}">
 			</things-grid>
 
-			<things-resource 
+			<things-ajax 
 				auto
-				action="[[formFieldUrl]]" 
+				resource-url="[[formFieldUrl]]" 
+				method="GET"
 				last-response="{{resourceFormFields}}">
-			</things-resource>
+			</things-ajax>
 
 			<things-resource-form 
 				id="resource-form"
@@ -162,9 +165,11 @@ Example:
 			_showResourceForm: function(row) {
 				this.$['resource-form'].openResourceForm(row);
 			},
+
 			_refreshGridData:function(grid){
 				this.$['search-form']._getForm().submit();
 			}
+
 		});
 	</script>
 </dom-module>

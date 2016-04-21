@@ -6,7 +6,7 @@
 <link rel="import" href="../../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../../bower_components/paper-material/paper-material.html">
 
-<link rel="import" href="../../things-resource/things-resource.html">
+<link rel="import" href="../../things-ajax/things-ajax.html">
 
 <!--
 커스텀 서비스의 테스트 화면 
@@ -23,12 +23,12 @@ Example:
 
 <dom-module id="things-base-rest-detail-api-test">
 	<template>
-		<things-resource 
+		<things-ajax 
 			id="put-resource"
 			method="PUT"
 			content-type="application/json"
 			last-response="{{lastResponse}}">
-		</things-resource>
+		</things-ajax>
 
 		<form is="iron-form" 
 			id="form" 
@@ -92,8 +92,8 @@ Example:
 			],
 
 			listeners : {
-				'put-resource.things-resource-ajax-success': '_successResponseHandler',
-				'put-resource.things-resource-ajax-error': '_errorResponseHandler',
+				'put-resource.things-ajax-response': '_successResponseHandler',
+				'put-resource.things-ajax-error': '_errorResponseHandler',
 				'iron-form-presubmit': '_preSubmitHandler'
 			},
 
@@ -285,9 +285,8 @@ Example:
 			_invokePutApi: function(params) {
 				var putResource = this.$['put-resource'];
 				var url = this.invokeUrl.substr(this.invokeUrl.indexOf('/rest/') + 6);
-				putResource.action = url;
-				putResource.resource = '';
-				putResource.params = (params === true) ? null : params;
+				putResource.resourceUrl = url;
+				putResource.body = (params === true) ? null : params;
 				putResource.generateRequest();
 			},
 

@@ -16,25 +16,26 @@
 
 	Example:
 
-    <things-resource 
+    <things-ajax 
       auto
-      action="diy_services/ElidomGridModel/query.json" 
-      last-response="{{gridModel}}">
-    </things-resource>
-
-    <things-resource 
-      auto
-      action="diy_services/ElidomGridColumn/query.json" 
-      last-response="{{gridColumns}}">
-    </things-resource>
-
-    <things-resource 
-      id="search-resource"
-      action="terminologies" 
+      resource-url="diy_services/ElidomGridModel/query.json" 
       method="GET"
-      content-type="application/json"
+      last-response="{{gridModel}}">
+    </things-ajax>
+
+    <things-ajax 
+      auto
+      resource-url="diy_services/ElidomGridColumn/query.json" 
+      method="GET"
+      last-response="{{gridColumns}}">
+    </things-ajax>
+
+    <things-ajax 
+      id="search-resource"
+      resource-url="terminologies" 
+      resource-action="index"
       last-response="{{gridData}}">
-    </things-resource>
+    </things-ajax>
 
     <things-resource-grid 
       id="grid"
@@ -102,13 +103,13 @@
 
 					<things-button-group id="button-group" buttons="[[buttons]]"></things-button-group>
 
-					<things-resource 
+					<things-ajax 
 						id="save-resource"
 						content-type="application/json"
-						action="{{gridSaveAction}}" 
+						resource-url="{{gridSaveAction}}" 
 						method = "POST"
-						params="{{writeData}}">
-					</things-resource>
+						body="{{writeData}}">
+					</things-ajax>
 				</div>
 			</paper-toolbar>
 		</paper-material>
@@ -234,8 +235,8 @@
 			},
 
 			listeners: {
-				'save-resource.things-resource-ajax-success' : '_successSaveHandler',
-				'save-resource.things-resource-ajax-error' : '_errorSaveHandler',
+				'save-resource.things-ajax-response' : '_successSaveHandler',
+				'save-resource.things-ajax-error' : '_errorSaveHandler',
 				'button-group.export-btn-tap' : '_exportGridDataHandler',
 				'button-group.add-btn-tap' : '_addGridRowHandler',
 				'button-group.delete-btn-tap' : '_removeGridRowHandler',

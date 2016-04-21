@@ -50,13 +50,12 @@ things-template-editor. template성 텍스트를 편집 및 저장 할 수 있�
       <things-html-preview id="html-preview" width = "94%" height="430px" hidden></things-html-preview>
     </div>
 
-    <things-resource 
+    <things-ajax 
       id="save-code" 
-      content-type="application/json" 
-      action="{{saveUrl}}" 
-      method="PUT" 
-      params="{{saveResource}}">
-    </things-resource>
+      resource-url="{{saveUrl}}" 
+      resource-action="update" 
+      body="{{saveResource}}">
+    </things-ajax>
   </template>
 
   <script>

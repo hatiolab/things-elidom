@@ -89,11 +89,12 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 
 	Resource Form Example:
 
-    <things-resource 
+    <things-ajax 
       auto
-      action="diy_services/ElidomResourceFormFields/query.json" 
+      method="GET"
+      resource-url="diy_services/ElidomResourceFormFields/query.json" 
       last-response="{{formFields}}">
-    </things-resource>
+    </things-ajax>
 
     <things-resource-form 
       id="resource-form"
@@ -150,12 +151,12 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			</div>
 		</form>
 
-		<things-resource 
+		<things-ajax 
 			id="member-resource"
-			action="{{resourceUrl}}" 
-			method="GET"
+			resource-url="{{resourceUrl}}" 
+			resource-action="find"
 			last-response="{{resource}}">
-		</things-resource>
+		</things-ajax>
 	</template>
 
 	<script>
@@ -241,8 +242,8 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 
 			listeners : {
 				'iron-form-presubmit' :'_preSubmitHandler',
-				'member-resource.things-resource-ajax-success' : '_successResponseHandler',
-				'member-resource.things-resource-ajax-error' : '_errorResponseHandler'
+				'member-resource.things-ajax-response' : '_successResponseHandler',
+				'member-resource.things-ajax-error' : '_errorResponseHandler'
 			},
 
 			observers: [
@@ -343,11 +344,8 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			 */
 			findResource: function(resourceId) {
 				var resourceGetter = this.$['member-resource'];
-				var originalAction = resourceGetter.action;
-				resourceGetter.method = 'GET';
-				resourceGetter.action = resourceGetter.action.replace(':id', resourceId);
+				resourceGetter.resourceId = resourceId;
 				resourceGetter.generateRequest();
-				resourceGetter.action = originalAction;
 			},
 
 			/**

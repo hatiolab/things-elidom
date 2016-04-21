@@ -49,13 +49,12 @@ things-code-editor. Code성 텍스트를 편집 및 저장 할 수 있는 컴퍼
       <things-button-bar id="button-bar" buttons="[[buttons]]"></things-button-bar>
     </div>
 
-    <things-resource 
+    <things-ajax 
       id="save-code" 
-      content-type="application/json" 
-      action="{{saveUrl}}" 
-      method="PUT" 
-      params="{{saveResource}}">
-    </things-resource>
+      resource-url="{{saveUrl}}" 
+      resource-action="update" 
+      body="{{saveResource}}">
+    </things-ajax>
   </template>
 
   <script>

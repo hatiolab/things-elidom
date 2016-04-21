@@ -12,7 +12,7 @@
 <link rel="import" href="../things-combo/things-resource-selector-behavior.html">
 <link rel="import" href="../things-grid/things-resource-grid.html">
 <link rel="import" href="../things-file-upload/things-file-upload.html">
-<link rel="import" href="../things-resource/things-resource.html">
+<link rel="import" href="../things-ajax/things-ajax.html">
 
 <link rel="import" href="../things-content/things-load-view-behavior.html">
 <link rel="import" href="../things-content/things-resource-meta-behavior.html">
@@ -48,16 +48,16 @@ things-attached-file. 첨부파일 목록을 서버로 부터 받아와 출력�
         tag-hidden="true">
       </things-file-upload>
 
-      <things-resource 
+      <things-ajax 
         id="resource-search"
+        resource-mode
         method="GET"
-        action=""
-        resource="[[gridSearchUrl]]"
+        resource-url="[[gridSearchUrl]]"
         select-fields="[[selectFields]]"
         sort-fields="[[sortFields]]"
         query-fields="[[queryFields]]"
         last-response="{{lastResponse}}">
-      </things-resource>
+      </things-ajax>
 
       <things-resource-grid 
         id="grid"
