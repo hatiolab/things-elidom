@@ -13,6 +13,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <title>things-ajax</title>
 
   <script src="../../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../../../bower_components/paper-checkbox/paper-checkbox.html">
   <link rel="import" href="../../../../bower_components/paper-input/paper-input.html">
   <link rel="import" href="../../../../bower_components/paper-input/paper-textarea.html">
   <link rel="import" href="../../../../bower_components/paper-styles/demo-pages.html">
@@ -37,26 +38,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <body unresolved>
   <h1>Things Ajax</h1>
 
-  <dom-module id="list-things-ajax">
+  <dom-module id="no-resource-things-ajax">
     <template>
       <things-ajax
-        id="ajax"
+        id="list-ajax"
+        auto="{{auto}}"
         resource-url="{{resourceUrl}}"
-        resource-action="index"
+        resource-mode="{{resourceMode}}"
+        method="GET"
+        content-type="application/x-www-form-urlencoded"
         page=1
         limit=10
         select-fields="id,locale,category,name,display"
         query-fields='[{"name" : "locale", "value" : "ko-KR"}, {"name" : "category", "value" : "button"}]'
         sort-fields='[{"field" : "name", "ascending" : false}]'
-        handle-as="json"
         last-response="{{ajaxResponse}}">
       </things-ajax>
 
       <form>
         <paper-button raised on-tap="invoke">invoke</paper-button>
         <paper-button raised on-tap="reset">reset</paper-button>
+        <paper-checkbox checked="{{auto}}" class="green">Auto</paper-checkbox>
+        <paper-checkbox checked="{{resourceMode}}" class="green">Resource Mode</paper-checkbox>
 
-        <paper-input label="Resource URL" value="{{resourceUrl}}">
+        <paper-input label="Resource URL" value="{{resourceUrl::change}}">
         </paper-input>
 
         <paper-textarea label="List Result" value="{{resultJson}}" rows=4>
@@ -66,9 +71,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <script>
       Polymer({
-        is: 'list-things-ajax',
+        is: 'no-resource-things-ajax',
 
         properties: {
+
+          auto: {
+            type: Boolean,
+            value: false
+          },
+
+          resourceMode: {
+            type: Boolean,
+            value: false
+          },
 
           resourceUrl : {
             type: String,
@@ -86,7 +101,80 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         invoke: function() {
-          this.$.ajax.generateRequest();
+          this.$['list-ajax'].generateRequest();
+        },
+
+        reset: function() {
+          this.resultJson = '';
+        },
+
+        _responseChanged: function(ajaxResponse) {
+          if(ajaxResponse && ajaxResponse.items) {
+            this.resultJson = JSON.stringify(ajaxResponse.items, null, 4);
+          } else {
+            this.reset();
+          }
+        }
+      });
+    </script>
+  </dom-module>
+
+  <dom-module id="list-things-ajax">
+    <template>
+      <things-ajax
+        id="list-ajax"
+        auto="{{auto}}"
+        resource-url="{{resourceUrl}}"
+        resource-action="index"
+        page=1
+        limit=10
+        select-fields="id,locale,category,name,display"
+        query-fields='[{"name" : "locale", "value" : "ko-KR"}, {"name" : "category", "value" : "button"}]'
+        sort-fields='[{"field" : "name", "ascending" : false}]'
+        last-response="{{ajaxResponse}}">
+      </things-ajax>
+
+      <form>
+        <paper-button raised on-tap="invoke">invoke</paper-button>
+        <paper-button raised on-tap="reset">reset</paper-button>
+        <paper-checkbox checked="{{auto}}" class="green">Auto</paper-checkbox>
+
+        <paper-input label="Resource URL" value="{{resourceUrl::change}}">
+        </paper-input>
+
+        <paper-textarea label="List Result" value="{{resultJson}}" rows=4>
+        </paper-textarea>
+      </form>
+    </template>
+
+    <script>
+      Polymer({
+        is: 'list-things-ajax',
+
+        properties: {
+
+          auto: {
+            type: Boolean,
+            value: false
+          },
+
+          resourceUrl : {
+            type: String,
+            value: 'terminologies'
+          },
+
+          ajaxResponse: {
+            type: Object,
+            observer: '_responseChanged'
+          },
+
+          resultJson: {
+            type: String
+          }
+        },
+
+        invoke: function() {
+          this.$['list-ajax'].generateRequest();
         },
 
         reset: function() {
@@ -108,21 +196,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <template>
       <things-ajax
         id="ajax"
+        auto="{{auto}}"
         resource-url="{{resourceUrl}}"
         resource-action="find"
         resource-id="{{resourceId}}"
-        handle-as="json"
         last-response="{{ajaxResponse}}">
       </things-ajax>
 
       <form>
         <paper-button raised on-tap="invoke">invoke</paper-button>
         <paper-button raised on-tap="reset">reset</paper-button>
+        <paper-checkbox checked="{{auto}}" class="green">Auto</paper-checkbox>
 
-        <paper-input label="Resource URL" value="{{resourceUrl}}">
+        <paper-input label="Resource URL" value="{{resourceUrl::change}}">
         </paper-input>
 
-        <paper-input label="Resource ID" value="{{resourceId}}">
+        <paper-input label="Resource ID" value="{{resourceId::change}}">
         </paper-input>        
 
         <paper-textarea label="One Result" value="{{resultJson}}" rows=4>
@@ -135,6 +224,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         is: 'one-things-ajax',
 
         properties: {
+
+          auto: {
+            type: Boolean,
+            value: true
+          },
 
           resourceUrl : {
             type: String,
@@ -193,10 +287,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-button raised on-tap="invoke">invoke</paper-button>
         <paper-button raised on-tap="reset">reset</paper-button>
 
-        <paper-input label="Resource URL" value="{{resourceUrl}}">
+        <paper-input label="Resource URL" value="{{resourceUrl::change}}">
         </paper-input>
 
-        <paper-textarea label="Create Data" value="{{createJson}}" rows=4>
+        <paper-textarea label="Create Data" value="{{createJson::change}}" rows=4>
         </paper-textarea>
 
         <paper-textarea label="Create Result" value="{{resultJson}}" rows=4>
@@ -282,16 +376,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-button raised on-tap="update">update</paper-button>
         <paper-button raised on-tap="reset">reset</paper-button>
 
-        <paper-input label="Resource URL" value="{{resourceUrl}}">
+        <paper-input label="Resource URL" value="{{resourceUrl::change}}">
         </paper-input>
 
-        <paper-input label="Resource Id" value="{{resourceId}}">
+        <paper-input label="Resource Id" value="{{resourceId::change}}">
         </paper-input>        
 
-        <paper-textarea label="Found Data" value="{{updateJson}}" rows=4>
+        <paper-textarea label="Found Data" value="{{updateJson::change}}" rows=4>
         </paper-textarea>
 
-        <paper-textarea label="Update Result" value="{{resultJson}}" rows=4>
+        <paper-textarea label="Update Result" value="{{resultJson::change}}" rows=4>
         </paper-textarea>
       </form>
     </template>
@@ -393,10 +487,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-button raised on-tap="invoke">invoke</paper-button>
         <paper-button raised on-tap="reset">reset</paper-button>
 
-        <paper-input label="Resource URL" value="{{resourceUrl}}">
+        <paper-input label="Resource URL" value="{{resourceUrl::change}}">
         </paper-input>
 
-        <paper-input label="Resource Id" value="{{resourceId}}">
+        <paper-input label="Resource Id" value="{{resourceId::change}}">
         </paper-input>        
 
         <paper-textarea label="Delete Result" value="{{resultJson}}" rows=4>
@@ -459,6 +553,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <things-setting id="setting"></things-setting>
 
     <things-spinner id="spinner" loading=false></things-spinner>
+
+    <section>
+      <h3>Things Ajax - Not Resource GET (List)</h3>
+      <no-resource-things-ajax></no-resource-things-ajax>
+    </section>
 
     <section>
       <h3>Things Ajax - Resource GET (List)</h3>
