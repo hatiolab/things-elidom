@@ -54,7 +54,9 @@ element.
        * The URL target of the request.
        */
       url: {
-        type: String
+        type: String,
+        readOnly: true,
+        computed: '_computeUrl(globals.baseUrl,resourceUrl)'
       },
       
       /**
@@ -266,7 +268,7 @@ element.
        */
       debounceDuration: {
         type: Number,
-        value: 0,
+        value: 10,
         notify: true
       },
       
@@ -316,8 +318,7 @@ element.
        * 이 경우 resourceId 값을 설정하고 실행 도중에 resourceId가 변경이 되면 ':id'를 실제 resourceId 값으로 변경하여 호출한다.
        */
       resourceUrl: {
-        type: String,
-        observer: '_resourceUrlChanged'
+        type: String
       },
 
       /**
@@ -325,7 +326,8 @@ element.
        * resourceUrl에 ':id'가 들어가 있다면 resourceId로 교체한다.
        */
       resourceId: {
-        type: String
+        type: String,
+        value: ''
       },
 
       /**
@@ -333,7 +335,7 @@ element.
        * Elidom Server의 REST API에서 정의된 액션을 설정만 하면 해당 액션에 대한 
        * 나머지 설정(contentType, method 등)들을 자동으로 설정해준다.
        * 지원하는 Resource Action은 다음과 같다. 따라서 아래 스펙과 맞지 않는다면 
-       * resourceAction을 설정하지 말고 각각 해당 설정을 해준다.
+       * resourceAction을 설정하지 말고 각각 해당 설정(method, contentType)을 해준다.
        *
        * [action]             [method]    [contentType]                         [collection/member]
        * 1. index              GET         application/x-www-form-urlencoded     collection
@@ -346,7 +348,8 @@ element.
        * 8. show_by_name       GET         application/x-www-form-urlencoded     
        */
       resourceAction: {
-        type: String
+        type: String,
+        observer: '_resourceActionChanged'
       },
 
       /**
@@ -356,14 +359,14 @@ element.
         type: Array,
         readonly: true,
         value: [
-          { name: 'index', method: 'GET', contentType: 'application/x-www-form-urlencoded' },
-          { name: 'create', method: 'POST', contentType: 'application/json' },
-          { name: 'update', method: 'PUT', contentType: 'application/json' },
-          { name: 'delete', method: 'DELETE', contentType: 'application/x-www-form-urlencoded' },
-          { name: 'find', method: 'GET', contentType: 'application/x-www-form-urlencoded' },
-          { name: 'exist', method: 'GET', contentType: 'application/x-www-form-urlencoded' },
-          { name: 'show_by_name', method: 'GET', contentType: 'application/x-www-form-urlencoded' },
-          { name: 'update_multiple', method: 'GET', contentType: 'application/json' } ]
+          { name: 'index',            method: 'GET',    contentType: 'application/x-www-form-urlencoded' },
+          { name: 'create',           method: 'POST',   contentType: 'application/json' },
+          { name: 'update',           method: 'PUT',    contentType: 'application/json' },
+          { name: 'delete',           method: 'DELETE', contentType: 'application/x-www-form-urlencoded' },
+          { name: 'find',             method: 'GET',    contentType: 'application/x-www-form-urlencoded' },
+          { name: 'exist',            method: 'GET',    contentType: 'application/x-www-form-urlencoded' },
+          { name: 'show_by_name',     method: 'GET',    contentType: 'application/x-www-form-urlencoded' },
+          { name: 'update_multiple',  method: 'GET',    contentType: 'application/json' } ]
       },
       
       _boundHandleResponse: {
@@ -376,22 +379,40 @@ element.
 
     observers: [
       '_requestOptionsChanged(url, method, params.*, headers, contentType, ' +
-          'body, sync, handleAs, jsonPrefix, withCredentials, timeout, auto)',
+          'body, sync, handleAs, jsonPrefix, withCredentials, timeout, auto, resourceId)',
       '_loadingChanged(loading)'
     ],
 
-		behaviors: [
+    behaviors: [
       Things.GlobalBehavior,
-			Things.SpinnerBehavior,
-			Things.MsgBoxBehavior,
+      Things.SpinnerBehavior,
+      Things.MsgBoxBehavior,
       Things.ResourceSearchBehavior
-		],
+    ],
 
     /**
-     * resourceUrl이 변경되었을 경우
+     * basicUrl과 resourceUrl로 url 생성 
      */
-    _resourceUrlChanged: function(resourceUrl) {
+    _computeUrl: function(basicUrl, resourceUrl) {
+      return basicUrl + '/' + resourceUrl;
+    },
+
+    /**
+     * resourceAction이 변경되었을 경우
+     *
+     * @param {String} resourceAction
+     */
+    _resourceActionChanged: function(resourceAction) {
       this.resourceMode = true;
+
+      if(this.resourceAction && this.resourceAction.length > 0) {
+        var resAct = this.resourceAction;
+        var actionInfo = this._resourceActionMap.filter(function(item) { return resAct == item.name });
+        if(actionInfo && actionInfo.length > 0) {
+          this.method = actionInfo[0].method;
+          this.contentType = actionInfo[0].contentType;
+        }
+      }
     },
 
     /**
@@ -402,12 +423,23 @@ element.
      */
     get queryString () {
       var queryParts = [];
-      var param;
-      var value;
+      var tempParams = null;
 
-      for (param in this.params) {
-        value = this.params[param];
+      // Resource Mode이고 검색 조건으로 조회시에 파라미터 조작 
+      if(this.resourceMode === true && (this.resourceAction == 'index' || 
+        (this.selectFields || this.sortFields || this.queryFields || this.page || this.limit))) {
+        tempParams = this.handleRequestParams(this.params);
+      } else {
+        tempParams = this.params;
+      }
+
+      var param = null;
+      var value = null;
+
+      for (param in tempParams) {
+        value = tempParams[param];
         param = window.encodeURIComponent(param);
+
         if (Array.isArray(value)) {
           for (var i = 0; i < value.length; i++) {
             queryParts.push(param + '=' + window.encodeURIComponent(value[i]));
@@ -430,16 +462,24 @@ element.
      */
     get requestUrl() {
       var queryString = this.queryString;
-      if (queryString) {
-        var bindingChar = this.url.indexOf('?') >= 0 ? '&' : '?';
-        this.url = this.url + bindingChar + queryString;
-      }
-      
-      if(this.url.indexOf('http') < 0) {
-        this.url = this.get('globals.basicUrl') + '/' + this.url;
+      var tempUrl = this.url;
+
+      if(tempUrl && tempUrl.indexOf(':id') > 0 && this.resourceId && this.resourceId.length > 0) {
+        tempUrl = tempUrl.replace(':id', this.resourceId);
       }
 
-      return this.url;
+      if(tempUrl.indexOf('http') != 0) {
+        if(this.get('globals.basicUrl')) {
+          tempUrl = this.get('globals.basicUrl') + '/' + tempUrl;
+        }
+      }      
+
+      if (queryString) {
+        var bindingChar = this.url.indexOf('?') >= 0 ? '&' : '?';
+        return tempUrl + bindingChar + queryString;
+      }
+      
+      return tempUrl;
     },
     
     /**
@@ -504,18 +544,8 @@ element.
      * @return {!IronRequestElement}
      */
     generateRequest: function() {
-      // auto mode를 일단 off
-      var oriAuto = this.auto;
-      this.auto = false;
-
       var request = /** @type {!IronRequestElement} */ (document.createElement('iron-request'));
-
-      // Resource Mode인 경우 처리 
-      if(this.resourceMode) {
-        this._handleResourceMode(request);
-      }
-
-      var requestOptions = this.toRequestOptions();
+      var requestOptions = this.toRequestOptions();      
       this.activeRequests.push(request);
 
       request.completes.then(
@@ -537,40 +567,7 @@ element.
       	bubbles: this.bubbles
       });
       
-      // auto mode를 이전 값으로 복원 
-      this.auto = oriAuto;
       return request;
-    },
-
-    /**
-     * Resource Mode인 경우 처리 
-     *
-     * @param {Object} request
-     */
-    _handleResourceMode: function(request) {
-      if(this.resourceUrl) {
-        this.url = this.resourceUrl;
-      }
-
-      if(this.resourceId) {
-        this.url = this.resourceUrl.replace(':id', this.resourceId);  
-      }
-      
-      if(this.resourceAction && this.resourceAction.length > 0) {
-        var resAct = this.resourceAction;
-        var actionInfo = this._resourceActionMap.filter(function(item) { return resAct == item.name });
-        if(actionInfo && actionInfo.length > 0) {
-          this.method = actionInfo[0].method;
-          this.contentType = actionInfo[0].contentType;
-        }
-      }
-
-      // index 즉 검색 조건으로 조회하는 경우는 파라미터 특별 처리 
-      // TODO 다른 조건으로 handleRequestParams를 호출  
-      if(this.resourceAction == 'index') {
-      // if(this.selectFields || this.sortFields || this.queryFields || this.page || this.limit)
-        this.params = this.handleRequestParams(this.params);
-      }
     },
     
     _handleResponse: function(request) {
@@ -617,14 +614,15 @@ element.
     
     _requestOptionsChanged: function() {
       this.debounce('generate-request', function() {
-        if (this.url == null && this.resourceMode === false) return;
+        if (this.url == null) return;
         if (this.auto) this.generateRequest();
       }, this.debounceDuration);
     },
 
     /**
-    * Loading 정보 변경시 핸들러 
-    */
+     * Loading 정보 변경시 핸들러 
+     * @param {Boolean} loading
+     */
     _loadingChanged: function(loading) {
       if(loading === false) {
         this.stopSpinner();

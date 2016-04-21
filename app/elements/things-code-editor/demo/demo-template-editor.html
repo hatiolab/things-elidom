@@ -15,7 +15,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
 
-  <title>things-date-picker demo</title>
+  <title>things-template-editor demo</title>
 
   <script src="../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
   
@@ -24,13 +24,14 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <link rel="import" href="../../../../bower_components/paper-styles/color.html">
   <link rel="import" href="../../../../bower_components/paper-styles/demo-pages.html">
   <link rel="import" href="../../../../bower_components/paper-toast/paper-toast.html">
+  <link rel="import" href="../../../../bower_components/juicy-ace-editor/juicy-ace-editor.html">
   
   <link rel="import" href="../../things-button/things-button.html">
   <link rel="import" href="../../things-resource/things-resource.html">
   <link rel="import" href="../../things-spinner/things-spinner.html">
   <link rel="import" href="../../things-setting/things-setting.html">
 
-  <link rel="import" href="../things-date-picker.html">
+  <link rel="import" href="../things-template-editor.html">
 
   <link rel="stylesheet" href="../../../../bower_components/paper-styles/demo.css">
 
@@ -71,26 +72,29 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 </head>
 <body unresolved>
 
-  <dom-module id="sample-date-picker">
+  <dom-module id="sample-template-editor">
     <template>
-      <things-date-picker 
-        label="Date Picker" 
-        locale="ko" 
-        read-format="YYYY-MM-DD">
-      </things-date-picker>
+      <things-template-editor
+        id="template-editor"
+        theme="ace/theme/monokai"
+        mode="ace/mode/html"
+        fontsize="10"
+        tabsize="2"
+        source="<h1>Hello, this is Template Editor</h1>">
+      </things-template-editor>
     </template>
 
     <script>
       Polymer({
-        is: "sample-date-picker"
+        is: "sample-template-editor"
       });
     </script>
   </dom-module>
 
   <template is="dom-bind" id="app">
     <section>
-      <h4>Things Date From To</h4>
-      <sample-date-picker></sample-date-picker>
+      <h4>Things Code Editor</h4>
+      <sample-template-editor></sample-template-editor>
     </section>    
   </template>
 

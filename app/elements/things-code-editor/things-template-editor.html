@@ -1,6 +1,22 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../things-html-preview/things-html-preview.html">
 
+<!--
+things-template-editor. template성 텍스트를 편집 및 저장 할 수 있는 컴퍼넌트
+
+  Example:
+    
+    <things-template-editor
+        id="template-editor"
+        theme="ace/theme/monokai"
+        mode="ace/mode/html"
+        fontsize="10"
+        tabsize="2"
+        source="<h1>Hello, this is Template Editor</h1>">
+    </things-template-editor>
+
+@demo ./things-code-editor/demo/demo-template-editor.html
+-->
 <dom-module id="things-template-editor">
   <template>
     <style>

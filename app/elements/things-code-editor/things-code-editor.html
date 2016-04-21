@@ -1,18 +1,18 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
 <!--
-things-code-editor. Code성 텍스트를 편집할 수 있는 에디팅 컴퍼넌트
+things-code-editor. Code성 텍스트를 편집 및 저장 할 수 있는 컴퍼넌트
 
   Example:
     
-    <things-code-selector 
-      id="code-selector" 
-      label="Language" 
-      value="en-US" 
-      code-name="LOCALE" 
-      label-path="description" 
-      value-path="name">
-    </things-code-selector>
+    <things-code-editor
+      id="code-editor"
+      theme="ace/theme/monokai"
+      mode="ace/mode/javascript"
+      fontsize="12px"
+      tabsize="2"
+      source="var source = function() { console.log('this is Code Editor') };">
+    </things-code-editor>
 
 @demo ./things-code-editor/demo/demo-code-editor.html
 -->
