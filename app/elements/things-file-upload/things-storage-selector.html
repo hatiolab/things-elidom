@@ -10,7 +10,7 @@
 
     <things-storage-selector id="storage" hidden="{{selectorHidden}}"></things-storage-selector>
 
-@demo ./things-combo/demo/index.html
+@demo ./things-file-upload/demo/demo-things-storage-selector.html
 -->
 <dom-module id="things-storage-selector">
 	<template>
@@ -97,7 +97,7 @@
         },
 
         listeners: {
-          'combo.vaadin-dropdown-opened' : '_dropdownOpenHandler',
+          'combo.things-combo-opened' : '_dropdownOpenHandler',
           'storage.things-ajax-response' : '_responseHandler'
         },
 
@@ -106,7 +106,6 @@
          */
         _dropdownOpenHandler: function(e) {
           if(!this.items || this.items.length == 0) {
-            this.$.storage.action = 'index';
             this.$.storage.generateRequest();
           }
         },

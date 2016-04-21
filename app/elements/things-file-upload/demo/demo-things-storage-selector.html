@@ -15,24 +15,28 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
 
-  <title>things-combo demo</title>
+  <title>things-storage-selector demo</title>
 
   <script src="../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
   
-  <link rel="import" href="../../../bower_components/polymer/polymer.html">
-  <link rel="import" href="../../../bower_components/paper-input/paper-input.html">
-  <link rel="import" href="../../../bower_components/paper-styles/color.html">
-  <link rel="import" href="../../../bower_components/paper-styles/demo-pages.html">
-  <link rel="import" href="../../../bower_components/paper-toast/paper-toast.html">
+  <link rel="import" href="../../../../bower_components/polymer/polymer.html">
+  <link rel="import" href="../../../../bower_components/paper-input/paper-input.html">
+  <link rel="import" href="../../../../bower_components/paper-styles/color.html">
+  <link rel="import" href="../../../../bower_components/paper-styles/demo-pages.html">
+  <link rel="import" href="../../../../bower_components/paper-toast/paper-toast.html">
+  <link rel="import" href="../../../../bower_components/iron-icon/iron-icon.html">
+  <link rel="import" href="../../../../bower_components/iron-dropdown/iron-dropdown.html">
+  <link rel="import" href="../../../../bower_components/paper-item/paper-item.html">
+
   
   <link rel="import" href="../../things-ajax/things-ajax.html">
   <link rel="import" href="../../things-button/things-button.html">
   <link rel="import" href="../../things-spinner/things-spinner.html">
   <link rel="import" href="../../things-setting/things-setting.html">
 
-  <link rel="import" href="../things-combo.html">
+  <link rel="import" href="../things-storage-selector.html">
 
-  <link rel="stylesheet" href="../../../bower_components/paper-styles/demo.css">
+  <link rel="stylesheet" href="../../../../bower_components/paper-styles/demo.css">
 
   <style is="custom-style">
 
@@ -71,56 +75,35 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 </head>
 <body unresolved>
 
-  <dom-module id="sample-combo">
+  <dom-module id="sample-storage-selector">
     <template>
-      <paper-input value="[[value]]" label="Value"></paper-input>
-      <paper-input value="[[display]]" label="Display"></paper-input>
-
-      <things-combo
-        id="combo"
-        label="Label"
-        items-str='[{"name": "item1","description": "First Item"}, {"name": "item2","description": "Second Item"}]'
-        label-path="description"
-        value-path="name">
-      </things-combo>
+      <things-storage-selector name="storage" label="Storage">
+      </things-storage-selector>
     </template>
 
     <script>
       Polymer({
-        is: "sample-combo",
-
-        properties: {
-          display: {
-            type: String
-          },
-
-          value: {
-            type: String
-          }
-        },
-
-        listeners: {
-          'combo.things-combo-value-changed' : '_valueChanged'
-        },
-      
-        /**
-         * input field의 값이 변경 될 시 drop down list를 닫고 value(검색에 필요한 실제 값)와 display(UI에 나타나는 값)를 초기화
-         */
-        _valueChanged: function(e) {
-          var combo = this.$.combo;
-          this.value = e.detail.item[combo.valuePath];
-          this.display = e.detail.item[combo.labelPath];
-        }
+        is: "sample-storage-selector"
       });
     </script>
   </dom-module>
 
   <template is="dom-bind" id="app">
+    <things-setting id="setting"></things-setting>
+
     <section>
-      <h4>Things Combo</h4>
-      <sample-combo></sample-combo>
-    </section>    
+      <h4>Things Code Editor</h4>
+      <sample-storage-selector></sample-storage-selector>
+    </section>
+
+    <things-spinner id="spinner" loading=false></things-spinner>
+    
+    <paper-toast id="toast" class="Toast" duration="8000"></paper-toast>
   </template>
+
+  <script type="text/javascript">
+    window.I18nMsg = {}; 
+  </script>
 
 </body>
 </html>

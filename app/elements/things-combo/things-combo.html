@@ -56,6 +56,11 @@ things-combo. items로 받은 데이터들을 콤보박스로 출력하고 선�
             notify: true,
             value: []
           },
+
+          itemsStr: {
+            type: String,
+            observer: 'itemsStrChanged'
+          },
           /**
            * input name
            */
@@ -102,6 +107,16 @@ things-combo. items로 받은 데이터들을 콤보박스로 출력하고 선�
           }
         },
 
+        itemsStrChanged: function(itemsStr) {
+          if(itemsStr && itemsStr.length >= 2) {
+            try {
+              this.items = JSON.parse(itemsStr);
+            } catch(e) {
+              console.log(e);
+            }
+          }
+        },
+
         /**
          * value가 변경될 시 발생하는 event handler
          */
@@ -137,6 +152,7 @@ things-combo. items로 받은 데이터들을 콤보박스로 출력하고 선�
          */
         spreadContents: function() {
           this.$['dropdownList'].toggle();
+          this.fire('things-combo-opened', 'open');
         },
 
         /**
