@@ -5,9 +5,12 @@ A comment describing this element
 
 Example:
 
-    <things-card-list></things-card-list>
+		<things-card-list 
+			items="[[response.items]]" 
+			selected="selectedItem">
+		</things-card-list>
 
-@demo ./things-card/demo/index.html
+@demo ./things-card/demo/demo-card-list.html
 -->
 <dom-module id="things-card-list">
 	<template>
