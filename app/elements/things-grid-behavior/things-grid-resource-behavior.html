@@ -3,7 +3,7 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
-<link rel="import" href="./things-grid-basic-behavior.html">
+<link rel="import" href="../things-grid-behavior/things-grid-basic-behavior.html">
 
 <script>
 
@@ -132,14 +132,12 @@ Things.GridResourceBehaviorImpl = {
 			this.writeData = changedDataList;
 			this._gridSaveAction();
 		} catch (err) {
-			console.log(err);
-			// this.openInfoMsg({
-			// 	type : 'warning',
-			// 	title : 'Validation Error',
-			// 	text : err.message,
-			// 	html : false
-			// });
-			this.showToastMsg(err.message);
+			this.openInfoMsg({
+				type : 'warning',
+				title : 'Validation Error',
+				text : err.message,
+				html : false
+			});
 		}
 	},
 

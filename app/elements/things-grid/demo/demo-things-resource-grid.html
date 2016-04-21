@@ -27,10 +27,10 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   
   <link rel="import" href="../../things-ajax/things-ajax.html">
   <link rel="import" href="../../things-button/things-button.html">
+  <link rel="import" href="../../things-grid-behavior/things-grid-resource-behavior.html">
   <link rel="import" href="../../things-spinner/things-spinner.html">
   <link rel="import" href="../../things-setting/things-setting.html">
 
-  <link rel="import" href="../things-grid-resource-behavior.html">
   <link rel="import" href="../things-resource-grid.html">
   <link rel="import" href="demo-resource-content.html">
 
@@ -43,25 +43,31 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
       word-wrap: break-word;
       @apply(--paper-font-common-code);
     }
+
     form > paper-button {
       width: 45%;
       margin-top: 20px;
     }
+
     form > paper-button:not([disabled]) {
       background: var(--paper-light-blue-500);
       color: white;
     }
+
     button {
       margin-top: 20px;
     }
+
     paper-spinner {
       width: 14px;
       height: 14px;
       margin-right: 20px;
     }
+
     paper-dropdown-menu {
       display: block;
     }
+
     demo-snippet {
       --demo-snippet-code: {
         max-height: 300px;
@@ -71,22 +77,22 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   </style>
 
 </head>
+
 <body unresolved>
 
   <dom-module id="sample-resource-grid">
     <template>      
       <things-setting id="setting"></things-setting>
-
       <things-button color="green" id="search">Meta</things-button>
 
       <section>
-          <demo-resource-content 
-            title="Terminology"
-            resource-type="Terminology"
-            resource-url="terminologies"
-            current-route="[[currentRoute]]"
-            layout="fullbleed layout vertical">
-          </demo-resource-content>
+        <demo-resource-content 
+          title="Terminology"
+          resource-type="Terminology"
+          resource-url="terminologies"
+          current-route="[[currentRoute]]"
+          layout="fullbleed layout vertical">
+        </demo-resource-content>
       </section>
     </template>
 
@@ -94,7 +100,8 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
       Polymer({
 
         is: 'sample-resource-grid',
-        propeties:{
+
+        propeties: {
           currentRoute : String
         },
 
@@ -103,7 +110,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
         },
 
         attached: function () {
-           // this.currentRoute ="terminologies" 
+          // this.currentRoute ="terminologies" 
         },
 
         search: function(e) {
@@ -119,17 +126,13 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   </dom-module>
 
   <template is="dom-bind" id="app">
-
     <section>
       <h4>Things Resource Grid</h4>
-
       <sample-resource-grid></sample-resource-grid>
     </section>
 
     <things-spinner id="spinner" loading=false></things-spinner>
-    
     <paper-toast id="toast" class="Toast" duration="8000"></paper-toast>
-
   </template>
 
 </body>
