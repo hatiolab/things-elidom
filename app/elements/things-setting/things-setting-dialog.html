@@ -15,7 +15,7 @@
 
     <paper-input 
       label="Base URL (ex: http://www.elidom.xyz:80/rest)" 
-      value="{{basicUrl}}">
+      value="{{globals.basicUrl::change}}">
     </paper-input>
     <!-- locale selector -->
     <things-locale-combo id="locale-selector" 
@@ -34,20 +34,7 @@
         behaviors: [
           Polymer.PaperDialogBehavior, 
           Things.GlobalBehavior
-        ],
-        ready:function () {
-          this.addEventListener('iron-overlay-closed', function (event) {
-            this.set('globals.basicUrl', this.basicUrl);
-          })
-        },
-        observers:[
-          '_onBasicUrlChanged(globals.basicUrl)'
-        ],
-        _onBasicUrlChanged:function (basicUrl) {
-          if(basicUrl){
-            this.set('basicUrl', basicUrl);
-          }
-        }
+        ]
 
       });
     })();
