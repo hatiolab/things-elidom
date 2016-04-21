@@ -27,7 +27,7 @@ things-combo. items로 받은 데이터들을 콤보박스로 출력하고 선�
 
   <template> 
     <p class="paper-font-caption">[[label]]</p>
-    <input is="iron-input" value="[[display]]" readonly>
+    <input is="iron-input" value="[[display]]" on-tap="spreadContents" disabled>
     <input is="iron-input" name="[[name]]" bind-value="[[value]]" hidden>
 
     <iron-icon icon="icons:list" on-tap="spreadContents"></iron-icon>
