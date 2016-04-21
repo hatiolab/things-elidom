@@ -1,19 +1,20 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-
 <link rel="import" href="../../../bower_components/iron-ajax/iron-request.html">
 
-<link rel="import" href="../things-spinner/things-spinner-behavior.html">
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
+<link rel="import" href="../things-setting/things-global-behavior.html">
+<link rel="import" href="../things-spinner/things-spinner-behavior.html">
+<link rel="import" href="./things-resource-search-behavior.html">
 
 <!--
-The `iron-ajax` element exposes network request functionality.
-    <iron-ajax
+The `things-ajax` element exposes network request functionality.
+    <things-ajax
         auto
         url="http://gdata.youtube.com/feeds/api/videos/"
         params='{"alt":"json", "q":"chrome"}'
         handle-as="json"
         on-response="handleResponse"
-        debounce-duration="300"></iron-ajax>
+        debounce-duration="300"></things-ajax>
 With `auto` set to `true`, the element performs a request whenever
 its `url`, `params` or `body` properties are changed. Automatically generated
 requests will be debounced in the case that multiple attributes are changed
@@ -83,11 +84,11 @@ element.
        *
        * Example:
        *
-       *     <iron-ajax
+       *     <things-ajax
        *         auto
        *         url="http://somesite.com"
        *         headers='{"X-Requested-With": "XMLHttpRequest"}'
-       *         handle-as="json"></iron-ajax>
+       *         handle-as="json"></things-ajax>
        *
        * Note: setting a `Content-Type` header here will override the value
        * specified by the `contentType` property of this element.
@@ -172,7 +173,7 @@ element.
        */
       withCredentials: {
         type: Boolean,
-        value: false
+        value: true
       },
       
       /**
@@ -201,7 +202,7 @@ element.
       },
       
       /**
-       * The most recent request made by this iron-ajax element.
+       * The most recent request made by this things-ajax element.
        */
       lastRequest: {
         type: Object,
@@ -248,7 +249,7 @@ element.
       },
       
       /**
-       * An Array of all in-flight requests originating from this iron-ajax
+       * An Array of all in-flight requests originating from this things-ajax
        * element.
        */
       activeRequests: {
@@ -285,12 +286,84 @@ element.
       
       /**
        * By default, these events do not bubble largely because the `error` event has special
-       * meaning in the window object. Setting this attribute will cause iron-ajax's request,
+       * meaning in the window object. Setting this attribute will cause things-ajax's request,
        * response, and error events to bubble to the window object.
        */
       bubbles: {
         type: Boolean,
         value: false
+      },
+
+      /**
+       * Elidom server와 연동을 고려한 동작 방식을 지원하는 지 여부
+       * 값이 false인 경우는 기존 iron-ajax와 동일한 동작 방식
+       * true이면 elidom server와 연동을 고려한 동작 방식
+       * Elidom Server의 REST API를 사용하려면 반드시 resourceMode를 true인 상태로 사용해야 하고 
+       * 그렇지 않은 경우는 false로 사용한다. 
+       * 직접 변경하지 않아도 resourceUrl 값이 설정되면 resourceMode값이 true로 변경된다.
+       * 기본값은 false
+       */
+      resourceMode: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * Elidom Server에 호출하고자 하는 URL
+       * Basic URL을 빼고 나머지 URL만 설정해도 자동으로 Global 변수로 부터 Basic URL을 가져와서 채워준다.
+       * URL에 ID가 들어가야 하는 경우인데 ID가 동적으로 변경되어야 하는 경우 id가 들어가야 할 자리에 ':id' 형식으로 설정한다.
+       * ex) resources/:id
+       * 이 경우 resourceId 값을 설정하고 실행 도중에 resourceId가 변경이 되면 ':id'를 실제 resourceId 값으로 변경하여 호출한다.
+       */
+      resourceUrl: {
+        type: String,
+        observer: '_resourceUrlChanged'
+      },
+
+      /**
+       * resourceId
+       * resourceUrl에 ':id'가 들어가 있다면 resourceId로 교체한다.
+       */
+      resourceId: {
+        type: String
+      },
+
+      /**
+       * 미리 정의된 Resource Action 
+       * Elidom Server의 REST API에서 정의된 액션을 설정만 하면 해당 액션에 대한 
+       * 나머지 설정(contentType, method 등)들을 자동으로 설정해준다.
+       * 지원하는 Resource Action은 다음과 같다. 따라서 아래 스펙과 맞지 않는다면 
+       * resourceAction을 설정하지 말고 각각 해당 설정을 해준다.
+       *
+       * [action]             [method]    [contentType]                         [collection/member]
+       * 1. index              GET         application/x-www-form-urlencoded     collection
+       * 2. update_multiple    POST        application/json                      collection
+       * 3. create             POST        application/json                      collection
+       * 4. find               GET         application/x-www-form-urlencoded     member
+       * 5. update             PUT         application/json                      member
+       * 6. delete             DELETE      application/x-www-form-urlencoded     member
+       * 7. exist              GET         application/x-www-form-urlencoded     member
+       * 8. show_by_name       GET         application/x-www-form-urlencoded     
+       */
+      resourceAction: {
+        type: String
+      },
+
+      /**
+       * 각 resourceAction에 대해서 Method, ContentType에 대한 정보를 매핑한다.
+       */
+      _resourceActionMap: {
+        type: Array,
+        readonly: true,
+        value: [
+          { name: 'index', method: 'GET', contentType: 'application/x-www-form-urlencoded' },
+          { name: 'create', method: 'POST', contentType: 'application/json' },
+          { name: 'update', method: 'PUT', contentType: 'application/json' },
+          { name: 'delete', method: 'DELETE', contentType: 'application/x-www-form-urlencoded' },
+          { name: 'find', method: 'GET', contentType: 'application/x-www-form-urlencoded' },
+          { name: 'exist', method: 'GET', contentType: 'application/x-www-form-urlencoded' },
+          { name: 'show_by_name', method: 'GET', contentType: 'application/x-www-form-urlencoded' },
+          { name: 'update_multiple', method: 'GET', contentType: 'application/json' } ]
       },
       
       _boundHandleResponse: {
@@ -308,10 +381,19 @@ element.
     ],
 
 		behaviors: [
+      Things.GlobalBehavior,
 			Things.SpinnerBehavior,
-			Things.MsgBoxBehavior
-		],    
-    
+			Things.MsgBoxBehavior,
+      Things.ResourceSearchBehavior
+		],
+
+    /**
+     * resourceUrl이 변경되었을 경우
+     */
+    _resourceUrlChanged: function(resourceUrl) {
+      this.resourceMode = true;
+    },
+
     /**
      * The query string that should be appended to the `url`, serialized from
      * the current value of `params`.
@@ -350,9 +432,13 @@ element.
       var queryString = this.queryString;
       if (queryString) {
         var bindingChar = this.url.indexOf('?') >= 0 ? '&' : '?';
-        return this.url + bindingChar + queryString;
+        this.url = this.url + bindingChar + queryString;
       }
       
+      if(this.url.indexOf('http') < 0) {
+        this.url = this.get('globals.basicUrl') + '/' + this.url;
+      }
+
       return this.url;
     },
     
@@ -386,7 +472,7 @@ element.
     
     /**
      * Request options suitable for generating an `iron-request` instance based
-     * on the current state of the `iron-ajax` instance's properties.
+     * on the current state of the `things-ajax` instance's properties.
      *
      * @return {{
      *   url: string,
@@ -418,7 +504,17 @@ element.
      * @return {!IronRequestElement}
      */
     generateRequest: function() {
+      // auto mode를 일단 off
+      var oriAuto = this.auto;
+      this.auto = false;
+
       var request = /** @type {!IronRequestElement} */ (document.createElement('iron-request'));
+
+      // Resource Mode인 경우 처리 
+      if(this.resourceMode) {
+        this._handleResourceMode(request);
+      }
+
       var requestOptions = this.toRequestOptions();
       this.activeRequests.push(request);
 
@@ -433,7 +529,7 @@ element.
       request.send(requestOptions);
       this._setLastRequest(request);
       this._setLoading(true);
-      
+
       this.fire('things-ajax-request', {
         request: request,
         options: requestOptions
@@ -441,7 +537,40 @@ element.
       	bubbles: this.bubbles
       });
       
+      // auto mode를 이전 값으로 복원 
+      this.auto = oriAuto;
       return request;
+    },
+
+    /**
+     * Resource Mode인 경우 처리 
+     *
+     * @param {Object} request
+     */
+    _handleResourceMode: function(request) {
+      if(this.resourceUrl) {
+        this.url = this.resourceUrl;
+      }
+
+      if(this.resourceId) {
+        this.url = this.resourceUrl.replace(':id', this.resourceId);  
+      }
+      
+      if(this.resourceAction && this.resourceAction.length > 0) {
+        var resAct = this.resourceAction;
+        var actionInfo = this._resourceActionMap.filter(function(item) { return resAct == item.name });
+        if(actionInfo && actionInfo.length > 0) {
+          this.method = actionInfo[0].method;
+          this.contentType = actionInfo[0].contentType;
+        }
+      }
+
+      // index 즉 검색 조건으로 조회하는 경우는 파라미터 특별 처리 
+      // TODO 다른 조건으로 handleRequestParams를 호출  
+      if(this.resourceAction == 'index') {
+      // if(this.selectFields || this.sortFields || this.queryFields || this.page || this.limit)
+        this.params = this.handleRequestParams(this.params);
+      }
     },
     
     _handleResponse: function(request) {
@@ -452,6 +581,9 @@ element.
       }
 
       this.fire('things-ajax-response', request, { bubbles: this.bubbles });
+
+      // Show Toast Message
+      this.showToastMsg('Success');      
     },
     
     _handleError: function(request, error) {
@@ -471,6 +603,9 @@ element.
       }, {
       	bubbles: this.bubbles
       });
+
+      // Show Error Message Box
+      this.openResponseError(request.xhr.response);      
     },
     
     _discardRequest: function(request) {
@@ -482,22 +617,21 @@ element.
     
     _requestOptionsChanged: function() {
       this.debounce('generate-request', function() {
-        if (this.url == null) return;
+        if (this.url == null && this.resourceMode === false) return;
         if (this.auto) this.generateRequest();
       }, this.debounceDuration);
     },
 
-		/**
-		 * Loading 정보 변경시 핸들러 
-		 */
-		_loadingChanged: function(loading) {
-			if(loading === false) {
-				this.stopSpinner();
-			} else if(loading === true) {
-				this.startSpinner();
-			}
-		}
-
+    /**
+    * Loading 정보 변경시 핸들러 
+    */
+    _loadingChanged: function(loading) {
+      if(loading === false) {
+        this.stopSpinner();
+      } else if(loading === true) {
+        this.startSpinner();
+      }
+    }
 
   });
 </script>

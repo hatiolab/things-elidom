@@ -1,3 +1,8 @@
+<script src="../../../bower_components/sweetalert/dist/sweetalert-dev.js"></script>
+<link rel="stylesheet" href="../../../bower_components/sweetalert/dist/sweetalert.css">
+
+<link rel="import" href="../../../bower_components/paper-toast/paper-toast.html">
+
 <script>
 
 window.Things = window.Things || {};
@@ -112,6 +117,18 @@ Things.MsgBoxBehavior = {
       text : 'Something went wrong, Please ask to administrator', 
       type : 'error' 
     });
+  },
+
+  /**
+   * Show toast message
+   *
+   * @param {Object} response
+   */
+  showToastMsg: function(msg) {
+    if(typeof(app) !== 'undefined' && app.$.toast && app.$.toast.open) {
+      app.$.toast.text = msg;
+      app.$.toast.open();
+    }
   }
 
 };

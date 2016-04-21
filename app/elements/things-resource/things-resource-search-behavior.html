@@ -61,14 +61,18 @@ Things.ResourceSearchBehavior = {
 	 * @param reqParams Ajax 요청 파라미터 
 	 */
 	handleRequestParams: function(reqParams) {
-		var newReqParams = { select : this.selectFields ? this.selectFields : '' };
+		var newReqParams = {};
+
+		if(this.selectFields && this.selectFields.length > 0) {
+				newReqParams.select = this.selectFields;
+		}
 
 		if(this.sortFields && this.sortFields.length > 0) {
-			newReqParams.sort = JSON.stringify(this.sortFields);
+			newReqParams.sort = (typeof(this.sortFields) == 'string') ? this.sortFields : JSON.stringify(this.sortFields);
 		}
 
 		if(this.queryFields && this.queryFields.length > 0) {
-			newReqParams.query = JSON.stringify(this.queryFields);
+			newReqParams.query = (typeof(this.queryFields) == 'string') ? this.queryFields : JSON.stringify(this.queryFields);
 
 		} else if(reqParams) {
 			var queries = [];

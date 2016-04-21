@@ -8,6 +8,18 @@
 
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 
+<!--
+`<things-date-from-to>` From Date와 To Date를 입력받아 기간을 표현하는 컴퍼넌트
+
+  Example
+    
+    <things-date-from-to 
+      locale="ko" 
+      read-format="YYYY-MM-DD">
+    </things-date-from-to>
+
+@demo ./things-date-picker/demo/demo-date-from-to.html
+-->
 <dom-module id="things-date-from-to">
 
   <template>
@@ -39,14 +51,20 @@
 
       behaviors: [ 
         Things.MsgBoxBehavior
-      ],      
+      ],
 
       properties: {
 
+        /**
+         * From Date
+         */
         fromDate: {
           type: String
         },
 
+        /**
+         * To Date
+         */
         toDate: {
           type: String
         },
@@ -115,6 +133,7 @@
        * from date와 to date 간의 범위 validation check, valid = true return, invalid = false return
        */
       dateValidation: function() {
+        console.log("test");
         if(this.selectedFromDate && this.selectedToDate && this.selectedFromDate > this.selectedToDate)  {
           this.openInfoMsg({ title : 'Invalid Date Range!', text : 'Please Select Proper Date.', type : 'info', timer : 5000 });
           return false;
