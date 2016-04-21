@@ -59,6 +59,18 @@
             observer: '_loadingChanged'
           }
         },
+        ready: function(){
+          // var event = document.createEvent('CustomEvent');
+          // var eventDetail= this.$.spinner;
+          
+          document.addEventListener('_startSpinner', function(e){
+            this.loading = true;
+          }.bind(this));
+
+          document.addEventListener('_stopSpinner', function(e){
+            this.loading = false;
+          }.bind(this));
+        },
 
         _loadingChanged: function(e) {
           var spinnerElement = this.querySelector('#spinner');

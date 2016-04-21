@@ -19,15 +19,16 @@ window.Things = window.Things || {};
  * @demo demo/index.html
  */
 Things.LoadViewBehavior = {
-
 	/**
 	 * view를 full screen 다이얼로그로 오픈한다.
 	 *
 	 * @param {String} view
 	 * @param {Boolean} modal
 	 */
-	popupFullScreenView: function(view, modal) {
-		app.$['common-full-dialog'].openFullScreenDialog(view, record, modal);
+	popupFullScreenView: function(view, modal, record) {
+		var eventDetail = {'view':view, 'record':record, 'modal':modal};
+      	var event = new CustomEvent('things-open-full-screen-view', { 'detail': eventDetail });
+      	document.dispatchEvent(event);
 	},
 
 	/**
@@ -38,16 +39,19 @@ Things.LoadViewBehavior = {
 	 * @param {Function} openCallback
 	 */
 	openPopupView: function(view, modal, openCallback) {
-		app.$['common-full-dialog'].openBasicDialog(view, modal, openCallback);
+		var eventDetail = {'view':view, 'modal':modal, 'openCallback':openCallback};
+      	var event = new CustomEvent('things-open-popup-view', { 'detail': eventDetail });
+      	document.dispatchEvent(event);
 	},
 
 	/**
 	 * view를 기본 다이얼로그로 닫는다.
 	 */
 	closePopupView: function() {
-		app.$['common-full-dialog'].closeBasicDialog();
+		var eventDetail = this;
+      	var event = new CustomEvent('things-close-popup-view', { 'detail': eventDetail });
+      	document.dispatchEvent(event);
 	}
-
 };
 
 </script>

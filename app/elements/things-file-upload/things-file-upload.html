@@ -332,8 +332,8 @@ A comment describing this element
 			/**
 			 * compute basic url for reuqest generation
 			 */
-			_basicUrl:{
-				computed:'_getBasicUrl(globals.basicUrl)'
+			_baseUrl:{
+				computed:'_getbaseUrl(globals.baseUrl)'
 			}
 		},
 		listeners: {
@@ -366,8 +366,8 @@ A comment describing this element
 		/**
 		 * compute basic url
 		 */
-		_getBasicUrl: function(basicUrl) {
-			return basicUrl;
+		_getbaseUrl: function(baseUrl) {
+			return baseUrl;
 		},
 
 		/**
@@ -431,7 +431,7 @@ A comment describing this element
 			formData.append('onId', this.resourceId);
 			formData.append('onType',this.resourceType);
 			file.xhr.withCredentials = true;
-			file.uploadTarget = [this._basicUrl, target, this.storage].join('/');
+			file.uploadTarget = [this._baseUrl, target, this.storage].join('/');
 		},
 		/**
 		 * when upload request sent this function will be worked

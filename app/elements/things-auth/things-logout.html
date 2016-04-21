@@ -27,7 +27,7 @@
 
           logoutUrl: {
             type: String,
-            computed: '_computeLogoutUrl(globals.basicUrl, action)'
+            computed: '_computeLogoutUrl(globals.baseUrl, action)'
           },
 
           signoutAjax: {
@@ -51,8 +51,8 @@
           this.listen(this.signoutAjax, 'response', '_signoutSuccess');
           this.listen(this.signoutAjax, 'error', '_signoutFailure');
         },
-        _computeLogoutUrl: function(basicUrl, url) {
-          return basicUrl + '/' + url;
+        _computeLogoutUrl: function(baseUrl, url) {
+          return baseUrl + '/' + url;
         },
 
         logout: function(e) {

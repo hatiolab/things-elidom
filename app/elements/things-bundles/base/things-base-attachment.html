@@ -186,14 +186,14 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 			 * 그리드 셀 선택이 변경되었을 경우 파일 다운로드  
 			 */
 			_downloadFile: function(e) {
-				var basicUrl = this.get('globals.basicUrl');
+				var baseUrl = this.get('globals.baseUrl');
 				this.openConfirmMsg({
 					title : 'Do you want to download file?',
 					type : 'info',
 					text : 'You can download file',
 					showCancelButton: true
 				}, function() {
-					window.location = basicUrl + '/download/' + e.detail.id;
+					window.location = baseUrl + '/download/' + e.detail.id;
 				});
 			},
 

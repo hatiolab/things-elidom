@@ -4,7 +4,8 @@
 <link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
 
 <!--
-애플리케이션에 단 하나만 존재하고 다이얼로그가 오픈 될 때 마다 화면 구성을 다시하여 오픈한다. 
+애플리케이션에 단 하나만 존재하고 다이얼로그가 오픈 될 때 마다 화면 구성을 다시하여 오픈한다.
+** 주의 : 이 Dialog는 Document에 등록되는 Event를 Trigger하기에 한 시스템에 단 한번만 사용될 것을 권장한다.
 
   Example:
 
@@ -80,13 +81,29 @@
 			'dialog.iron-overlay-opened' : '_openHandler'
 		},
 
+		ready:function () {
+			// add event listners to dccumnet to listen gloabl event
+			document.addEventListener('things-open-full-screen-view', function(event){
+			 	var request = event.detail;
+			 	this.openFullScreenDialog(request.view,request.modal,request.record);
+			}.bind(this));
+			 
+			document.addEventListener('things-open-popup-view', function(event){
+			 	var request = event.detail;
+			 	this.openBasicDialog(request.view,request.modal,request.openCallback);
+			}.bind(this));
+
+			document.addEventListener('things-close-popup-view', function(event){
+			 	this.closeBasicDialog();
+			}.bind(this));
+		},
 		/**
 	   * View를 Full Screen 다이얼로그 내에 오픈한다.
 	   *
 	   * @param {Object} view 오픈할 view
 	   * @param {Boolean} modal modal로 오픈할 지 여부
 	   */
-		openFullScreenDialog: function(view, modal) {
+		openFullScreenDialog: function(view, modal, record) {
 			// TODO
 		},
 

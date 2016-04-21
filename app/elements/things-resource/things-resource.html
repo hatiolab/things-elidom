@@ -60,7 +60,7 @@
 				 *
 				 * Collection actions : index, update_multiple, imports, export, create
 				 * Member Actions : findOne, update, delete(url = :resource/:id), isExist (url=:resource/:id/exist)
-				 * 기타 : 일반 액션을 벗어난 Action에 대하여서는 {globals.basicUrl}/{resource}/{action} 형태로 호출한다.				 
+				 * 기타 : 일반 액션을 벗어난 Action에 대하여서는 {globals.baseUrl}/{resource}/{action} 형태로 호출한다.				 
 				 */
 				action : {
 					type: String,
@@ -72,7 +72,7 @@
 				 */
 				resourceUrl: {
 					type: String,
-					computed : '_computeResourceUrl(globals.basicUrl, resource, action)'
+					computed : '_computeResourceUrl(globals.baseUrl, resource, action)'
 				},				
 
 				/**
@@ -202,30 +202,30 @@
 			/**
 			 * 실제 Ajax 호출 URL 생성
 			 * 
-			 * @param  {String} basicUrl basic rest url
+			 * @param  {String} baseUrl basic rest url
 			 * @param  {String} resource resource 대표 url
 			 * @param  {String} action basic rest url을 제외한 action url
 			 * @return {String} 실제 액션 URL
 			 */
-			_computeResourceUrl : function(basicUrl, resource, action) {
+			_computeResourceUrl : function(baseUrl, resource, action) {
 				var mapping = this._actionMapping(action);
 				var urlArr = [];
 
 				if(!mapping) {
-					urlArr = [basicUrl, resource, action];
+					urlArr = [baseUrl, resource, action];
 
 				} else {
 					this.method = mapping.method;
 					this.contentType = mapping.contentType;
 
 					if(mapping.type == 'collection') {
-						urlArr = [basicUrl, resource];
+						urlArr = [baseUrl, resource];
 
 					} else if(mapping.type == 'member') {
-						urlArr = [basicUrl, resource, ':id'];
+						urlArr = [baseUrl, resource, ':id'];
 
 					} else {
-						urlArr = [basicUrl, resource, action];
+						urlArr = [baseUrl, resource, action];
 					}
 				}
 				return urlArr.filter(function(e) { return e ? true : false }).join('/');
@@ -250,11 +250,6 @@
 			 */
 			_successAjaxHandler: function(event) {
 				this.fire('things-resource-ajax-success', this.lastResponse);
-
-				if(this.method && this.method != 'GET') {
-					// this.openInfoMsg('Success');
-					// app.$.thingsHeader.toggleSidebar();
-				}
 			},
 
 			/**
@@ -320,9 +315,6 @@
 			*/
 			handleUnauthorized: function() {
 				this.set('globals.user', null);
-				if(app.$.thingsHeader){
-				  app.$.thingsHeader.toggleSidebar(); 
-				}
 				page('/login');
 			},
 			

@@ -294,13 +294,13 @@ things-attached-file. 첨부파일 목록을 서버로 부터 받아와 출력�
        * Detail icon 클릭시 Download
        */
       _onDetailButtonTap: function(e) {
-        var basicUrl = this.get('globals.basicUrl');
+        var baseUrl = this.get('globals.baseUrl');
         this.openConfirmMsg({
           title : 'Do you want to download file?',
           type : 'info',
           text : 'You can download file'
         }, function() {
-          window.location = basicUrl + '/download/' + e.detail.id;
+          window.location = baseUrl + '/download/' + e.detail.id;
         });
       },
 

@@ -3,13 +3,22 @@
 window.Things = window.Things || {};
 
 Things.SpinnerBehavior = {
-  
+  properties:{
+    spinnerState:{
+      type:Boolean,
+      value:false
+    }
+  },
+
   /**
    * Start spinner
    */
   startSpinner: function() {
-    if(this.checkGlobalSpinner()) {
-      app.$.spinner.loading = true;
+    if(!this.spinnerState) {
+      this.spinnerState = true;
+      var eventDetail = this;
+      var event = new CustomEvent('_startSpinner', { 'detail': eventDetail });
+      document.dispatchEvent(event);
     }
   },
 
@@ -17,40 +26,23 @@ Things.SpinnerBehavior = {
    * Stop spinner
    */
   stopSpinner: function() {
-    if(this.checkGlobalSpinner()) {
-      app.$.spinner.loading = false;
+    if(this.spinnerState) {
+      this.spinnerState = false;
+      var eventDetail = this;
+      var event = new CustomEvent('_stopSpinner', { 'detail': eventDetail });
+      document.dispatchEvent(event);
     }
   },
-
   /**
-   * Spinner is running?
-   */
-  isLoadingSpinner: function() {
-    if(this.checkGlobalSpinner()) {
-      return app.$.spinner.loading;
-    } else {
-      return false;
-    }
-  },
-
-  /**
-   * Toggle spinner
+   * toggle Spinner
    */
   toggleSpinner: function() {
-    if(this.checkGlobalSpinner()) {
-      app.$.spinner.loading = !app.$.spinner.loading;
+    if(!this.spinnerState) {
+      this.startSpinner();
+    }else{
+      this.stopSpinner();
     }
   },
 
-  /**
-   * check global spinner is exist
-   */
-  checkGlobalSpinner: function() {
-    if(typeof(app) === 'undefined') {
-      return false;
-    }
-
-    return app.$.spinner;
-  }
 };
 </script>

@@ -35,7 +35,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	// See https://github.com/Polymer/polymer/issues/1381
 	window.addEventListener('WebComponentsReady', () => {
 		I18nMsg.lang = dataGlobal.locale || document.documentElement.lang;
-		I18nMsg.url = dataGlobal.basicUrl
+		I18nMsg.url = dataGlobal.baseUrl
 		if(dataGlobal.user){
 			I18nMsg.domain = dataGlobal.user.domain_id||'1';
 		}
@@ -68,12 +68,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	});
 
 	// Close drawer after menu item is selected if drawerPanel is narrow
-	app.onDataRouteClick = function() {
-		let drawerPanel = Polymer.dom(document).querySelector('#paperDrawerPanel');
-		if (drawerPanel.narrow) {
-			drawerPanel.closeDrawer();
-		}
-	};
+	// app.onDataRouteClick = function() {
+	// 	let drawerPanel = Polymer.dom(document).querySelector('#paperDrawerPanel');
+	// 	if (drawerPanel.narrow) {
+	// 		drawerPanel.closeDrawer();
+	// 	}
+	// };
 
 	// Hide toastConfirm after tap on OK button 
 	app.onToastConfirmTap = () => app.$.toastConfirm.hide();

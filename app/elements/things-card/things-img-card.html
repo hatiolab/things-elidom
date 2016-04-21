@@ -122,7 +122,7 @@
 					 */
 					image: {
 					  type: String,
-					  computed:'_onCardChange(globals.basicUrl, card.id)'
+					  computed:'_onCardChange(globals.baseUrl, card.id)'
 					},
 					/**
 					 * When `true`, any change to the image url property will cause the
@@ -175,8 +175,8 @@
 				/**
 				 * when image changed calculate image url and set to screen
 				 */
-				_onCardChange:function(basicUrl, cardId){
-					return [basicUrl,'download',cardId].join('/');
+				_onCardChange:function(baseUrl, cardId){
+					return [baseUrl,'download',cardId].join('/');
 				},
 				/**
 				 * when card taped fire event on-card-clicked with card information

@@ -52,7 +52,7 @@ Things.FormBehaviorImpl = {
 		},
 
 		/**
-		 * Url for submit. global setting의 basicUrl이 제거된 불완전한 URL.
+		 * Url for submit. global setting의 baseUrl이 제거된 불완전한 URL.
 		 * 이 정보로는 form submit을 할 수 없고 이 url이 설정되는 순간 _computeAction이 작동하여 완전한 action url을 생성하여 action 값에 설정한다.
 		 */
 		actionUrl: {
@@ -66,7 +66,7 @@ Things.FormBehaviorImpl = {
 		 */
 		action: {
 			type: String,
-			computed: '_computeAction(globals.basicUrl,actionUrl)'
+			computed: '_computeAction(globals.baseUrl,actionUrl)'
 		},
 
 		/**
@@ -140,11 +140,11 @@ Things.FormBehaviorImpl = {
 
 	/**
 	 * compute action url by base url of the global settings
-	 * @param {string} basicUrl base url of the global settings
+	 * @param {string} baseUrl base url of the global settings
 	 * @param {string} url url attribute
 	 */
-	_computeAction: function(basicUrl, actionUrl) {
-		return basicUrl + '/' + actionUrl;
+	_computeAction: function(baseUrl, actionUrl) {
+		return baseUrl + '/' + actionUrl;
 	},
 
 	/**
