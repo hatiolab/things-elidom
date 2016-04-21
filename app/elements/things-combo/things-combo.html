@@ -57,6 +57,9 @@ things-combo. items로 받은 데이터들을 콤보박스로 출력하고 선�
             value: []
           },
 
+          /**
+           * String type으로 items를 전달 받기 위한 property
+           */
           itemsStr: {
             type: String,
             observer: 'itemsStrChanged'
@@ -107,6 +110,9 @@ things-combo. items로 받은 데이터들을 콤보박스로 출력하고 선�
           }
         },
 
+        /**
+         * String type으로 전달 받은 itemsStr을 json 형식으로 parsing한 후 items에 초기화
+         */
         itemsStrChanged: function(itemsStr) {
           if(itemsStr && itemsStr.length >= 2) {
             try {

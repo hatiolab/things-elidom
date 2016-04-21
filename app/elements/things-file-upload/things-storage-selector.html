@@ -4,11 +4,14 @@
 <link rel="import" href="../things-combo/things-combo.html">
 
 <!--
-코드 셀렉터. 서버에 저장되어 있는 코드 정보를 조회하여 콤보로 표시하는 컴포넌트 
+things-storage-selector. things-ajax 컴퍼넌트를 이용하여 storage_infos의 data를 조회하고 콤보박스의 형태로 출력하고 선택한 값을 필드에 입력하는 컴퍼넌트
 
   Example:
 
-    <things-storage-selector id="storage" hidden="{{selectorHidden}}"></things-storage-selector>
+    <things-storage-selector 
+      name="storage"
+      label="Storage">
+    </things-storage-selector>
 
 @demo ./things-file-upload/demo/demo-things-storage-selector.html
 -->
