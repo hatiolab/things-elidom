@@ -2,6 +2,7 @@
 <link rel="import" href="../../../bower_components/iron-localstorage/iron-localstorage.html">
 
 <link rel="import" href="./things-global-behavior.html">
+<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 <link rel="import" href="./things-setting-dialog.html">
 
 <!--
@@ -41,7 +42,10 @@
       Polymer({
         is: 'things-setting',
 
-        behaviors: [Things.GlobalBehavior],
+        behaviors: [
+          Things.GlobalBehavior,
+          Things.MsgBoxBehavior
+        ],
 
         getGlobalValue: function(name) {
           return this.get('globals.' + name);

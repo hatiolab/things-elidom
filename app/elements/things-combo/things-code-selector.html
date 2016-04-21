@@ -24,12 +24,12 @@
 
     <things-combo 
       id="combo" 
-      name="{{name}}" 
-      label="{{label}}" 
+      name="[[name]]" 
+      label="[[label]]" 
       value="{{value}}" 
-      items="{{items}}" 
-      label-path="{{labelPath}}" 
-      value-path="{{valuePath}}">
+      items="[[items]]" 
+      label-path="[[labelPath]]" 
+      value-path="[[valuePath]]">
     </things-combo>
 
     <things-resource
@@ -95,8 +95,7 @@
            * code items
            */
           items: {
-            type: Array,
-            notify: true
+            type: Array
           },
 
           /**

@@ -27,11 +27,11 @@ things-combo. items로 받은 데이터들을 콤보박스로 출력하고 선�
 
   <template> 
     <p class="paper-font-caption">[[label]]</p>
-    <input is="iron-input" name="display"  value="[[display]]" disabled>
-    <input is="iron-input" name="{{name}}" value="[[value]]" hidden>
+    <input is="iron-input" value="[[display]]" readonly>
+    <input is="iron-input" name="[[name]]" bind-value="[[value]]" hidden>
 
     <iron-icon icon="icons:list" on-tap="spreadContents"></iron-icon>
-    <paper-icon-button suffix on-tap="clearValue" icon="clear" alt="clear" title="clear"></paper-icon-button>
+    <!-- <paper-icon-button suffix on-tap="clearValue" icon="clear" alt="clear" title="clear"></paper-icon-button> -->
     <iron-dropdown id="dropdownList" horizontal-align="left" vertical-align="top">
       <div class="dropdown-content">
         <template is="dom-repeat" items="[[items]]">
@@ -55,7 +55,12 @@ things-combo. items로 받은 데이터들을 콤보박스로 출력하고 선�
             notify: true,
             value: []
           },
-
+          /**
+           * input name
+           */
+          name:{
+            type:String
+          },
           /**
            * item에서 display 값을 추출하기 위한 labelPath
            */
@@ -76,7 +81,8 @@ things-combo. items로 받은 데이터들을 콤보박스로 출력하고 선�
            * 화면에 출력 할 값
            */
           display: {
-            type: String
+            type: String,
+            computed:'_findDisplay(items,value)'
           },
 
           /**
@@ -101,8 +107,8 @@ things-combo. items로 받은 데이터들을 콤보박스로 출력하고 선�
         _valueChangeHandler: function(e) {
           if(this.valuePath) {
             if(this.value) {
+              this.display = this._findDisplay(this.items, this.value);
               this.fire('things-combo-value-changed', { value : this.value, item : { name : this.value, description : this.display } });
-              this._findDisplay(this.value);
             } else {
               this.fire('things-combo-value-changed', { value : '', item : {} });
             }
@@ -112,14 +118,17 @@ things-combo. items로 받은 데이터들을 콤보박스로 출력하고 선�
         /**
          * value가 변경 되었을 시 value를 통해 display 값을 얻고 detail form field에 표시하기 위한 display 초기화
          */
-        _findDisplay: function(value) {
-          var founds = this.items.filter(function(item) {
+        _findDisplay: function(items,value) {
+          var dispaly;
+          var founds = items.filter(function(item) {
             return item.name == value;
           });
 
           if(founds && founds.length > 0) {
-            this.display = founds[0].description;
+            display = founds[0].description;
           }
+
+          return display;
         },
 
         /**
