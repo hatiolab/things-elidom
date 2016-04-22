@@ -2,17 +2,20 @@
 <link rel="import" href="../../../bower_components/paper-spinner/paper-spinner.html">
 
 <!--
-`<things-spinner>` Spinner 
+`<things-spinner> 
 
   Example
 
-    <things-setting id="setting"></things-setting>
+        <things-spinner id="spinner" loading=false></things-spinner>
+        <paper-button color="green" id="spn-button" on-tap="clickSpinner">Toggle Spinner</paper-button>
+        <script>
+          function clickSpinner(e) {
+            var spinner = document.querySelector('#spinner');
+            spinner.loading= !spinner.loading;
+          }
+        </script>
 
-    <div class="buttons">
-      <things-button color="green" target-id="setting">Setting</things-button>
-    </div>
-
-@demo ./things-spinner/demo/index.html
+@demo demo/index.html
 -->
 <dom-module id="things-spinner">
   <style>
@@ -40,9 +43,7 @@
   <template>
     <template is="dom-if" if="{{loading}}">
       <div id="refresh" class="fit layout vertical center-center">
-        <div id="spinner" class="layout vertical center-center shrink">
-          <paper-spinner active></paper-spinner>
-        </div>
+          <paper-spinner id ="spinner" active></paper-spinner>
       </div>
     </template>
   </template>
@@ -54,15 +55,14 @@
         properties: {
           loading: {
             type: Boolean,
-            notify: true,
             value: false,
             observer: '_loadingChanged'
           }
         },
+
         ready: function(){
-          // var event = document.createEvent('CustomEvent');
-          // var eventDetail= this.$.spinner;
-          
+          var spinnerElement = this.$.spinner;
+          if(spinnerElement) spinnerElement.active = this.loading;
           document.addEventListener('_startSpinner', function(e){
             this.loading = true;
           }.bind(this));
@@ -72,16 +72,9 @@
           }.bind(this));
         },
 
-        _loadingChanged: function(e) {
-          var spinnerElement = this.querySelector('#spinner');
-
-          if(spinnerElement) {
-            if(this.loading) {
-              spinnerElement.classList.remove('shrink');
-            } else {
-              spinnerElement.classList.add('shrink');
-            }
-          }
+        _loadingChanged: function(loading) {
+          var spinnerElement = this.$.spinner;
+          if(spinnerElement) spinnerElement.active = loading;
         }
 
       });
