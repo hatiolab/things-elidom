@@ -102,6 +102,14 @@
       },
 
       /**
+       * 그리드 이미지 루트 
+       */
+      gridImageDir: {
+        type: String,
+        value: 'images/grid/'
+      },
+
+      /**
        * Read data
        */
       data: {
@@ -127,14 +135,14 @@
       if(this.grid) return;
 
       DataLudi.setRootContext('');
-      DataLudi.setAssetRoot('images/grid');
+      DataLudi.setAssetRoot(this.gridImageDir);
       this.gridContainerId = this.generateGuid();
       this.grid = DataLudi.createGridView(this.gridContainerId, null, false);
       this.grid.setDataSource(this.dataSet);
 
       this.grid.registerImageList({
         name: 'images',
-        root: 'images/grid/',
+        root: this.gridImageDir,
         items: [
           'iconDetail.png',
           'ellipsis_hover.png',
@@ -294,67 +302,68 @@
      * @param {Object} config
      */
     _setGridConfig: function(config) {
-      if(!this.grid) return;
+      if(!config || !this.grid) return;
 
-      if(typeof(config) === 'string') config = JSON.parse(config);
+      var configStr = (typeof(config) === 'string') ? config : JSON.stringify(config);
+      var gridConfig = JSON.parse(configStr);      
 
-      if(!config) {
+      if(!gridConfig) {
         this.grid.setEditOptions({ readOnly : true });
 
       } else {
-        var me = this;
-        Object.keys(config).forEach(function(confKey) {
+        var grid = this.grid;
+        Object.keys(gridConfig).forEach(function(confKey) {
           switch (confKey) {
             case 'body':
-              me.grid.setBody(config[confKey]);
+              grid.setBody(gridConfig[confKey]);
               break;
 
             case 'checkBar':
-              me.grid.setCheckBar(config[confKey]);
+              grid.setCheckBar(gridConfig[confKey]);
               break;
 
             case 'header':
-              me.grid.setHeader(config[confKey]);
+              grid.setHeader(gridConfig[confKey]);
               break;
 
             case 'footer':
-              me.grid.setFooter(config[confKey]);
+              grid.setFooter(gridConfig[confKey]);
               break;
 
             case 'columnLayout':
-              me.grid.setColumnLayout(config[confKey]);
+              grid.setColumnLayout(gridConfig[confKey]);
               break;
 
             case 'dataCellRenderers':
-              me.grid.dataCellRenderers().addRenderers(config[confKey]);
+              grid.dataCellRenderers().addRenderers(gridConfig[confKey]);
               break;
 
             case 'displayOptions':
-              me.grid.setDisplayOptions(config[confKey]);
+              grid.setDisplayOptions(gridConfig[confKey]);
               break;
 
             case 'editOptions':
-              me.grid.setEditOptions(config[confKey]);
+              grid.setEditOptions(gridConfig[confKey]);
               break;
 
             case 'summaryMode':
-              var SummaryMode = DataLudi.SummaryMode[config[confKey].toUpperCase()];
-                me.grid.setSummaryMode(SummaryMode);
+              var SummaryMode = DataLudi.SummaryMode[gridConfig[confKey].toUpperCase()];
+                grid.setSummaryMode(SummaryMode);
               break;
 
             case 'button':
-              config[confKey].forEach(function(button){
-                me.buttons.push(button);
+              gridConfig[confKey].forEach(function(button) {
+                buttons.push(button);
               });
               break;
 
             case 'rowIndicator':
-              me.grid.rowIndicator().setProperties(config[confKey]);
+              grid.rowIndicator().setProperties(gridConfig[confKey]);
               break;
 
             case 'gridColumnPopupMenus':
-              config[confKey].forEach(function(columnMenu) {
-                me.grid.registerPopupMenu(columnMenu.name, columnMenu.menu);
+              gridConfig[confKey].forEach(function(columnMenu) {
+                grid.registerPopupMenu(columnMenu.name, columnMenu.menu);
               })
               break;
 

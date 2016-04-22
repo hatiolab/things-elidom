@@ -1,10 +1,5 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/paper-material/paper-material.html">
-<link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
-
-<link rel="import" href="../things-button/things-button-group.html">
-<link rel="import" href="../things-button/things-button-bar.html">
-<link rel="import" href="../things-paginator/things-paginator.html">
 
 <link rel="import" href="../things-grid-behavior/things-grid-config-behavior.html">
 <link rel="import" href="../things-grid-behavior/things-grid-event-behavior.html">
@@ -13,9 +8,38 @@
 <link rel="import" href="../things-grid-behavior/things-grid-save-behavior.html">
 
 <!--
-기본 라소스 그리드
+기본 라소스 그리드. 기본 리소스 그리드는 두 개의 GridBehavior (Things.GridConfigBehavior, Things.GridEventBehavior)만 
+mixin 하고 있어서 그리드에 데이터만 표시하는데 사용된다. 
 
 	Example:
+
+    <things-ajax 
+      auto
+      resource-url="diy_services/ElidomGridModel/query.json" 
+      method="GET"
+      last-response="{{gridModel}}">
+    </things-ajax>
+
+    <things-ajax 
+      auto
+      resource-url="diy_services/ElidomGridColumn/query.json" 
+      method="GET"
+      last-response="{{gridColumns}}">
+    </things-ajax>
+
+    <things-ajax 
+      id="search-resource"
+      resource-url="terminologies" 
+      resource-action="index"
+      last-response="{{data}}">
+    </things-ajax>
+
+    <things-basic-grid 
+      id="grid"
+      model="[[gridModel]]" 
+      columns="[[gridColumns]]" 
+      data="[[data]]"
+    </things-basic-grid>	
 
 @demo ./things-grid/demo/demo-things-basic-grid.html
 -->
@@ -48,9 +72,11 @@
 	
 		<paper-material elevation="1" class="flex">
 			<div id="{{gridContainerId}}"></div>
-			<content></content>
-		</paper-material>
 
+			<paper-toolbar class="white">
+				<content></content>
+			</paper-toolbar>
+		</paper-material>
 	</template>
 
 	<script>
@@ -61,17 +87,77 @@
 				Things.GridConfigBehavior,
 				Things.GridEventBehavior
 			],
-	
-			properties: {
-			},
 
+			properties: {
+				/**
+				 * 그리드 구성 전 발생하는 이벤트
+				 *
+				 * @event things-grid-configure
+				 */
+				/**
+				 * 그리드 구성이 완료된 후 발생하는 이벤트
+				 *
+				 * @event things-grid-configured
+				 */
+				/**
+				 * 그리드 구성 도중 에러가 발생한 경우 발생하는 이벤트
+				 *
+				 * @event things-grid-configure-failed
+				 */
+				/**
+				 * 그리드 이벤트 Behavior 구성 전 발생하는 이벤트
+				 *
+				 * @event things-grid-event-configure
+				 */
+				/**
+				 * 그리드 이벤트 Behavior 구성이 완료된 후 발생하는 이벤트
+				 *
+				 * @event things-grid-event-configured
+				 */
+				/**
+				 * 그리드 Resize 전 발생하는 이벤트
+				 *
+				 * @event things-grid-resize
+				 */
+				/**
+				 * 그리드 Resize 후 발생하는 이벤트
+				 *
+				 * @event things-grid-resized
+				 */
+				/**
+				 * 그리드 Data 변경 전 발생하는 이벤트
+				 *
+				 * @event things-grid-data-change
+				 */
+				/**
+				 * 그리드 Data 변경 후 발생하는 이벤트
+				 *
+				 * @event things-grid-data-changed
+				 */
+				/**
+				 * 그리드 상세 버튼이 클릭 되었을 경우 발생하는 이벤트
+				 *
+				 * @event things-grid-detail-tap
+				 */
+				/**
+				 * 그리드 Row Data가 선택되었을 경우 발생하는 이벤트
+				 *
+				 * @event things-grid-row-data-select
+				 */
+				/**
+				 * 그리드 Cell Data가 선택되었을 경우 발생하는 이벤트
+				 *
+				 * @event things-grid-cell-data-select
+				 */		 
+			},			
+	
 			listeners: {
 				'things-grid-configure-failed' : '_gridConfigureFailed',
-				'things-grid-configured' : '_initializeResourceGrid'
+				'things-grid-configured' : '_initializeBasicGrid'
 			},
 
 			/**
-			 * Grid 구성이 실패했을 경우 
+			 * Grid 구성이 실패했을 경우 핸들러 
 			 * 
 			 * @event {Event} event things-grid-configure-failed
 			 */
@@ -84,11 +170,11 @@
 			},
 
 			/**
-			 * Grid 구성 후 추가 액션
+			 * Grid 구성이 완료된 후 핸들러 
 			 *
 			 * @event {Event} event things-grid-configured
 			 */
-			_initializeResourceGrid: function(e) {
+			_initializeBasicGrid: function(e) {
 				console.log('things-basic-grid received [things-grid-configured]');
 				this.fire('things-basic-grid-configured', this.grid);
 			}

@@ -54,7 +54,7 @@
     /**
      * 그리드 구성이 완료된 후 GridEventBehavior를 initialize 한다.
      *
-     * @event {Event} e
+     * @event {Event} things-grid-configured
      */
     _initializeEventHandler: function(e) {
       console.log('things-grid-event-behavior received [things-grid-configured]');
@@ -72,26 +72,20 @@
     },
 
     /**
-     * 데이터 변경시
+     * 데이터 변경 이벤트 핸들러 
      *
      * @event {Event} e
      */
     _gridDataChanged: function(e) {
       var evt = this.fire('things-grid-data-change', this.data, { cancelable: true });
       if(!evt.defaultPrevented && this.data && this.dataSet) {
-        if (this.infiniteScroll) {
-          this.dataSet.appendRows(this.data, 0, -1, false);
-          this.dataSet.clearRowStates();
-        } else {
-          this.dataSet.setRows(this.data);
-        }
-
+        this.dataSet.setRows(this.data);
         this.fire('things-grid-data-changed', this.data);
       }
     },    
 
     /**
-     * 화면 리사이즈 시에 ...
+     * 화면 리사이즈 시 이벤트 핸들러
      *
      * @event {Event} e
      */
@@ -138,7 +132,7 @@
     },
 
     /**
-     * Grid Cell Double Click 시
+     * Grid Cell Double Click 이벤트 핸들러 
      *
      * @param {Object} grid
      * @param {Object} index

@@ -17,27 +17,32 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 
   <title>things-basic-grid demo</title>
 
-  <script src="../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
   
-  <link rel="import" href="../../../bower_components/polymer/polymer.html">
-  <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
-  <link rel="import" href="../../../bower_components/paper-styles/color.html">
-  <link rel="import" href="../../../bower_components/paper-styles/demo-pages.html">
-  <link rel="import" href="../../../bower_components/paper-toast/paper-toast.html">
+  <link rel="import" href="../../../../bower_components/polymer/polymer.html">
+  <link rel="import" href="../../../../bower_components/paper-button/paper-button.html">
+  <link rel="import" href="../../../../bower_components/paper-styles/color.html">
+  <link rel="import" href="../../../../bower_components/paper-styles/demo-pages.html">
+  <link rel="import" href="../../../../bower_components/paper-toast/paper-toast.html">
   
   <link rel="import" href="../../things-ajax/things-ajax.html">
   <link rel="import" href="../../things-button/things-button.html">
   <link rel="import" href="../../things-spinner/things-spinner.html">
   <link rel="import" href="../../things-setting/things-setting.html">
-
   <link rel="import" href="../../things-button/things-button.html">
-  <link rel="import" href="../../things-button/things-button-group.html">
   <link rel="import" href="../../things-button/things-button-bar.html">
-  <link rel="import" href="../../things-import-excel/things-import-excel-button.html">
+
+  <link rel="import" href="../../things-grid-behavior/things-grid-config-behavior.html">
+  <link rel="import" href="../../things-grid-behavior/things-grid-event-behavior.html">
+  <link rel="import" href="../../things-grid-behavior/things-grid-export-behavior.html">
+  <link rel="import" href="../../things-grid-behavior/things-grid-import-behavior.html">
+  <link rel="import" href="../../things-grid-behavior/things-grid-save-behavior.html">
 
   <link rel="import" href="../things-basic-grid.html">
 
-  <link rel="stylesheet" href="../../../bower_components/paper-styles/demo.css">
+  <script src='../../../../bower_components/jszip/dist/jszip.min.js'></script>
+
+  <link rel="stylesheet" href="../../../../bower_components/paper-styles/demo.css">
 
   <style is="custom-style">
 
@@ -77,96 +82,161 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 <body unresolved>
 
   <dom-module id="sample-basic-grid">
-    <template>      
-      <things-setting id="setting"></things-setting>
+    <template>
+      <style>
+        :host {
+          display: block;
+          height: 100%;
+          width: 100%;
+        }
 
-      <things-button color="green" id="search">Search</things-button>
+        :host paper-material {
+          padding: 10px;
+        }
 
-      <section>
+        :host paper-toolbar {
+          padding: 10px 0px 0px 0px;
+        }
+
+        paper-toolbar.white {
+          --paper-toolbar-background: white;
+          --paper-toolbar-title: {
+            font-style: italic;
+            font-weight: bold;
+          };
+        }     
+      </style>
+    
+      <paper-material elevation="1" class="flex">
+        <things-button color="green" id="search">Search</things-button>
+
         <things-ajax 
-          id="resource-meta"
           auto
+          id="resource-meta"
           resource-url="diy_grids/:id"
           resource-action="find"
           resource-id="2"
           last-response="{{metaData}}">
         </things-ajax>
 
-        <things-basic-grid 
-          id="grid"
-          model="[[metaData.fields]]" 
-          columns="[[metaData.columns]]"
-          config="[[metaData.config]]" 
-          data="[[gridData.items]]"
-          total-count ="[[gridData.total]]"
-          per-page ="{{perPage}}"
-          current-page = "{{currentPage}}"
-          enable-toolbar
-          paginatable>
+        <div id="{{gridContainerId}}"></div>
+
+        <paper-toolbar class="white">
           <div class="grid-toolbar-content">
-            <things-import-excel-button 
-              color="green" 
-              id="import-btn"
-              sheet-name="Sheet1"
-              parsed-result="{{gridData}}">Import
-            </things-import-excel-button>
-
             <things-button-bar id="button-group" buttons="[[buttons]]"></things-button-bar>
-
-            <things-ajax 
-              id="save-resource"
-              content-type="application/json"
-              resource-url="{{gridSaveAction}}" 
-              method = "POST"
-              params="{{writeData}}">
-            </things-ajax>
           </div>
-        </things-basic-grid>
+        </paper-toolbar>
 
         <things-ajax 
           id="search-resource"
-          resource-url="diy_services/DynamicScreen/query.json"
           method="GET"
           content-type="application/json"
-          last-response="{{gridData}}">
+          resource-url="diy_services/DynamicScreen/query.json"
+          last-response="{{data}}">
         </things-ajax>
 
-      </section>
+      </paper-material>
     </template>
 
     <script>
       Polymer({
-
+        
         is: 'sample-basic-grid',
 
-        listeners: {
-          'search.tap' : 'search'
+        behaviors: [
+          Things.GridConfigBehavior,
+          Things.GridEventBehavior,
+          Things.GridImportBehavior,
+          Things.GridExportBehavior          
+        ],
+
+        properties: {
+          metaData : {
+            type: Object,
+            observer: '_metaDataChanged'
+          },
+
+          buttons : {
+            type: Array,
+            value: [ {
+              id: 'import-btn',
+              text: 'Import',
+              icon: 'icons:file-upload'
+            }, {
+              id: 'export-btn',
+              text: 'Export',
+              icon: 'icons:swap-vert'
+            } ]
+          }
         },
 
+        listeners: {
+          'search.tap' : 'search',
+          'things-grid-configure-failed' : '_gridConfigureFailed',
+          'things-grid-configured' : '_initializeBasicGrid',
+          'button-group.export-btn-tap' : 'exportExcel',
+          'button-group.import-btn-tap' : 'importExcel'          
+        },
+
+        /**
+         * Meta Data 변경시 핸들러 
+         */
+        _metaDataChanged: function(metaData) {
+          this.gridImageDir = '../../../images/grid';
+          this.config = metaData.config;
+          this.model = metaData.fields;
+          this.columns = metaData.columns;
+        },
+
+        /**
+         * Grid 구성이 실패했을 경우 핸들러 
+         * 
+         * @event {Event} event things-grid-configure-failed
+         */
+        _gridConfigureFailed: function(event) {
+          this.openInfoMsg({
+            type : 'warning',
+            title : 'Grid Configuration Failed',
+            text : 'Error : ' + event.detail.error
+          });
+        },
+
+        /**
+         * Grid 구성이 완료된 후 핸들러 
+         *
+         * @event {Event} event things-grid-configured
+         */
+        _initializeBasicGrid: function(e) {
+          console.log('things-basic-grid received [things-grid-configured]');
+          this.fire('things-basic-grid-configured', this.grid);
+        },
+
+        /**
+         * 데이터 조회 
+         */
         search: function(e) {
-          var grid = this.$.grid;
-          var resource = this.$['search-resource'];
-          resource.params = { page : grid.currentPage, limit : grid.perPage };
-          resource.generateRequest();
-        }
+          this.$['search-resource'].generateRequest();
+        }        
 
       });
     </script>
   </dom-module>
 
   <template is="dom-bind" id="app">
-
+    <things-setting id="setting"></things-setting>
+    
     <section>
       <h4>Things Basic Grid</h4>
-
       <sample-basic-grid></sample-basic-grid>
     </section>
 
     <things-spinner id="spinner" loading=false></things-spinner>
-    
     <paper-toast id="toast" class="Toast" duration="8000"></paper-toast>
-
   </template>
+
+  <script type="text/javascript">
+    window.I18nMsg = {};
+  </script>
 
 </body>
 </html>

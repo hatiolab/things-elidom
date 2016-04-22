@@ -17,13 +17,13 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 
   <title>things-resource-grid demo</title>
 
-  <script src="../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
   
-  <link rel="import" href="../../../bower_components/polymer/polymer.html">
-  <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
-  <link rel="import" href="../../../bower_components/paper-styles/color.html">
-  <link rel="import" href="../../../bower_components/paper-styles/demo-pages.html">
-  <link rel="import" href="../../../bower_components/paper-toast/paper-toast.html">
+  <link rel="import" href="../../../../bower_components/polymer/polymer.html">
+  <link rel="import" href="../../../../bower_components/paper-button/paper-button.html">
+  <link rel="import" href="../../../../bower_components/paper-styles/color.html">
+  <link rel="import" href="../../../../bower_components/paper-styles/demo-pages.html">
+  <link rel="import" href="../../../../bower_components/paper-toast/paper-toast.html">
   
   <link rel="import" href="../../things-ajax/things-ajax.html">
   <link rel="import" href="../../things-button/things-button.html">
@@ -33,7 +33,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <link rel="import" href="../things-resource-grid.html">
   <link rel="import" href="demo-resource-content.html">
 
-  <link rel="stylesheet" href="../../../bower_components/paper-styles/demo.css">
+  <link rel="stylesheet" href="../../../../bower_components/paper-styles/demo.css">
 
   <style is="custom-style">
 
@@ -81,17 +81,45 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 
   <dom-module id="sample-resource-grid">
     <template>      
-      <things-setting id="setting"></things-setting>
-      <things-button color="green" id="search">Meta</things-button>
+      <things-button color="green" id="search">Search</things-button>
 
       <section>
-        <demo-resource-content 
+        <!--demo-resource-content 
           title="Terminology"
           resource-type="Terminology"
           resource-url="terminologies"
           current-route="[[currentRoute]]"
           layout="fullbleed layout vertical">
-        </demo-resource-content>
+        </demo-resource-content-->
+
+        <things-ajax 
+          auto
+          id="resource-meta"
+          resource-url="diy_grids/:id"
+          resource-action="find"
+          resource-id="2"
+          last-response="{{metaData}}">
+        </things-ajax>
+
+        <things-resource-grid
+          id="grid"
+          enable-detail-column
+          grid-image-dir="../../../images/grid/"
+          model="[[metaData.fields]]"
+          columns="[[metaData.columns]]"
+          data="[[data.items]]"
+          total-count="[[data.total]]"
+          current-page="{{page}}"
+          per-page="{{limit}}"
+          grid-save-action="terminologies/update_multiple">
+        </things-resource-grid>
+
+        <things-ajax 
+          id="search-resource"
+          resource-url="terminologies"
+          resource-action="index"
+          last-response="{{data}}">
+        </things-ajax>        
       </section>
     </template>
 
@@ -100,24 +128,38 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 
         is: 'sample-resource-grid',
 
-        propeties: {
-          currentRoute : String
+        properties: {
+          page : {
+            type: Number,
+            notify: true,
+            value: 1,
+            observer: '_pageChanged'
+          },
+
+          limit: {
+            type: Number,
+            value: 50
+          }
         },
 
         listeners: {
           'search.tap' : 'search'
         },
 
-        attached: function () {
-          // this.currentRoute ="terminologies" 
+        _pageChanged: function(page) {
+          var ajax = this.$['search-resource'];
+          if(ajax.url) {
+            ajax.page = page;
+            ajax.limit = this.limit;
+            ajax.generateRequest();
+          }          
         },
 
         search: function(e) {
-          this.currentRoute = "terminologies"
-          // var grid = this.$.grid;
-          // var resource = this.$['search-resource'];
-          // resource.params = { page : grid.page, limit : grid.limit };
-          // resource.generateRequest();
+          var ajax = this.$['search-resource'];
+          ajax.page = this.page;
+          ajax.limit = this.limit;
+          ajax.generateRequest();
         }
 
       });
@@ -125,6 +167,8 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   </dom-module>
 
   <template is="dom-bind" id="app">
+    <things-setting id="setting"></things-setting>
+
     <section>
       <h4>Things Resource Grid</h4>
       <sample-resource-grid></sample-resource-grid>
@@ -133,6 +177,10 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
     <things-spinner id="spinner" loading=false></things-spinner>
     <paper-toast id="toast" class="Toast" duration="8000"></paper-toast>
   </template>
+
+  <script type="text/javascript">
+    window.I18nMsg = {};
+  </script>
 
 </body>
 </html>
