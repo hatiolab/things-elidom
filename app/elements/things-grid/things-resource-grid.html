@@ -1,11 +1,9 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
 
-<link rel="import" href="../things-button/things-button.html">
 <link rel="import" href="../things-button/things-button-group.html">
 <link rel="import" href="../things-button/things-button-bar.html">
-<link rel="import" href="../things-import-excel/things-import-excel.html">
 <link rel="import" href="../things-paginator/things-paginator.html">
 
 <link rel="import" href="../things-grid-behavior/things-grid-config-behavior.html">
@@ -44,11 +42,10 @@
       id="grid"
       model="[[gridModel]]" 
       columns="[[gridColumns]]" 
-      read-data="[[gridData]]"
+      data="[[gridData]]"
       page="{{page}}"
       limit="{{limit}}"
-      root-property="items"
-      total-property="total"
+      grid-save-action="terminologies/update_multiple"
       selected-row-data="{{selectedRow}}"
       page-start-idx="{{pageStartIdx}}"
       page-end-idx="{{pageEndIdx}}">
@@ -103,16 +100,7 @@
 
 					<!--things-button-bar id="button-group" buttons="[[buttons]]"></things-button-bar-->
 
-					<things-button-group id="button-group" buttons="[[buttons]]"></things-button-group>
-
-					<things-ajax 
-						id="save-resource"
-						content-type="application/json"
-						resource-url="{{gridSaveAction}}" 
-						method = "POST"
-						body="{{writeData}}">
-					</things-ajax>
-					
+					<things-button-group id="button-group" buttons="[[buttons]]"></things-button-group>					
 				</div>
 			</paper-toolbar>
 		</paper-material>
@@ -243,101 +231,36 @@
 			},
 
 			listeners: {
-				'things-grid-configured' : '_initiateResourceGrid',				
-				'save-resource.things-ajax-response' : '_successSaveHandler',
-				'save-resource.things-ajax-error' : '_errorSaveHandler',
-				'button-group.export-btn-tap' : '_exportGridDataHandler',
-				'button-group.add-btn-tap' : '_addGridRowHandler',
-				'button-group.delete-btn-tap' : '_removeGridRowHandler',
-				'button-group.save-btn-tap' : '_saveGridDataHandler',
-				'button-group.import-btn-tap' : '_importExcelHandler'
+				'things-grid-configure-failed' : '_gridConfigureFailed',
+				'things-grid-configured' : '_initializeResourceGrid',
+				'button-group.add-btn-tap' : 'addGridRow',
+				'button-group.delete-btn-tap' : 'removeGridRow',
+				'button-group.save-btn-tap' : 'saveGridData',
+				'button-group.export-btn-tap' : 'exportGrid',
+				'button-group.import-btn-tap' : 'importExcel'
 			},
 
 			/**
-			 * Life Cycle - Detached
+			 * Grid 구성이 실패했을 경우 
+			 * 
+			 * @event {Event} event things-grid-configure-failed
 			 */
-			detached: function() {
-				this.clearGrid();
+			_gridConfigureFailed: function(event) {
+				this.openInfoMsg({
+					type : 'warning',
+					title : 'Grid Configuration Failed',
+					text : 'Error : ' + event.detail.error
+				});
 			},
 
 			/**
-			 * grid 구성 후 추가 액션, callback으로 function 전달
+			 * Grid 구성 후 추가 액션
+			 *
+			 * @event {Event} event things-grid-configured
 			 */
-			_initiateResourceGrid: function(e) {
-				// enableToolbar가 true인 경우 c.u.d 활성화
-				if(this.enableToolbar) {
-					this.grid.editOptions().setInsertable(true);
-					this.grid.editOptions().setAppendable(true);
-					this.grid.editOptions().setUpdatable(true);
-					this.grid.editOptions().setDeletable(true);
-				}
-
-				this.fire('things-resource-grid-configured', this.grid);				
-			},
-
-			/**
-			 * export
-			 */
-			_exportGridDataHandler: function(e) {
-				var evt = this.fire('things-grid-handle-export', e.detail, { cancelable: true });
-				if(!evt.defaultPrevented) this.exportGridData();
-			},
-
-			/**
-			 * add grid row
-			 */
-			_addGridRowHandler: function(e) {
-				var evt = this.fire('things-grid-handle-addrow', e.detail, { cancelable: true });
-				if(!evt.defaultPrevented) this.addGridRow();
-			},
-
-			/**
-			 * remove grid row
-			 */
-			_removeGridRowHandler: function(e) {
-				var evt = this.fire('things-grid-handle-removerow', e.detail, { cancelable: true });
-				if(!evt.defaultPrevented) this.removeGridRow();
-			},
-
-			/**
-			 * save grid data
-			 */
-			_saveGridDataHandler: function(e) {
-				var evt = this.fire('things-grid-handle-savegrid', e.detail, { cancelable: true });
-				if(!evt.defaultPrevented) this.saveGridData();
-			},
-
-			/**
-			 * import
-			 */
-			_importExcelHandler: function(e) {
-				var evt = this.fire('things-grid-handle-import', e.detail, { cancelable: true });
-				if(!evt.defaultPrevented) this.importExcel();
-			},
-
-			/**
-			 * grid save action
-			 */
-			_gridSaveAction: function() {
-				var event = this.fire('things-grid-pre-save', {}, { cancelable: true });
-
-				if(!event.defaultPrevented) {
-					this.$['save-resource'].generateRequest();
-				}
-			},
-
-			/**
-			 * save 성공시 핸들러
-			 */
-			_successSaveHandler: function() {
-				this.fire('things-grid-save-success', this.grid);
-			},
-
-			/**
-			 * save 실패시 핸들러  
-			 */
-			_errorSaveHandler: function(e) {
-				this.fire('things-grid-save-error', e.detail);
+			_initializeResourceGrid: function(e) {
+				console.log('things-resource-grid received [things-grid-configured]');
+				this.fire('things-resource-grid-configured', this.grid);
 			}
 
 		});

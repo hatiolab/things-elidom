@@ -2,6 +2,7 @@
 
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../things-ajax/things-ajax.html">
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 <link rel="import" href="../things-grid-behavior/things-grid-basic-behavior.html">
 
@@ -29,65 +30,80 @@
 			 */
 			gridSaveAction: {
 				type: String
-			},
+			}			
+		},
 
-			/**
-			 * 저장(Multiple Update)할 데이터
-			 */
-			writeData: {
-				type: Array,
-				notify: true
+		listeners: {
+			'things-grid-configured' : '_initializeSaveHandler'
+		},
+
+		/**
+		 * 그리드 구성이 완료된 후 GridSaveBehavior를 initialize 한다.
+		 *
+		 * @event {Event} event things-grid-configured
+		 */
+		_initializeSaveHandler: function(e) {
+			if(this.grid && this.enableToolbar) {
+				var evt = this.fire('things-grid-save-configure', this.grid, { cancelable: true });
+				if(!evt.defaultPrevented) {
+					this.grid.editOptions().setInsertable(true);
+					this.grid.editOptions().setAppendable(true);
+					this.grid.editOptions().setUpdatable(true);
+					this.grid.editOptions().setDeletable(true);
+					this.fire('things-grid-save-configured', this.grid);
+				}
 			}
 		},
 
 		/**
-		 * remove grid row. 실제 삭제하지 않고 플래그 처리한 후 save시 서버에서 일괄 처리한다.
+		 * Add Grid Row
+		 *
+		 * @event {Event} event button tap event
 		 */
-		removeGridRow: function() {
-			var rows = this.grid.getCheckedRows();
-			if (rows && rows.length > 0) {
-				var ds = this.dataSet;
-
-				rows.forEach(function(row) {
-					if (ds.getRowState(row.dataIndex()) == 'created') {
-						ds.setRowState(row.dataIndex(), 'createAndDeleted');
-					} else {
-						ds.setRowState(row.dataIndex(), 'deleted');
-					}
-				});
+		addGridRow: function(e) {
+			var evt = this.fire('things-grid-handle-addrow', e.detail, { cancelable: true });
+			if(!evt.defaultPrevented) {
+				this.dataSet.insertRow(0, {});
 			}
 		},
 
 		/**
-		 * add grid row
+		 * Remove grid row. 실제 삭제하지 않고 플래그 처리한 후 save시 서버에서 일괄 처리한다.
+		 *
+		 * @event {Event} event button tap event
 		 */
-		addGridRow: function() {
-			this.dataSet.insertRow(0, {});
+		removeGridRow: function(e) {
+			var evt = this.fire('things-grid-handle-removerow', e.detail, { cancelable: true });
+			if(!evt.defaultPrevented) {
+				var rows = this.grid.getCheckedRows();
+				if (rows && rows.length > 0) {
+					var ds = this.dataSet;
+					rows.forEach(function(row) {
+						if (ds.getRowState(row.dataIndex()) == 'created') {
+							ds.setRowState(row.dataIndex(), 'createAndDeleted');
+						} else {
+							ds.setRowState(row.dataIndex(), 'deleted');
+						}
+					});
+				}
+			}
 		},
 
 		/**
 		 * 그리드의 변경된 데이터를 감지하여 서버로 한꺼번에 Create/Update/Delete 요청을 한다.
+		 *
+		 * @event {Event} event button tap event
 		 */
-		saveGridData: function() {
+		saveGridData: function(e) {
 			var changedDataList = [];
+			this.grid.commit();
 			try {
-				this.grid.commit();
 				this._configureChangedData(changedDataList, 'created', 'c');
 				this._configureChangedData(changedDataList, 'updated', 'u');
 				this._configureChangedData(changedDataList, 'deleted', 'd');
-				this.writeData = changedDataList;
-				
-				this._gridSaveAction();
-				// TODO event fire && resource grid에서 받아서 처리 
-				//this.fire('things-grid-about-to-save');
-
+				this._updateMultiple(changedDataList);
 			} catch (err) {
-				this.openInfoMsg({
-					type : 'warning',
-					title : 'Validation Error',
-					text : err.message,
-					html : false
-				});
+				this.openInfoMsg({ type : 'warning', title : 'Grid Error', text : err.message });
 			}
 		},
 
@@ -104,6 +120,34 @@
 				var changedRow = this.dataSet.getRowObject(changed[i]);
 				changedRow.cud_flag_ = changeFlag;
 				changedData.push(changedRow);
+			}
+		},
+
+		/**
+		 * Update Multiple Data 
+		 *
+		 * @param {Array} changedDataList
+		 */
+		_updateMultiple: function(changedDataList) {
+			var event = this.fire('things-grid-pre-save', {}, { cancelable: true });
+
+			if(!event.defaultPrevented) {
+				var ajax = document.createElement('things-ajax');
+				ajax.resourceUrl = this.gridSaveAction;
+				ajax.resourceAction = 'update_multiple';
+				// this.writeData = changedDataList;
+				ajax.body = changedDataList;
+				var me = this;
+
+				ajax.addEventListener('things-ajax-response', function(event) {
+					me.fire('things-grid-save-success', me.grid);
+				});
+
+				ajax.addEventListener('things-ajax-error', function(event) {
+					me.fire('things-grid-save-error', event.detail);
+				});
+
+				ajax.generateRequest();
 			}
 		}
 		

@@ -22,22 +22,44 @@
 			}
 		},
 
+		listeners: {
+			'things-grid-configured': '_initializeExportHandler'
+		},
+
 		/**
-		 * import 버튼이 클릭 될때 excel import 화면 열기 
+		 * 그리드 구성이 완료된 후 GridImportBehavior를 initialize 한다.
+		 *
+		 * @event {Event} e
 		 */
-		importExcel :function() {
-			var excelImport = document.createElement('things-import-excel');
-			excelImport.sheetName = this.sheetName;
-			var me = this;
+		_initializeExportHandler: function(e) {
+			var evt = this.fire('things-grid-import-configure', this.grid, { cancelable: true });
+			if(!evt.defaultPrevented) {
+				// TODO Initialized
+				this.fire('things-grid-import-configured', this.grid);
+			}
+		},		
 
-			excelImport.addEventListener('excel-process-finish', function(event) {
-				// 1. clear grid
-				new DataLudi.DataLoader(me.dataSet).load('json', '', {});
-				// 2. load excel data to grid, fillMode : 'insert', 'append', 'update', 기본은 'set'
-				new DataLudi.DataLoader(me.dataSet).load('json', event.detail, { fillMode: 'insert', fillPos: 0 });
-			});
+		/**
+		 * Import excel
+		 */
+		importExcelData: function() {
+			var evt = this.fire('things-grid-handle-import', e.detail, { cancelable: true });
+			if(!evt.defaultPrevented) {
+				var excelImport = document.createElement('things-import-excel');
+				excelImport.sheetName = this.sheetName;
+				var me = this;
 
-			excelImport.import();
+				excelImport.addEventListener('excel-process-finish', function(event) {
+					// 1. Clear grid
+					new DataLudi.DataLoader(me.dataSet).load('json', '', {});
+					// 2. Load excel data to grid, fillMode : 'insert', 'append', 'update', 기본은 'set'
+					new DataLudi.DataLoader(me.dataSet).load('json', event.detail, { fillMode: 'insert', fillPos: 0 });
+					// 3. Fire event
+					me.fire('things-grid-import-finished', event.detail);
+				});
+
+				excelImport.import();
+			}
 		}
 
 	};

@@ -44,7 +44,7 @@
     },
 
     listeners: {
-      'things-grid-event-configuring' : '_configureGridEvent',
+      'things-grid-configured': '_initializeEventHandler',
       'iron-resize': '_gridScreenResizeHandler'
     },
 
@@ -53,15 +53,21 @@
     ],    
 
     /**
-     * Dataludi 그리드 이벤트를 추가한다.
-     * attribute 중에 Event 값이 설정되어 있다면 그것으로 이벤트 핸들러를 등록한다.
+     * 그리드 구성이 완료된 후 GridEventBehavior를 initialize 한다.
      *
      * @event {Event} e
      */
-    _configureGridEvent: function(e) {
-      if (this.events) {
-        for (var eventName in this.events) {
-          this.grid[eventName] = this[this.events[eventName]];
+    _initializeEventHandler: function(e) {
+      console.log('things-grid-event-behavior received [things-grid-configured]');
+
+      if (this.grid && this.events) {
+        var evt = this.fire('things-grid-event-configure', this.grid, { cancelable: true });
+        if(!evt.defaultPrevented) {
+          for (var eventName in this.events) {
+            this.grid[eventName] = this[this.events[eventName]];
+          }
+
+          this.fire('things-grid-event-configured', this.grid);
         }
       }
     },
@@ -72,31 +78,17 @@
      * @event {Event} e
      */
     _gridDataChanged: function(e) {
-      if (!this.grid) {
-        this.initializeGrid();
-        this.resizeGrid(this.parentNode, this.querySelector('div'));
-      }
-
-      if (this.data && this.dataSet) {
+      var evt = this.fire('things-grid-data-change', this.data, { cancelable: true });
+      if(!evt.defaultPrevented && this.data && this.dataSet) {
         if (this.infiniteScroll) {
           this.dataSet.appendRows(this.data, 0, -1, false);
           this.dataSet.clearRowStates();
         } else {
           this.dataSet.setRows(this.data);
         }
-      }
-    },    
 
-    /**
-     * parentNode 사이즈에 따라 그리드를 리사이즈
-     *
-     * @param {Object} parentNode
-     * @param {Object} gridContainer
-     */
-    resizeGrid: function(parentNode, gridContainer) {
-      gridContainer.style.width = (parentNode.offsetWidth - 20) + 'px';
-      gridContainer.style.height = this.gridHeight + 'px';
-      this.grid.resetSize();
+        this.fire('things-grid-data-changed', this.data);
+      }
     },    
 
     /**
@@ -105,12 +97,10 @@
      * @event {Event} e
      */
     _gridScreenResizeHandler: function(e) {
-      if (this.parentNode.offsetWidth > 0 && this.grid == null) {
-        this.initializeGrid();
-      }
-
-      if (this.grid != null && this.grid._container) {
+      var evt = this.fire('things-grid-resize', this.grid, { cancelable: true });
+      if(!evt.defaultPrevented && this.grid != null && this.grid._container) {
         this.resizeGrid(this.parentNode, this.querySelector('div'));
+        this.fire('things-grid-resized', this.grid);
       }
     },
 

@@ -27,16 +27,38 @@
 			}
 		},
 
+		listeners: {
+			'things-grid-configured': '_initializeExportHandler'
+		},
+
 		/**
-		 * export to excel
+		 * 그리드 구성이 완료된 후 GridExportBehavior를 initialize 한다.
+		 *
+		 * @event {Event} e
 		 */
-		exportGridData: function() {
-			new DataLudi.GridExcelExporter().export(this.grid, {
-				target: 'local',
-				fileName: this.exportFileName,
-				numberFormat: '#,##0.00',
-				datetimeFormat: 'yyyy.mm.dd'
-			});
+		_initializeExportHandler: function(e) {
+			var evt = this.fire('things-grid-export-configure', this.grid, { cancelable: true });
+			if(!evt.defaultPrevented) {
+				// TODO 
+				this.fire('things-grid-export-configured', this.grid);
+			}
+		},
+
+		/**
+		 * Export excel
+		 */
+		exportGrid: function() {
+			var evt = this.fire('things-grid-handle-export', e.detail, { cancelable: true });
+			if(!evt.defaultPrevented) {
+				new DataLudi.GridExcelExporter().export(this.grid, {
+					target: 'local',
+					fileName: this.exportFileName,
+					numberFormat: '#,##0.00',
+					datetimeFormat: 'yyyy.mm.dd'
+				});
+
+				// TODO listen export-finish event and fire event
+			}
 		}
 
 	};

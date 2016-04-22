@@ -1,5 +1,6 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../things-id/things-guid-behavior.html">
+<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 
 <script src='../../../lib/grid/dataludi.lic.eval-1.2.0.min.js'></script>
 <script src='../../../lib/grid/dataludi.eval-1.2.1.min.js'></script>
@@ -56,16 +57,14 @@
        * Grid data model - array of fields
        */
       model: {
-        type: Array,
-        observer: '_setGridModel'
+        type: Array
       },
 
       /**
        * Grid view column
        */
       columns: {
-        type: Array,
-        observer: '_setGridColumns'
+        type: Array
       },
       
       /**
@@ -118,60 +117,68 @@
       }       
     },
 
+    observers: [
+      '_configurationsChanged(model, columns)'
+    ],
+
+    /**
+     * Life Cycle - Detached
+     */
+    detached: function() {
+      this.clearGrid();
+    },
+
     /**
      * Initialize Grid
      */
     initializeGrid: function() {
-      if (this.grid == null) {
-        DataLudi.setRootContext('');
-        DataLudi.setAssetRoot('images/grid');
-        this.gridContainerId = this.generateGuid();
-        this.grid = DataLudi.createGridView(this.gridContainerId, null, false);
-        this.grid.setDataSource(this.dataSet);
+      if(this.grid) return;
 
-        this.grid.registerImageList({
-          name: 'images',
-          root: 'images/grid/',
-          items: [
-            'iconDetail.png',
-            'ellipsis_hover.png',
-            'indicator_insert.png',
-            'menu_button.png',
-            'menu_button_hover.png'
-          ]});
+      DataLudi.setRootContext('');
+      DataLudi.setAssetRoot('images/grid');
+      this.gridContainerId = this.generateGuid();
+      this.grid = DataLudi.createGridView(this.gridContainerId, null, false);
+      this.grid.setDataSource(this.dataSet);
 
-          this.grid.body().setCellDynamicStyles([{
-            expression: "state == 'c'",
-            styles: {
-              background: '#1000ff00'
-            }
-          }, {
-            expression: "(row % 2) > 0",
-            styles: {
-              background: '#20006060'
-            }
-          } ]);
+      this.grid.registerImageList({
+        name: 'images',
+        root: 'images/grid/',
+        items: [
+          'iconDetail.png',
+          'ellipsis_hover.png',
+          'indicator_insert.png',
+          'menu_button.png',
+          'menu_button_hover.png'
+        ]});
 
-        this.grid._container_ = this;
-
-        if(this.config) {
-          this._setGridConfig(this.config);
+      this.grid.body().setCellDynamicStyles([{
+        expression: "state == 'c'",
+        styles: {
+          background: '#1000ff00'
         }
-
-        if(this.model) {
-          this._setGridModel(this.model);
+      }, {
+        expression: "(row % 2) > 0",
+        styles: {
+          background: '#20006060'
         }
+      } ]);
 
-        if(this.columns) {
-          this._setGridColumns(this.columns);
-        }
+      this.grid._container_ = this;
 
-        this.grid.footer().setVisible(this.showGridFooter);
-
-        // Fire Events
-        this.fire('things-grid-event-configuring', this.grid);
-        this.fire('things-grid-configured', this.grid);
+      if(this.config) {
+        this._setGridConfig(this.config);
       }
+
+      if(this.model) {
+        this._setGridModel(this.model);
+      }
+
+      if(this.columns) {
+        this._setGridColumns(this.columns);
+      }
+
+      this.grid.footer().setVisible(this.showGridFooter);
+      this.resizeGrid(this.parentNode, this.querySelector('div'));
     },
 
     /**
@@ -205,6 +212,42 @@
     },
 
     /**
+     * 그리드 리사이즈 - parentNode 사이즈에 따라 그리드를 리사이즈
+     *
+     * @param {Object} parentNode
+     * @param {Object} gridContainer
+     */
+    resizeGrid: function(parentNode, gridContainer) {
+      gridContainer.style.width = (parentNode.offsetWidth - 20) + 'px';
+      gridContainer.style.height = this.gridHeight + 'px';
+      this.grid.resetSize();
+    },
+
+    /**
+     * Configurations changed
+     *
+     * @param {Object} model
+     * @param {Object} columns
+     */
+    _configurationsChanged: function(model, columns) {
+      if(model && columns && !this.grid) {
+        var evtDetail = { config: this.config, model: model, columns: columns };
+        var evt = this.fire('things-grid-configure', evtDetail, { cancelable: true });
+        if(!evt.defaultPrevented) {
+          try {
+            this.initializeGrid();
+          } catch(e) {
+            console.log('error : ' + this.className + ', ' + e);
+            evtDetail.error = e;
+            this.fire('things-grid-configure-failed', evtDetail);
+          }
+          
+          this.fire('things-grid-configured', evtDetail);          
+        }
+      }
+    },
+
+    /**
      * Set Grid Model Fields
      *
      * @param {Array} / {String} gridModel
@@ -212,10 +255,11 @@
     _setGridModel: function(gridModel) {
       if(!gridModel || !this.grid) return;
 
-      if(typeof(gridModel) === 'string') gridModel = JSON.parse(gridModel);
-      
-      if (gridModel && gridModel.length > 0) {
-        this.dataSet.setFields(gridModel);
+      var modelStr = (typeof(gridModel) === 'string') ? gridModel : JSON.stringify(gridModel);
+      var fields = JSON.parse(modelStr);
+
+      if (fields && fields.length > 0) {
+        this.dataSet.setFields(fields);
         this.dataSet.setCheckStates(true);
       }
     },
@@ -223,17 +267,16 @@
     /**
      * Set Grid Column Views
      *
-     * @param {Array} columns
+     * @param {Array} / {String} columns
      */
     _setGridColumns: function(columns) {
       if(!columns || !this.grid) return;
       
-      if(typeof(columns) === 'string') {
-        columns = JSON.parse(columns);
-      }
-     
+      var columnStr = (typeof(columns) === 'string') ? columns : JSON.stringify(columns);
+      var gridColumns = JSON.parse(columnStr);
+
       if(this.enableDetailColumn) {
-        columns.unshift({
+        gridColumns.unshift({
           name: 'Detail',
           width: 30,
           imageList: 'images',
@@ -246,8 +289,8 @@
         });
       }
 
-      if(columns.length > 0) {
-        this.grid.setColumns(columns);
+      if(gridColumns.length > 0) {
+        this.grid.setColumns(gridColumns);
       }
 
       this.grid.resetSize();
@@ -333,7 +376,8 @@
 
   Things.GridConfigBehavior = [
     Things.GridConfigBehaviorImpl,
-    Things.GUIDBehavior
+    Things.GUIDBehavior,
+    Things.MsgBoxBehavior
   ];
 
 </script>
