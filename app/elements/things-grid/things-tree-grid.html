@@ -66,17 +66,15 @@
 			},
 
 			listeners: {
-				'things-grid-configured' : '_initiateResourceGrid',
-			},
-
-			detached: function() {
-				this.clearGrid();
+				'things-grid-configured' : '_initiateTreeGrid',
 			},
 
 			/**
-			 * grid 구성 후 추가 액션 
+			 * Grid 구성이 완료된 후 핸들러 
+			 *
+			 * @event {Event} event things-grid-configured
 			 */
-			_initiateResourceGrid: function(e) {
+			_initiateTreeGrid: function(e) {
 				this.fire("things-tree-grid-configured", this.grid);
 			}
 

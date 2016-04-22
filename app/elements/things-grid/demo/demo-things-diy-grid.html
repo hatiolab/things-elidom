@@ -17,13 +17,13 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 
   <title>things-diy-grid demo</title>
 
-  <script src="../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
   
-  <link rel="import" href="../../../bower_components/polymer/polymer.html">
-  <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
-  <link rel="import" href="../../../bower_components/paper-styles/color.html">
-  <link rel="import" href="../../../bower_components/paper-styles/demo-pages.html">
-  <link rel="import" href="../../../bower_components/paper-toast/paper-toast.html">
+  <link rel="import" href="../../../../bower_components/polymer/polymer.html">
+  <link rel="import" href="../../../../bower_components/paper-button/paper-button.html">
+  <link rel="import" href="../../../../bower_components/paper-styles/color.html">
+  <link rel="import" href="../../../../bower_components/paper-styles/demo-pages.html">
+  <link rel="import" href="../../../../bower_components/paper-toast/paper-toast.html">
   
   <link rel="import" href="../../things-ajax/things-ajax.html">
   <link rel="import" href="../../things-button/things-button.html">
@@ -32,7 +32,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 
   <link rel="import" href="../things-diy-grid.html">
 
-  <link rel="stylesheet" href="../../../bower_components/paper-styles/demo.css">
+  <link rel="stylesheet" href="../../../../bower_components/paper-styles/demo.css">
 
   <style is="custom-style">
 
@@ -41,25 +41,31 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
       word-wrap: break-word;
       @apply(--paper-font-common-code);
     }
+
     form > paper-button {
       width: 45%;
       margin-top: 20px;
     }
+    
     form > paper-button:not([disabled]) {
       background: var(--paper-light-blue-500);
       color: white;
     }
+    
     button {
       margin-top: 20px;
     }
+    
     paper-spinner {
       width: 14px;
       height: 14px;
       margin-right: 20px;
     }
+    
     paper-dropdown-menu {
       display: block;
     }
+    
     demo-snippet {
       --demo-snippet-code: {
         max-height: 300px;
@@ -69,40 +75,30 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   </style>
 
 </head>
+
 <body unresolved>
 
   <dom-module id="sample-diy-grid">
-    <template>      
-      <things-setting id="setting"></things-setting>
-
-      <things-button color="green" id="search">Search</things-button>
-      <things-button color="green" id="refreshmeta">refresh meta</things-button>
-      <paper-input type="text" label ="input meta url" value="{{metaURL}}"></paper-input>
-      <paper-input type="text" label ="input custom service url" value="{{customServiceUrl}}"></paper-input>
+    <template>
+      <things-button color="green" id="search-meta">Search Grid Meta</things-button>
+      <things-button color="green" id="search-data">Search Data</things-button>
+      
+      <paper-input type="text" label="Input Grid Meta URL" value="{{metaId::change}}"></paper-input>
+      <paper-input type="text" label="Input Service URL" value="{{customServiceUrl::change}}"></paper-input>
+      <paper-input type="number" min=1 label="Current Page" value="{{page}}"></paper-input>
+      <paper-input type="text" label="Page Limit" value="{{limit::change}}"></paper-input>
 
       <section>
-<!--         <things-diy-grid 
-          id="grid"
-          resource-meta-url="diy_grids/2.json"
-          data="[[gridData.items]]"
-          paginatable
-          total-count ="[[gridData.total]]"
-          current-page="{{currentPage}}"
-          per-page="{{perPage}}"
-          page-start-idx="{{pageStartIdx}}"
-          page-end-idx="{{pageEndIdx}}"
-          selected-row-data="{{selectedRow}}">
-        </things-diy-grid> -->
         <things-diy-grid 
           id="grid"
-          resource-meta-url="{{metaURL}}"
-          data="[[gridData]]"
-          selected-row-data="{{selectedRow}}">
+          grid-image-dir="../../../images/grid/"
+          diy-grid-id="{{metaId}}"
+          data="[[gridData.items]]">
         </things-diy-grid>
-        <!--resource="diy_services/GridTestData/query.json"-->
+                
         <things-ajax 
           id="search-resource"
-          method="GET"
+          method="POST"
           content-type="application/json"
           resource-url="{{customServiceUrl}}"
           last-response="{{gridData}}">
@@ -115,21 +111,54 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 
         is: 'sample-diy-grid',
 
-        listeners: {
-          'search.tap' : 'search',
-          'refreshmeta.tap':'refreshmeta'
+        properties: {
+          
+          page: {
+            type: Number,
+            value: 1
+          },
+          
+          limit: {
+            type: Number,
+            value: 50
+          },
+
+          metaId: {
+            type: String,
+            value: '2'
+          },
+
+          customServiceUrl: {
+            type: String,
+            value: 'diy_services/DynamicScreen/shoot.json'
+          }
         },
 
-        search: function(e) {
+        listeners: {
+          'search-data.tap': 'searchData',
+          'search-meta.tap': 'searchMeta'
+        },
+
+        observers: [
+          'paginationChange(page, limit)'
+        ],
+
+        paginationChange: function(page, limit) {
+          var grid = this.$.grid;
+          if(grid.data && grid.data.length > 0) {
+            this.searchData();
+          }
+        },
+
+        searchData: function(e) {
           var grid = this.$.grid;
           var resource = this.$['search-resource'];
-          resource.params = { page : grid.currentPage, limit : grid.perPage };
+          resource.body = { input : { page : this.page, limit : this.limit } };
           resource.generateRequest();
         },
 
-        refreshmeta:function(e){
-          var grid = this.$.grid;
-          grid.refreshMeta();
+        searchMeta: function(e){
+          this.$.grid.refreshMeta();
         }
 
       });
@@ -137,18 +166,20 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   </dom-module>
 
   <template is="dom-bind" id="app">
+    <things-setting id="setting"></things-setting>
 
     <section>
       <h4>Things diy Grid</h4>
-
       <sample-diy-grid></sample-diy-grid>
     </section>
 
     <things-spinner id="spinner" loading=false></things-spinner>
-    
     <paper-toast id="toast" class="Toast" duration="8000"></paper-toast>
-
   </template>
+
+  <script type="text/javascript">
+    window.I18nMsg = {};
+  </script>  
 
 </body>
 </html>
