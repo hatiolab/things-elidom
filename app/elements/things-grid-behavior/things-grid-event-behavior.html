@@ -57,8 +57,6 @@
      * @event {Event} things-grid-configured
      */
     _initializeEventHandler: function(e) {
-      console.log('things-grid-event-behavior received [things-grid-configured]');
-
       if (this.grid && this.events) {
         var evt = this.fire('things-grid-event-configure', this.grid, { cancelable: true });
         if(!evt.defaultPrevented) {
@@ -87,12 +85,19 @@
     /**
      * 화면 리사이즈 시 이벤트 핸들러
      *
-     * @event {Event} e
+     * @event {Event} iron-resize 이벤트
      */
     _gridScreenResizeHandler: function(e) {
       var evt = this.fire('things-grid-resize', this.grid, { cancelable: true });
-      if(!evt.defaultPrevented && this.grid != null && this.grid._container) {
-        this.resizeGrid(this.parentNode, this.querySelector('div'));
+      if(!evt.defaultPrevented) {
+        if(this.parentNode.offsetWidth > 0 && this.grid == null) {
+          this.initializeGrid();
+        }
+
+        if(this.grid != null && this.grid._container) {
+          this.resizeGrid(this.parentNode, this.querySelector('div'));
+        }
+
         this.fire('things-grid-resized', this.grid);
       }
     },

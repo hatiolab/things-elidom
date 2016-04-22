@@ -25,16 +25,14 @@
        * Grid container id가 중복이 되면 grid가 다른 grid container에 생성될 수 있으므로 GUID로 한다.
        */
       gridContainerId: {
-        type: String,
-        readonly: true
+        type: String
       },
 
       /**
        * Dataludi grid
        */
       grid: {
-        type: Object,
-        readonly: true
+        type: Object
       },
 
       /**
@@ -132,11 +130,18 @@
      * Initialize Grid
      */
     initializeGrid: function() {
-      if(this.grid) return;
+      if(this.grid || !this.model || !this.columns) return;
+      
+      if(!this.gridContainerId || this.gridContainerId == '') {
+        this.gridContainerId = this.generateGuid();  
+      }
+
+      if(!this.parentNode.offsetWidth || this.parentNode.offsetWidth == 0) {
+        return;
+      }
 
       DataLudi.setRootContext('');
       DataLudi.setAssetRoot(this.gridImageDir);
-      this.gridContainerId = this.generateGuid();
       this.grid = DataLudi.createGridView(this.gridContainerId, null, false);
       this.grid.setDataSource(this.dataSet);
 
@@ -175,6 +180,10 @@
 
       if(this.columns) {
         this._setGridColumns(this.columns);
+      }
+
+      if(this.data) {
+        this.dataSet.setRows(this.data);
       }
 
       this.grid.footer().setVisible(this.showGridFooter);
@@ -237,7 +246,6 @@
           try {
             this.initializeGrid();
           } catch(e) {
-            console.log('error : ' + this.className + ', ' + e);
             evtDetail.error = e;
             this.fire('things-grid-configure-failed', evtDetail);
           }
@@ -255,8 +263,7 @@
     _setGridModel: function(gridModel) {
       if(!gridModel || !this.grid) return;
 
-      var modelStr = (typeof(gridModel) === 'string') ? gridModel : JSON.stringify(gridModel);
-      var fields = JSON.parse(modelStr);
+      var fields = (typeof(gridModel) === 'string') ? JSON.parse(gridModel) : gridModel;
 
       if (fields && fields.length > 0) {
         this.dataSet.setFields(fields);
@@ -271,9 +278,8 @@
      */
     _setGridColumns: function(columns) {
       if(!columns || !this.grid) return;
-      
-      var columnStr = (typeof(columns) === 'string') ? columns : JSON.stringify(columns);
-      var gridColumns = JSON.parse(columnStr);
+
+      var gridColumns = (typeof(columns) === 'string') ? JSON.parse(columns) : columns;
 
       if(this.enableDetailColumn) {
         gridColumns.unshift({
@@ -304,8 +310,7 @@
     _setGridConfig: function(config) {
       if(!config || !this.grid) return;
 
-      var configStr = (typeof(config) === 'string') ? config : JSON.stringify(config);
-      var gridConfig = JSON.parse(configStr);      
+      var gridConfig = (typeof(config) === 'string') ? JSON.parse(config) : config;   
 
       if(!gridConfig) {
         this.grid.setEditOptions({ readOnly : true });
