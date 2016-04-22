@@ -41,8 +41,10 @@
 
 		/**
 		 * Import excel
+		 *
+		 * @event {Event} e Button Click Event
 		 */
-		importExcelData: function() {
+		importExcel: function(e) {
 			var evt = this.fire('things-grid-handle-import', e.detail, { cancelable: true });
 			if(!evt.defaultPrevented) {
 				var excelImport = document.createElement('things-import-excel');

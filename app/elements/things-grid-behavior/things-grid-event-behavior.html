@@ -19,8 +19,7 @@
         type: Object,
         value: {
           'onDataCellClicked': '_gridCellClicked',
-          'onDataCellDblClicked': '_gridCellDblClicked',
-          'onScrollToBottom':'_gridScrollToBottom'
+          'onDataCellDblClicked': '_gridCellDblClicked'
         }
       },
 
@@ -155,21 +154,6 @@
           userObj : matchColumn ? matchColumn[0].userObj : null, 
           index: index 
         });
-      }
-    },
-
-    /**
-     * 그리드에서 스크롤이 아래로 향했을 경우 
-     *
-     * @param {Object} grid
-     */
-    _gridScrollToBottom: function(grid) {
-      if(this.infiniteScroll) {
-        var thingsGrid = grid._container_;
-
-        if(thingsGrid.totalCount > thingsGrid.pageEndIdx) {
-          thingsGrid.page += 1; 
-        }
       }
     } 
 

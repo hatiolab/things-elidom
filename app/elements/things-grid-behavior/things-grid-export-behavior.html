@@ -34,7 +34,7 @@
 		/**
 		 * 그리드 구성이 완료된 후 GridExportBehavior를 initialize 한다.
 		 *
-		 * @event {Event} e
+		 * @event {Event} e things-grid-configured
 		 */
 		_initializeExportHandler: function(e) {
 			var evt = this.fire('things-grid-export-configure', this.grid, { cancelable: true });
@@ -46,8 +46,10 @@
 
 		/**
 		 * Export excel
+		 *
+		 * @event {Event} e Button Click Event
 		 */
-		exportGrid: function() {
+		exportExcel: function(e) {
 			var evt = this.fire('things-grid-handle-export', e.detail, { cancelable: true });
 			if(!evt.defaultPrevented) {
 				new DataLudi.GridExcelExporter().export(this.grid, {

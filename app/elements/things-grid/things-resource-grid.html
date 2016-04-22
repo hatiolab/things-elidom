@@ -13,7 +13,8 @@
 <link rel="import" href="../things-grid-behavior/things-grid-save-behavior.html">
 
 <!--
-기본 라소스 그리드. Pagination을 지원하고 import, export, add, delete, save가 가능한 그리드
+기본 라소스 그리드. 
+Pagination을 지원하고 import, export, add, delete, save가 가능한 그리드
 
 	Example:
 
@@ -44,11 +45,8 @@
       columns="[[gridColumns]]" 
       data="[[gridData]]"
       page="{{page}}"
-      limit="{{limit}}"
-      grid-save-action="terminologies/update_multiple"
-      selected-row-data="{{selectedRow}}"
-      page-start-idx="{{pageStartIdx}}"
-      page-end-idx="{{pageEndIdx}}">
+      limit="50"
+      grid-save-action="terminologies/update_multiple">
     </things-resource-grid>
 
 @demo ./things-grid/demo/demo-things-resource-grid.html
@@ -83,24 +81,22 @@
 		<paper-material elevation="1" class="flex">
 			<div id="{{gridContainerId}}"></div>
 		
-			<paper-toolbar
-				class="white"
-				hidden$="{{!enableToolbar}}">
-				<div id="gridToolbar" class="bottom fit">
+			<paper-toolbar class="white" hidden$="{{!enableToolbar}}">
+				<div class="bottom fit">
+					<template is="dom-if" if="[[usePagination]]">
+						<things-paginator
+							hidden$="{{!paginatable}}"
+							id ="paginator"
+							per-page="{{perPage}}" 
+							current-page="{{currentPage}}" 
+							total-count="[[totalCount]]"
+							page-start-idx="[[pageStartIdx]]"
+							page-end-idx="[[pageEndIdx]]">
+						</things-paginator>
+					</template>
 
-					<things-paginator
-						hidden$="{{!paginatable}}"
-						id ="paginator"
-						per-page="{{perPage}}" 
-						current-page="{{currentPage}}" 
-						total-count="[[totalCount]]"
-						page-start-idx="[[pageStartIdx]]"
-						page-end-idx="[[pageEndIdx]]">
-					</things-paginator>
-
-					<!--things-button-bar id="button-group" buttons="[[buttons]]"></things-button-bar-->
-
-					<things-button-group id="button-group" buttons="[[buttons]]"></things-button-group>					
+					<things-button-bar id="button-group" buttons="[[buttons]]"></things-button-bar>
+					<!--things-button-group id="button-group" buttons="[[buttons]]"></things-button-group-->
 				</div>
 			</paper-toolbar>
 		</paper-material>
@@ -120,12 +116,13 @@
 			],
 	
 			properties: {
+
 				/**
-				 * 추가할 button 정보
+				 * Button Group에 표시될 버튼 정보
 				 */
 				buttons : {
 					type: Array,
-					value: [{
+					value: [ {
 						id: 'export-btn',
 						text: 'Export',
 						icon: 'icons:swap-vert'
@@ -148,11 +145,35 @@
 						id: 'import-btn',
 						text: 'Import',
 						icon: 'icons:file-upload'
-					}]
+					} ]
 				},
 
 				/**
-				 * use page nate or not
+				 * If enable toolbar or not
+				 */
+				enableToolbar: {
+					type: Boolean,
+					value: false
+				},
+
+				/**
+				 * Use pagenate or not
+				 */
+				usePagination: {
+					type: Boolean,
+					value: false
+				},
+
+				/**
+				 * Infinite Scroll 지원 여부 
+				 */
+				infiniteScroll: {
+					type: Boolean,
+					value: false
+				},
+
+				/**
+				 * Pagination 기능을 사용한다고 했을 경우 Total Page가 1보다 작은 경우에는 Paginator가 보이지 않게 하기 위한 변수 
 				 */
 				paginatable: {
 					type: Boolean,
@@ -160,8 +181,7 @@
 				},
 				
 				/**
-				 * page limit
-				 * @type {Object}
+				 * Page Limit
 				 */
 				perPage: {
 					type: Number,
@@ -169,7 +189,7 @@
 				},
 				
 				/**
-				 * current page
+				 * Current Page
 				 */
 				currentPage: {
 					type: Number,
@@ -177,7 +197,7 @@
 				},
 				
 				/**
-				 * total data count
+				 * Total Data Count
 				 */
 				totalCount: {
 					type: Number,
@@ -185,49 +205,140 @@
 				},
 
 				/**
-				 * if enable toolbar or not
-				 */
-				enableToolbar: {
-					type: Boolean,
-					value: false
-				}
-
-				/**
-				 * 그리드 이벤트 구성할 시점이 되었을 경우 fire
-				 * 이 이벤트를 받아 Things.GridEventBehavior가 동작한다.
+				 * 그리드 구성 전 발생하는 이벤트
 				 *
-				 * @event things-grid-event-configuring
+				 * @event things-grid-configure
 				 */
 				/**
-				 * 그리드 구성이 완료되었을 경우 fire
-				 * 이 이벤트를 받아 Things.GridEventBehavior가 동작한다.
+				 * 그리드 구성이 완료된 후 발생하는 이벤트
 				 *
 				 * @event things-grid-configured
 				 */
 				/**
-				 * 그리드 Row Data가 선택되었을 경우 fire
+				 * 그리드 구성 도중 에러가 발생한 경우 발생하는 이벤트
+				 *
+				 * @event things-grid-configure-failed
+				 */
+				/**
+				 * 그리드 이벤트 Behavior 구성 전 발생하는 이벤트
+				 *
+				 * @event things-grid-event-configure
+				 */
+				/**
+				 * 그리드 이벤트 Behavior 구성이 완료된 후 발생하는 이벤트
+				 *
+				 * @event things-grid-event-configured
+				 */
+				/**
+				 * 그리드 Save Behavior 구성 전 발생하는 이벤트
+				 *
+				 * @event things-grid-save-configure
+				 */
+				/**
+				 * 그리드 Save Behavior 구성이 완료된 후 발생하는 이벤트
+				 *
+				 * @event things-grid-save-configured
+				 */
+				/**
+				 * 그리드 Import Behavior 구성 전 발생하는 이벤트
+				 *
+				 * @event things-grid-import-configure
+				 */
+				/**
+				 * 그리드 Import Behavior 구성이 완료된 후 발생하는 이벤트
+				 *
+				 * @event things-grid-import-configured
+				 */
+				/**
+				 * 그리드 Export Behavior 구성 전 발생하는 이벤트
+				 *
+				 * @event things-grid-export-configure
+				 */
+				/**
+				 * 그리드 Export Behavior 구성이 완료된 후 발생하는 이벤트
+				 *
+				 * @event things-grid-export-configured
+				 */
+				/**
+				 * 그리드 Resize 전 발생하는 이벤트
+				 *
+				 * @event things-grid-resize
+				 */
+				/**
+				 * 그리드 Resize 후 발생하는 이벤트
+				 *
+				 * @event things-grid-resized
+				 */
+				/**
+				 * 그리드 Data 변경 전 발생하는 이벤트
+				 *
+				 * @event things-grid-data-change
+				 */
+				/**
+				 * 그리드 Data 변경 후 발생하는 이벤트
+				 *
+				 * @event things-grid-data-changed
+				 */
+				/**
+				 * 그리드 상세 버튼이 클릭 되었을 경우 발생하는 이벤트
+				 *
+				 * @event things-grid-detail-tap
+				 */
+				/**
+				 * 그리드 Row Data가 선택되었을 경우 발생하는 이벤트
 				 *
 				 * @event things-grid-row-data-select
 				 */
 				/**
-				 * 그리드 Cell Data가 선택되었을 경우 fire
+				 * 그리드 Cell Data가 선택되었을 경우 발생하는 이벤트
 				 *
 				 * @event things-grid-cell-data-select
 				 */
 				/**
-				 * 그리드 데이터 Save(저장/삭제/추가) 액션이 성공했을 경우 fire
+				 * 그리드 데이터 Save(저장/삭제/추가) 액션이 성공시 발생하는 이벤트
 				 *
 				 * @event things-grid-save-success
 				 */
 				/**
-				 * 그리드 데이터 Save(저장/삭제/추가) 액션시 에러가 발생 했을 경우 fire
+				 * 그리드 데이터 Save(저장/삭제/추가) 액션시 에러 발생시 발생하는 이벤트
 				 *
 				 * @event things-grid-save-error
 				 */
 				/**
-				 * 그리드 detail이 클릭 되었을 경우 
-				 * @event things-grid-detail-tap
+				 * 그리드 행 추가 전 발생하는 이벤트. 
+				 * 이 이벤트를 잡아서 event.preventDefault()를 호출하고 별도 로직을 작성하면 기본 로직을 override 할 수 있다.
+				 *
+				 * @event things-grid-handle-addrow
 				 */
+				/**
+				 * 그리드 행 삭제 전 발생하는 이벤트. 
+				 * 이 이벤트를 잡아서 event.preventDefault()를 호출하고 별도 로직을 작성하면 기본 로직을 override 할 수 있다.
+				 *
+				 * @event things-grid-handle-removerow
+				 */
+				/**
+				 * 그리드 Save(저장/삭제/추가) 로직 수행 전 발생하는 이벤트. 
+				 * 이 이벤트를 잡아서 event.preventDefault()를 호출하고 별도 로직을 작성하면 기본 로직을 override 할 수 있다.
+				 *
+				 * @event things-grid-pre-save
+				 */
+				/**
+				 * 그리드 Import 로직 수행 전 발생하는 이벤트. 
+				 * 이 이벤트를 잡아서 event.preventDefault()를 호출하고 별도 로직을 작성하면 기본 로직을 override 할 수 있다.
+				 *
+				 * @event things-grid-handle-import
+				 */
+				/**
+				 * 그리드 Import 완료 후 발생하는 이벤트. 
+				 *
+				 * @event things-grid-import-finished
+				 */
+				/**
+				 * 그리드 Export 수행 전 발생하는 이벤트. 
+				 * 이 이벤트를 잡아서 event.preventDefault()를 호출하고 별도 로직을 작성하면 기본 로직을 override 할 수 있다.
+				 *
+				 * @event things-grid-handle-export
+				 */					 
 			},
 
 			listeners: {
@@ -236,32 +347,60 @@
 				'button-group.add-btn-tap' : 'addGridRow',
 				'button-group.delete-btn-tap' : 'removeGridRow',
 				'button-group.save-btn-tap' : 'saveGridData',
-				'button-group.export-btn-tap' : 'exportGrid',
+				'button-group.export-btn-tap' : 'exportExcel',
 				'button-group.import-btn-tap' : 'importExcel'
 			},
 
+			observers: [
+				'_toolbarConfigChanged(usePagination, buttons)'
+			],
+
 			/**
-			 * Grid 구성이 실패했을 경우 
-			 * 
-			 * @event {Event} event things-grid-configure-failed
+			 * 툴바 관련 설정 변경시 
+			 *
+			 * @param {Boolean} usePagination
+			 * @param {Array} buttons
 			 */
-			_gridConfigureFailed: function(event) {
-				this.openInfoMsg({
-					type : 'warning',
-					title : 'Grid Configuration Failed',
-					text : 'Error : ' + event.detail.error
-				});
+			_toolbarConfigChanged: function(usePagination, buttons) {
+				this.enableToolbar = (usePagination || (buttons && buttons.length > 0));
 			},
 
 			/**
-			 * Grid 구성 후 추가 액션
-			 *
-			 * @event {Event} event things-grid-configured
+			 * Grid 구성이 실패한 후 핸들러
+			 * 
+			 * @param {Event} event things-grid-configure-failed
 			 */
-			_initializeResourceGrid: function(e) {
+			_gridConfigureFailed: function(event) {
+				var title = 'Grid Configuration Error';
+				var text = 'Error : ' + event.detail.error;
+				this.openInfoMsg({ type : 'error', title : title, text : text });
+			},
+
+			/**
+			 * Grid 구성이 완료된 후 핸들러 
+			 *
+			 * @param {Event} event things-grid-configured
+			 */
+			_initializeResourceGrid: function(event) {
 				console.log('things-resource-grid received [things-grid-configured]');
+				if(this.infiniteScroll) {
+					this.grid.onScrollToBottom = '_gridScrollToBottom';
+				}
 				this.fire('things-resource-grid-configured', this.grid);
-			}
+			},
+
+			/**
+			 * 그리드에서 스크롤이 아래로 향했을 경우 핸들러
+			 *
+			 * @param {Object} grid
+			 */
+			_gridScrollToBottom: function(grid) {
+				var thingsGrid = grid._container_;
+
+				if(thingsGrid.totalCount > thingsGrid.pageEndIdx) {
+					thingsGrid.page += 1; 
+				}
+			} 
 
 		});
 	</script>
