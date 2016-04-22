@@ -42,7 +42,7 @@
 
     <things-resource-grid 
       id="grid"
-      grid-model="[[gridModel]]" 
+      model="[[gridModel]]" 
       columns="[[gridColumns]]" 
       read-data="[[gridData]]"
       page="{{page}}"
@@ -90,6 +90,7 @@
 				class="white"
 				hidden$="{{!enableToolbar}}">
 				<div id="gridToolbar" class="bottom fit">
+
 					<things-paginator
 						hidden$="{{!paginatable}}"
 						id ="paginator"
@@ -99,8 +100,6 @@
 						page-start-idx="[[pageStartIdx]]"
 						page-end-idx="[[pageEndIdx]]">
 					</things-paginator>
-
-					<things-import-excel id ="excelImport" sheet-name="Sheet1"></things-import-excel>
 
 					<!--things-button-bar id="button-group" buttons="[[buttons]]"></things-button-bar-->
 
@@ -113,6 +112,7 @@
 						method = "POST"
 						body="{{writeData}}">
 					</things-ajax>
+					
 				</div>
 			</paper-toolbar>
 		</paper-material>
@@ -132,17 +132,6 @@
 			],
 	
 			properties: {
-				/**
-				 * 핸들링하고자 하는 grid event를 설정한다. { grid event 명 : 'event handler 명' }
-				 */
-				events : {
-					type: Object,
-					value: {
-						onDataCellClicked : '_gridCellClicked',
-						onScrollToBottom :'_gridScrollToBottom'
-					}
-				},
-
 				/**
 				 * 추가할 button 정보
 				 */
@@ -214,7 +203,19 @@
 					type: Boolean,
 					value: false
 				}
-				
+
+				/**
+				 * 그리드 이벤트 구성할 시점이 되었을 경우 fire
+				 * 이 이벤트를 받아 Things.GridEventBehavior가 동작한다.
+				 *
+				 * @event things-grid-event-configuring
+				 */
+				/**
+				 * 그리드 구성이 완료되었을 경우 fire
+				 * 이 이벤트를 받아 Things.GridEventBehavior가 동작한다.
+				 *
+				 * @event things-grid-configured
+				 */
 				/**
 				 * 그리드 Row Data가 선택되었을 경우 fire
 				 *
@@ -242,6 +243,7 @@
 			},
 
 			listeners: {
+				'things-grid-configured' : '_initiateResourceGrid',				
 				'save-resource.things-ajax-response' : '_successSaveHandler',
 				'save-resource.things-ajax-error' : '_errorSaveHandler',
 				'button-group.export-btn-tap' : '_exportGridDataHandler',
@@ -252,14 +254,6 @@
 			},
 
 			/**
-			 * Life Cycle - Create
-			 */
-			created: function() {
-				DataLudi.setRootContext('');
-				DataLudi.setAssetRoot('images/grid');
-			},
-
-			/**
 			 * Life Cycle - Detached
 			 */
 			detached: function() {
@@ -267,26 +261,9 @@
 			},
 
 			/**
-			 * grid 구성 후 추가 액션, callback으로 function전달
+			 * grid 구성 후 추가 액션, callback으로 function 전달
 			 */
-			afterGridInitiated: function() {
-				this.grid.footer().setVisible(false);
-				this.fire('things-resource-grid-configured', this.grid);
-				
-				// header가 ...인 경우 Resource Selector
-				var me = this;
-				this.grid.onDataCellDblClicked = function (grid, index) {
-					var column = index.column;
-					if(column._header && column._header._text == '...' && 
-						 column._renderer && column._renderer.type && column._renderer.type == 'icon') {
-						var matchColumn = me.columns.filter(function(col) { return (column._name == col.name); });
-						me.fire('things-grid-resource-column-edit', { 
-							userObj : matchColumn ? matchColumn[0].userObj : null, 
-							index: index 
-						});
-					}
-				};
-
+			_initiateResourceGrid: function(e) {
 				// enableToolbar가 true인 경우 c.u.d 활성화
 				if(this.enableToolbar) {
 					this.grid.editOptions().setInsertable(true);
@@ -294,6 +271,8 @@
 					this.grid.editOptions().setUpdatable(true);
 					this.grid.editOptions().setDeletable(true);
 				}
+
+				this.fire('things-resource-grid-configured', this.grid);				
 			},
 
 			/**
@@ -334,62 +313,13 @@
 			_importExcelHandler: function(e) {
 				var evt = this.fire('things-grid-handle-import', e.detail, { cancelable: true });
 				if(!evt.defaultPrevented) this.importExcel();
-			},			
-
-			/**
-			 * TODO Things.GridEventBehavior와 중복 
-			 * 
-			 * Dataludi grid cell click 이벤트 핸들러 
-			 *
-			 * @param {Object} grid
-			 * @param {Object} cellData
-			 */
-			_gridCellClicked: function(grid, cellData) {
-				if(!grid._container_ || !cellData) return;
-
-				var thingsGrid = grid._container_;
-
-				if (cellData.dataColumn() && cellData.getDataIndex(grid) >= 0) {
-					var rowIndex = cellData.getDataIndex(grid);
-					var colIndex = cellData.dataField();
-					var row = grid.focusedRow();
-
-					if(row && row.dataIndex() >= 0) {
-						thingsGrid.selectedRowData = row.getRowObject();
-						thingsGrid.fire('things-grid-row-data-select', thingsGrid.selectedRowData);
-					}
-
-					if(cellData.dataField() >= 0) {
-						if(thingsGrid.dataSet) {
-							thingsGrid.selectedCellData = thingsGrid.dataSet.getValue(rowIndex, colIndex);
-							thingsGrid.fire('things-grid-cell-data-select', { row : thingsGrid.selectedRowData, cell: cellData });
-						}
-					}
-					
-					if(thingsGrid.enableDetailColumn && cellData.column._name == 'Detail' && 
-						 cellData.column._renderer && cellData.column._renderer.type == 'icon') {
-						thingsGrid.selectedRowData = row.getRowObject();
-						thingsGrid.fire('things-grid-detail-tap', thingsGrid.selectedRowData);
-					}
-				}
-			},
-
-			/**
-			 * Dataludi grid scroll to bottom event handller 
-			 */
-			_gridScrollToBottom: function(grid) {
-				var thingsGrid = grid._container_;
-				if(thingsGrid.totalCount > thingsGrid.pageEndIdx) {
-					thingsGrid.page += 1;	
-				}				
 			},
 
 			/**
 			 * grid save action
 			 */
 			_gridSaveAction: function() {
-				// Allow for a presubmit hook
-				var event = this.fire('things-grid-pre-save', {}, {cancelable: true});
+				var event = this.fire('things-grid-pre-save', {}, { cancelable: true });
 
 				if(!event.defaultPrevented) {
 					this.$['save-resource'].generateRequest();

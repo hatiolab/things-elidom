@@ -76,7 +76,11 @@
 				this._configureChangedData(changedDataList, 'updated', 'u');
 				this._configureChangedData(changedDataList, 'deleted', 'd');
 				this.writeData = changedDataList;
+				
 				this._gridSaveAction();
+				// TODO event fire && resource grid에서 받아서 처리 
+				//this.fire('things-grid-about-to-save');
+
 			} catch (err) {
 				this.openInfoMsg({
 					type : 'warning',

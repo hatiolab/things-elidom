@@ -9,13 +9,13 @@
   window.Things = window.Things || {};
 
   /**
-   * 그리드 설정을 담당하는 Behavior. 
+   * 트리 그리드 설정을 담당하는 Behavior. 
    * 그리드, 그리드 모델, 그리드 컬럼에 대한 설정을 통해 그리드를 설정하고 그리는 기능까지 담당한다.
    * dataludi grid를 사용하고 중요한 설정사항은 크게 grid config, grid fields (model), grid columns 설정이 있다.
    *
    * @demo ./things-grid-behavior/demo/index.html
    */
-  Things.GridConfigBehaviorImpl = {
+  Things.TreeGridConfigBehaviorImpl = {
 
     properties: {
 
@@ -74,7 +74,7 @@
       dataSet: {
         type: Object,
         value: function() {
-          return DataLudi.createGridDataSet();
+          return DataLudi.createTreeDataSet();
         }
       },
 
@@ -126,18 +126,18 @@
         DataLudi.setRootContext('');
         DataLudi.setAssetRoot('images/grid');
         this.gridContainerId = this.generateGuid();
-        this.grid = DataLudi.createGridView(this.gridContainerId, null, false);
+        this.grid = DataLudi.createTreeView(this.gridContainerId, null, false);
         this.grid.setDataSource(this.dataSet);
 
         this.grid.registerImageList({
-          name: 'images',
-          root: 'images/grid/',
+          name: "images",
+          root: "images/grid/",
           items: [
-            'iconDetail.png',
-            'ellipsis_hover.png',
-            'indicator_insert.png',
-            'menu_button.png',
-            'menu_button_hover.png'
+            "iconDetail.png",
+            "ellipsis_hover.png",
+            "indicator_insert.png",
+            "menu_button.png",
+            "menu_button_hover.png"
           ]});
 
           this.grid.body().setCellDynamicStyles([{
@@ -331,8 +331,8 @@
     }
   };
 
-  Things.GridConfigBehavior = [
-    Things.GridConfigBehaviorImpl,
+  Things.TreeGridConfigBehavior = [
+    Things.TreeGridConfigBehaviorImpl,
     Things.GUIDBehavior
   ];
 

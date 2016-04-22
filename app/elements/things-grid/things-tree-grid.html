@@ -2,53 +2,8 @@
 <link rel="import" href="../../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
 
-<link rel="import" href="../things-paginator/things-paginator.html">
-<link rel="import" href="../things-grid-behavior/things-grid-tree-behavior.html">
-
-<!--
-기본 그리드. 그리드, 그리드 모델, 그리드 컬럼에 대한 설정을 통해 그리드를 표시한다.
-
-pagination을 지원하고 데이터를 표시한 후 저장이나 삭제 등의 트랜잭션 기능은 없다.
-
-	Example:
-
-	  <things-ajax 
-	    auto
-	    method="GET"
-	    resource-url="diy_services/ElidomGridModel/query.json" 
-	    last-response="{{gridModel}}">
-	  </things-ajax>
-
-	  <things-ajax 
-	    auto
-	    method="GET"
-	    resource-url="diy_services/ElidomGridColumn/query.json" 
-	    last-response="{{gridColumns}}">
-	  </things-ajax>
-
-	  <things-ajax 
-	    id="search-resource"
-	    method="GET"
-	    resource-url="terminologies" 
-	    last-response="{{gridData}}">
-	  </things-ajax>
-
-	  <things-basic-grid 
-	    id="grid"
-	    grid-model="[[gridModel]]" 
-	    columns="[[gridColumns]]" 
-	    read-data="[[gridData]]"
-	    page="{{page}}"
-	    limit="{{limit}}"
-	    root-property="items"
-	    total-property="total"
-	    selected-row-data="{{selectedRow}}"
-	    page-start-idx="{{pageStartIdx}}"
-	    page-end-idx="{{pageEndIdx}}">
-	  </things-basic-grid>
-
-@demo ./things-grid/demo/demo-things-basic-grid.html
--->
+<link rel="import" href="../things-grid-behavior/things-tree-grid-config-behavior.html">
+<link rel="import" href="../things-grid-behavior/things-tree-grid-event-behavior.html">
 
 <dom-module id="things-tree-grid">
 	<template>
@@ -88,35 +43,11 @@ pagination을 지원하고 데이터를 표시한 후 저장이나 삭제 등의
 			is: 'things-tree-grid',
 
 			behaviors: [
-				Things.GridTreeBehavior
+				Things.TreeGridConfigBehavior,
+				Things.TreeGridEventBehavior
 			],
 	
 			properties: {
-				/**
-				 * use page nate or not
-				 */
-				paginatable: {
-					type: Boolean,
-					value: false
-				},
-
-				/**
-				 * page limit
-				 * @type {Object}
-				 */
-				perPage: {
-					type: Number,
-					notify: true
-				},
-
-				/**
-				 * current page
-				 */
-				currentPage: {
-					type: Number,
-					notify: true
-				},
-
 				/**
 				 * total data count
 				 */
@@ -126,39 +57,16 @@ pagination을 지원하고 데이터를 표시한 후 저장이나 삭제 등의
 				},
 
 				/**
-				 * 핸들링하고자 하는 grid event를 설정한다. { grid event 명 : 'event handler 명' }
-				 */
-				events : {
-					type: Object,
-					value: {
-						onDataCellClicked : '_gridCellClicked',
-						onScrollToBottom :'_gridScrollToBottom'
-					}
-				},
-
-				/**
 				 * if enable toolbar or not
 				 */
 				enableToolbar: {
 					type: Boolean,
 					value: false
 				}
-
-				/**
-				 * 그리드 Row Data가 선택되었을 경우 fire
-				 *
-				 * @event things-grid-row-data-select
-				 */
-				/**
-				 * 그리드 Cell Data가 선택되었을 경우 fire
-				 *
-				 * @event things-grid-cell-data-select
-				 */				
 			},
 
-			created: function() {
-				DataLudi.setRootContext('');
-				DataLudi.setAssetRoot('../../../images/grid');
+			listeners: {
+				'things-grid-configured' : '_initiateResourceGrid',
 			},
 
 			detached: function() {
@@ -168,8 +76,8 @@ pagination을 지원하고 데이터를 표시한 후 저장이나 삭제 등의
 			/**
 			 * grid 구성 후 추가 액션 
 			 */
-			afterGridInitiate: function() {
-				this.fire("things-grid-configured", this.grid);
+			_initiateResourceGrid: function(e) {
+				this.fire("things-tree-grid-configured", this.grid);
 			}
 
 		});
