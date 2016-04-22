@@ -1,0 +1,25 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="./things-resource-meta-behavior.html">
+
+<dom-module id="things-resource-meta">
+	<template>
+		<things-ajax 
+			id="meta-ajax"
+			resource-url="{{resourceMetaUrl}}"
+			last-response="{{metaData}}">
+		</things-ajax>
+	</template>
+
+	<script>
+		Polymer({
+			is: 'things-resource-meta',
+			
+			behaviors: [ Things.ResourceMetaBehavior ],
+
+			loadMeta: function() {
+				this.$['meta-ajax'].generateRequest();
+			}
+		});
+	</script>
+</dom-module>
