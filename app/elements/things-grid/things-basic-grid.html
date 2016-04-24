@@ -2,13 +2,12 @@
 <link rel="import" href="../../../bower_components/paper-material/paper-material.html">
 
 <link rel="import" href="../things-grid-behavior/things-grid-config-behavior.html">
-<link rel="import" href="../things-grid-behavior/things-grid-event-behavior.html">
 <link rel="import" href="../things-grid-behavior/things-grid-export-behavior.html">
 <link rel="import" href="../things-grid-behavior/things-grid-import-behavior.html">
 <link rel="import" href="../things-grid-behavior/things-grid-save-behavior.html">
 
 <!--
-기본 라소스 그리드. 기본 리소스 그리드는 두 개의 GridBehavior (Things.GridConfigBehavior, Things.GridEventBehavior)만 
+기본 라소스 그리드. 기본 리소스 그리드는 기본 GridBehavior(Things.GridConfigBehavior)만 
 mixin 하고 있어서 그리드에 데이터만 표시하는데 사용된다. 
 
 	Example:
@@ -84,8 +83,7 @@ mixin 하고 있어서 그리드에 데이터만 표시하는데 사용된다.
 			is: 'things-basic-grid',
 
 			behaviors: [
-				Things.GridConfigBehavior,
-				Things.GridEventBehavior
+				Things.GridConfigBehavior
 			],
 
 			properties: {

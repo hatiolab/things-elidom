@@ -1,4 +1,5 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="../things-id/things-guid-behavior.html">
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 
@@ -12,7 +13,7 @@
   /**
    * 그리드 설정을 담당하는 Behavior. 
    * 그리드, 그리드 모델, 그리드 컬럼에 대한 설정을 통해 그리드를 설정하고 그리는 기능까지 담당한다.
-   * dataludi grid를 사용하고 중요한 설정사항은 크게 grid config, grid fields (model), grid columns 설정이 있다.
+   * Dataludi grid를 사용하고 중요한 설정사항은 크게 grid config, grid fields (model), grid columns 및 event 설정이 있다.
    *
    * @demo ./things-grid-behavior/demo/index.html
    */
@@ -52,17 +53,19 @@
       },
 
       /**
-       * Grid data model - array of fields
+       * Grid Data Model - array of fields
        */
       model: {
-        type: Array
+        type: Array,
+        reflectToAttribute: true // For TEST
       },
 
       /**
        * Grid view column
        */
       columns: {
-        type: Array
+        type: Array,
+        reflectToAttribute: true // For TEST
       },
       
       /**
@@ -76,11 +79,73 @@
       },
 
       /**
+       * Read data
+       */
+      data: {
+        type: Object
+      },      
+
+      /**
        * Grid Height
        */
       gridHeight: {
         type: Number,
         value: 300
+      },
+
+      /**
+       * 그리드 이미지 루트 
+       */
+      gridImageDir: {
+        type: String,
+        value: 'images/grid/'
+      },
+
+      /**
+       * Grid에서 사용할 이미지 리스트 
+       */
+      gridImageItems: {
+        type: Array,
+        value: function() {
+          return [
+            'iconDetail.png',
+            'ellipsis_hover.png',
+            'indicator_insert.png',
+            'menu_button.png',
+            'menu_button_hover.png'
+          ];
+        }
+      },
+
+      /**
+       * Grid Cell Styles
+       */
+      gridCellStyles: {
+        type: Array,
+        value: function() {
+          return [ {
+            expression: "state == 'c'",
+            styles: {
+              background: '#1000ff00'
+            }
+          }, {
+            expression: "(row % 2) > 0",
+            styles: {
+              background: '#20006060'
+            }
+          } ];
+        }
+      },
+
+      /**
+      * 핸들링하고자 하는 grid event를 설정한다. { grid event 명 : 'event handler 명' }
+      */
+      events : {
+        type: Object,
+        value: {
+          'onDataCellClicked': '_gridCellClicked',
+          'onDataCellDblClicked': '_gridCellDblClicked'
+        }
       },
 
       /**
@@ -100,23 +165,31 @@
       },
 
       /**
-       * 그리드 이미지 루트 
+       * 선택된 row data
        */
-      gridImageDir: {
-        type: String,
-        value: 'images/grid/'
+      selectedRowData: {
+        type: Object,
+        notify: true,
+        readOnly: true
       },
 
       /**
-       * Read data
+       * 선택된 cell data
        */
-      data: {
-        type: Object
-      }       
+      selectedCellData: {
+        type: Object,
+        notify: true,
+        readOnly: true
+      }
     },
 
+    listeners: {
+      'iron-resize': '_gridScreenResizeHandler'
+    },    
+
     observers: [
-      '_configurationsChanged(model, columns)'
+      '_configurationsChanged(model, columns)',
+      '_gridDataChanged(data)'
     ],
 
     /**
@@ -144,29 +217,12 @@
       DataLudi.setAssetRoot(this.gridImageDir);
       this.grid = DataLudi.createGridView(this.gridContainerId, null, false);
       this.grid.setDataSource(this.dataSet);
-
       this.grid.registerImageList({
         name: 'images',
         root: this.gridImageDir,
-        items: [
-          'iconDetail.png',
-          'ellipsis_hover.png',
-          'indicator_insert.png',
-          'menu_button.png',
-          'menu_button_hover.png'
-        ]});
-
-      this.grid.body().setCellDynamicStyles([{
-        expression: "state == 'c'",
-        styles: {
-          background: '#1000ff00'
-        }
-      }, {
-        expression: "(row % 2) > 0",
-        styles: {
-          background: '#20006060'
-        }
-      } ]);
+        items: this.gridImageItems});
+      this.grid.body().setCellDynamicStyles(this.gridCellStyles);
+      this.grid.footer().setVisible(this.showGridFooter);      
 
       this.grid._container_ = this;
 
@@ -186,9 +242,19 @@
         this.dataSet.setRows(this.data);
       }
 
-      this.grid.footer().setVisible(this.showGridFooter);
+      if (this.grid && this.events) {
+        var evt = this.fire('things-grid-event-configure', this.grid, { cancelable: true });
+        if(!evt.defaultPrevented) {
+          for (var eventName in this.events) {
+            this.grid[eventName] = this[this.events[eventName]];
+          }
+
+          this.fire('things-grid-event-configured', this.grid);
+        }
+      }      
+
       this.resizeGrid(this.parentNode, this.querySelector('div'));
-    },
+    },    
 
     /**
      * Clear Grid
@@ -199,7 +265,7 @@
       this.model = null;
       this.columns = null;
 
-      if (this.grid && this.grid._container_) {
+      if(this.grid && this.grid._container_) {
         this.grid._container_ = null;
       }
 
@@ -231,6 +297,11 @@
       gridContainer.style.height = this.gridHeight + 'px';
       this.grid.resetSize();
     },
+
+    /**********************************************************************************
+     *                            Grid Configuration
+     **********************************************************************************
+
 
     /**
      * Configurations changed
@@ -377,11 +448,103 @@
           }
         });
       }
-    }
+    },
+
+    /**********************************************************************************
+     *                            Grid Event
+     **********************************************************************************
+
+    /**
+     * 데이터 변경 이벤트 핸들러 
+     *
+     * @event {Event} e
+     */
+    _gridDataChanged: function(e) {
+      var evt = this.fire('things-grid-data-change', this.data, { cancelable: true });
+      if(!evt.defaultPrevented && this.data && this.dataSet) {
+        this.dataSet.setRows(this.data);
+        this.fire('things-grid-data-changed', this.data);
+      }
+    },    
+
+    /**
+     * 화면 리사이즈 시 이벤트 핸들러
+     *
+     * @event {Event} iron-resize 이벤트
+     */
+    _gridScreenResizeHandler: function(e) {
+      var evt = this.fire('things-grid-resize', this.grid, { cancelable: true });
+      if(!evt.defaultPrevented) {
+        if(this.parentNode.offsetWidth > 0 && this.grid == null) {
+          this.initializeGrid();
+        }
+
+        if(this.grid != null && this.grid._container) {
+          this.resizeGrid(this.parentNode, this.querySelector('div'));
+        }
+
+        this.fire('things-grid-resized', this.grid);
+      }
+    },
+
+    /**
+     * Grid Cell Click 이벤트 핸들러 
+     *
+     * @param {Object} grid
+     * @param {Object} cellData
+     */
+    _gridCellClicked: function(grid, cellData) {
+      if(!grid._container_ || !cellData) return;
+
+      var thingsGrid = grid._container_;
+
+      if (cellData.dataColumn() && cellData.getDataIndex(grid) >= 0) {
+        var rowIndex = cellData.getDataIndex(grid);
+        var colIndex = cellData.dataField();
+        var row = grid.focusedRow();
+
+        if(row && row.dataIndex() >= 0) {
+          thingsGrid._setSelectedRowData(row.getRowObject());
+          thingsGrid.fire('things-grid-row-data-select', thingsGrid.selectedRowData);
+        }
+
+        if(thingsGrid.dataSet && cellData.dataField() >= 0) {
+          thingsGrid._setSelectedCellData(thingsGrid.dataSet.getValue(rowIndex, colIndex));
+          thingsGrid.fire('things-grid-cell-data-select', { row: thingsGrid.selectedRowData, cell: cellData });
+        }
+
+        if(thingsGrid.enableDetailColumn && cellData.column._name == 'Detail' && 
+           cellData.column._renderer && cellData.column._renderer.type == 'icon') {
+          thingsGrid._setSelectedRowData(row.getRowObject());
+          thingsGrid.fire('things-grid-detail-tap', thingsGrid.selectedRowData);
+        }
+      }
+    },
+
+    /**
+     * Grid Cell Double Click 이벤트 핸들러 
+     *
+     * @param {Object} grid
+     * @param {Object} index
+     */
+    _gridCellDblClicked: function(grid, index) {
+      var me = grid._container_;
+      var column = index.column;
+
+      if(column._header && column._header._text == '...' && 
+         column._renderer && column._renderer.type && column._renderer.type == 'icon') {
+        var matchColumn = me.columns.filter(function(col) { return (column._name == col.name); });
+        me.fire('things-grid-resource-column-edit', { 
+          userObj : matchColumn ? matchColumn[0].userObj : null, 
+          index: index 
+        });
+      }
+    }    
   };
 
   Things.GridConfigBehavior = [
     Things.GridConfigBehaviorImpl,
+    Polymer.IronResizableBehavior,
     Things.GUIDBehavior,
     Things.MsgBoxBehavior
   ];

@@ -2,7 +2,6 @@
 <link rel="import" href="../../../bower_components/paper-material/paper-material.html">
 
 <link rel="import" href="../things-grid-behavior/things-grid-config-behavior.html">
-<link rel="import" href="../things-grid-behavior/things-grid-event-behavior.html">
 <link rel="import" href="../things-grid-behavior/things-grid-export-behavior.html">
 <link rel="import" href="../things-grid-behavior/things-grid-import-behavior.html">
 <link rel="import" href="../things-grid-behavior/things-grid-save-behavior.html">
@@ -65,8 +64,7 @@
 			is: 'things-diy-grid',
 
 			behaviors: [
-				Things.GridConfigBehavior,
-				Things.GridEventBehavior
+				Things.GridConfigBehavior
 			],
 
 			properties: {
@@ -206,7 +204,6 @@
 			 * @event {Event} event things-grid-configured
 			 */
 			_initializeBasicGrid: function(e) {
-				console.log('things-diy-grid received [things-grid-configured]');
 				this.fire('things-diy-grid-configured', this.grid);
 			}
 
