@@ -1,0 +1,201 @@
+<script src='../../../bower_components/jszip/dist/jszip.min.js'></script>
+
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../things-paginator/things-paginator.html">
+
+<script>
+
+	window.Things = window.Things || {};
+
+	/**
+	 * 그리드에 Pagination 기능을 제공하는 그리드 Behavior 
+	 */
+	Things.GridPaginationBehavior = {
+
+		properties: {
+
+			/**
+			 * Use pagenate or not
+			 */
+			paginatable: {
+				type: Boolean,
+				value: true
+			},
+			
+			/**
+			 * Infinite Scroll 지원 여부 
+			 */
+			infiniteScroll: {
+				type: Boolean,
+				value: false
+			},
+
+			/**
+			 * Page Limit
+			 */
+			perPage: {
+				type: Number,
+				value: 50,
+				notify: true,
+				observer: '_perPageChanged'
+			},
+			
+			/**
+			 * Current Page
+			 */
+			currentPage: {
+				type: Number,
+				value: 1,
+				notify: true,
+				observer: '_currentPageChanged'
+			},
+			
+			/**
+			 * Total Data Count
+			 */
+			totalCount: {
+				type: Number,
+				value: 0,
+				notify: true,
+				observer: '_totalCountChanged'
+			},
+
+			/**
+			 * Page Start Index
+			 */
+			pageStartIdx: {
+				type: Number,
+				value: 1
+			},
+
+			/**
+			 * Page End Index
+			 */
+			pageEndIdx: {
+				type: Number,
+				value: 1
+			}
+
+		},
+
+		listeners: {
+			'things-grid-configured' : '_initializePaginationHandler',
+			'things-grid-data-change' : '_infiniteGridDataChangedHandler',			
+		},
+
+		/**
+		 * Ready
+		 */
+		ready: function() {
+			// Add Paginator Element
+			var paginator = document.createElement('things-paginator');
+			paginator.id = 'paginator';
+			paginator.perPage = this.perPage;
+			paginator.currentPage = this.currentPage;
+			paginator.totalCount = this.totalCount;
+			paginator.pageStartIdx = this.pageStartIdx;
+			paginator.pageEndIdx = this.pageEndIdx;
+			this.$.paginator = paginator;
+
+			var me = this;
+
+			// Add Event Listener things-paginator's properties changed
+			paginator.addEventListener("current-page-changed", function(ev) {
+				me.currentPage = this.currentPage;
+			});
+
+			paginator.addEventListener("page-start-idx-changed", function(ev) {
+				me.pageStartIdx = this.pageStartIdx;
+			});
+
+			paginator.addEventListener("page-end-idx-changed", function(ev) {
+				me.pageEndIdx = this.pageEndIdx;
+			});
+
+			Polymer.dom(this.$['toolbar-paginator-div']).appendChild(paginator);
+		},
+
+		/**
+		 * perPage 변경시 핸들러
+		 *
+		 * @param {Number} newValue
+		 */
+		_perPageChanged: function(newValue) {
+			if(this.$.paginator) {
+				this.$.paginator.perPage = newValue;
+			}
+		},
+
+		/**
+		 * currentPage 변경시 핸들러
+		 *
+		 * @param {Number} newValue
+		 */
+		_currentPageChanged: function(newValue) {
+			if(this.$.paginator) {
+				this.$.paginator.currentPage = newValue;
+			}
+		},
+
+		/**
+		 * totalCount 변경시 핸들러
+		 *
+		 * @param {Number} newValue
+		 */
+		_totalCountChanged: function(newValue) {
+			if(this.$.paginator) {
+				this.$.paginator.totalCount = newValue;
+			}
+		},
+
+		/**
+		 * 그리드 구성이 완료된 후 GridPaginationBehavior를 initialize 한다.
+		 *
+		 * @event {Event} event things-grid-configured
+		 */
+		_initializePaginationHandler: function(e) {
+			if(this.grid) {
+				var evt = this.fire('things-grid-paginator-configure', this.grid, { cancelable: true });
+				if(!evt.defaultPrevented) {
+					// infiniteScroll 일 경우 처리 
+					if(this.infiniteScroll) {
+						this.grid.onScrollToBottom = '_gridScrollToBottom';
+					}
+
+					this.fire('things-grid-paginator-configured', this.grid);
+				}
+			}
+		},
+
+		/**
+		 * 그리드에서 스크롤이 아래로 향했을 경우 핸들러
+		 *
+		 * @param {Object} grid
+		 */
+		_gridScrollToBottom: function(grid) {
+			var thingsGrid = grid._container_;
+
+			if(thingsGrid.totalCount > thingsGrid.pageEndIdx) {
+				thingsGrid.page += 1; 
+			}
+		},
+
+		/**
+		 * 그리드 데이터가 변경된 경우 핸들러 Override, 
+		 * InfiniteScroll인 경우에만 Override한다.
+		 *
+		 * @param {Event} event
+		 */
+		_infiniteGridDataChangedHandler: function(event) {
+			if(this.infiniteScroll) {
+				event.preventDefault();
+				this.dataSet.appendRows(this.data, 0, -1, false);
+				this.dataSet.clearRowStates();
+				this.fire('things-grid-data-changed', this.data);
+			}
+		}		
+		
+	};
+
+</script>

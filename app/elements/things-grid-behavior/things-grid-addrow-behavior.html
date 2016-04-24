@@ -1,0 +1,49 @@
+<script src='../../../bower_components/jszip/dist/jszip.min.js'></script>
+
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<script>
+
+	window.Things = window.Things || {};
+
+	/**
+	 * 그리드에 행을 추가하는 기능을 제공하는 그리드 Behavior 
+	 */
+	Things.GridAddrowBehavior = {
+
+		listeners: {
+			'things-grid-configured' : '_initializeAddrowHandler'
+		},
+
+		/**
+		 * 그리드 구성이 완료된 후 GridAddRowBehavior를 initialize 한다.
+		 *
+		 * @event {Event} event things-grid-configured
+		 */
+		_initializeAddrowHandler: function(e) {
+			if(this.grid) {
+				var evt = this.fire('things-grid-addrow-configure', this.grid, { cancelable: true });
+				if(!evt.defaultPrevented) {
+					this.grid.editOptions().setInsertable(true);
+					this.grid.editOptions().setAppendable(true);
+					this.fire('things-grid-addrow-configured', this.grid);
+				}
+			}
+		},
+
+		/**
+		 * Add Grid Row
+		 *
+		 * @event {Event} event button tap event
+		 */
+		addGridRow: function(e) {
+			var evt = this.fire('things-grid-handle-addrow', e.detail, { cancelable: true });
+			if(!evt.defaultPrevented) {
+				// TODO model 정보로 부터 모델을 만들어서 insert
+				this.dataSet.insertRow(0, {});
+			}
+		}
+		
+	};
+
+</script>

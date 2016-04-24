@@ -6,14 +6,18 @@
 <link rel="import" href="../things-button/things-button-bar.html">
 <link rel="import" href="../things-paginator/things-paginator.html">
 
+<link rel="import" href="../things-grid-behavior/things-resource-grid-behavior.html">
 <link rel="import" href="../things-grid-behavior/things-grid-config-behavior.html">
 <link rel="import" href="../things-grid-behavior/things-grid-export-behavior.html">
 <link rel="import" href="../things-grid-behavior/things-grid-import-behavior.html">
+<link rel="import" href="../things-grid-behavior/things-grid-addrow-behavior.html">
+<link rel="import" href="../things-grid-behavior/things-grid-soft-deleterow-behavior.html">
 <link rel="import" href="../things-grid-behavior/things-grid-save-behavior.html">
 
 <!--
 기본 라소스 그리드. 
 Pagination을 지원하고 import, export, add, delete, save가 가능한 그리드
+Things.ResourceGridBehavior에 필요한 모든 구현이 포함되어 있다. 
 
 	Example:
 
@@ -42,9 +46,10 @@ Pagination을 지원하고 import, export, add, delete, save가 가능한 그리
       id="grid"
       model="[[gridModel]]" 
       columns="[[gridColumns]]" 
-      data="[[gridData]]"
-      page="{{page}}"
-      limit="50"
+      data="[[gridData.items]]"
+      total-count="[[gridData.total]]"
+      current-page="1"
+      per-page="50"
       grid-save-action="terminologies/update_multiple">
     </things-resource-grid>
 
@@ -81,18 +86,14 @@ Pagination을 지원하고 import, export, add, delete, save가 가능한 그리
 			<div id="{{gridContainerId}}"></div>
 		
 			<paper-toolbar class="white" hidden$="{{!enableToolbar}}">
-				<div class="bottom fit">
-					<things-paginator
-						hidden$="{{!paginatable}}"
-						id ="paginator"
-						per-page="{{perPage}}" 
-						current-page="{{currentPage}}" 
-						total-count="[[totalCount]]"
-						page-start-idx="[[pageStartIdx]]"
-						page-end-idx="[[pageEndIdx]]">
-					</things-paginator>
+				<!-- paginator -->
+				<div id="toolbar-paginator-div" class="middle fit">
+					<!--content></content-->
+				</div>
 
-					<things-button-bar id="button-group" buttons="[[buttons]]"></things-button-bar>
+				<!-- button group -->
+				<div id="toolbar-button-group-div" class="bottom fit">					
+					<things-button-bar id="button-group" buttons="[[buttons]]"></things-button-bar>					
 					<!--things-button-group id="button-group" buttons="[[buttons]]"></things-button-group-->
 				</div>
 			</paper-toolbar>
@@ -104,92 +105,10 @@ Pagination을 지원하고 import, export, add, delete, save가 가능한 그리
 			is: 'things-resource-grid',
 
 			behaviors: [
-				Things.GridConfigBehavior,
-				Things.GridSaveBehavior,
-				Things.GridImportBehavior,
-				Things.GridExportBehavior
+				Things.ResourceGridBehavior
 			],
 	
 			properties: {
-
-				/**
-				 * Button Group에 표시될 버튼 정보
-				 */
-				buttons : {
-					type: Array,
-					value: [ {
-						id: 'export-btn',
-						text: 'Export',
-						icon: 'icons:swap-vert'
-					}, {
-						id: 'add-btn',
-						text: 'Add',
-						icon: 'icons:add'
-					}, {
-						id: 'delete-btn',
-						text: 'Delete',
-						icon: 'icons:delete'
-					}, {
-						id: 'save-btn',
-						text: 'Save',
-						icon: 'icons:save',
-						confirm: true,
-						title: 'Confirmation',
-						message: 'Are you sure to save?'
-					}, {
-						id: 'import-btn',
-						text: 'Import',
-						icon: 'icons:file-upload'
-					} ]
-				},
-
-				/**
-				 * If enable toolbar or not
-				 */
-				enableToolbar: {
-					type: Boolean,
-					value: false
-				},
-
-				/**
-				 * Infinite Scroll 지원 여부 
-				 */
-				infiniteScroll: {
-					type: Boolean,
-					value: false
-				},
-
-				/**
-				 * Use pagenate or not
-				 */
-				paginatable: {
-					type: Boolean,
-					value: true
-				},
-				
-				/**
-				 * Page Limit
-				 */
-				perPage: {
-					type: Number,
-					notify: true
-				},
-				
-				/**
-				 * Current Page
-				 */
-				currentPage: {
-					type: Number,
-					notify: true
-				},
-				
-				/**
-				 * Total Data Count
-				 */
-				totalCount: {
-					type: Number,
-					notify: true
-				},
 
 				/**
 				 * 그리드 구성 전 발생하는 이벤트
@@ -217,16 +136,6 @@ Pagination을 지원하고 import, export, add, delete, save가 가능한 그리
 				 * @event things-grid-event-configured
 				 */
 				/**
-				 * 그리드 Save Behavior 구성 전 발생하는 이벤트
-				 *
-				 * @event things-grid-save-configure
-				 */
-				/**
-				 * 그리드 Save Behavior 구성이 완료된 후 발생하는 이벤트
-				 *
-				 * @event things-grid-save-configured
-				 */
-				/**
 				 * 그리드 Import Behavior 구성 전 발생하는 이벤트
 				 *
 				 * @event things-grid-import-configure
@@ -245,7 +154,37 @@ Pagination을 지원하고 import, export, add, delete, save가 가능한 그리
 				 * 그리드 Export Behavior 구성이 완료된 후 발생하는 이벤트
 				 *
 				 * @event things-grid-export-configured
+				 */				 
+				/**
+				 * 그리드 Add Row Behavior 구성 전 발생하는 이벤트
+				 *
+				 * @event things-grid-addrow-configure
 				 */
+				/**
+				 * 그리드 Add Row Behavior 구성이 완료된 후 발생하는 이벤트
+				 *
+				 * @event things-grid-addrow-configured
+				 */
+				/**
+				 * 그리드 Soft Delete Row Behavior 구성 전 발생하는 이벤트
+				 *
+				 * @event things-grid-soft-deleterow-configure
+				 */
+				/**
+				 * 그리드 Soft Delete Behavior 구성이 완료된 후 발생하는 이벤트
+				 *
+				 * @event things-grid-soft-deleterow-configured
+				 */
+				/**
+				 * 그리드 Save Behavior 구성 전 발생하는 이벤트
+				 *
+				 * @event things-grid-save-configure
+				 */
+				/**
+				 * 그리드 Save Behavior 구성이 완료된 후 발생하는 이벤트
+				 *
+				 * @event things-grid-save-configured
+				 */				 
 				/**
 				 * 그리드 Resize 전 발생하는 이벤트
 				 *
@@ -301,7 +240,7 @@ Pagination을 지원하고 import, export, add, delete, save가 가능한 그리
 				 * 그리드 행 삭제 전 발생하는 이벤트. 
 				 * 이 이벤트를 잡아서 event.preventDefault()를 호출하고 별도 로직을 작성하면 기본 로직을 override 할 수 있다.
 				 *
-				 * @event things-grid-handle-removerow
+				 * @event things-grid-handle-deleterow
 				 */
 				/**
 				 * 그리드 Save(저장/삭제/추가) 로직 수행 전 발생하는 이벤트. 
@@ -326,82 +265,6 @@ Pagination을 지원하고 import, export, add, delete, save가 가능한 그리
 				 *
 				 * @event things-grid-handle-export
 				 */
-			},
-
-			listeners: {
-				'things-grid-configure-failed' : '_gridConfigureFailed',
-				'things-grid-configured' : '_initializeResourceGrid',
-				'button-group.add-btn-tap' : 'addGridRow',
-				'button-group.delete-btn-tap' : 'removeGridRow',
-				'button-group.save-btn-tap' : 'saveGridData',
-				'button-group.export-btn-tap' : 'exportExcel',
-				'button-group.import-btn-tap' : 'importExcel',
-				'things-grid-data-change' : '_resourceGridDataChanged'
-			},
-
-			observers: [
-				'_toolbarConfigChanged(paginatable, buttons)'
-			],
-
-			/**
-			 * 툴바 관련 설정 변경시 
-			 *
-			 * @param {Boolean} paginatable
-			 * @param {Array} buttons
-			 */
-			_toolbarConfigChanged: function(paginatable, buttons) {
-				this.enableToolbar = (paginatable || (buttons && buttons.length > 0));
-			},
-
-			/**
-			 * Grid 구성이 실패한 후 핸들러
-			 * 
-			 * @param {Event} event things-grid-configure-failed
-			 */
-			_gridConfigureFailed: function(event) {
-				var title = 'Grid Configuration Error';
-				var text = 'Error : ' + event.detail.error;
-				this.openInfoMsg({ type : 'error', title : title, text : text });
-			},
-
-			/**
-			 * Grid 구성이 완료된 후 핸들러 
-			 *
-			 * @param {Event} event things-grid-configured
-			 */
-			_initializeResourceGrid: function(event) {
-				if(this.infiniteScroll) {
-					this.grid.onScrollToBottom = '_gridScrollToBottom';
-				}
-				this.fire('things-resource-grid-configured', this.grid);
-			},
-
-			/**
-			 * 그리드에서 스크롤이 아래로 향했을 경우 핸들러
-			 *
-			 * @param {Object} grid
-			 */
-			_gridScrollToBottom: function(grid) {
-				var thingsGrid = grid._container_;
-
-				if(thingsGrid.totalCount > thingsGrid.pageEndIdx) {
-					thingsGrid.page += 1; 
-				}
-			},
-
-			/**
-			 * 그리드 데이터가 변경된 경우 핸들러 Override, 
-			 * InfiniteScroll인 경우에만 Override한다.
-			 *
-			 * @param {Event} event
-			 */
-			_resourceGridDataChanged: function(event) {
-				if(this.infiniteScroll) {
-					event.preventDefault();
-          this.dataSet.appendRows(this.data, 0, -1, false);
-          this.dataSet.clearRowStates();
-          this.fire('things-grid-data-changed', this.data);
-				}
 			}
 
 		});

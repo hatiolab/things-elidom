@@ -3,15 +3,14 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../things-ajax/things-ajax.html">
-<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 
 <script>
 
 	window.Things = window.Things || {};
 
 	/**
-	 * 그리드에 행을 추가하거나 삭제하거나 셀 편집을 통해 데이터를 업데이트해서 한꺼번에 저장(Create, Update, Delete)하는 
-	 * 기능을 제공하는 그리드 Behavior 
+	 * 그리드에 행을 추가하거나 삭제하거나 셀 편집을 통해 데이터를 업데이트해서 
+	 * 한꺼번에 저장(Create, Update, Delete)하는 기능을 제공하는 그리드 Behavior 
 	 */
 	Things.GridSaveBehavior = {
 
@@ -29,7 +28,7 @@
 			 */
 			gridSaveAction: {
 				type: String
-			}			
+			}
 		},
 
 		listeners: {
@@ -42,48 +41,11 @@
 		 * @event {Event} event things-grid-configured
 		 */
 		_initializeSaveHandler: function(e) {
-			if(this.grid && this.enableToolbar) {
+			if(this.grid) {
 				var evt = this.fire('things-grid-save-configure', this.grid, { cancelable: true });
 				if(!evt.defaultPrevented) {
-					this.grid.editOptions().setInsertable(true);
-					this.grid.editOptions().setAppendable(true);
 					this.grid.editOptions().setUpdatable(true);
-					this.grid.editOptions().setDeletable(true);
 					this.fire('things-grid-save-configured', this.grid);
-				}
-			}
-		},
-
-		/**
-		 * Add Grid Row
-		 *
-		 * @event {Event} event button tap event
-		 */
-		addGridRow: function(e) {
-			var evt = this.fire('things-grid-handle-addrow', e.detail, { cancelable: true });
-			if(!evt.defaultPrevented) {
-				this.dataSet.insertRow(0, {});
-			}
-		},
-
-		/**
-		 * Remove grid row. 실제 삭제하지 않고 플래그 처리한 후 save시 서버에서 일괄 처리한다.
-		 *
-		 * @event {Event} event button tap event
-		 */
-		removeGridRow: function(e) {
-			var evt = this.fire('things-grid-handle-removerow', e.detail, { cancelable: true });
-			if(!evt.defaultPrevented) {
-				var rows = this.grid.getCheckedRows();
-				if (rows && rows.length > 0) {
-					var ds = this.dataSet;
-					rows.forEach(function(row) {
-						if (ds.getRowState(row.dataIndex()) == 'created') {
-							ds.setRowState(row.dataIndex(), 'createAndDeleted');
-						} else {
-							ds.setRowState(row.dataIndex(), 'deleted');
-						}
-					});
 				}
 			}
 		},
@@ -134,7 +96,6 @@
 				var ajax = document.createElement('things-ajax');
 				ajax.resourceUrl = this.gridSaveAction;
 				ajax.resourceAction = 'update_multiple';
-				// this.writeData = changedDataList;
 				ajax.body = changedDataList;
 				var me = this;
 

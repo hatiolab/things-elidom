@@ -1,0 +1,58 @@
+<script src='../../../bower_components/jszip/dist/jszip.min.js'></script>
+
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<script>
+
+	window.Things = window.Things || {};
+
+	/**
+	 * 그리드에 행을 삭제하는데 Soft Delete 기능을 제공하는 그리드 Behavior
+	 */
+	Things.GridSoftDeleterowBehavior = {
+
+		listeners: {
+			'things-grid-configured' : '_initializeSoftDeleterowHandler'
+		},
+
+		/**
+		 * 그리드 구성이 완료된 후 GridSoftDeleterowBehavior를 initialize 한다.
+		 *
+		 * @event {Event} event things-grid-configured
+		 */
+		_initializeSoftDeleterowHandler: function(e) {
+			if(this.grid) {
+				var evt = this.fire('things-grid-soft-deleterow-configure', this.grid, { cancelable: true });
+				if(!evt.defaultPrevented) {
+					this.grid.editOptions().setDeletable(true);
+					this.fire('things-grid-soft-deleterow-configured', this.grid);
+				}
+			}
+		},
+
+		/**
+		 * Soft Delete Row. 
+		 * 실제 삭제하지 않고 플래그 처리한 후 save시 서버에서 일괄 처리한다.
+		 *
+		 * @event {Event} event button tap event
+		 */
+		removeGridRow: function(e) {
+			var evt = this.fire('things-grid-handle-deleterow', e.detail, { cancelable: true });
+			if(!evt.defaultPrevented) {
+				var rows = this.grid.getCheckedRows();
+				if (rows && rows.length > 0) {
+					var ds = this.dataSet;
+					rows.forEach(function(row) {
+						if (ds.getRowState(row.dataIndex()) == 'created') {
+							ds.setRowState(row.dataIndex(), 'createAndDeleted');
+						} else {
+							ds.setRowState(row.dataIndex(), 'deleted');
+						}
+					});
+				}
+			}
+		}
+		
+	};
+
+</script>
