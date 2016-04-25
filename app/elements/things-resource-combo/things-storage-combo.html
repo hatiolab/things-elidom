@@ -4,18 +4,18 @@
 <link rel="import" href="../things-combo/things-combo.html">
 
 <!--
-things-storage-selector. things-ajax 컴퍼넌트를 이용하여 storage_infos의 data를 조회, 콤보박스의 형태로 출력하고 선택한 값을 input field에 표시하는 컴퍼넌트
+things-storage-combo. things-ajax 컴퍼넌트를 이용하여 storage_infos의 data를 조회, 콤보박스의 형태로 출력하고 선택한 값을 input field에 표시하는 컴퍼넌트
 
   Example:
 
-    <things-storage-selector 
+    <things-storage-combo 
       name="storage"
       label="Storage">
-    </things-storage-selector>
+    </things-storage-combo>
 
-@demo ./things-file-upload/demo/demo-things-storage-selector.html
+@demo ./things-resource-combo/demo/demo-things-storage-combo.html
 -->
-<dom-module id="things-storage-selector">
+<dom-module id="things-storage-combo">
 	<template>
 
     <things-combo 
@@ -41,7 +41,7 @@ things-storage-selector. things-ajax 컴퍼넌트를 이용하여 storage_infos�
   <script type="text/javascript">
   	(function() {
       Polymer({
-        is: "things-storage-selector",
+        is: "things-storage-combo",
 
         properties: {
           /**
