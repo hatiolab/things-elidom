@@ -8,33 +8,68 @@
 
 	/**
 	 * 그리드 정보를 Excel로 Export 하는 기능을 제공하는 그리드 Behavior
+	 *
+	 * @polymerBehavior Things.GridExportBehavior
 	 */
 	Things.GridExportBehavior = {
 
 		properties: {
 			/**
-			 * Export 파일 이름 
+			 * Excel Export 파일 이름 
 			 */
 			exportFileName: {
-				type: String
+				type: String,
+				value: 'Export'
 			},
 
 			/**
 			 * Export 파일 Sheet 이름 
 			 */
 			exportSheetName: {
-				type: String
+				type: String,
+				value: 'Sheet1'
 			}
+
+			/**
+			 * 그리드 Export Behavior 구성 전 발생하는 이벤트
+			 *
+			 * @event things-grid-export-configure
+			 */
+			/**
+			 * 그리드 Export Behavior 구성이 완료된 후 발생하는 이벤트
+			 *
+			 * @event things-grid-export-configured
+			 */
+			/**
+			 * 그리드 Export 수행 전 발생하는 이벤트. 
+			 * 이 이벤트를 잡아서 event.preventDefault()를 호출하고 별도 로직을 작성하면 기본 로직을 override 할 수 있다.
+			 *
+			 * @event things-grid-handle-export
+			 */
 		},
 
 		listeners: {
-			'things-grid-configured': '_initializeExportHandler'
+			'things-grid-configured': '_initializeExportHandler',
+			'button-group.export-btn-tap' : 'exportExcel'
+		},
+
+		/**
+		 * Life Cycle
+		 */
+		ready: function() {
+			if(!this.buttons) return;
+
+			this.push('buttons', {
+				id: 'export-btn',
+				text: 'Export',
+				icon: 'icons:swap-vert'
+			});
 		},
 
 		/**
 		 * 그리드 구성이 완료된 후 GridExportBehavior를 initialize 한다.
 		 *
-		 * @event {Event} e things-grid-configured
+		 * @param {Object} e things-grid-configured 이벤트
 		 */
 		_initializeExportHandler: function(e) {
 			var evt = this.fire('things-grid-export-configure', this.grid, { cancelable: true });
@@ -47,7 +82,7 @@
 		/**
 		 * Export excel
 		 *
-		 * @event {Event} e Button Click Event
+		 * @param {Object} e Button Tap Event
 		 */
 		exportExcel: function(e) {
 			var evt = this.fire('things-grid-handle-export', e.detail, { cancelable: true });

@@ -153,6 +153,13 @@
       },
 
       /**
+       * 버튼 추가 
+       */
+      addButton: function(button) {
+        this.push('buttons', button);
+      },      
+
+      /**
        * 버튼이 클릭되면 things-button-tap 이벤트가 발생한다. 이 때 buttons에 설정한 버튼 정보가 파라미터로 날아간다. 
        * @param {Object} event
        */

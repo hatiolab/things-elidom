@@ -24,6 +24,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <link rel="import" href="../../../bower_components/paper-input/paper-input.html">
   
   <link rel="import" href="../things-button-group.html">
+  <link rel="import" href="../things-button.html">
 
 </head>
 
@@ -32,6 +33,8 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <dom-module id="sample-things-button-group">
     
     <template>
+      <things-button id="add-button">Add Button</things-button>
+
       <things-button-group id="button-group" buttons="{{buttons}}"></things-button-group>
 
       <paper-input id="target" label="Which Button Clicked"></paper-input>

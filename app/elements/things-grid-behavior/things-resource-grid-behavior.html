@@ -16,6 +16,8 @@
 
 	/**
 	 * 리소스 그리드 Behavior 
+	 *
+	 * @polymerBehavior Things.ResourceGridBehavior
 	 */
 	Things.ResourceGridBehaviorImpl = {
 
@@ -26,30 +28,9 @@
 			 */
 			buttons : {
 				type: Array,
-				value: [ {
-					id: 'export-btn',
-					text: 'Export',
-					icon: 'icons:swap-vert'
-				}, {
-					id: 'add-btn',
-					text: 'Add',
-					icon: 'icons:add'
-				}, {
-					id: 'delete-btn',
-					text: 'Delete',
-					icon: 'icons:delete'
-				}, {
-					id: 'save-btn',
-					text: 'Save',
-					icon: 'icons:save',
-					confirm: true,
-					title: 'Confirmation',
-					message: 'Are you sure to save?'
-				}, {
-					id: 'import-btn',
-					text: 'Import',
-					icon: 'icons:file-upload'
-				} ]
+				value: function() {
+					return [];
+				}
 			},
 
 			/**
@@ -220,12 +201,7 @@
 		},
 
 		listeners: {
-			'things-grid-configure-failed' : '_gridConfigureFailed',
-			'button-group.add-btn-tap' : 'addGridRow',
-			'button-group.delete-btn-tap' : 'removeGridRow',
-			'button-group.save-btn-tap' : 'saveGridData',
-			'button-group.export-btn-tap' : 'exportExcel',
-			'button-group.import-btn-tap' : 'importExcel'			
+			'things-grid-configure-failed' : '_gridConfigureFailed'
 		},
 
 		observers: [
@@ -245,7 +221,7 @@
 		/**
 		 * Grid 구성이 실패한 후 핸들러
 		 * 
-		 * @param {Event} event things-grid-configure-failed
+		 * @param {Object} event things-grid-configure-failed 이벤트 
 		 */
 		_gridConfigureFailed: function(event) {
 			var title = 'Grid Configuration Error';

@@ -8,17 +8,52 @@
 
 	/**
 	 * 그리드에 행을 추가하는 기능을 제공하는 그리드 Behavior 
+	 *
+	 * @polymerBehavior Things.GridAddrowBehavior
 	 */
 	Things.GridAddrowBehavior = {
 
+		properties: {
+			/**
+			* 그리드 Add Row Behavior 구성 전 발생하는 이벤트
+			*
+			* @event things-grid-addrow-configure
+			*/
+			/**
+			* 그리드 Add Row Behavior 구성이 완료된 후 발생하는 이벤트
+			*
+			* @event things-grid-addrow-configured
+			*/
+			/**
+			* 그리드 행 추가 전 발생하는 이벤트. 
+			* 이 이벤트를 잡아서 event.preventDefault()를 호출하고 별도 로직을 작성하면 기본 로직을 override 할 수 있다.
+			*
+			* @event things-grid-handle-addrow
+			*/
+		},
+
 		listeners: {
-			'things-grid-configured' : '_initializeAddrowHandler'
+			'things-grid-configured' : '_initializeAddrowHandler',
+			'button-group.add-btn-tap' : 'addGridRow'
+		},
+
+		/**
+		 * Life Cycle
+		 */
+		ready: function() {
+			if(!this.buttons) return;
+
+			this.push('buttons', {
+				id: 'add-btn',
+				text: 'Add',
+				icon: 'icons:add'
+			});
 		},
 
 		/**
 		 * 그리드 구성이 완료된 후 GridAddRowBehavior를 initialize 한다.
 		 *
-		 * @event {Event} event things-grid-configured
+		 * @param {Object} e things-grid-configured 이벤트
 		 */
 		_initializeAddrowHandler: function(e) {
 			if(this.grid) {
@@ -34,7 +69,7 @@
 		/**
 		 * Add Grid Row
 		 *
-		 * @event {Event} event button tap event
+		 * @param {Object} e button-tap 이벤트
 		 */
 		addGridRow: function(e) {
 			var evt = this.fire('things-grid-handle-addrow', e.detail, { cancelable: true });

@@ -36,6 +36,8 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <link rel="import" href="../../things-grid-behavior/things-grid-export-behavior.html">
   <link rel="import" href="../../things-grid-behavior/things-grid-import-behavior.html">
   <link rel="import" href="../../things-grid-behavior/things-grid-save-behavior.html">
+  <link rel="import" href="../../things-grid-behavior/things-grid-addrow-behavior.html">
+  <link rel="import" href="../../things-grid-behavior/things-grid-soft-deleterow-behavior.html">
 
   <link rel="import" href="../things-basic-grid.html">
 
@@ -118,13 +120,14 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
           last-response="{{metaData}}">
         </things-ajax>
 
-        <div id="{{gridContainerId}}"></div>
-
-        <paper-toolbar class="white">
-          <div class="grid-toolbar-content">
-            <things-button-bar id="button-group" buttons="[[buttons]]"></things-button-bar>
-          </div>
-        </paper-toolbar>
+        <things-basic-grid 
+          id="basic-grid" 
+          grid-image-dir="../../../images/grid"
+          config="[[config]]"
+          model="[[model]]"
+          columns="[[columns]]"
+          data="[[data]]">
+        </things-basic-grid>
 
         <things-ajax 
           id="search-resource"
@@ -142,71 +145,24 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
         
         is: 'sample-basic-grid',
 
-        behaviors: [
-          Things.GridConfigBehavior,
-          Things.GridImportBehavior,
-          Things.GridExportBehavior          
-        ],
-
         properties: {
           metaData : {
             type: Object,
             observer: '_metaDataChanged'
-          },
-
-          buttons : {
-            type: Array,
-            value: [ {
-              id: 'import-btn',
-              text: 'Import',
-              icon: 'icons:file-upload'
-            }, {
-              id: 'export-btn',
-              text: 'Export',
-              icon: 'icons:swap-vert'
-            } ]
           }
         },
 
         listeners: {
           'search.tap' : 'search',
-          'things-grid-configure-failed' : '_gridConfigureFailed',
-          'things-grid-configured' : '_initializeBasicGrid',
-          'button-group.export-btn-tap' : 'exportExcel',
-          'button-group.import-btn-tap' : 'importExcel'          
         },
 
         /**
          * Meta Data 변경시 핸들러 
          */
         _metaDataChanged: function(metaData) {
-          this.gridImageDir = '../../../images/grid';
           this.config = metaData.config;
           this.model = metaData.fields;
           this.columns = metaData.columns;
-        },
-
-        /**
-         * Grid 구성이 실패했을 경우 핸들러 
-         * 
-         * @event {Event} event things-grid-configure-failed
-         */
-        _gridConfigureFailed: function(event) {
-          this.openInfoMsg({
-            type : 'warning',
-            title : 'Grid Configuration Failed',
-            text : 'Error : ' + event.detail.error
-          });
-        },
-
-        /**
-         * Grid 구성이 완료된 후 핸들러 
-         *
-         * @event {Event} event things-grid-configured
-         */
-        _initializeBasicGrid: function(e) {
-          console.log('things-basic-grid received [things-grid-configured]');
-          this.fire('things-basic-grid-configured', this.grid);
         },
 
         /**

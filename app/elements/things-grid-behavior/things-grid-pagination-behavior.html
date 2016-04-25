@@ -10,13 +10,15 @@
 
 	/**
 	 * 그리드에 Pagination 기능을 제공하는 그리드 Behavior 
+	 *
+	 * @polymerBehavior Things.GridPaginationBehavior
 	 */
 	Things.GridPaginationBehavior = {
 
 		properties: {
 
 			/**
-			 * Use pagenate or not
+			 * Pagination 기능을 사용할 지 여부 
 			 */
 			paginatable: {
 				type: Boolean,
@@ -77,6 +79,16 @@
 				value: 1
 			}
 
+			/**
+			 * 그리드 Pagination Behavior 구성 전 발생하는 이벤트
+			 *
+			 * @event things-grid-paginator-configure
+			 */
+			/**
+			 * 그리드 Pagination Behavior 구성이 완료된 후 발생하는 이벤트
+			 *
+			 * @event things-grid-paginator-configured
+			 */
 		},
 
 		listeners: {
@@ -113,7 +125,8 @@
 				me.pageEndIdx = this.pageEndIdx;
 			});
 
-			Polymer.dom(this.$['toolbar-paginator-div']).appendChild(paginator);
+			// id가 toolbar-middle-div인 Element에 paginator 추가 
+			Polymer.dom(this.$['toolbar-middle-div']).appendChild(paginator);
 		},
 
 		/**
@@ -152,7 +165,7 @@
 		/**
 		 * 그리드 구성이 완료된 후 GridPaginationBehavior를 initialize 한다.
 		 *
-		 * @event {Event} event things-grid-configured
+		 * @param {Object} e things-grid-configured 이벤트 
 		 */
 		_initializePaginationHandler: function(e) {
 			if(this.grid) {
@@ -185,7 +198,7 @@
 		 * 그리드 데이터가 변경된 경우 핸들러 Override, 
 		 * InfiniteScroll인 경우에만 Override한다.
 		 *
-		 * @param {Event} event
+		 * @param {Object} event things-grid-data-change 이벤트 
 		 */
 		_infiniteGridDataChangedHandler: function(event) {
 			if(this.infiniteScroll) {

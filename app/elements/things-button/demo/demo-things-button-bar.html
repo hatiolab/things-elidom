@@ -21,9 +21,11 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <link rel="import" href="../../../bower_components/polymer/polymer.html">
   <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
   <link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+  <link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
   <link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
   
   <link rel="import" href="../things-button-bar.html">
+  <link rel="import" href="../things-button.html">
 
 </head>
 
@@ -32,6 +34,15 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <dom-module id="sample-things-button-bar">
     
     <template>
+      <things-button id="add-button" color="pink" on-tap="onAddButton">Add Button</things-button>
+
+      <paper-textarea 
+        id="add-button-info" 
+        label="Button Information To Add" 
+        value={{addButtonInfo}} 
+        rows=4>
+      </paper-textarea>      
+
       <things-button-bar id="button-bar" buttons="{{buttons}}"></things-button-bar>
 
       <paper-input id="target" label="Which Button Clicked"></paper-input>
@@ -44,9 +55,17 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
         is: 'sample-things-button-bar',
 
         properties: {
+
+          addButtonInfo : {
+            type: String,
+            value: function() {
+              return '{"id": "test", "text": "Test", "icon": "icons:test", "color": "indigo"}';
+            }
+          },
+
           buttons: {
             type: Array,
-            value : [{
+            value : [ {
               id: 'import',
               text: 'Import',
               icon: 'icons:import',
@@ -71,7 +90,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
               text: 'Save',
               icon: 'icons:save',
               color: 'indigo'
-            }]
+            } ]
           }
         },
 
@@ -80,7 +99,15 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
           'button-bar.add-tap' : 'onTapButton',
           'button-bar.delete-tap' : 'onTapButton',
           'button-bar.save-tap' : 'onTapButton',
-          'button-bar.import-tap' : 'onTapButton'
+          'button-bar.import-tap' : 'onTapButton',
+          'button-bar.test-tap' : 'onTapButton',
+        },
+
+        onAddButton: function(e) {
+          if(this.addButtonInfo && this.addButtonInfo.length > 0) {
+            var buttonInfo = JSON.parse(this.addButtonInfo);
+            this.$['button-bar'].addButton(buttonInfo);
+          }
         },
 
         onTapButton: function(e) {

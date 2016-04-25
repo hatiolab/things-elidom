@@ -11,34 +11,72 @@
 	/**
 	 * 그리드에 행을 추가하거나 삭제하거나 셀 편집을 통해 데이터를 업데이트해서 
 	 * 한꺼번에 저장(Create, Update, Delete)하는 기능을 제공하는 그리드 Behavior 
+	 *
+	 * @polymerBehavior Things.GridSaveBehavior
 	 */
 	Things.GridSaveBehavior = {
 
 		properties: {
-			/**
-			 * 저장 가능한 지 여부 
-			 */
-			writable: {
-				type: Boolean,
-				value: true
-			},
-
 			/**
 			 * 저장(Multiple Update)할 서버 측 URL
 			 */
 			gridSaveAction: {
 				type: String
 			}
+
+			/**
+			 * 그리드 데이터 Save(저장/삭제/추가) 액션이 성공시 발생하는 이벤트
+			 *
+			 * @event things-grid-save-success
+			 */
+			/**
+			 * 그리드 데이터 Save(저장/삭제/추가) 액션시 에러 발생시 발생하는 이벤트
+			 *
+			 * @event things-grid-save-error
+			 */
+			/**
+			 * 그리드 Save(저장/삭제/추가) 로직 수행 전 발생하는 이벤트. 
+			 * 이 이벤트를 잡아서 event.preventDefault()를 호출하고 별도 로직을 작성하면 기본 로직을 override 할 수 있다.
+			 *
+			 * @event things-grid-pre-save
+			 */
+			/**
+			 * 그리드 데이터 Save(저장/삭제/추가) 액션이 성공시 발생하는 이벤트
+			 *
+			 * @event things-grid-save-success
+			 */
+			/**
+			 * 그리드 데이터 Save(저장/삭제/추가) 액션시 에러 발생시 발생하는 이벤트
+			 *
+			 * @event things-grid-save-error
+			 */			 	
 		},
 
 		listeners: {
-			'things-grid-configured' : '_initializeSaveHandler'
+			'things-grid-configured' : '_initializeSaveHandler',
+			'button-group.save-btn-tap' : 'saveGridData'
+		},
+
+		/**
+		 * Life Cycle
+		 */
+		ready: function() {
+			if(!this.buttons) return;
+
+			this.push('buttons', {
+				id: 'save-btn',
+				text: 'Save',
+				icon: 'icons:save',
+				confirm: true,
+				title: 'Confirmation',
+				message: 'Are you sure to save?'
+			});
 		},
 
 		/**
 		 * 그리드 구성이 완료된 후 GridSaveBehavior를 initialize 한다.
 		 *
-		 * @event {Event} event things-grid-configured
+		 * @param {Object} e things-grid-configured 이벤트
 		 */
 		_initializeSaveHandler: function(e) {
 			if(this.grid) {
@@ -53,7 +91,7 @@
 		/**
 		 * 그리드의 변경된 데이터를 감지하여 서버로 한꺼번에 Create/Update/Delete 요청을 한다.
 		 *
-		 * @event {Event} event button tap event
+		 * @param {Object} e button tap event
 		 */
 		saveGridData: function(e) {
 			var changedDataList = [];
