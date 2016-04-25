@@ -133,7 +133,6 @@
        * from date와 to date 간의 범위 validation check, valid = true return, invalid = false return
        */
       dateValidation: function() {
-        console.log("test");
         if(this.selectedFromDate && this.selectedToDate && this.selectedFromDate > this.selectedToDate)  {
           this.openInfoMsg({ title : 'Invalid Date Range!', text : 'Please Select Proper Date.', type : 'info', timer : 5000 });
           return false;
