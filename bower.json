@@ -26,7 +26,8 @@
     "juicy-ace-editor": "^1.1.1",
     "gold-email-input": "^1.0.7",
     "gold-phone-input": "^1.0.9",
-    "i18n-msg": "^1.0.4"
+    "i18n-msg": "^1.0.4",
+    "things-resource-combo": "ThingsElements/things-resource-combo#^0.0.2"
   },
   "devDependencies": {
     "test-fixture": "PolymerElements/test-fixture#1.0.x",
