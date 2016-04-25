@@ -1,7 +1,7 @@
-<link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-localstorage/iron-localstorage.html">
 
-<link rel="import" href="../things-combo/things-code-selector.html">
+<link rel="import" href="things-code-combo.html">
 
 <!--
 다국어 설정을 위한 Locale Selector 
@@ -25,14 +25,14 @@ Example:
 			}
 		</style>
 
-		<things-code-selector 
+		<things-code-combo 
 			id="code-selector" 
 			label="Language" 
 			value="[[defaultLocale]]" 
 			code-name="LOCALE" 
 			label-path="description" 
 			value-path="name">
-		</things-code-selector>
+		</things-code-combo>
 
 		<iron-localstorage name="[[storageName]]" value="{{selectedLocale}}"></iron-localstorage>
 	</template>
@@ -74,8 +74,11 @@ Example:
 			 */
 			_onComboValueChanged: function(event) {
 				this.set('selectedLocale',event.detail.value);
-				I18nMsg.lang = dataGlobal.language || document.documentElement.lang
-				I18nMsg.lang = event.detail.value;
+				if(window.I18nMsg)
+				{
+					I18nMsg.lang = dataGlobal.language || document.documentElement.lang
+					I18nMsg.lang = event.detail.value;
+				}
 				Platform.performMicrotaskCheckpoint();
 			},
 

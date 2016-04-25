@@ -8,18 +8,18 @@
 
   Example:
 
-    <things-code-selector 
+    <things-code-combo 
       id="code-selector" 
       label="Language" 
       value="en-US" 
       code-name="LOCALE" 
       label-path="description" 
       value-path="name">
-    </things-code-selector>
+    </things-code-combo>
 
 @demo ./things-combo/demo/demo-code-selector.html
 -->
-<dom-module id="things-code-selector">
+<dom-module id="things-code-combo">
 	<template>
 
     <things-combo 
@@ -44,7 +44,7 @@
 
   <script type="text/javascript">
     Polymer({
-      is: "things-code-selector",
+      is: "things-code-combo",
 
       properties: {
         /**
