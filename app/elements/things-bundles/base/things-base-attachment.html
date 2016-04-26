@@ -70,8 +70,6 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 				current-page="{{page}}"
 				per-page="[[perPage]]"
 				grid-save-action="[[gridSaveUrl]]"
-				export-file-name="[[title]]"
-				export-sheet-name="[[title]]"
 				buttons="[[buttons]]"
 				enable-detail-column
 				paginatable
@@ -139,14 +137,15 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 			},
 
 			listeners : {
+				'grid.upload-btn-tap' : '_onTapUpload',
 				'grid.things-grid-detail-tap': '_downloadFile',
-				'grid.things-button-upload-tap' : '_onTapUpload',
 				'grid.things-grid-save-success': 'refreshGridData',
 				'grid.things-grid-resource-column-edit' : '_openResourceSelector'
 			},
 
 			/**
-			 * resourceUrl로 grid save url을 생성
+			 * ResourceUrl로 grid save url을 생성
+			 *
 			 * @param {String} resourceUrl
 			 * @return {String} grid save URL
 			 */
@@ -155,7 +154,7 @@ things-attach-content는 첨부파일에 대한 검색 폼, 리스트가 기본�
 			},
 
 			/**
-			 * research form
+			 * Refresh Data
 			 */
 			refreshGridData: function(grid) {
 				this.$['search-form'].getMyForm().submit();
