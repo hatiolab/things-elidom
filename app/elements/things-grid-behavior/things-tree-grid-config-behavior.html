@@ -181,6 +181,72 @@
         notify: true,
         readOnly: true
       }
+      /**
+       * 그리드 구성 전 발생하는 이벤트
+       *
+       * @event things-grid-configure
+       */
+      /**
+       * 그리드 구성이 완료된 후 발생하는 이벤트
+       *
+       * @event things-grid-configured
+       */
+      /**
+       * 그리드 구성 도중 에러가 발생한 경우 발생하는 이벤트
+       *
+       * @event things-grid-configure-failed
+       */
+      /**
+       * 그리드 이벤트 Behavior 구성 전 발생하는 이벤트
+       *
+       * @event things-grid-event-configure
+       */
+      /**
+       * 그리드 이벤트 Behavior 구성이 완료된 후 발생하는 이벤트
+       *
+       * @event things-grid-event-configured
+       */
+      /**
+       * 그리드 Resize 전 발생하는 이벤트
+       *
+       * @event things-grid-resize
+       */
+      /**
+       * 그리드 Resize 후 발생하는 이벤트
+       *
+       * @event things-grid-resized
+       */
+      /**
+       * 그리드 Data 변경 전 발생하는 이벤트
+       *
+       * @event things-grid-data-change
+       */
+      /**
+       * 그리드 Data 변경 후 발생하는 이벤트
+       *
+       * @event things-grid-data-changed
+       */
+      /**
+       * 그리드 상세 버튼이 클릭 되었을 경우 발생하는 이벤트
+       *
+       * @event things-grid-detail-tap
+       */
+      /**
+       * 그리드 Row Data가 선택되었을 경우 발생하는 이벤트
+       *
+       * @event things-grid-row-data-select
+       */
+      /**
+       * 그리드 Cell Data가 선택되었을 경우 발생하는 이벤트
+       *
+       * @event things-grid-cell-data-select
+       */
+      /**
+       * 그리드 셀 중에서 Resource Column 속성인 Resource Column을 Edit하고자 하는 경우 발생하는 이벤트
+       * 외부에서는 이 이벤트를 받아서 사용자가 데이터를 선택할 수 있도록 Resource Selector 창을 띄운다.
+       *
+       * @event things-grid-resource-column-edit
+       */
     },
 
     listeners: {
@@ -453,11 +519,12 @@
     /**********************************************************************************
      *                            Grid Event
      **********************************************************************************
+    
 
     /**
      * 데이터 변경 이벤트 핸들러 
      *
-     * @event {Event} e
+     * @param {event} e
      */
     _gridDataChanged: function(e) {
       var evt = this.fire('things-grid-data-change', this.data, { cancelable: true });
@@ -470,7 +537,7 @@
     /**
      * 화면 리사이즈 시 이벤트 핸들러
      *
-     * @event {Event} iron-resize 이벤트
+     * @param {event} iron-resize 이벤트
      */
     _gridScreenResizeHandler: function(e) {
       var evt = this.fire('things-grid-resize', this.grid, { cancelable: true });
