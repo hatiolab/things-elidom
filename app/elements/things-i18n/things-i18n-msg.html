@@ -69,7 +69,7 @@ If an appropriate message file can't be found, the `textContent` of the element 
 
 @demo
 -->
-<dom-module id="things-i18n-msg"></dom-module>
+<dom-module id="things-i18n-msg">
 <script>
 (function () {
 
@@ -239,7 +239,7 @@ If an appropriate message file can't be found, the `textContent` of the element 
 
       _fetching = true;
 
-      if(!this.globals.baseUrl){
+      if(!this.globals.baseUrl||!this.messagesUrl){
         _fetching= false;
         return;
       }
@@ -348,3 +348,4 @@ If an appropriate message file can't be found, the `textContent` of the element 
 
 })();
 </script>
+</dom-module>
