@@ -28,7 +28,7 @@ Example:
 		<things-code-combo 
 			id="code-selector" 
 			label="Language" 
-			value="[[defaultLocale]]" 
+			value="{{selectedLocale}}" 
 			code-name="LOCALE" 
 			label-path="description" 
 			value-path="name">
@@ -61,25 +61,19 @@ Example:
 				 * 선택된 Locale 값 
 				 */
 				selectedLocale: {
-					type: String
+					type: String,
+					notify:true
 				}
 			},
 
 			listeners: {
 				'code-selector.things-combo-value-changed' : '_onComboValueChanged'
 			},
-
 			/**
 			 * Combo 값이 변경될 때 
 			 */
 			_onComboValueChanged: function(event) {
 				this.set('selectedLocale',event.detail.value);
-				if(window.I18nMsg)
-				{
-					I18nMsg.lang = dataGlobal.language || document.documentElement.lang
-					I18nMsg.lang = event.detail.value;
-				}
-				Platform.performMicrotaskCheckpoint();
 			},
 
 			/**

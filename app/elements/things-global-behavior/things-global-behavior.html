@@ -1,12 +1,27 @@
 <script>
 
 window.Things = window.Things || {};
-var instances = [];
+var _behaviorInstances = [];
 var dataGlobal = {};
+
+/**
+ * Global변수의 Set/Get을 Elements를 통하여 접속이 가능하게하는 Behavior이다.
+ * 일부 공통으로 사용되는 Event와 Message처리도 수행한다.
+ *
+ * @polymerBehavior Things.GlobalBehavior
+ * 
+ * @demo demo/index.html
+ */
 
 Things.GlobalBehavior = {
   
   properties: {
+    /**
+     * GlobalBehavior를 import한 This에 적용되는 동시에 Window 변수인 dataGlobal를 Reference한다.
+     * 
+     * 모든 GlobalBehavior를 사용한 Elements를 변수 _behaviorInstances에 저장한다. 
+     * 필요할 경우에 Window변수 _behaviorInstances를 통하여 GlobalBehavior를 사용한 전체 Elements에 대한 변경을 할 수 있다.
+     */
     globals: {
       type: Object,
       notify: true,
@@ -22,7 +37,7 @@ Things.GlobalBehavior = {
       _setOrig.apply(this, arguments);
 
       if (arguments[0].split(".")[0] === "globals") {
-        this.invokeInstances(_notifyPathOrig, arguments);
+        this._invokeInstances(_notifyPathOrig, arguments);
       }
     };
     
@@ -35,10 +50,10 @@ Things.GlobalBehavior = {
     };
   },
   
-  invokeInstances: function(fn, args) {
+  _invokeInstances: function(fn, args) {
     var i;
-    for (i = 0; i < instances.length; i++) {
-      instance = instances[i];
+    for (i = 0; i < _behaviorInstances.length; i++) {
+      instance = _behaviorInstances[i];
       if (instance !== this) {
         fn.apply(instance, args);
       }
@@ -46,21 +61,30 @@ Things.GlobalBehavior = {
   },
   
   attached: function() {
-    instances.push(this);
+    _behaviorInstances.push(this);
   },
   
   detached: function() {
-    var i = instances.indexOf(this);
+    var i = _behaviorInstances.indexOf(this);
     if (i >= 0) {
-      instances.splice(i, 1);
+      _behaviorInstances.splice(i, 1);
     }
   },
 
   /**
   * ajax 호출 후 에러 발생시 unauthorized 에러이면 로그인 페이지로 이동 
   */
-  handleUnauthorized: function() {
+  handleUnauthorized: function(response) {
     this.set('globals.user', null);
+    
+    var eventDetail = {'response':response};
+
+    var event = new CustomEvent('things-unauthorized-session', { 'detail': eventDetail });
+    document.dispatchEvent(event);
+    var defaultPrevented = document.dispatchEvent(event);
+
+    if(defaultPrevented) return;
+
     page('/login');
   },
 
