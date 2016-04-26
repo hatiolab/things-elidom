@@ -91,7 +91,7 @@
       <paper-toolbar>
         <paper-icon-button icon="menu"></paper-icon-button>
         <span class="title">[[title]]</span>
-        <paper-icon-button icon="search" id="search-btn" on-tap="searchForm">
+        <paper-icon-button icon="search" id="search-btn" on-tap="submitMyForm">
         </paper-icon-button>
         <paper-icon-button icon="refresh" id="reset-btn" on-tap="resetMyForm">
         </paper-icon-button>
@@ -183,9 +183,11 @@
     /**
     * Submits form
     */
-    searchForm: function() {
+    submitMyForm: function() {
       this.startSpinner();
-      this.getMyForm().submit();
+
+      if(this.page > 1) this.page = 1;
+      else this.getMyForm().submit();
     },
 
     /**
@@ -196,6 +198,7 @@
      */
     _successResponseHandler: function(event) {
       this.stopSpinner();
+      
       this.lastResponse = event.detail.xhr.response;
       this.handleSuccessResponse(this.lastResponse);
     },

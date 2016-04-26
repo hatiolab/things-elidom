@@ -2,18 +2,17 @@
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../bower_components/iron-form/iron-form.html">
-<link rel="import" href="../../../bower_components/iron-input/iron-input.html">
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/iron-iconset/iron-iconset.html">
-<link rel="import" href="../../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../../../bower_components/iron-input/iron-input.html">
 
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../bower_components/paper-fullscreen-dialog/paper-fullscreen-dialog.html">
 <link rel="import" href="../../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
-<link rel="import" href="../../../bower_components/paper-fullscreen-dialog/paper-fullscreen-dialog.html">
 <link rel="import" href="../../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
@@ -27,7 +26,6 @@
 
 <link rel="import" href="./things-form-behavior.html">
 <link rel="import" href="./things-detail-form-behavior.html">
-
 
 <!--
 Resource Form Element. 
@@ -138,8 +136,10 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			
 		<paper-toolbar>
 			<span class="title">[[title]]</span>
-			<things-button color='green' id='save-btn' on-tap='saveResourceForm'>
-				<things-i18n-msg msgid="button.save">Save</things-i18n-msg>
+			<things-button color='green' id='save-btn' on-tap='submitMyForm'>
+				<things-i18n-msg msgid="button.save">
+					<things-i18n-msg msgid="button.save">Save</things-i18n-msg>
+				</things-i18n-msg>
 			</things-button>
 		</paper-toolbar>
 
@@ -158,12 +158,6 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			</div>
 		</form>
 
-		<things-ajax 
-			id="member-resource"
-			resource-url="{{resourceUrl}}" 
-			resource-action="find"
-			last-response="{{resource}}">
-		</things-ajax>
 	</template>
 
 	<script>
@@ -178,25 +172,24 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 					type: String,
 					value: 'Detail Form',
 					computed: '_computeTitle(resourceType)'
-				},
-
-
+				}
 			},
 
 			behaviors: [
+				Things.FormBehavior,
 				Things.DetailFormBehavior,
-				Things.LoadViewBehavior,
 				Things.SpinnerBehavior,
-				Things.MsgBoxBehavior,
-				Polymer.IronResizableBehavior
+				Things.MsgBoxBehavior
 			],
 
 			listeners : {
 				'iron-form-presubmit' :'handleBeforeSubmit',
-				'iron-form-response' :'handleSuccessResponse',
-				'iron-form-error' : 'handleErrorResponse',
-				'member-resource.things-ajax-response' : 'handleSuccessResponse',
-				'member-resource.things-ajax-error' : 'handleErrorResponse'
+				'iron-form-response' :'_successResponseHandler',
+				'iron-form-error' : '_errorResponseHandler',
+				'things-detail-form-read-success' : '_successResponseHandler',
+				'things-detail-form-read-error' : '_errorResponseHandler',			
+				'things-detail-form-save-success' : '_successResponseHandler',
+				'things-detail-form-save-error' : '_errorResponseHandler'
 			},
 
 			/**
@@ -204,6 +197,79 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			 */
 			_computeTitle: function(resourceType)	{
 				return resourceType + ' Detail';
+			},
+
+			/**
+			 * 리소스 폼이 이미 구성되었는지 여부 
+			 */
+			isFormConfigured: function() {
+				return this.$['left-fields'].childNodes.length > 0 || this.$['right-fields'].childNodes.length > 0;
+			},
+
+			/**
+			 * 리소스 폼 화면을 구성. formFields 정보로 동적으로 폼 하위 엘리먼트를 생성하여 폼을 구성한다. 
+			 */
+			reconfigureMyForm: function() {
+				if(this.isFormConfigured()) return;
+				
+				for(index in this.formFields) {
+					var field = this.formFields[index];
+					var newElement = this._createFormElement(field);
+					if(!newElement) continue;
+
+					if((index % 2) == 0) {
+						this.$['left-fields'].appendChild(newElement);
+					} else {
+						this.$['right-fields'].appendChild(newElement);
+					}
+				}
+			},
+
+			/**
+			 * Save Form
+			 *
+			 * @param {Object} e 버튼 클릭 이벤트 
+			 */
+			submitMyForm: function(e) {
+				this.startSpinner();
+				this.saveResourceForm();
+			},
+
+			/**
+			 * Successful response handler After form submits.
+			 * this fires a 'things-form-submit-success' in this function
+			 *
+			 * @param {Object} event Successful response event
+			 */
+			_successResponseHandler: function(event) {
+				this.stopSpinner();
+
+				var method = typeof(event.detail === 'string') ? event.detail : event.srcElement.method.toUpperCase();
+				this.handleSuccessResponse(method);
+			},
+
+			/**
+			 * Error response handler After form submits.
+			 * this fires a 'things-form-submit-error' in this function
+			 *
+			 * @param {Object} event Error response event
+			 */
+			_errorResponseHandler: function(event) {
+				this.stopSpinner();
+
+				var response = event.detail.request.xhr.response;
+				if(response && response.status == 401) {
+					this.handleUnauthorized();
+				} else {
+					if(response) {
+						this.openResponseError(response);
+					} else {
+						response = event.detail.request;
+						this.openUnkownError(response);
+					}
+				}
+
+				this.handleErrorResponse(response);
 			},
 
       /***************************************************************************************

@@ -1,29 +1,8 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/iron-form/iron-form.html">
-<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import" href="../../../bower_components/iron-input/iron-input.html">
 
-<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../../bower_components/paper-checkbox/paper-checkbox.html">
-<link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
-<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../../bower_components/paper-material/paper-material.html">
-<link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
-<link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
-<link rel="import" href="../../../bower_components/paper-toggle-button/paper-toggle-button.html">
-
-<link rel="import" href="../things-button/things-button.html">
-<link rel="import" href="../things-date-picker/things-date-picker.html">
-<link rel="import" href="../things-date-picker/things-date-from-to.html">
-<link rel="import" href="../things-date-picker/things-time-picker.html">
-<link rel="import" href="../things-input-field/things-input-field.html">
-<link rel="import" href="../things-resource-combo/things-code-combo.html">
-<link rel="import" href="../things-resource-selector/things-resource-selector.html">
-<link rel="import" href="../things-resource-selector/things-resource-field.html">
-<link rel="import" href="../things-tristate-checkbox/things-tristate-checkbox.html">
-
+<link rel="import" href="../things-ajax/things-ajax.html">
+<link rel="import" href="../things-content/things-load-view-behavior.html">
 <link rel="import" href="../things-global-behavior/things-global-behavior.html">
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 <link rel="import" href="../things-spinner/things-spinner-behavior.html">
@@ -99,13 +78,8 @@ Things.DetailFormBehaviorImpl = {
 	   * 조회/생성/업데이트 에러 발생 후 fire
 	   *
 	   * @event things-resource-form-error
-	   */		
+	   */
 	},
-
-	behaviors: [
-		Things.DetailFormBehavior
-	],
-
 
 	observers: [
 		'_onFormFieldsChanged(formFields)',
@@ -127,6 +101,7 @@ Things.DetailFormBehaviorImpl = {
 	 */
 	_resourceChanged: function(resource) {
 		if(resource && this.isFormConfigured()) {
+			// TODO 이 부분이 Resource Form 쪽으로 올라가야 함 
 			this._bindData(this.$['left-fields'].childNodes, resource);
 			this._bindData(this.$['right-fields'].childNodes, resource);
 		}
@@ -173,54 +148,31 @@ Things.DetailFormBehaviorImpl = {
 		}
 
 		return params;
-	},	
-
-	/**
-	 * 리소스 폼이 이미 구성되었는지 여부 
-	 */
-	isFormConfigured: function() {
-		return this.$['left-fields'].childNodes.length > 0 || this.$['right-fields'].childNodes.length > 0;
-	},
-
-	/**
-	 * 리소스 폼 화면을 구성. formFields 정보로 동적으로 폼 하위 엘리먼트를 생성하여 폼을 구성한다. 
-	 */
-	reconfigureMyForm: function() {
-		if(this.isFormConfigured()) return;
-		
-		for(index in this.formFields) {
-			var field = this.formFields[index];
-			var newElement = this._createFormElement(field);
-			if(!newElement) continue;
-
-			if((index % 2) == 0) {
-				this.$['left-fields'].appendChild(newElement);
-			} else {
-				this.$['right-fields'].appendChild(newElement);
-			}
-		}
 	},
 
 	/**
 	 * save data from resource detail screen
 	 */
 	saveResourceForm: function() {
-		var resourceSaver = this.$['member-resource'];
-		var originalAction = resourceSaver.action;
-		var originalContentType = resourceSaver.contentType;
+		var saveAjax = document.createElement('things-ajax');
+		saveAjax.resourceUrl = this.resourceUrl;
+		saveAjax.resourceId = this.resource.id;
+		saveAjax.resourceAction = this.resource.id ? 'update' : 'create';
 
-		resourceSaver.method = this.resource.id ? 'PUT' : 'POST';
-		if(resourceSaver.action && resourceSaver.action.indexOf(':id') >= 0) {
-			resourceSaver.action = resourceSaver.action.replace(':id', this.resource.id);
-		}
-		
 		var params = this.serializeMyForm();
 		params = this._filterResourceColumns(params);
-		resourceSaver.params = params;
-		resourceSaver.contentType = 'application/json';
-		resourceSaver.generateRequest();
-		resourceSaver.action = originalAction;
-		resourceSaver.contentType = originalContentType;
+		saveAjax.body = params;
+
+		var me = this;
+		saveAjax.addEventListener('things-ajax-response', function(event) {
+			me.fire('things-detail-form-save-success', saveAjax.method);
+		});
+
+		saveAjax.addEventListener('things-ajax-error', function(event) {
+			me.fire('things-detail-form-save-error', event.detail);
+		});
+
+		saveAjax.generateRequest();
 	},
 
 	/**
@@ -240,9 +192,21 @@ Things.DetailFormBehaviorImpl = {
 	 * @param {String} resourceId
 	 */
 	findResource: function(resourceId) {
-		var resourceGetter = this.$['member-resource'];
-		resourceGetter.resourceId = resourceId;
-		resourceGetter.generateRequest();
+		var getAjax = document.createElement('things-ajax');
+		getAjax.resourceUrl = this.resourceUrl;
+		getAjax.resourceId = this.resource.id;
+		getAjax.resourceAction = 'find';
+
+		var me = this;
+		saveAjax.addEventListener('things-ajax-response', function(event) {
+			me.fire('things-detail-form-read-success', saveAjax.method);
+		});
+
+		saveAjax.addEventListener('things-ajax-error', function(event) {
+			me.fire('things-detail-form-read-error', event.detail);
+		});
+		
+		getAjax.generateRequest();
 	},
 
 	/**
@@ -260,10 +224,7 @@ Things.DetailFormBehaviorImpl = {
 	 * method가 PUT인 경우 : things-resource-form-saved 이벤트
 	 * method가 POST인 경우 : things-resource-form-created 이벤트
 	 */
-	handleSuccessResponse: function(event) {
-		this.stopSpinner();
-
-		var method = event.srcElement.method.toUpperCase();
+	handleSuccessResponse: function(method) {
 		if(method == 'GET') {
 			this.openPopupView(this, true);
 			this.fire('things-resource-form-read', event.detail);
@@ -282,32 +243,17 @@ Things.DetailFormBehaviorImpl = {
 	* Error response handler After form submits.
 	* Fires a 'things-resource-form-error' in this function
 	*
-	* @param {Event} event
+	* @param {Object} errorResponse
 	*/
-	handleErrorResponse: function(event) {
-		this.stopSpinner();
-
-		var response = (event.detail && !event.detail.request) ? event.detail : event.detail.request.xhr.response;
-		if(response && response.status == 401) {
-			this.handleUnauthorized();
-
-		} else {
-			if(response) {
-				this.openResponseError(response);
-			} else {
-				response = event.detail.request;
-				this.openUnkownError(response);
-			}
-		}
-
-		this.fire('things-resource-form-error', response);
+	handleErrorResponse: function(errorResponse) {
+		this.fire('things-resource-form-error', errorResponse);
 	}
 
 };
 
 Things.DetailFormBehavior = [
-	Things.DetailFormBehaviorImpl, 
-	Things.FormBehavior
+	Things.DetailFormBehaviorImpl,
+	Things.LoadViewBehavior,
 ];
 
 </script>
