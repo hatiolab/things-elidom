@@ -148,13 +148,13 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			id="resource-form" 
 			action=[[action]]
 			headers="[[headers]]"
-			content-type="application/json"
+			content-type="[[contentType]]"
 			method="[[method]]"
-			last-response="{{lastResponse}}"
-			with-credentials=true>
+			with-credentials="[[withCredentials]]"
+			last-response="{{lastResponse}}">
 			<div class="layout horizontal flex">
-			<div id="left-fields" class="layout vertical flex fields"></div>
-			<div id="right-fields" class="layout vertical flex fields"></div>
+				<div id="left-fields" class="layout vertical flex fields"></div>
+				<div id="right-fields" class="layout vertical flex fields"></div>
 			</div>
 		</form>
 
