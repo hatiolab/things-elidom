@@ -1,7 +1,7 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/iron-form/iron-form.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/iron-form-element-behavior/iron-form-element-behavior.html">
 <link rel="import" href="../../../bower_components/iron-input/iron-input.html">
 
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
@@ -23,9 +23,8 @@
 <link rel="import" href="../things-resource-selector/things-resource-selector.html">
 <link rel="import" href="../things-resource-selector/things-resource-field.html">
 <link rel="import" href="../things-tristate-checkbox/things-tristate-checkbox.html">
-<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
+
 <link rel="import" href="../things-global-behavior/things-global-behavior.html">
-<link rel="import" href="../things-spinner/things-spinner-behavior.html">
 
 <script>
 
@@ -33,6 +32,8 @@ window.Things = window.Things || {};
 
 /**
  * 기본 Form Behavior
+ * Things.FormBehavior를 사용하고자 한다면 반드시 아래 함수들을 구현해야 한다.
+ * 1) reconfigureMyForm() : 구현 내용 - Things.FormBehavior를 이용하여 Form을 구성한다.
  *
  * @polymerBehavior Things.FormBehavior
  */
@@ -307,21 +308,6 @@ Things.FormBehaviorImpl = {
 	},
 
 	/**
-	 * Submits form
-	 */
-	submitMyForm: function() {
-		this.startSpinner();
-
-		/*if(this.getAttribute('on-submit')) {
-			this.fire('things-form-submit', this.serializeMyForm());
-		} else {
-			this.getMyForm().submit();
-		}*/
-
-		this.getMyForm().submit();
-	},
-
-	/**
 	 * Serialize form and return serialized object.
 	 * It can be used form parameters
 	 * @return {Object} serialized object
@@ -335,8 +321,6 @@ Things.FormBehaviorImpl = {
 Things.FormBehavior = [
 	'IronFormElementBehavior', 
 	Things.FormBehaviorImpl, 
-	Things.SpinnerBehavior, 
-	Things.MsgBoxBehavior,
 	Things.GlobalBehavior
 ];
 

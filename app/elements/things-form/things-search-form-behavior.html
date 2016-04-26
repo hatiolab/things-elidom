@@ -120,43 +120,22 @@ Things.SearchFormBehaviorImpl = {
 				}
 			}
 		}
-	},
-
-  /**
-   * 검색 폼 화면을 구성. formFields 정보로 동적으로 폼 하위 엘리먼트를 생성하여 폼을 구성한다.
-   */
-  reconfigureMyForm: function() {
-    if(this.formFields.length > 0) {
-      for(index in this.formFields) {
-        var field = this.formFields[index];
-        var newElement = this._createFormElement(field);
-        if(!newElement) continue;
-        
-        if((index % 2) == 0) {
-          this.$['left-fields'].appendChild(newElement);
-        } else {
-          this.$['right-fields'].appendChild(newElement);
-        }
-      }
-    }
-  },
-
-  /**
-   * 검색 버튼 클릭시 핸들러
-   */
-  searchForm: function(event) {
-    if(this.page > 1) this.page = 1;
-    else this.submitMyForm();
-  },  
+	}, 
 
   /**
    * Submit 전에 전처리 핸들
    * Pagination을 사용하는 경우에 page, perPage 정보를 파라미터에 추가한다.
    */
   handleBeforeSubmit: function(event) {
-    var form = this.getMyForm();
+    var form = event.srcElement;
     var evt = this.fire('things-form-pre-submit', form, { cancelable : true });
     if(evt.defaultPrevented) return;
+
+    var user = this.get('globals.user');
+    if(user) {
+      form.request.headers['X-Locale'] = this.get('globals.locale') ? this.get('globals.locale') : 'en-US';
+      form.request.headers['X-Domain-Id'] = this.get('globals.user').domain_id;
+    }
 
     form.request.params || {};
     if(this.paramType == 'RESOURCE') {
@@ -168,43 +147,27 @@ Things.SearchFormBehaviorImpl = {
   /**
    * Successful response handler After form submits.
    * this fires a 'things-form-submit-success' in this function
-   * @param {Event} event Successful response event
+   *
+   * @param {Object} errorResponse Successful Response
    */
-  handleSuccessResponse: function(event) {
-    this.stopSpinner();
-    this.lastResponse = event.detail.xhr.response;
-    this.fire('things-form-submit-success', this.lastResponse);
+  handleSuccessResponse: function(errorResponse) {
+    this.fire('things-form-submit-success', errorResponse);
   },
 
   /**
    * Error response handler After form submits.
    * this fires a 'things-form-submit-error' in this function
-   * @param {Event} event Error response event
+   *
+   * @param {Object} sucessResponse Error Response
    */
-  handleErrorResponse: function(event) {
-    this.stopSpinner();
-
-    var response = event.detail.request.xhr.response;
-    if(response && response.status == 401) {
-      this.handleUnauthorized();
-
-    } else {
-      if(response) {
-        this.openResponseError(response);
-      } else {
-        response = event.detail.request;
-        this.openUnkownError(response);
-      }
-    }
-
-    this.fire('things-form-submit-error', response);
+  handleErrorResponse: function(sucessResponse) {
+    this.fire('things-form-submit-error', sucessResponse);
   }  
 
 };
 
 Things.SearchFormBehavior = [
 	Things.SearchFormBehaviorImpl,
-	Things.FormBehavior,
 	Things.ResourceSearchBehavior
 ];
 

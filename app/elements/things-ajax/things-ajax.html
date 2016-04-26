@@ -484,7 +484,7 @@ element.
       
       return tempUrl;
     },
-    
+
     /**
      * An object that maps header names to header values, first applying the
      * the value of `Content-Type` and then overlaying the headers specified
@@ -493,7 +493,12 @@ element.
      * @return {Object}
      */
     get requestHeaders() {
-      var headers = {};
+      var user = this.get('globals.user');
+      var headers = !user ? {} : { 
+        'X-Locale' : this.get('globals.locale') ? this.get('globals.locale') : 'en-US',
+        'X-Domain-Id' : user.domain_id 
+      };
+
       var contentType = this.contentType;
       if (contentType == null && (typeof this.body === 'string')) {
         contentType = 'application/x-www-form-urlencoded';

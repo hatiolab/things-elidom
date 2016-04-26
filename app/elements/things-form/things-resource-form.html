@@ -22,7 +22,12 @@
 <link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
 
 <link rel="import" href="../things-content/things-load-view-behavior.html">
+<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
+<link rel="import" href="../things-spinner/things-spinner-behavior.html">
+
 <link rel="import" href="./things-form-behavior.html">
+<link rel="import" href="./things-detail-form-behavior.html">
+
 
 <!--
 Resource Form Element. 
@@ -133,7 +138,9 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			
 		<paper-toolbar>
 			<span class="title">[[title]]</span>
-			<things-button color='green' id='save-btn' on-tap='saveResourceForm'>Save</things-button>
+			<things-button color='green' id='save-btn' on-tap='saveResourceForm'>
+				<things-i18n-msg msgid="button.save">Save</things-i18n-msg>
+			</things-button>
 		</paper-toolbar>
 
 		<form
@@ -173,84 +180,31 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 					computed: '_computeTitle(resourceType)'
 				},
 
-				/**
-				 * Resource Type
-				 */
-				resourceType: {
-					type: String
-				},
 
-				/**
-				 * Resource Get/Update를 하기 위한 URL.
-				 * 이 속성으로 아이디로 레코드를 조회하거나 레코드를 업데이트 혹은 생성하는데 사용된다.
-				 * Resource URL은 보통 {복수 entity 명}/{:id} 형식이다. 
-				 * ex) users/:id
-				 */
-				resourceUrl: {
-					type: String
-				},
-
-				/**
-				 * 폼에 채우기 위한 리소스
-				 * 최초 폼이 실행되는 시점에 서버에 요청하여 리턴받은 데이터
-				 */
-				resource: {
-					type: Object,
-					observer: '_resourceChanged'
-				},
-
-				/**
-				 * 폼에는 있지만 업데이트하기에 불필요한 필드를 삭제하기 위한 필드명
-				 */
-				removeFieldsOnSave: {
-					type: Array,
-					value: ['domain_id', 'creator', 'updater', 'creator_id', 'updater_id', 'created_at', 'updated_at']
-				}
 			},
 
 			behaviors: [
-				Things.FormBehavior,
-				Polymer.IronResizableBehavior,
-				Things.LoadViewBehavior
+				Things.DetailFormBehavior,
+				Things.LoadViewBehavior,
+				Things.SpinnerBehavior,
+				Things.MsgBoxBehavior,
+				Polymer.IronResizableBehavior
 			],
-
-			/**
-			 * 폼이 오픈된 후 fire
-			 *
-			 * @event things-resource-form-opened
-			 */
-			/**
-			 * 리소스 조회 후 fire
-			 *
-			 * @event things-resource-form-read
-			 */
-			/**
-			 * 리소스 업데이트 후 fire
-			 *
-			 * @event things-resource-form-saved
-			 */
-			/**
-			 * 생성 후 fire
-			 *
-			 * @event things-resource-form-created
-			 */
-			 /**
-			  * 조회/생성/업데이트 에러 발생 후 fire
-			  *
-			  * @event things-resource-form-error
-			  */
 
 			listeners : {
-				'iron-form-presubmit' :'_preSubmitHandler',
-				'iron-form-response' :'_successResponseHandler',
-				'iron-form-error' : '_errorResponseHandler',
-				'member-resource.things-ajax-response' : '_successResponseHandler',
-				'member-resource.things-ajax-error' : '_errorResponseHandler'
+				'iron-form-presubmit' :'handleBeforeSubmit',
+				'iron-form-response' :'handleSuccessResponse',
+				'iron-form-error' : 'handleErrorResponse',
+				'member-resource.things-ajax-response' : 'handleSuccessResponse',
+				'member-resource.things-ajax-error' : 'handleErrorResponse'
 			},
 
-			observers: [
-				'_onFormFieldsChanged(formFields)',
-			],
+			/**
+			 * Compute title
+			 */
+			_computeTitle: function(resourceType)	{
+				return resourceType + ' Detail';
+			},
 
       /***************************************************************************************
        *                            Start detail item view interface
@@ -278,206 +232,7 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 
       /***************************************************************************************
        *                            End detail item view interface
-       ***************************************************************************************/      
-
-			/**
-			 * 리소스 폼이 이미 구성되었는지 여부 
-			 */
-			isFormConfigured: function() {
-				return this.$['left-fields'].childNodes.length > 0 || this.$['right-fields'].childNodes.length > 0;
-			},
-
-			/**
-			 * 리소스 폼 화면을 구성. formFields 정보로 동적으로 폼 하위 엘리먼트를 생성하여 폼을 구성한다. 
-			 */
-			reconfigureMyForm: function() {
-				if(this.isFormConfigured()) return;
-				
-				for(index in this.formFields) {
-					var field = this.formFields[index];
-					var newElement = this._createFormElement(field);
-					if(!newElement) continue;
-
-					if((index % 2) == 0) {
-						this.$['left-fields'].appendChild(newElement);
-					} else {
-						this.$['right-fields'].appendChild(newElement);
-					}
-				}
-			},
-
-			/**
-			 * save data from resource detail screen
-			 */
-			saveResourceForm: function() {
-				var resourceSaver = this.$['member-resource'];
-				var originalAction = resourceSaver.action;
-				var originalContentType = resourceSaver.contentType;
-
-				resourceSaver.method = this.resource.id ? 'PUT' : 'POST';
-				if(resourceSaver.action && resourceSaver.action.indexOf(':id') >= 0) {
-					resourceSaver.action = resourceSaver.action.replace(':id', this.resource.id);
-				}
-				
-				var params = this.serializeMyForm();
-				params = this._filterResourceColumns(params);
-				resourceSaver.params = params;
-				resourceSaver.contentType = 'application/json';
-				resourceSaver.generateRequest();
-				resourceSaver.action = originalAction;
-				resourceSaver.contentType = originalContentType;
-			},
-
-			/**
-			 * 리소스 폼을 오픈한다.
-			 * @param {Object} data 리소스 데이터 
-			 */
-			openResourceForm: function(data) {
-				if(!this.isFormConfigured()) {
-					this.reconfigureMyForm();
-				}
-
-				this.findResource(data.id);
-			},
-
-			/**
-			 * 리소스 아이디로 서버에 리소스를 조회 요청한다.
-			 * @param {String} resourceId
-			 */
-			findResource: function(resourceId) {
-				var resourceGetter = this.$['member-resource'];
-				resourceGetter.resourceId = resourceId;
-				resourceGetter.generateRequest();
-			},
-
-			/**
-			* Submit 전에 전처리. TODO
-			*
-			* @param {Event} event
-			*/
-			_preSubmitHandler: function(event) {
-				// TODO
-			},
-
-			/**
-			 * FormFields가 변경될 때 
-			 *
-			 * @param {Array} formFields 
-			 */
-			_onFormFieldsChanged: function(formFields) {
-				this._resourceChanged(this.resource);
-			},
-
-			/**
-			 * resource가 변경될 때 
-			 *
-			 * @param {Object} 리소스 
-			 */
-			_resourceChanged: function(resource) {
-				if(resource && this.isFormConfigured()) {
-					this._bindData(this.$['left-fields'].childNodes, resource);
-					this._bindData(this.$['right-fields'].childNodes, resource);
-				}
-			},
-
-			/**
-			 * resource로 elements에 각각 바인딩한다.
-			 *
-			 * @param {Array} elements
-			 * @param {Object} resource
-			 */
-			_bindData: function(elements, resource) {
-				for(var i = 0 ; i < elements.length ; i++) {
-					var element = elements[i];
-					if(element.nodeName == 'THINGS-TRISTATE-CHECKBOX') {
-						var val = resource[element.name];
-						if(val === true)
-							element.state = 'on';
-						else if(val === false)
-							element.state = 'off';
-						else
-							element.state = null;
-					} else {
-						element.value = resource[element.name];
-					}
-				}
-			},
-
-			/**
-			 * 서버에 저장 요청할 파라미터 중에서 Save 전에 저장에 불필요한 컬럼들을 필터링한다.
-			 *
-			 * @param {Object} params 서버에 저장 요청할 파라미터 
-			 */
-			_filterResourceColumns: function(params) {
-				for(var name in params) {
-					if(this.removeFieldsOnSave.includes(name)) {
-						delete params[name];
-					} else {
-						var value = params[name];
-						if(typeof(value) === 'undefined') {
-							delete params[name];
-						}
-					}
-				}
-
-				return params;
-			},
-
-			/**
-			 * Save 액션 성공 후 후처리 
-			 * method가 GET인 경우 : things-resource-form-read 이벤트
-			 * method가 PUT인 경우 : things-resource-form-saved 이벤트
-			 * method가 POST인 경우 : things-resource-form-created 이벤트
-			 */
-			_successResponseHandler: function(event) {
-				this.stopSpinner();
-
-				var method = event.srcElement.method.toUpperCase();
-				if(method == 'GET') {
-					this.openPopupView(this, true);
-					this.fire('things-resource-form-read', event.detail);
-
-				} else if(method == 'PUT') {
-					this.closePopupView();
-					this.fire('things-resource-form-saved', event.detail);
-
-				} else if(method == 'POST') {
-					this.closePopupView();
-					this.fire('things-resource-form-created', event.detail);
-				}
-			},
-
-			/**
-			* Error response handler After form submits.
-			* Fires a 'things-resource-form-error' in this function
-			*
-			* @param {Event} event
-			*/
-			_errorResponseHandler: function(event) {
-				this.stopSpinner();
-
-				var response = (event.detail && !event.detail.request) ? event.detail : event.detail.request.xhr.response;
-				if(response && response.status == 401) {
-					this.handleUnauthorized();
-
-				} else {
-					if(response) {
-						this.openResponseError(response);
-					} else {
-						response = event.detail.request;
-						this.openUnkownError(response);
-					}
-				}
-
-				this.fire('things-resource-form-error', response);
-			},
-
-			/**
-			 * compute title
-			 */
-			_computeTitle: function(resourceType)	{
-				return resourceType + ' Detail';
-			}
+       ***************************************************************************************/
 
 		});
 	</script>
