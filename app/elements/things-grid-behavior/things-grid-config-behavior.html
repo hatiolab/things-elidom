@@ -355,6 +355,17 @@
     },
 
     /**
+     * 버튼이 존재하는지 여부 체크
+     *
+     * @param {String} buttonId
+     */
+    isButtonExist: function(buttonId) {
+      if(!this.buttons || this.buttons.length == 0) return false;
+      var btns = this.buttons.filter(function(button) { return buttonId == button.id; });
+      return (!btns || btns.length == 0) ? false : true;
+    },
+
+    /**
      * 그리드 리사이즈 - parentNode 사이즈에 따라 그리드를 리사이즈
      *
      * @param {Object} parentNode

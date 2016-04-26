@@ -96,13 +96,7 @@ mixin 하고 있어서 그리드에 데이터만 표시하는데 사용된다.
 			is: 'things-basic-grid',
 
 			behaviors: [
-				Things.GridConfigBehavior/*,
-				Things.GridPaginationBehavior,
-				Things.GridImportBehavior,
-				Things.GridExportBehavior,
-				Things.GridAddrowBehavior,
-				Things.GridSoftDeleterowBehavior,
-				Things.GridSaveBehavior*/
+				Things.GridConfigBehavior
 			],
 	
 			properties: {
@@ -115,21 +109,7 @@ mixin 하고 있어서 그리드에 데이터만 표시하는데 사용된다.
 					value: function() {
 						return [];
 					}
-				}/*,
-
-				behaviorConfig: {
-					type: Object,
-					value: function() { 
-						return {
-							pagination: false,
-							import: false,
-							export: false,
-							addrow: false,
-							deleterow: false,
-							save: false
-						}; 
-					}
-				}*/
+				}
 			},
 
 			listeners: {
@@ -140,10 +120,48 @@ mixin 하고 있어서 그리드에 데이터만 표시하는데 사용된다.
 				'_toolbarConfigChanged(paginatable, buttons)'
 			],
 
-			/*beforeRegister: function() {
-				console.log(this.behaviorConfig);
-				this.behaviors.push(Things.GridAddrowBehavior);
-				this._mixinBehavior(Things.GridAddrowBehavior);
+			/**
+			 * Life Cycle 
+			 */
+			/*_buttonsChanged: function() {
+				if(this.paginatable) {
+					this.behaviors.push(Things.GridPaginationBehavior);
+					this._mixinBehavior(Things.GridPaginationBehavior);
+				}
+
+				if(!this.buttons || this.buttons.length <= 0) {
+					return;
+				}
+
+				var enableImport = this.buttons.filter(function(button) { return button.id == 'import-btn'; });
+				if(enableImport && enableImport.length > 0) {
+					this._mixinBehavior(Things.GridImportBehavior);
+					this.initImportBehavior();
+				}
+
+				var enableExport = this.buttons.filter(function(button) { return button.id == 'export-btn'; });
+				if(enableExport && enableExport.length > 0) {
+					this._mixinBehavior(Things.GridExportBehavior);
+					this.initExportBehavior();
+				}
+
+				var enableAdd = this.buttons.filter(function(button) { return button.id == 'add-btn'; });
+				if(enableAdd && enableAdd.length > 0) {
+					this._mixinBehavior(Things.GridAddrowBehavior);
+					this.initAddrowBehavior();
+				}
+
+				var enableDelete = this.buttons.filter(function(button) { return button.id == 'delete-btn'; });
+				if(enableDelete && enableDelete.length > 0) {
+					this._mixinBehavior(Things.GridSoftDeleterowBehavior);
+					this.initSoftDeleterowBehavior();
+				}
+
+				var enableSave = this.buttons.filter(function(button) { return button.id == 'save-btn'; });
+				if(enableSave && enableSave.length > 0) {
+					this._mixinBehavior(Things.GridSaveBehavior);
+					this.initSaveBehavior();
+				}
 			},*/
 
 			/**

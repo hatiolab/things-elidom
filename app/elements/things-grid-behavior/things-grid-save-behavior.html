@@ -53,24 +53,7 @@
 		},
 
 		listeners: {
-			'things-grid-configured' : '_initializeSaveHandler',
-			'button-group.save-btn-tap' : 'saveGridData'
-		},
-
-		/**
-		 * Life Cycle
-		 */
-		ready: function() {
-			if(!this.buttons) return;
-
-			this.push('buttons', {
-				id: 'save-btn',
-				text: 'Save',
-				icon: 'icons:save',
-				confirm: true,
-				title: 'Confirmation',
-				message: 'Are you sure to save?'
-			});
+			'things-grid-configured' : '_initializeSaveBehavior'
 		},
 
 		/**
@@ -78,11 +61,13 @@
 		 *
 		 * @param {Object} e things-grid-configured 이벤트
 		 */
-		_initializeSaveHandler: function(e) {
-			if(this.grid) {
+		_initializeSaveBehavior: function(e) {
+			if(this.grid && this.isButtonExist('save-btn')) {
 				var evt = this.fire('things-grid-save-configure', this.grid, { cancelable: true });
 				if(!evt.defaultPrevented) {
 					this.grid.editOptions().setUpdatable(true);
+					// button tap 이벤트 추가 
+					this.listen(this.$['button-group'], 'save-btn-tap', 'saveGridData');
 					this.fire('things-grid-save-configured', this.grid);
 				}
 			}

@@ -92,8 +92,7 @@
 		},
 
 		listeners: {
-			'things-grid-configured' : '_initializePaginationHandler',
-			'things-grid-data-change' : '_infiniteGridDataChangedHandler',			
+			'things-grid-configured' : '_initializePaginationBehavior'
 		},
 
 		/**
@@ -167,13 +166,14 @@
 		 *
 		 * @param {Object} e things-grid-configured 이벤트 
 		 */
-		_initializePaginationHandler: function(e) {
-			if(this.grid) {
+		_initializePaginationBehavior: function(e) {
+			if(this.grid && this.paginatable) {
 				var evt = this.fire('things-grid-paginator-configure', this.grid, { cancelable: true });
 				if(!evt.defaultPrevented) {
 					// infiniteScroll 일 경우 처리 
 					if(this.infiniteScroll) {
 						this.grid.onScrollToBottom = '_gridScrollToBottom';
+						this.listen(this, 'things-grid-data-change', '_infiniteGridDataChangedHandler');
 					}
 
 					this.fire('things-grid-paginator-configured', this.grid);

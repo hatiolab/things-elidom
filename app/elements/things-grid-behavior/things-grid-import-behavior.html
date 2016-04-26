@@ -47,21 +47,8 @@
 		},
 
 		listeners: {
-			'things-grid-configured': '_initializeExportHandler',
+			'things-grid-configured': '_initializeImportBehavior',
 			'button-group.import-btn-tap' : 'importExcel'
-		},
-
-		/**
-		 * Life Cycle
-		 */
-		ready: function() {
-			if(!this.buttons) return;
-
-			this.push('buttons', {
-				id: 'import-btn',
-				text: 'Import',
-				icon: 'icons:file-upload'
-			});
 		},
 
 		/**
@@ -69,10 +56,14 @@
 		 *
 		 * @param {Object} e things-grid-configured 이벤트
 		 */
-		_initializeExportHandler: function(e) {
-			var evt = this.fire('things-grid-import-configure', this.grid, { cancelable: true });
-			if(!evt.defaultPrevented) {
-				this.fire('things-grid-import-configured', this.grid);
+		_initializeImportBehavior: function(e) {
+			if(this.grid && this.isButtonExist('import-btn')) {
+				var evt = this.fire('things-grid-import-configure', this.grid, { cancelable: true });
+				if(!evt.defaultPrevented) {
+					// button tap 이벤트 추가 
+					this.listen(this.$['button-group'], 'import-btn-tap', 'importExcel');
+					this.fire('things-grid-import-configured', this.grid);
+				}
 			}
 		},		
 

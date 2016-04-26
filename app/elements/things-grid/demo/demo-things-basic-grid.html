@@ -123,9 +123,11 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
         <things-basic-grid 
           id="basic-grid" 
           grid-image-dir="../../../images/grid"
+          buttons="{{buttons}}"
           config="[[config]]"
           model="[[model]]"
           columns="[[columns]]"
+          grid-save-action="{{gridSaveAction}}"
           data="[[data]]">
         </things-basic-grid>
 
@@ -146,14 +148,53 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
         is: 'sample-basic-grid',
 
         properties: {
+
+          gridSaveAction: {
+            type: String,
+            value: 'terminologies/update_multiple'
+          },
+
           metaData : {
             type: Object,
             observer: '_metaDataChanged'
+          },
+
+          buttons: {
+            type: Array,
+            value: 
+              [ {
+                id: 'export-btn',
+                text: 'Export',
+                icon: 'icons:swap-vert'
+              }, {
+                id: 'add-btn',
+                text: 'Add',
+                icon: 'icons:add'
+              }, {
+                id: 'delete-btn',
+                text: 'Delete',
+                icon: 'icons:delete'
+              }, {
+                id: 'save-btn',
+                text: 'Save',
+                icon: 'icons:save',
+                confirm: true,
+                title: 'Confirmation',
+                message: 'Are you sure to save?'
+              }, {
+                id: 'import-btn',
+                text: 'Import',
+                icon: 'icons:file-upload'
+              } ]
           }
         },
 
         listeners: {
           'search.tap' : 'search',
+        },
+
+        created: function() {
+          console.log(this.$['basic-grid']);
         },
 
         /**

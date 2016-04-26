@@ -33,33 +33,21 @@
 		},
 
 		listeners: {
-			'things-grid-configured' : '_initializeSoftDeleterowHandler',
-			'button-group.delete-btn-tap' : 'removeGridRow'
+			'things-grid-configured' : '_initializeSoftDeleterowBehavior'
 		},
-
-		/**
-		 * Life Cycle
-		 */
-		ready: function() {
-			if(!this.buttons) return;
-
-			this.push('buttons', {
-				id: 'delete-btn',
-				text: 'Delete',
-				icon: 'icons:delete'
-			});
-		},		
 
 		/**
 		 * 그리드 구성이 완료된 후 GridSoftDeleterowBehavior를 initialize 한다.
 		 *
 		 * @param {Object} e things-grid-configured 이벤트 
 		 */
-		_initializeSoftDeleterowHandler: function(e) {
-			if(this.grid) {
+		_initializeSoftDeleterowBehavior: function(e) {
+			if(this.grid && this.isButtonExist('delete-btn')) {
 				var evt = this.fire('things-grid-soft-deleterow-configure', this.grid, { cancelable: true });
 				if(!evt.defaultPrevented) {
 					this.grid.editOptions().setDeletable(true);
+					// button tap 이벤트 추가 
+					this.listen(this.$['button-group'], 'delete-btn-tap', 'removeGridRow');
 					this.fire('things-grid-soft-deleterow-configured', this.grid);
 				}
 			}

@@ -33,21 +33,7 @@
 		},
 
 		listeners: {
-			'things-grid-configured' : '_initializeAddrowHandler',
-			'button-group.add-btn-tap' : 'addGridRow'
-		},
-
-		/**
-		 * Life Cycle
-		 */
-		ready: function() {
-			if(!this.buttons) return;
-
-			this.push('buttons', {
-				id: 'add-btn',
-				text: 'Add',
-				icon: 'icons:add'
-			});
+			'things-grid-configured' : '_initializeAddrowBehavior',
 		},
 
 		/**
@@ -55,12 +41,15 @@
 		 *
 		 * @param {Object} e things-grid-configured 이벤트
 		 */
-		_initializeAddrowHandler: function(e) {
-			if(this.grid) {
+		_initializeAddrowBehavior: function(e) {
+			if(this.grid && this.isButtonExist('add-btn')) {
 				var evt = this.fire('things-grid-addrow-configure', this.grid, { cancelable: true });
 				if(!evt.defaultPrevented) {
 					this.grid.editOptions().setInsertable(true);
 					this.grid.editOptions().setAppendable(true);
+
+					// button tap 이벤트 추가 
+					this.listen(this.$['button-group'], 'add-btn-tap', 'addGridRow');
 					this.fire('things-grid-addrow-configured', this.grid);
 				}
 			}
