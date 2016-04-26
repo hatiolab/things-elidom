@@ -95,25 +95,25 @@ Things.DetailFormBehaviorImpl = {
 	},
 
 	/**
-	 * resource가 변경될 때 
+	 * Resource가 변경될 때 
 	 *
 	 * @param {Object} 리소스 
 	 */
 	_resourceChanged: function(resource) {
 		if(resource && this.isFormConfigured()) {
 			// TODO 이 부분이 Resource Form 쪽으로 올라가야 함 
-			this._bindData(this.$['left-fields'].childNodes, resource);
-			this._bindData(this.$['right-fields'].childNodes, resource);
+			this._bindElementData(this.$['left-fields'].childNodes, resource);
+			this._bindElementData(this.$['right-fields'].childNodes, resource);
 		}
 	},
 
 	/**
-	 * resource로 elements에 각각 바인딩한다.
+	 * Resource로 elements에 각각 바인딩한다.
 	 *
 	 * @param {Array} elements
 	 * @param {Object} resource
 	 */
-	_bindData: function(elements, resource) {
+	_bindElementData: function(elements, resource) {
 		for(var i = 0 ; i < elements.length ; i++) {
 			var element = elements[i];
 			if(element.nodeName == 'THINGS-TRISTATE-CHECKBOX') {
@@ -205,17 +205,8 @@ Things.DetailFormBehaviorImpl = {
 		saveAjax.addEventListener('things-ajax-error', function(event) {
 			me.fire('things-detail-form-read-error', event.detail);
 		});
-		
-		getAjax.generateRequest();
-	},
 
-	/**
- 	 * Submit 전에 전처리. TODO
-	 *
-	 * @param {Object} event
-	 */
-	handleBeforeSubmit: function(event) {
-		// TODO Add Header
+		getAjax.generateRequest();
 	},
 
 	/**
