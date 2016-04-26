@@ -17,6 +17,15 @@ window.Things = window.Things || {};
 Things.RouteContentBehavior = {
 
 	properties: {
+
+		/**
+		 * 자산의 Route 정보
+		 */
+		myRoute: {
+			type: String,
+			computed: '_computeRoute(resourceUrl)'
+		},
+
 		/**
 		 * 현재 메뉴에서 선택된 라우팅
 		 */
@@ -42,6 +51,23 @@ Things.RouteContentBehavior = {
 			value: false
 		}
 	},
+
+	/**
+	 * 메뉴에 등록된 자신의 routing 정보를 리턴한다.
+	 */
+	getMyRoute: function() {
+		return this.myRoute;
+	},
+
+	/**
+	 * resourceUrl로 route 정보를 다시 생성
+	 *
+	 * @param {String} resourceUrl
+	 * @return {String} route
+	 */
+	_computeRoute: function(resourceUrl) {
+		return resourceUrl;
+	},	
 
 	/**
 	 * 현재 선택된 routing이 자신인지 체크하여 자신이 선택되었다면 메타 데이터를 조회하여 화면을 구성한다. 

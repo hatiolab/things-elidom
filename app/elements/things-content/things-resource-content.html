@@ -10,14 +10,13 @@
 
 <link rel="import" href="../things-ajax/things-ajax.html">
 <link rel="import" href="../things-button/things-button.html">
-<link rel="import" href="../things-resource-selector/things-resource-selector-behavior.html">
-<link rel="import" href="../things-grid/things-basic-grid.html">
-<link rel="import" href="../things-grid/things-resource-grid.html">
 <link rel="import" href="../things-form/things-resource-form.html">
 <link rel="import" href="../things-form/things-search-form.html">
-<link rel="import" href="../things-meta/things-resource-meta-behavior.html">
-
 <link rel="import" href="../things-full-dialog/things-full-dialog.html">
+<link rel="import" href="../things-grid/things-resource-grid.html">
+<link rel="import" href="../things-meta/things-resource-meta-behavior.html">
+<link rel="import" href="../things-resource-selector/things-resource-selector-behavior.html">
+
 <link rel="import" href="./things-load-view-behavior.html">
 <link rel="import" href="./things-route-content-behavior.html">
 
@@ -73,19 +72,17 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				id="grid"
 				model="[[gridModel]]" 
 				columns="[[gridColumns]]"
-				config ="[[gridConfig]]"
+				config="[[gridConfig]]"
 				current-page="{{page}}"
 				per-page="{{perPage}}"
 				data="[[lastResponse.items]]"
 				total-count="[[lastResponse.total]]"
 				grid-save-action="[[gridSaveUrl]]"
-				selected-row-data="{{selectedRow}}"
 				export-file-name="[[title]]"
 				export-sheet-name="[[title]]"
 				enable-detail-column="[[enableDetailColumn]]"
 				paginatable>
 			</things-resource-grid>
-
 		</div>
 	</template>
 
@@ -115,26 +112,11 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				},
 
 				/**
-				 * 자산의 Route 정보
-				 */
-				myRoute: {
-					type: String,
-					computed: '_computeRoute(resourceUrl)'
-				},
-
-				/**
 				 * 그리드 저장 (Multiple Save) URL
 				 */
 				gridSaveUrl: {
 					type: String,
 					computed: '_computeGridSaveUrl(resourceUrl)'
-				},
-
-				/**
-				 * 그리드에서 선택된 Row Data
-				 */
-				selectedRow: {
-					type: Object
 				},
 
 				/**
@@ -163,9 +145,9 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			},
 
 			listeners : {
-				'grid.things-grid-detail-tap': '_showDetailView',
+				'grid.things-grid-detail-tap': 'showDetailView',
 				'grid.things-grid-save-success': 'refreshGridData',
-				'grid.things-grid-resource-column-edit' : '_openResourceSelector'
+				'grid.things-grid-resource-column-edit' : 'openResourceSelector'
 			},
 
 			/**
@@ -179,13 +161,11 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			},
 
 			/**
-			 * resourceUrl로 route 정보를 다시 생성
-			 *
-			 * @param {String} resourceUrl
-			 * @return {String} route
+			 * 화면 초기화 함수 
+			 * 메타 데이터를 서버로 요청하여 화면을 구성한다.
 			 */
-			_computeRoute: function(resourceUrl) {
-				return resourceUrl;
+			initializeContent: function() {
+				this.$['resource-meta'].generateRequest();
 			},
 
 			/**
@@ -193,11 +173,11 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 *
 			 * @param {Event} event 그리드에서 선택된 event
 			 */
-			_showDetailView: function(event) {
+			showDetailView: function(event) {
 				if(!this.detailView || this.detailView == 'things-resource-form') {
-					this._showResourceForm(event.detail);
+					this.showResourceForm(event.detail);
 				} else {
-					this._showCustomView(event.detail);
+					this.showCustomView(event.detail);
 				}
 			},
 
@@ -206,7 +186,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 *
 			 * @param {Object} selectedRecord 그리드에서 선택된 Row Data
 			 */
-			_showResourceForm: function(selectedRecord) {
+			showResourceForm: function(selectedRecord) {
 				var viewElement = document.createElement('things-resource-form');
 				viewElement.id = 'resource-form';
 				viewElement.title = this.title + ' Detail';
@@ -227,7 +207,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 *
 			 * @param {Object} selectedRecord 그리드에서 선택된 Row Data
 			 */
-			_showCustomView: function(selectedRecord) {
+			showCustomView: function(selectedRecord) {
 				var viewElement = document.createElement(this.detailView);
 				viewElement.id = 'detail-view';
 				viewElement.title = this.title + ' Detail';
@@ -253,26 +233,11 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			},
 
 			/**
-			 * 메뉴에 등록된 자신의 routing 정보를 리턴한다.
-			 */
-			getMyRoute: function() {
-				return this.myRoute;
-			},
-
-			/**
-			 * 화면 초기화 함수 
-			 * 메타 데이터를 서버로 요청하여 화면을 구성한다.
-			 */
-			initializeContent: function() {
-				this.$['resource-meta'].generateRequest();
-			},
-
-			/**
 			 * Open Resource Selector Dialog
 			 *
 			 * @param {Object} event
 			 */
-			_openResourceSelector: function(event) {
+			openResourceSelector: function(event) {
 				var index = event.detail.index;
 				this.openResourceSelectorByGrid(index._grid, index.rowIndex, event.detail.userObj, true);
 			}

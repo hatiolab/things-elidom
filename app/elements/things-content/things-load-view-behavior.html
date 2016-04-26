@@ -13,22 +13,23 @@ window.Things = window.Things || {};
 
 /**
  * View를 Load 해주는 Behavior.
- * 
  * view를 기본 다이얼로그로 오픈하는 함수와 FullScreen 다이얼로그로 오픈하는 함수가 있다.
  *
- * @demo demo/index.html
+ * @polymerBehavior Things.LoadViewBehavior
  */
 Things.LoadViewBehavior = {
+
 	/**
 	 * view를 full screen 다이얼로그로 오픈한다.
 	 *
 	 * @param {String} view
 	 * @param {Boolean} modal
+	 * @param {Object} record
 	 */
 	popupFullScreenView: function(view, modal, record) {
-		var eventDetail = {'view':view, 'record':record, 'modal':modal};
-      	var event = new CustomEvent('things-open-full-screen-view', { 'detail': eventDetail });
-      	document.dispatchEvent(event);
+		var eventDetail = { view: view, record: record, modal: modal };
+		var event = new CustomEvent('things-open-full-screen-view', { 'detail': eventDetail });
+		document.dispatchEvent(event);
 	},
 
 	/**
@@ -39,9 +40,9 @@ Things.LoadViewBehavior = {
 	 * @param {Function} openCallback
 	 */
 	openPopupView: function(view, modal, openCallback) {
-		var eventDetail = {'view':view, 'modal':modal, 'openCallback':openCallback};
-      	var event = new CustomEvent('things-open-popup-view', { 'detail': eventDetail });
-      	document.dispatchEvent(event);
+		var eventDetail = { view: view, modal: modal, openCallback: openCallback };
+		var event = new CustomEvent('things-open-popup-view', { 'detail': eventDetail });
+		document.dispatchEvent(event);
 	},
 
 	/**
@@ -49,8 +50,8 @@ Things.LoadViewBehavior = {
 	 */
 	closePopupView: function() {
 		var eventDetail = this;
-      	var event = new CustomEvent('things-close-popup-view', { 'detail': eventDetail });
-      	document.dispatchEvent(event);
+		var event = new CustomEvent('things-close-popup-view', { 'detail': eventDetail });
+		document.dispatchEvent(event);
 	}
 };
 
