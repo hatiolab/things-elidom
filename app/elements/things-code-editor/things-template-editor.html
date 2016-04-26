@@ -169,7 +169,7 @@ things-template-editor. template성 텍스트를 편집 및 저장 할 수 있�
           readonly: true,
           value: [ {
             id: 'save-btn',
-            text: 'Save'
+            text: 'save'
           } ]
         }
       },
@@ -211,7 +211,7 @@ things-template-editor. template성 텍스트를 편집 및 저장 할 수 있�
         var result = buttons.filter(function(button) { return button.id === 'preview-btn'; })[0];
 
         if(mode === 'ace/mode/html' && !result) {
-          this.push('buttons', { id:'preview-btn', text:'Preview' });
+          this.push('buttons', { id:'preview-btn', text:'preview' });
         }
       },
 

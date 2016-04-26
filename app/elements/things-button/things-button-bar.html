@@ -10,11 +10,11 @@
 
     var buttons = [{
       id: 'import',
-      text: 'Import',
+      text: 'import',
       icon: 'icons:import'
     }, {
       id: 'export',
-      text: 'Export',
+      text: 'export',
       icon: 'icons:export'
     }, {
       id: 'add',
@@ -22,11 +22,11 @@
       icon: 'icons:add'
     }, {
       id: 'delete',
-      text: 'Delete',
+      text: 'delete',
       icon: 'icons:delete'
     }, {
       id: 'save',
-      text: 'Save',
+      text: 'save',
       icon: 'icons:save'
     }];
 
@@ -56,7 +56,9 @@
         confirm="[[button.confirm]]"
         title="[[button.title]]"
         message="[[button.message]]"
-        on-tap="_onTabButton">[[button.text]]</things-button>
+        on-tap="_onTabButton">
+        <things-i18n-msg msgid="button.[[button.text]]">[[button.text]]</things-i18n-msg>
+        </things-button>
     </template>
 	</template>
 
@@ -72,11 +74,11 @@
          *
          * [ {
          *    id: 'import',
-         *    text: 'Import',
+         *    text: 'import',
          *    icon: 'icons:import',
          *  }, {
          *    id: 'export',
-         *    text: 'Export',
+         *    text: 'export',
          *    icon: 'icons:export'
          *  }, {
          *    id: 'add',
@@ -84,11 +86,11 @@
          *    icon: 'icons:add'
          *  }, {
          *    id: 'delete',
-         *    text: 'Delete',
+         *    text: 'delete',
          *    icon: 'icons:delete'
          *  }, {
          *    id: 'save',
-         *    text: 'Save',
+         *    text: 'save',
          *    icon: 'icons:save'
          *  } ]
          */

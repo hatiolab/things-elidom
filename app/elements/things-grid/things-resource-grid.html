@@ -91,6 +91,7 @@ Things.ResourceGridBehavior에 필요한 모든 구현이 포함되어 있다.
 				<!-- button group -->
 				<div id="toolbar-bottom-div" class="bottom fit">					
 					<things-button-bar id="button-group" buttons="[[buttons]]"></things-button-bar>
+					<!--things-button-group id="button-group" buttons="[[buttons]]"></things-button-group-->
 				</div>
 			</paper-toolbar>
 		</paper-material>
@@ -116,23 +117,23 @@ Things.ResourceGridBehavior에 필요한 모든 구현이 포함되어 있다.
 			 * 기본적으로 아래 다섯개의 버튼에 대해서 지원하고 필요한 버튼만 추가시키면 추가된 버튼만 표시된다.
 			 * ex) [ {
 					id: 'export-btn',
-					text: 'Export',
+					text: 'export',
 					icon: 'icons:swap-vert'
 				}, {
 					id: 'add-btn',
-					text: 'Add',
+					text: 'add',
 					icon: 'icons:add'
 				}, {
 					id: 'delete-btn',
-					text: 'Delete',
+					text: 'delete',
 					icon: 'icons:delete'
 				}, {
 					id: 'save-btn',
-					text: 'Save',
+					text: 'save',
 					icon: 'icons:save'
 				}, {
 					id: 'import-btn',
-					text: 'Import',
+					text: 'import',
 					icon: 'icons:file-upload'
 				} ]
 			 */
@@ -141,23 +142,23 @@ Things.ResourceGridBehavior에 필요한 모든 구현이 포함되어 있다.
 					value: function() {
 						return [ {
                 id: 'export-btn',
-                text: 'Export',
+                text: 'export',
                 icon: 'icons:swap-vert'
               }, {
                 id: 'add-btn',
-                text: 'Add',
+                text: 'add',
                 icon: 'icons:add'
               }, {
                 id: 'delete-btn',
-                text: 'Delete',
+                text: 'delete',
                 icon: 'icons:delete'
               }, {
                 id: 'save-btn',
-                text: 'Save',
+                text: 'save',
                 icon: 'icons:save'
               }, {
                 id: 'import-btn',
-                text: 'Import',
+                text: 'import',
                 icon: 'icons:file-upload'
               } ];
 					}

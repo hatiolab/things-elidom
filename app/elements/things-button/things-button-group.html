@@ -10,11 +10,11 @@
 
     var buttons = [ {
       id: 'import',
-      text: 'Import',
+      text: 'import',
       icon: 'icons:import'
     }, {
       id: 'export',
-      text: 'Export',
+      text: 'export',
       icon: 'icons:export'
     }, {
       id: 'add',
@@ -22,11 +22,11 @@
       icon: 'icons:add'
     }, {
       id: 'delete',
-      text: 'Delete',
+      text: 'delete',
       icon: 'icons:delete'
     }, {
       id: 'save',
-      text: 'Save',
+      text: 'save',
       icon: 'icons:save'
     } ];
 
@@ -100,7 +100,7 @@
 
           <template is="dom-repeat" items="[[buttons]]" as=button>
             <paper-fab mini icon="{{button.icon}}" id="{{button.id}}" on-tap="_onTabButton"></paper-fab>
-            <div class="fab-text">{{button.text}}</div>
+            <div class="fab-text"><things-i18n-msg msgid="button.[[button.text]]">[[button.text]]</things-i18n-msg></div>
           </template>
 
         </div>
@@ -121,11 +121,11 @@
          *
          * [ {
          *    id: 'import',
-         *    text: 'Import',
+         *    text: 'import',
          *    icon: 'icons:import',
          *  }, {
          *    id: 'export',
-         *    text: 'Export',
+         *    text: 'export',
          *    icon: 'icons:export'
          *  }, {
          *    id: 'add',
@@ -133,11 +133,11 @@
          *    icon: 'icons:add'
          *  }, {
          *    id: 'delete',
-         *    text: 'Delete',
+         *    text: 'delete',
          *    icon: 'icons:delete'
          *  }, {
          *    id: 'save',
-         *    text: 'Save',
+         *    text: 'save',
          *    icon: 'icons:save'
          *  } ]
          */
