@@ -117,7 +117,7 @@ Example:
 
 				for(index in this.formFields) {
 					var field = this.formFields[index];
-					var newElement = this.createFormElement(field);
+					var newElement = this._createFormElement(field);
 					if(!newElement) continue;
 
 					this.$['param-fields'].appendChild(newElement);

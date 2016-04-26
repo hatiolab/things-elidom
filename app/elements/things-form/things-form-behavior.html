@@ -14,41 +14,39 @@
 <link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../../bower_components/paper-toggle-button/paper-toggle-button.html">
 
+<link rel="import" href="../things-button/things-button.html">
+<link rel="import" href="../things-date-picker/things-date-picker.html">
+<link rel="import" href="../things-date-picker/things-date-from-to.html">
+<link rel="import" href="../things-date-picker/things-time-picker.html">
+<link rel="import" href="../things-input-field/things-input-field.html">
 <link rel="import" href="../things-resource-combo/things-code-combo.html">
 <link rel="import" href="../things-resource-selector/things-resource-selector.html">
 <link rel="import" href="../things-resource-selector/things-resource-field.html">
-<link rel="import" href="../things-date-picker/things-date-picker.html">
-<link rel="import" href="../things-date-picker/things-time-picker.html">
-<link rel="import" href="../things-input-field/things-input-field.html">
+<link rel="import" href="../things-tristate-checkbox/things-tristate-checkbox.html">
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 <link rel="import" href="../things-global-behavior/things-global-behavior.html">
 <link rel="import" href="../things-spinner/things-spinner-behavior.html">
-<link rel="import" href="../things-tristate-checkbox/things-tristate-checkbox.html">
 
 <script>
 
 window.Things = window.Things || {};
 
 /**
- * Things.FormBehavior enables a custom element to be included in an things-search-form or things-resource-form
+ * 기본 Form Behavior
  *
- * @demo demo/index.html
- * @IronFormElementBehavior
- * @SpinnerBehavior
- * @MsgBoxBehavior
- * @GlobalBehavior
+ * @polymerBehavior Things.FormBehavior
  */
 Things.FormBehaviorImpl = {
 
 	properties: {
-    /**
+		/**
      * Meta-Data of the form elements of the form.
      * Custom Form element can configure child elements of the form dynamically.
      * StdFormBehavior create form element by each of this attributes
      */
 		formFields: {
 			type: Array,
-			observer: '_formFieldsChange'
+			observer: '_formFieldsChanged'
 		},
 
 		/**
@@ -67,20 +65,6 @@ Things.FormBehaviorImpl = {
 		action: {
 			type: String,
 			computed: '_computeAction(globals.baseUrl,actionUrl)'
-		},
-
-		/**
-		 * select fields
-		 */
-		selectFields: {
-			type: String
-		},
-
-		/**
-		 * sort fields - [{ field : 'fieldName1', ascending : true }, { field : 'fieldName2', ascending : false }]
-		 */
-		sortFields: {
-			type: Array
 		},
 		
 		/**
@@ -116,14 +100,10 @@ Things.FormBehaviorImpl = {
 		 * 검색 결과 데이터 
 		 */
 		lastResponse: {
-			type: Object
+			type: Object,
+			notify: true
 		}
 
-	},
-
-	listeners : {
-		'iron-form-response' :'_successResponseHandler',
-		'iron-form-error' : '_errorResponseHandler'
 	},
 
   /**
@@ -134,7 +114,7 @@ Things.FormBehaviorImpl = {
    *
    * @param {Array} formFields attribute
    */
-	_formFieldsChange: function(formFields) {
+	_formFieldsChanged: function(formFields) {
 		this.reconfigureMyForm();
 	},
 
@@ -148,9 +128,22 @@ Things.FormBehaviorImpl = {
 	},
 
 	/**
+	 * Bind element's attribute values by formField informations.
+	 * @param {Object} child element of the form
+	 * @param {Object} element information object from formFields
+	 */
+	_bindAttributes: function(element, attrs) {
+		for(attr in attrs) {
+			element.setAttribute(attr, attrs[attr]);
+		}
+
+		return element;
+	},
+
+	/**
 	 * create list box
 	 *
-	 * @param{Array} items Listbox values
+	 * @param {Array} items Listbox values
 	 * @return {Object} paper-listbox element 
 	 */
 	_makeListBox: function(items) {
@@ -167,77 +160,13 @@ Things.FormBehaviorImpl = {
 		return listbox;
 	},
 
-	/**
-	 * key event - form submits when enter key is monitored
-	 * @param {Event} event A 'KeyPressed' event
-	 */
-	_keyPressHandler: function(event) {
-		var code = event.keyCode;
-		if(code == 13) {
-			if(this.page == 1) this.submitMyForm();
-			else this.page = 1;
-		}
-	},
-
-	/**
-	 * Bind element's attribute values by formField informations.
-	 * @param {Object} child element of the form
-	 * @param {Object} element information object from formFields
-	 */
-	bindAttributes: function(element, attrs) {
-		for(attr in attrs) {
-			element.setAttribute(attr, attrs[attr]);
-		}
-
-		return element;
-	},
-
-	/**
-	 * find form by querySelector and return found form
-	 * @return {Object}
-	 */
-	getMyForm: function() {
-		return this.querySelector('form');
-	},
-
-	/**
-	 * Resets form
-	 */
-	resetMyForm: function() {
-		this.getMyForm().reset();
-	},
-
-	/**
-	 * Submits form
-	 */
-	submitMyForm: function() {
-		this.startSpinner();
-
-		/*if(this.getAttribute('on-submit')) {
-			this.fire('things-form-submit', this.serializeMyForm());
-		} else {
-			this.getMyForm().submit();
-		}*/
-
-		this.getMyForm().submit();
-	},
-
-	/**
-	 * Serialize form and return serialized object.
-	 * It can be used form parameters
-	 * @return {Object} serialized object
-	 */
-	serializeMyForm: function() {
-		return this.getMyForm().serialize();
-	},
-
   /**
    * Create child element of the form by one of the formFields object
    *
    * @param {Object} one of the formFields attribute
    * @return {Object} created child element for the form
    */	 
-	createFormElement: function(element) {
+	_createFormElement: function(element) {
 		var newElement = null;
 
 		switch(element.type) {
@@ -248,19 +177,19 @@ Things.FormBehaviorImpl = {
 				break;
 
 			case 'button':
-				newElement = document.createElement('paper-button');
-				newElement = this.bindAttributes(newElement, element);
-				newElement.innerHTML = element.label;
+				newElement = document.createElement('things-button');
+				newElement = this._bindAttributes(newElement, element);
+				newElement.label = element.label;
 				break;
 
 			case 'listbox':
 				newElement = this._makeListBox(element.options);
-				newElement = this.bindAttributes(newElement, element);
+				newElement = this._bindAttributes(newElement, element);
 				break;
 
 			case 'dropdown':
 				newElement = document.createElement('paper-dropdown-menu');
-				newElement = this.bindAttributes(newElement, element);
+				newElement = this._bindAttributes(newElement, element);
 				newChild = this._makeListBox(element.options);
 				newChild.setAttribute('class','dropdown-content');
 				newElement.appendChild(newChild);
@@ -268,18 +197,18 @@ Things.FormBehaviorImpl = {
 
 			case 'radio':
 				newElement = document.createElement('paper-radio-group');
-				newElement = this.bindAttributes(newElement, element);
+				newElement = this._bindAttributes(newElement, element);
 				for(index in element.child) {
 					child = element[index];
 					newChild = document.createElement('paper-radio-button');
-					newChild = this.bindAttributes(newChild, child);
+					newChild = this._bindAttributes(newChild, child);
 					newElement.appendChild(newChild);
 				}
 				break;
 
 			case 'textarea':
 				newElement = document.createElement('paper-textarea');
-				newElement = this.bindAttributes(newElement, element)
+				newElement = this._bindAttributes(newElement, element)
 				break;
 
 			case 'code-combo':
@@ -335,7 +264,7 @@ Things.FormBehaviorImpl = {
 
 			default:
 				newElement = document.createElement('things-input-field');
-				//newElement = this.bindAttributes(newElement, element);
+				//newElement = this._bindAttributes(newElement, element);
 				newElement.setAttribute('name', element.name);
 				newElement.setAttribute('label', element.label);
 		}
@@ -348,6 +277,57 @@ Things.FormBehaviorImpl = {
 
 		newElement.setAttribute('class', 'flex style-scope things-form');
 		return newElement;
+	},
+
+	/**
+	 * key event - form submits when enter key is monitored
+	 * @param {Object} event A 'KeyPressed' event
+	 */
+	handleKeyPress: function(event) {
+		var code = event.keyCode;
+		if(code == 13) {
+			if(this.page == 1) this.submitMyForm();
+			else this.page = 1;
+		}
+	},
+
+	/**
+	 * find form by querySelector and return found form
+	 * @return {Object}
+	 */
+	getMyForm: function() {
+		return this.querySelector('form');
+	},
+
+	/**
+	 * Resets form
+	 */
+	resetMyForm: function() {
+		this.getMyForm().reset();
+	},
+
+	/**
+	 * Submits form
+	 */
+	submitMyForm: function() {
+		this.startSpinner();
+
+		/*if(this.getAttribute('on-submit')) {
+			this.fire('things-form-submit', this.serializeMyForm());
+		} else {
+			this.getMyForm().submit();
+		}*/
+
+		this.getMyForm().submit();
+	},
+
+	/**
+	 * Serialize form and return serialized object.
+	 * It can be used form parameters
+	 * @return {Object} serialized object
+	 */
+	serializeMyForm: function() {
+		return this.getMyForm().serialize();
 	}
 
 };

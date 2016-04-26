@@ -28,7 +28,9 @@ Things.ResourceSearchBehavior = {
 		 */
 		sortFields: {
 			type: Array,
-			value:[]
+			value: function() {
+				return [];
+			}
 		},
 		
 		/**
@@ -38,7 +40,9 @@ Things.ResourceSearchBehavior = {
 		 */
 		queryFields: {
 			type: Array,
-			value:[]
+			value: function() {
+				return [];
+			}
 		},
 
 		/**
@@ -57,8 +61,11 @@ Things.ResourceSearchBehavior = {
 	},
 
 	/**
-	 * 서버에 보낼 파라미터를 재구성한다.
-	 * @param reqParams Ajax 요청 파라미터 
+	 * 서버에 보낼 파라미터를 재구성한다. 
+	 * 실제 서버에 요청시 이 함수에서 리턴된 파라미터가 날아간다.
+	 *
+	 * @param {Object} reqParams Ajax 요청 파라미터 
+	 * @return {Object} 재구성된 파라미터 
 	 */
 	handleRequestParams: function(reqParams) {
 		var newReqParams = {};

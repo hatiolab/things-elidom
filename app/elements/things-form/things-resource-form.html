@@ -242,6 +242,8 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 
 			listeners : {
 				'iron-form-presubmit' :'_preSubmitHandler',
+				'iron-form-response' :'_successResponseHandler',
+				'iron-form-error' : '_errorResponseHandler',
 				'member-resource.things-ajax-response' : '_successResponseHandler',
 				'member-resource.things-ajax-error' : '_errorResponseHandler'
 			},
@@ -293,7 +295,7 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 				
 				for(index in this.formFields) {
 					var field = this.formFields[index];
-					var newElement = this.createFormElement(field);
+					var newElement = this._createFormElement(field);
 					if(!newElement) continue;
 
 					if((index % 2) == 0) {

@@ -15,6 +15,7 @@
 <link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
 
 <link rel="import" href="../things-fullscreen/things-fullscreen-behavior.html">
+<link rel="import" href="./things-search-form-behavior.html">
 <link rel="import" href="./things-form-behavior.html">
 
 <!--
@@ -49,53 +50,59 @@
     </style>
 
     <style>
-    :host {
-      display: block;
-      box-sizing: border-box;
-      /*text-align: center;*/
-      /*margin: 0 auto;*/
-      height: 100%;
-      width: 98%;
-    }
-        
-    :host paper-input {
-      margin-left: auto;
-      margin-right: auto;
-      width: 90%;
-    }
+      :host {
+        display: block;
+        box-sizing: border-box;
+        /*text-align: center;*/
+        /*margin: 0 auto;*/
+        height: 100%;
+        width: 98%;
+      }
+          
+      :host paper-input {
+        margin-left: auto;
+        margin-right: auto;
+        width: 90%;
+      }
 
-    :host things-code-combo {
-      margin-left: auto;
-      margin-right: auto;
-      width: 90%;
-    }    
-    
-    :host paper-material {
-      padding: 10px;
-    }
+      :host things-code-combo {
+        margin-left: auto;
+        margin-right: auto;
+        width: 90%;
+      }    
+      
+      :host paper-material {
+        padding: 10px;
+      }
 
-    :host .search {
-      padding:5px 0 3px 5px;
-    }
+      :host .search {
+        padding:5px 0 3px 5px;
+      }
 
-    :host .fields {
-      padding: 0px 10px 0px 0px;
-    }
+      :host .fields {
+        padding: 0px 10px 0px 0px;
+      }
     </style>
 
-    <paper-material elevation="1" class="flex" on-keypress="_keyPressHandler">
+    <paper-material elevation="1" class="flex" on-keypress="handleKeyPress">
       <paper-toolbar>
         <paper-icon-button icon="menu"></paper-icon-button>
         <span class="title">[[title]]</span>
-        <paper-icon-button icon="search" id="search-btn" on-tap="_searchButtonHandler">
+        <paper-icon-button icon="search" id="search-btn" on-tap="searchForm">
         </paper-icon-button>
         <paper-icon-button icon="refresh" id="reset-btn" on-tap="resetMyForm">
         </paper-icon-button>
         <paper-icon-button icon="icons:fullscreen" id="fullscreen-btn" on-tap="toggleFullscreen">
         </paper-icon-button>
-        <paper-tooltip for="search-btn" offset="0">Search</paper-tooltip>
-        <paper-tooltip for="reset-btn" offset="0">Reset</paper-tooltip>
-        <paper-tooltip for="fullscreen-btn" offset="0">Full Screen</paper-tooltip>
+        <paper-tooltip for="search-btn" offset="0">
+          <things-i18n-msg msgid="button.search">Search</things-i18n-msg>
+        </paper-tooltip>
+        <paper-tooltip for="reset-btn" offset="0">
+          <things-i18n-msg msgid="button.reset">Reset</things-i18n-msg>
+        </paper-tooltip>
+        <paper-tooltip for="fullscreen-btn" offset="0">
+          <things-i18n-msg msgid="button.fullscreen">Full Screen</things-i18n-msg>
+        </paper-tooltip>
       </paper-toolbar>
 
       <div class="layout vertical flex">
@@ -103,7 +110,7 @@
               action="[[action]]"
               content-type="[[contentType]]"
               last-response ="{{lastResponse}}"
-              with-credentials=true>
+              with-credentials="[[withCredentials]]">
           <div class="layout horizontal flex" >
             <div id="left-fields" class="layout vertical flex fields"></div>
             <div id="right-fields" class="layout vertical flex"></div>
@@ -125,204 +132,19 @@
        */
       title: {
         type: String
-      },
-
-      /**
-       * form이 active 상태인지 여부. active 상태인 경우에만 form submit이 가능하다.
-       */
-      active: {
-        type: Boolean
-      },
-
-      /**
-       * Pagination을 위한 설정. 페이지에 표시할 데이터 개수
-       */
-      perPage: {
-        type: Number,
-        value: 50
-      },
-
-      /**
-       * Pagination을 위한 설정. 현재 페이지 수 
-       */
-      page : {
-        type: Number,
-        value: 1,
-        notify: true,
-        observer: '_pageChanged'
-      },
-
-      /**
-       * 조회 결과 
-       */
-      lastResponse: {
-        type: Object,
-        notify: true
-      },
-
-      /**
-       * 값이 필요없는 operator
-       */
-      nonValueOpers: {
-        type: Array,
-        value: ['is_null', 'is_not_null', 'is_true', 'is_false', 'is_present', 'is_blank']
-      },
-
-      /**
-       * 검색시 파라미터 유형 : RESOURCE / PLAIN
-       * RESOURCE : 리소스 쿼리인 경우 검색 파라미터가 query = "[{'name' : 'searchField', 'operator' : 'eq', 'value' : 'value'}]" 형식으로 넘어간다.
-       * PLAIN : 검색 파라미터가 Key / Value 형식으로 넘어간다.
-       */
-      paramType: {
-        type: String,
-        value: 'RESOURCE'
       }
+    },
 
-      /**
-       * Fires before handle parameters before form submit
-       *
-       * @event things-form-pre-submit
-      /**
-       * Fires when the successful response is arrived after submit
-       *
-       * @event things-form-submit-success
-       */
-      /**
-       * Fires when the error response is arrived after submit
-       *
-       * @event things-form-submit-error
-       */
+    listeners : {
+      'iron-form-presubmit' :'handleBeforeSubmit',
+      'iron-form-response' :'handleSuccessResponse',
+      'iron-form-error' : 'handleErrorResponse'      
     },
     
     behaviors: [ 
-      Things.FormBehavior,
+      Things.SearchFormBehavior,
       Things.FullscreenBehavior
-    ],
-
-    listeners : {
-      'iron-form-presubmit' :'_preSubmitHandler'
-    },    
-
-    /**
-     * 검색 폼 화면을 구성. formFields 정보로 동적으로 폼 하위 엘리먼트를 생성하여 폼을 구성한다.
-     */
-    reconfigureMyForm: function() {
-      if(this.formFields.length > 0) {
-        for(index in this.formFields) {
-          var field = this.formFields[index];
-          var newElement = this.createFormElement(field);
-          if(!newElement) continue;
-          
-          if((index % 2) == 0) {
-            this.$['left-fields'].appendChild(newElement);
-          } else {
-            this.$['right-fields'].appendChild(newElement);
-          }
-        }
-      }
-    },
-
-    /**
-     * 검색 버튼 클릭시 ...
-     */
-    _searchButtonHandler: function() {
-      if(this.page > 1) this.page = 1;
-      else this.submitMyForm();
-    },
-
-    /**
-     * Submit 전에 전처리. 
-     * Pagination을 사용하는 경우에 currentPage, perPage 정보를 파라미터에 추가한다.
-     *
-     * @param {Event} event
-     */
-    _preSubmitHandler: function(event) {
-      var form = this.getMyForm();
-      var evt = this.fire('things-form-pre-submit', form, { cancelable : true });
-      if(evt.defaultPrevented) return;
-
-      form.request.params || {};
-
-      if(this.paramType == 'RESOURCE') {
-        form.request.params = this._handleSubmitParams(form.request.params);  
-      }
-      
-      form.request.params.select = this.selectFields ? this.selectFields : '';
-      form.request.params.page = this.page;
-      form.request.params.limit = this.perPage;
-    },
-
-    /**
-     * 서버에 보낼 파라미터를 재구성한다.
-     * 
-     * @param {Object} params
-     */
-    _handleSubmitParams: function(params) {
-      var newParams = this.sortFields ? { 
-        sort : (typeof(this.sortFields) == 'string' ? this.sortFields : JSON.stringify(this.sortFields))
-      } : {};
-      
-      var queries = [];
-      for(prop in params) {
-        if(params[prop]) {
-          var fieldModel = this.formFields.filter(function(formField) { return formField.name == prop })[0];
-          var q = { name : prop, operator : fieldModel.op };
-          if(!this.nonValueOpers.includes(fieldModel.op)) {
-            q.value = params[prop];
-          }
-          queries.push(q);
-        }
-      }
-
-      if(queries.length > 0) newParams.query = JSON.stringify(queries);
-      return newParams;
-    },
-
-    /**
-     * 현재 페이지가 변경되었을 때 액션
-     * 페이지가 변경된 경우 해당 페이지로 다시 검색한다.
-     * @param {Number} page 현재 페이지 
-     */
-    _pageChanged: function(page) {
-      if(this.active && page > 0) {
-        this.submitMyForm();
-      }
-    },
-
-    /**
-    * Successful response handler After form submits.
-    * StdFormBehavior fires a 'things-form-submit-success' in this function
-    * @param {Event} event Successful response event
-    */
-    _successResponseHandler: function(event) {
-      this.stopSpinner();
-      this.lastResponse = event.detail.xhr.response;
-      this.fire('things-form-submit-success', this.lastResponse);
-    },
-
-    /**
-    * Error response handler After form submits.
-    * StdFormBehavior fires a 'things-form-submit-error' in this function
-    * @param {Event} event Error response event
-    */
-    _errorResponseHandler: function(event) {
-      this.stopSpinner();
-
-      var response = event.detail.request.xhr.response;
-      if(response && response.status == 401) {
-        this.handleUnauthorized();
-
-      } else {
-        if(response) {
-          this.openResponseError(response);
-        } else {
-          response = event.detail.request;
-          this.openUnkownError(response);
-        }
-      }
-
-      this.fire('things-form-submit-error', response);
-    }
+    ]
 
   });
   </script>
