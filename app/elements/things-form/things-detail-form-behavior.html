@@ -42,8 +42,7 @@ Things.DetailFormBehavior = {
 		 * Resource Id
 		 */
 		resourceId: {
-			type: String,
-			observer: '_resourceIdChanged'
+			type: String
 		},
 
 		/**
@@ -90,16 +89,19 @@ Things.DetailFormBehavior = {
 	   */
 	},
 
+	observers: [
+		'_resourceIdAndUrlChange(resourceUrl, resourceId)'
+	],
+
 	/**
 	 * resourceId가 변경될 때 
 	 *
 	 * @param {String} newVal New resourceId
 	 * @param {String} oldVal Old resourceId
 	 */
-	_resourceIdChanged: function(newVal, oldVal) {
-		if(newVal != oldVal) {
-			this.findResource(newVal);
-		}
+	_resourceIdAndUrlChange: function(resourceUrl, resourceId) {
+		if(resourceUrl && resourceId)
+			this.findResource(resourceId);
 	},
 
 	/**
