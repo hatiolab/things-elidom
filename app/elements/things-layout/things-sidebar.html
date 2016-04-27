@@ -121,7 +121,9 @@
 			last-response="{{menu}}">
 		</things-ajax>
 
-		<div class="brand">{{title}}</div>
+		<div class="brand">
+			<things-i18n-msg msgid="title.[[title]]">[[title]]</things-i18n-msg>
+		</div>
 
 		<!-- Drawer Scroll Header Panel -->
 		<paper-scroll-header-panel id = "panel">
@@ -129,7 +131,7 @@
 				
 				<!-- {{item}} and {{index}} can be used in this binding scope -->
 				<paper-button aria-controls={{group.menuGroupId}} on-click="toggle">
-					<iron-icon icon="icons:folder-open"></iron-icon>[[group.name]]
+					<iron-icon icon="icons:folder-open"></iron-icon>[[group.title]]
 				</paper-button>
 
 				<iron-collapse id="{{group.menuGroupId}}" tabindex="0">
@@ -147,7 +149,8 @@
 		</paper-scroll-header-panel>
 
 		<div class="group-btnline">
-			<paper-icon-button icon="icons:refresh" id="refresh-button" on-tap="refreshmenu"></paper-icon-button>
+			<paper-icon-button icon="icons:refresh" id="refresh-button" on-tap="refreshmenu">
+			</paper-icon-button>
 		</div>
 	</template>
 

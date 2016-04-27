@@ -3,80 +3,80 @@
 <link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
 
 <link rel="import" href="../things-auth/things-logout.html">
-<link rel="import" href="../things-resource-combo/things-locale-combo.html">
-<!-- <link rel="import" href="../things-i18n/things-i18n-msg.html"> -->
-<link rel="import" href="../things-profile/things-profile.html">
 <link rel="import" href="../things-global-behavior/things-global-behavior.html">
+<link rel="import" href="../things-i18n/things-i18n-msg.html">
+<link rel="import" href="../things-profile/things-profile.html">
+<link rel="import" href="../things-resource-combo/things-locale-combo.html">
 <link rel="import" href="../things-setting/things-setting-dialog.html">
 <link rel="import" href="../things-setting/things-setting.html">
 
 <dom-module id="things-header">
   <template>
 	<style>
-      :host {
-        display: block;
-        background-color:var(--paper-blue-grey-800);
-        color:#fff;
-      }
+    :host {
+      display: block;
+      background-color:var(--paper-blue-grey-800);
+      color:#fff;
+    }
 
-      :host iron-icon {
-        width:15px;height:15px;
-        margin-right:4px;
-      }
-      
-      :host .side-toggle {
-      	background-color:var(--paper-teal-700);
-      }
-      
-      :host .side-toggle paper-icon-button {
-        width:31px;height:31px;
-        margin-left:3px;
-        padding:0 4px 0 2px;
-      }
-      
-      :host .user-menu {
-        padding:7px 5px 0 0;
-        color:var(--paper-blue-grey-400);
-        font-size:13px;
-      }
+    :host iron-icon {
+      width:15px;height:15px;
+      margin-right:4px;
+    }
+    
+    :host .side-toggle {
+    	background-color:var(--paper-teal-700);
+    }
+    
+    :host .side-toggle paper-icon-button {
+      width:31px;height:31px;
+      margin-left:3px;
+      padding:0 4px 0 2px;
+    }
+    
+    :host .user-menu {
+      padding:7px 5px 0 0;
+      color:var(--paper-blue-grey-400);
+      font-size:13px;
+    }
 
-      :host .user-menu paper-icon-button {
-        width:18px;height:18px;
-        position:relative;
-        top:-1px;
-        margin-left:5px;
-        padding:1px;
-        color:var(--paper-blue-grey-200);
-      }
+    :host .user-menu paper-icon-button {
+      width:18px;height:18px;
+      position:relative;
+      top:-1px;
+      margin-left:5px;
+      padding:1px;
+      color:var(--paper-blue-grey-200);
+    }
 
-      :host .user-menu things-logout::shadow paper-icon-button {
-        width:18px;height:18px;
-        position:relative;
-        top:-1px;
-        margin-left:1px;
-        padding:0px;
-        color:var(--paper-blue-grey-200);
-      }
+    :host .user-menu things-logout::shadow paper-icon-button {
+      width:18px;height:18px;
+      position:relative;
+      top:-1px;
+      margin-left:1px;
+      padding:0px;
+      color:var(--paper-blue-grey-200);
+    }
 
-      :host .search {
-      	padding:5px 0 3px 5px;
-      }
-      
-      :host .search input {
-        background-color:rgba(255,255,255,.1);
-        border-radius:3px;
-        border:1px solid rgba(255,255,255,.15);
-        padding:1px 3px;
-        max-width:120px;
-        color:#fff;
-        font-size:13px;
-      }
+    :host .search {
+    	padding:5px 0 3px 5px;
+    }
+    
+    :host .search input {
+      background-color:rgba(255,255,255,.1);
+      border-radius:3px;
+      border:1px solid rgba(255,255,255,.15);
+      padding:1px 3px;
+      max-width:120px;
+      color:#fff;
+      font-size:13px;
+    }
 
-      :host .search paper-icon-button {
-        width:22px;height:22px;
-        margin-left:3px;
-        padding:1px;
-      }
+    :host .search paper-icon-button {
+      width:22px;height:22px;
+      margin-left:3px;
+      padding:1px;
+    }
 	</style>
 
 	<div>
@@ -84,7 +84,7 @@
 		<paper-icon-button icon="icons:menu" id="sidebar-toggler">
 		</paper-icon-button>
 		<paper-tooltip for="sidebar-toggler">
-			<things-i18n-msg msgid="label.toggle_sidebar">Toggle Sidebar</things-i18n-msg>
+			<things-i18n-msg msgid="button.toggle_sidebar">Toggle Sidebar</things-i18n-msg>
 		</paper-tooltip>
 
 		<!-- profile -->
@@ -119,8 +119,7 @@
 			is: 'things-header',
 
 			behaviors: [ 
-				Things.GlobalBehavior,
-				// Things.I18nBehavior
+				Things.GlobalBehavior
 			],
 
 			properties: {
@@ -137,13 +136,6 @@
 				user: {
 					type: Object,
 					value: { name: '', id: '' }
-				},
-
-				// /**
-				//  * 사용자 이름 
-				//  */
-				userName: {
-					type: String
 				},
 				
 				/**
@@ -162,10 +154,7 @@
 				'setting-toggler.tap': 'showSetting',
 				'account.tap': 'showProfile'
 			},
-			// attached:function () {
-			// 	 this.userName = this.globals.user.name;
 
-			// }
 			/**
 			 * Toggle Sidebar. 로그인 이후에만 toggle이 적용됨 
 			 */
