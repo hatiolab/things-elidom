@@ -30,7 +30,7 @@ Things.DetailFormMetaBehavior = {
 	_parseResourceFormFields: function(metaDataList) {
 		var me = this;
 		return metaDataList.map(function(metaData) {
-			var field = { name : metaData.name, label : metaData.name, type : metaData.editor };
+			var field = { name : metaData.name, label : metaData.term, type : metaData.editor };
 			if(metaData.editor) me._parseFormField(field, metaData, true);
 			return field;
 		});		

@@ -90,7 +90,7 @@ Things.SearchFormMetaBehavior = {
 		return searchMetaList.map(function(metaData) {
 			var field = { 
 				name : metaData.name, 
-				label : metaData.name, 
+				label : metaData.term, 
 				type : metaData.editor,
 				op : metaData.operator ? metaData.operator : 'eq'
 			};
