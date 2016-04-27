@@ -235,6 +235,7 @@ things-code-editor. Code성 텍스트를 편집 및 저장 할 수 있는 컴퍼
         this.resource[this.codeField] = this.$['code-editor'].editor.getValue();
         this.saveResource = { id: this.resource.id };
         this.saveResource[this.codeField] = this.resource[this.codeField];
+        this.$['save-code'].resourceId = this.resource.id;
         this.$['save-code'].generateRequest();
       },
 

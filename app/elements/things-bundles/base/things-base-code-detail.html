@@ -16,7 +16,7 @@
       <things-ajax
         auto
         id="subcode-list"
-        resource-url="[[gridSearchUrl]]"
+        resource-url="[[codeDetailUrl]]"
         resource-action="index"
         resource-id="{{resourceId}}"
         query-fields="[[queryFields]]"
@@ -28,7 +28,7 @@
         id='resource-form'
         title="[[title]]"
         resource-type="CommonCode"
-        resource-url="[[gridSearchUrl]]"
+        resource-url="[[codeDetailUrl]]"
         resource-id="[[resourceId]]"
         form-fields="[[formFields]]">
       </things-resource-form>
@@ -152,9 +152,9 @@
         },
 
         /**
-         * Code list search URL
+         * Code Detail Search URL
          */
-        gridSearchUrl: {
+        codeDetailUrl: {
           type: String,
           value: 'common_codes/:id'
         },
@@ -239,7 +239,7 @@
         if(this.resourceId != resourceId) {
           this.resourceId = resourceId;
         }
-        
+
         this.openPopupView(this, true);
       }
 

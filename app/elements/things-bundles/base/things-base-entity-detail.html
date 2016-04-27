@@ -14,7 +14,7 @@
         id="resource-search"
         method="GET"
         resource-url="entities/:id/entity_columns"
-        resource-id="{{entityId}}"
+        resource-id="{{resourceId}}"
         last-response="{{lastResponse}}"
         auto>
       </things-ajax>
@@ -48,7 +48,7 @@
         /**
          * entity id
          */
-        entityId: {
+        resourceId: {
           type: String
         },
 
@@ -228,7 +228,7 @@
          */
         gridSaveUrl: {
           type: String,
-          computed: '_computeEntityColumnSaveUrl(entityId)'
+          computed: '_computeEntityColumnSaveUrl(resourceId)'
         },
 
         /**
@@ -260,11 +260,11 @@
       /**
        * Entity Id로 Entity Column Save URL 생성
        *
-       * @param {String} entityId
+       * @param {String} resourceId
        * @return {String} entity column save url
        */
-      _computeEntityColumnSaveUrl: function(entityId) {
-        return 'entities/' + entityId + '/update_multiple_entity_columns.json';
+      _computeEntityColumnSaveUrl: function(resourceId) {
+        return 'entities/' + resourceId + '/update_multiple_entity_columns.json';
       },
 
       /**
@@ -273,7 +273,7 @@
       _beforeColumnsSave: function(event) {
         var grid = event.target;
         if(grid.writeData && grid.writeData.length > 0) {
-          var entityId = this.resource.id;
+          var entityId = this.resourceId;
           grid.writeData.forEach(function(changedData) {
             if(changedData.cud_flag_ == 'c' && (!changedData.entity || !changedData.entity_id)) {
               changedData.entity_id = entityId;
@@ -290,15 +290,17 @@
       },
 
       /**
-       * detail view를 오픈과 detail title 초기화
+       * Detail 화면 Open
        *
+       * @param {String} resourceId
        * @param {Object} resource
        */
-      showDetailView: function(resource) {
-        this.entityName = resource.name;
-        this.resource = resource;
+      showDetailView: function(resourceId, resource) {
+        if(this.resourceId != resourceId) {
+          this.resourceId = resourceId;
+        }
+
         this.openPopupView(this, true);
-        this.entityId = this.resource.id;
       }
 
     });

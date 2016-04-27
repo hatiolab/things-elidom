@@ -53,8 +53,10 @@ Example:
     </style>
 
     <things-ajax 
+      auto
       id="get-resource"
-      resource-url="[[memberResourceUrl]]"
+      resource-url="[[resourceUrl]]"
+      resource-id="[[resourceId]]"
       last-response="{{resource}}">
     </things-ajax>
 
@@ -67,7 +69,7 @@ Example:
     <iron-pages id="tabPages" selected="{{currentTabIdx}}">
       <things-resource-form
         id="resource-form" 
-        resource-url="[[memberResourceUrl]]"
+        resource-url="[[resourceUrl]]"
         resource="{{resource}}"
         form-fields="[[formFields]]"
         remove-fields-on-save="[[removeFieldsOnSave]]">
@@ -78,7 +80,7 @@ Example:
         theme="ace/theme/monokai"
         mode="ace/mode/html"
         template-field="template"
-        save-url="[[memberResourceUrl]]">
+        save-url="[[resourceUrl]]">
       </things-template-editor>
 
       <things-code-editor 
@@ -86,7 +88,7 @@ Example:
         theme="ace/theme/monokai"
         mode="ace/mode/html"
         code-field="logic"
-        save-url="[[memberResourceUrl]]">
+        save-url="[[resourceUrl]]">
       </things-code-editor>
 
       <template is="dom-if" if={{attachable}}>
@@ -156,14 +158,6 @@ Example:
          */
         resourceUrl: {
           type: String
-        },
-
-        /**
-         * resource member url, resource url과 resourceId로 memberResourceUrl을 구성한다.
-         */
-        memberResourceUrl: {
-          type: String,
-          computed: '_computeMemberResourceUrl(resourceUrl,resourceId)'
         },
 
         /**
@@ -275,17 +269,6 @@ Example:
           this.currentTabIdx = 0;
         }
       },
-
-      /**
-       * resourceUrl로 resource member url을 생성
-       *
-       * @param {String} resourceUrl
-       * @param {String} resourceId
-       * @return {String} resource member URL
-       */
-      _computeMemberResourceUrl: function(resourceUrl, resourceId) {
-        return resourceUrl + '/' + resourceId;
-      },
       
       /**
        * meta data를 파싱한다.
@@ -298,14 +281,14 @@ Example:
       },
 
       /**
-       * detail view를 오픈 
+       * Detail 화면 Open
        *
+       * @param {String} resourceId
        * @param {Object} resource
        */
-      showDetailView: function(resource) {
-        if(resource) {
-          this.resourceId = resource.id;
-          this.$['get-resource'].generateRequest();
+      showDetailView: function(resourceId, resource) {
+        if(this.resourceId != resourceId) {
+          this.resourceId = resourceId;
         }
 
         this.openPopupView(this, true);

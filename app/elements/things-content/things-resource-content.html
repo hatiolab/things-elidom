@@ -209,7 +209,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				viewElement.attachable = true;
 				viewElement.propExtensible = true;
 				this._setViewConfig('detail-view', viewElement, selectedRecord);
-				viewElement.showDetailView(selectedRecord.id);
+				viewElement.showDetailView(selectedRecord.id, selectedRecord);
 
 				var me = this;
 				viewElement.addEventListener('things-resource-form-saved', function(e) {

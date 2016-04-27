@@ -166,11 +166,13 @@ things-template-editor. template성 텍스트를 편집 및 저장 할 수 있�
          */
         buttons: {
           type: Array,
-          readonly: true,
-          value: [ {
-            id: 'save-btn',
-            text: 'save'
-          } ]
+          readOnly: true,
+          value: function() {
+            return [ {
+             id: 'save-btn',
+              text: 'save'
+            } ];
+          }
         }
       },
 
@@ -200,14 +202,14 @@ things-template-editor. template성 텍스트를 편집 및 저장 할 수 있�
        */
       _onResourceChanged: function(resource, templateField) {
         if(templateField) {
-          this.source = resource[templateField]
+          this.source = resource[templateField];
         }
       },
 
       /**
        * 모드가 ace/mode/html 일 경우 preview 버튼 표시
        */
-      _onModeChange: function(mode,buttons) {
+      _onModeChange: function(mode, buttons) {
         var result = buttons.filter(function(button) { return button.id === 'preview-btn'; })[0];
 
         if(mode === 'ace/mode/html' && !result) {
@@ -251,6 +253,7 @@ things-template-editor. template성 텍스트를 편집 및 저장 할 수 있�
         this.resource[this.templateField] = this.$['template-editor'].editor.getValue();
         this.saveResource = { id: this.resource.id };
         this.saveResource[this.templateField] = this.resource[this.templateField];
+        this.$['save-code'].resourceId = this.resource.id;
         this.$['save-code'].generateRequest();
       },
 

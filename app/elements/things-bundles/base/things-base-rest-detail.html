@@ -165,7 +165,11 @@
        *
        * @param {Object} resource
        */
-      showDetailView: function(resource) {
+      showDetailView: function(resourceId, resource) {
+        if(this.resourceId != resourceId) {
+          this.resourceId = resourceId;  
+        }
+        
         this.resource = resource;
         this.openPopupView(this, true);
         this.$['resource-search'].resourceUrl = 'rests/api?id=' + resource.bean_class_name;

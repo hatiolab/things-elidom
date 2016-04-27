@@ -55,8 +55,10 @@ Example:
     </style>
 
     <things-ajax 
+      auto
       id="get-resource"
-      resource-url="[[memberResourceUrl]]"
+      resource-url="[[resourceUrl]]"
+      resource-id="[[resourceId]]"
       resource-action="find"
       last-response="{{resource}}">
     </things-ajax>
@@ -70,8 +72,8 @@ Example:
     <iron-pages id="tabPages" selected="{{currentTabIdx}}">
       <things-resource-form
         id="resource-form" 
-        resource-url="[[memberResourceUrl]]"
-        resource="{{resource}}"
+        resource-url="[[resourceUrl]]"
+        resource-id="[[resourceId]]"
         form-fields="[[formFields]]"
         remove-fields-on-save="[[removeFieldsOnSave]]">
       </things-resource-form>
@@ -81,7 +83,7 @@ Example:
         theme="ace/theme/monokai"
         mode="ace/mode/json"
         template-field="config"
-        save-url="[[memberResourceUrl]]">
+        save-url="[[resourceUrl]]">
       </things-template-editor>
 
       <things-template-editor 
@@ -89,7 +91,7 @@ Example:
         theme="ace/theme/monokai"
         mode="ace/mode/json"
         template-field="fields"
-        save-url="[[memberResourceUrl]]">
+        save-url="[[resourceUrl]]">
       </things-template-editor>
 
       <things-template-editor 
@@ -97,7 +99,7 @@ Example:
         theme="ace/theme/monokai"
         mode="ace/mode/json"
         template-field="columns"
-        save-url="[[memberResourceUrl]]">
+        save-url="[[resourceUrl]]">
       </things-template-editor>
 
     </iron-pages>
@@ -150,14 +152,6 @@ Example:
          */
         resourceUrl: {
           type: String
-        },
-
-        /**
-         * resource member url, resource url과 resourceId로 memberResourceUrl을 구성한다.
-         */
-        memberResourceUrl: {
-          type: String,
-          computed: '_computeMemberResourceUrl(resourceUrl,resourceId)'
         },
 
         /**
@@ -252,17 +246,6 @@ Example:
       },
 
       /**
-       * resourceUrl로 resource member url을 생성
-       *
-       * @param {String} resourceUrl
-       * @param {String} resourceId
-       * @return {String} resource member URL
-       */
-      _computeMemberResourceUrl: function(resourceUrl, resourceId) {
-        return resourceUrl + '/' + resourceId;
-      },
-      
-      /**
        * meta data를 파싱한다.
        *
        * @param {Array} metaDataList
@@ -273,14 +256,14 @@ Example:
       },
 
       /**
-       * detail view를 오픈 
+       * Detail 화면 Open
        *
+       * @param {String} resourceId
        * @param {Object} resource
        */
-      showDetailView: function(resource) {
-        if(resource) {
-          this.resourceId = resource.id;
-          this.$['get-resource'].generateRequest();
+      showDetailView: function(resourceId, resource) {
+        if(this.resourceId != resourceId) {
+          this.resourceId = resourceId;
         }
 
         this.openPopupView(this, true);

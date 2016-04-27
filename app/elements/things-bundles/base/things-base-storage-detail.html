@@ -13,8 +13,10 @@
   <template>
     <div class="[[layout]]">
       <things-ajax 
+        auto
         id="resource-search"
-        resource-url="[[gridSearchUrl]]"
+        resource-url="[[resourceUrl]]"
+        resource-id="[[resourceId]]"
         resource-action="index"
         select-fields="[[selectFields]]"
         sort-fields="[[sortFields]]"
@@ -60,13 +62,6 @@
          */
         title: {
           type: String
-        },
-
-        /**
-         * storage info resource
-         */
-        resource: {
-          type: Object
         },
 
         /**
@@ -165,11 +160,18 @@
         },
 
         /**
-         * Attachment search URL
+         * Resource URL
          */
-        gridSearchUrl: {
+        resourceUrl: {
           type: String,
-          value: 'attachments',
+          value: 'attachments/:id',
+        },
+
+        /**
+         * Resource Id
+         */
+        resourceId: {
+          type: String
         },
 
         /**
@@ -192,7 +194,7 @@
 
       listeners : {
         'grid.things-grid-detail-tap': '_downloadFile'
-      },      
+      },
 
       /**
        * 그리드 셀 선택이 변경되었을 경우 파일 다운로드  
@@ -224,15 +226,21 @@
       },
 
       /**
-       * detail view를 오픈 
+       * Detail 화면 Open
        *
+       * @param {String} resourceId
        * @param {Object} resource
        */
-      showDetailView: function(resource) {
-        this.storageName = resource.name;
-        this.resource = resource;
+      showDetailView: function(resourceId, resource) {
+        if(this.resourceId != resourceId) {
+          this.resourceId = resourceId;
+        }
+
+        if(resource) {
+          this.storageName = resource.name;
+        }
+
         this.openPopupView(this, true);
-        this.reloadGrid();
       }
 
     });
