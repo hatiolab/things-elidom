@@ -59,12 +59,14 @@
 		 * @param {Object} e things-grid-configured 이벤트
 		 */
 		_initializeExportBehavior: function(e) {
-			if(this.grid && this.isButtonExist('export-btn')) {
-				var evt = this.fire('things-grid-export-configure', this.grid, { cancelable: true });
+			var grid = e.detail;
+
+			if(grid && this.isButtonExist('export-btn')) {
+				var evt = this.fire('things-grid-export-configure', grid, { cancelable: true });
 				if(!evt.defaultPrevented) {
 					// button tap 이벤트 추가 
 					this.listen(this.$['button-group'], 'export-btn-tap', 'exportExcel');
-					this.fire('things-grid-export-configured', this.grid);
+					this.fire('things-grid-export-configured', grid);
 				}
 			}
 		},

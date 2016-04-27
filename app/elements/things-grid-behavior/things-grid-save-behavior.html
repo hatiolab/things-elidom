@@ -62,13 +62,15 @@
 		 * @param {Object} e things-grid-configured 이벤트
 		 */
 		_initializeSaveBehavior: function(e) {
-			if(this.grid && this.isButtonExist('save-btn')) {
-				var evt = this.fire('things-grid-save-configure', this.grid, { cancelable: true });
+			var grid = e.detail;
+
+			if(grid && this.isButtonExist('save-btn')) {
+				var evt = this.fire('things-grid-save-configured', grid, { cancelable: true });
 				if(!evt.defaultPrevented) {
-					this.grid.editOptions().setUpdatable(true);
+					grid.editOptions().setUpdatable(true);
 					// button tap 이벤트 추가 
 					this.listen(this.$['button-group'], 'save-btn-tap', 'saveGridData');
-					this.fire('things-grid-save-configured', this.grid);
+					this.fire('things-grid-save-configured', grid);
 				}
 			}
 		},

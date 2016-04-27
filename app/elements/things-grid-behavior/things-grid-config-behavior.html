@@ -322,6 +322,7 @@
       }      
 
       this.resizeGrid(this.parentNode, this.querySelector('div'));
+      this.fire('things-grid-configured', this.grid);
     },    
 
     /**
@@ -398,8 +399,6 @@
             evtDetail.error = e;
             this.fire('things-grid-configure-failed', evtDetail);
           }
-          
-          this.fire('things-grid-configured', evtDetail);          
         }
       }
     },

@@ -42,15 +42,17 @@
 		 * @param {Object} e things-grid-configured 이벤트
 		 */
 		_initializeAddrowBehavior: function(e) {
-			if(this.grid && this.isButtonExist('add-btn')) {
-				var evt = this.fire('things-grid-addrow-configure', this.grid, { cancelable: true });
+			var grid = e.detail;
+
+			if(grid && this.isButtonExist('add-btn')) {
+				var evt = this.fire('things-grid-addrow-configure', grid, { cancelable: true });
 				if(!evt.defaultPrevented) {
-					this.grid.editOptions().setInsertable(true);
-					this.grid.editOptions().setAppendable(true);
+					grid.editOptions().setInsertable(true);
+					grid.editOptions().setAppendable(true);
 
 					// button tap 이벤트 추가 
 					this.listen(this.$['button-group'], 'add-btn-tap', 'addGridRow');
-					this.fire('things-grid-addrow-configured', this.grid);
+					this.fire('things-grid-addrow-configured', grid);
 				}
 			}
 		},

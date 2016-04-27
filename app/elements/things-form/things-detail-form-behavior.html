@@ -198,11 +198,11 @@ Things.DetailFormBehaviorImpl = {
 		getAjax.resourceAction = 'find';
 
 		var me = this;
-		saveAjax.addEventListener('things-ajax-response', function(event) {
-			me.fire('things-detail-form-read-success', saveAjax.method);
+		getAjax.addEventListener('things-ajax-response', function(event) {
+			me.fire('things-detail-form-read-success', getAjax.method);
 		});
 
-		saveAjax.addEventListener('things-ajax-error', function(event) {
+		getAjax.addEventListener('things-ajax-error', function(event) {
 			me.fire('things-detail-form-read-error', event.detail);
 		});
 
