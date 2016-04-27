@@ -100,8 +100,9 @@ Things.DetailFormBehavior = {
 	 * @param {String} oldVal Old resourceId
 	 */
 	_resourceIdAndUrlChange: function(resourceUrl, resourceId) {
-		if(resourceUrl && resourceId)
+		if(resourceUrl && resourceId) {
 			this.findResource(resourceId);
+		}
 	},
 
 	/**
@@ -165,7 +166,12 @@ Things.DetailFormBehavior = {
 	 */
 	saveResource: function() {
 		var saveAjax = document.createElement('things-ajax');
-		saveAjax.resourceUrl = this.resourceUrl;
+		if(this.resourceUrl.indexOf('/:id') >= 0) {
+			saveAjax.resourceUrl = this.resourceUrl;	
+		} else {
+			saveAjax.resourceUrl = this.resourceUrl + '/:id';
+		}
+		
 		saveAjax.resourceId = this.resource.id;
 		saveAjax.resourceAction = this.resource.id ? 'update' : 'create';
 
@@ -191,7 +197,13 @@ Things.DetailFormBehavior = {
 	 */
 	findResource: function(resourceId) {
 		var getAjax = document.createElement('things-ajax');
-		getAjax.resourceUrl = this.resourceUrl;
+
+		if(this.resourceUrl.indexOf('/:id') >= 0) {
+			getAjax.resourceUrl = this.resourceUrl;	
+		} else {
+			getAjax.resourceUrl = this.resourceUrl + '/:id';
+		}
+		
 		getAjax.resourceId = this.resourceId;
 		getAjax.resourceAction = 'find';
 

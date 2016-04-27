@@ -20,7 +20,7 @@
 <link rel="import" href="../../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
 
-<link rel="import" href="../things-content/things-load-view-behavior.html">
+<link rel="import" href="../things-view-open-behavior/things-view-open-behavior.html">
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 <link rel="import" href="../things-spinner/things-spinner-behavior.html">
 
@@ -283,33 +283,33 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 				this.handleErrorResponse(response);
 			},
 
-      /***************************************************************************************
-       *                            Start detail item view interface
-       ***************************************************************************************/
+			/***************************************************************************************
+			*                            Start detail item view interface
+			***************************************************************************************/
 
-      /**
-       * detail item view를 구성하기 위한 필수 함수 
-       * item view를 구성한다.
-       *
-       * @return {Object} resource 리소스 데이터 (Object) 혹은 리소스 아이디 (Number)
-       */
-      loadDetailData: function(resource) {
-      	this.resource = resource;
-      },
+			/**
+			* detail item view를 구성하기 위한 필수 함수 
+			* item view를 구성한다.
+			*
+			* @return {Object} resource 리소스 데이터 (Object) 혹은 리소스 아이디 (Number)
+			*/
+			loadDetailData: function(resource) {
+				this.resource = resource;
+			},
 
-      /**
-       * detail item view를 구성하기 위한 필수 함수 
-       * data로 부터 item view의 데이터를 직접 로딩한다. 외부에서 직접 데이터를 설정한다.
-       *
-       * @param {Object} resource
-       */
-      loadDetailDataDirectly: function(resource) {
-        this.resource = resource;
-      },
+			/**
+			* detail item view를 구성하기 위한 필수 함수 
+			* data로 부터 item view의 데이터를 직접 로딩한다. 외부에서 직접 데이터를 설정한다.
+			*
+			* @param {Object} resource
+			*/
+			loadDetailDataDirectly: function(resource) {
+				this.resource = resource;
+			}
 
-      /***************************************************************************************
-       *                            End detail item view interface
-       ***************************************************************************************/
+			/***************************************************************************************
+			*                            End detail item view interface
+			***************************************************************************************/
 
 		});
 	</script>

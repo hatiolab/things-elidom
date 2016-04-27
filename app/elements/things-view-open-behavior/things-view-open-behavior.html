@@ -1,23 +1,16 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/paper-fullscreen-dialog/paper-fullscreen-dialog.html">
-
-<link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
-<link rel="import" href="../things-global-behavior/things-global-behavior.html">
-<link rel="import" href="../things-spinner/things-spinner-behavior.html">
-
-<link rel="import" href="../things-full-dialog/things-full-dialog.html">
 
 <script>
 
 window.Things = window.Things || {};
 
 /**
- * View를 Load 해주는 Behavior.
+ * View를 Open해주는 Behavior.
  * view를 기본 다이얼로그로 오픈하는 함수와 FullScreen 다이얼로그로 오픈하는 함수가 있다.
  *
- * @polymerBehavior Things.LoadViewBehavior
+ * @polymerBehavior Things.ViewOpenBehavior
  */
-Things.LoadViewBehavior = {
+Things.ViewOpenBehavior = {
 
 	/**
 	 * view를 full screen 다이얼로그로 오픈한다.

@@ -17,7 +17,7 @@
 <link rel="import" href="../things-meta/things-resource-meta-behavior.html">
 <link rel="import" href="../things-resource-selector/things-resource-selector-behavior.html">
 
-<link rel="import" href="./things-load-view-behavior.html">
+<link rel="import" href="../things-view-open-behavior/things-view-open-behavior.html">
 <link rel="import" href="./things-route-content-behavior.html">
 
 <!--
@@ -94,7 +94,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				Things.ResourceSelectorBehavior,
 				Things.ResourceMetaBehavior,
 				Things.RouteContentBehavior,
-				Things.LoadViewBehavior
+				Things.ViewOpenBehavior
 			],
 			
 			properties: {
@@ -189,8 +189,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 */
 			showResourceForm: function(selectedRecord) {
 				var viewElement = document.createElement('things-resource-form');
-				viewElement.id = 'resource-form';
-				this._setViewConfig(viewElement, selectedRecord);				
+				this._setViewConfig('resource-form', viewElement, selectedRecord);
 				this.openPopupView(viewElement, true);
 
 				var me = this;
@@ -207,10 +206,9 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 */
 			showCustomView: function(selectedRecord) {
 				var viewElement = document.createElement(this.detailView);
-				viewElement.id = 'detail-view';
 				viewElement.attachable = true;
 				viewElement.propExtensible = true;
-				this._setViewConfig(viewElement, selectedRecord);
+				this._setViewConfig('detail-view', viewElement, selectedRecord);
 				viewElement.showDetailView(selectedRecord.id);
 
 				var me = this;
@@ -223,15 +221,17 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			/**
 			 * 선택된 레코드로 상세 뷰 Properties를 설정한다.
 			 *
+			 * @param {String} elementId
 			 * @param {Object} viewElement
 			 * @param {Object} selectedRecord
 			 */
-			_setViewConfig: function(viewElement, selectedRecord) {
+			_setViewConfig: function(elementId, viewElement, selectedRecord) {
+				viewElement.id = elementId;
 				viewElement.title = this.title + ' Detail';
 				viewElement.formFields = this.resourceFormFields;
 				viewElement.resourceType = this.resourceType;
-				viewElement.resourceUrl = this.resourceUrl;
 				viewElement.resourceId = selectedRecord.id;
+				viewElement.resourceUrl = this.resourceUrl + '/:id';
 			},
 
 			/**

@@ -3,7 +3,7 @@
 <link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
 
 <link rel="import" href="../../things-meta/things-detail-form-meta-behavior.html">
-<link rel="import" href="../../things-content/things-load-view-behavior.html">
+<link rel="import" href="../../things-view-open-behavior/things-view-open-behavior.html">
 <link rel="import" href="./things-base-role-detail-auth.html">
 <link rel="import" href="./things-base-role-detail-user.html">
 
@@ -20,7 +20,8 @@
     <things-ajax 
       id="get-resource"
       method="GET"
-      resource-url="[[memberResourceUrl]]"
+      resource-url="roles/:id"
+      resource-id="[[resourceId]]"
       last-response="{{resource}}">
     </things-ajax>
 
@@ -33,7 +34,8 @@
     <iron-pages id="tabPages" selected="{{currentTabIdx}}">
       <things-resource-form
         id="resource-form" 
-        resource-url="[[memberResourceUrl]]"
+        resource-url="roles/:id"
+        resource-id="[[resourceId]]"
         resource="{{resource}}"
         form-fields="[[formFields]]"
         remove-fields-on-save="[[removeFieldsOnSave]]">
@@ -60,7 +62,7 @@
 
       behaviors: [ 
         Things.DetailFormMetaBehavior,
-        Things.LoadViewBehavior
+        Things.ViewOpenBehavior
       ],
 
       properties: {
@@ -99,10 +101,10 @@
         /**
          * resource member url, resource url과 resourceId로 memberResourceUrl을 구성한다.
          */
-        memberResourceUrl: {
-          type: String,
-          computed: '_computeMemberResourceUrl(resourceUrl, resourceId)'
-        },
+        // memberResourceUrl: {
+        //   type: String,
+        //   //computed: '_computeMemberResourceUrl(resourceUrl, resourceId)'
+        // },
 
         /**
          * 폼에 채우기 위한 리소스
@@ -203,17 +205,6 @@
           this.currentTabIdx = 0;
         }
       },
-
-      /**
-       * resourceUrl로 resource member url을 생성
-       *
-       * @param {String} resourceUrl
-       * @param {String} resourceId
-       * @return {String} resource member URL
-       */
-      _computeMemberResourceUrl: function(resourceUrl, resourceId) {
-        return resourceUrl + '/' + resourceId;
-      },
       
       /**
        * meta data를 파싱한다.
@@ -233,6 +224,7 @@
        * Detail 화면 Open
        *
        * @param {String} resourceId
+       * @param {Object} resource
        */
       showDetailView: function(resourceId, resource) {
         this.resourceId = resourceId;

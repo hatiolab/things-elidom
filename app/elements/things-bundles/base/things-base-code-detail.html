@@ -3,7 +3,7 @@
 
 <link rel="import" href="../../things-ajax/things-ajax.html">
 <link rel="import" href="../../things-resource-selector/things-resource-selector-behavior.html">
-<link rel="import" href="../../things-content/things-load-view-behavior.html">
+<link rel="import" href="../../things-view-open-behavior/things-view-open-behavior.html">
 <link rel="import" href="../../things-grid/things-resource-grid.html">
 
 <!--
@@ -13,12 +13,12 @@
 
   <template>
     <div class="[[layout]]">
-      <things-ajax 
+      <things-ajax
         auto
         id="subcode-list"
         resource-url="[[gridSearchUrl]]"
         resource-action="index"
-        resource-id="{{codeId}}"
+        resource-id="{{resourceId}}"
         query-fields="[[queryFields]]"
         sort-fields="[[sortFields]]"
         last-response="{{lastResponse}}">
@@ -28,8 +28,8 @@
         id='resource-form'
         title="[[title]]"
         resource-type="CommonCode"
-        resource-url="[[codeDetailUrl]]"
-        resource="[[resource]]"
+        resource-url="[[gridSearchUrl]]"
+        resource-id="[[resourceId]]"
         form-fields="[[formFields]]">
       </things-resource-form>
 
@@ -55,7 +55,7 @@
       is: 'things-base-code-detail',
 
       behaviors: [ 
-        Things.LoadViewBehavior
+        Things.ViewOpenBehavior
       ],
 
       properties: {
@@ -63,7 +63,7 @@
         /**
          * code id
          */
-        codeId: {
+        resourceId: {
           type: String
         },
 
@@ -152,7 +152,7 @@
         },
 
         /**
-         * Code lsit search URL
+         * Code list search URL
          */
         gridSearchUrl: {
           type: String,
@@ -164,15 +164,7 @@
          */
         gridSaveUrl: {
           type: String,
-          computed: '_computeCodeListSaveUrl(codeId)'
-        },
-
-        /**
-         * Code detail find/save URL
-         */
-        codeDetailUrl: {
-          type: String,
-          computed: '_computeCodeDetailUrl(codeId)'
+          computed: '_computeCodeListSaveUrl(resourceId)'
         },
 
         /**
@@ -212,21 +204,11 @@
       /**
        * Code Id로 Code List Save URL 생성
        *
-       * @param {String} codeId
+       * @param {String} resourceId
        * @return {String} code save url
        */
-      _computeCodeListSaveUrl: function(codeId) {
-        return 'common_codes/' + codeId + '/update_multiple_codes.json';
-      },
-
-      /**
-       * Code Id로 Code Master Save URL 생성
-       *
-       * @param {String} codeId
-       * @return {String} code save url
-       */
-      _computeCodeDetailUrl: function(codeId) {
-        return 'common_codes/' + codeId + '.json';
+      _computeCodeListSaveUrl: function(resourceId) {
+        return 'common_codes/' + resourceId + '/update_multiple_codes.json';
       },
 
       /**
@@ -236,7 +218,7 @@
         event.preventDefault();
         
         this.$.grid.dataSet.insertRow(0, { 
-          id: null, name : '', description : '', parent_id : this.codeId 
+          id: null, name : '', description : '', parent_id : this.resourceId 
         });
       },
 
@@ -248,14 +230,17 @@
       },
 
       /**
-       * detail view를 오픈 
+       * Detail 화면 Open
        *
+       * @param {String} resourceId
        * @param {Object} resource
        */
-      showDetailView: function(resource) {
-        this.resource = resource;
+      showDetailView: function(resourceId, resource) {
+        if(this.resourceId != resourceId) {
+          this.resourceId = resourceId;
+        }
+        
         this.openPopupView(this, true);
-        this.codeId = this.resource.id;
       }
 
     });

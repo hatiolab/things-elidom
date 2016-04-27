@@ -25,9 +25,9 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
   <link rel="import" href="../../things-button/things-button.html">
   <link rel="import" href="../../things-spinner/things-spinner.html">
   <link rel="import" href="../../things-setting/things-setting.html">
-
+  <link rel="import" href="../../things-view-open-behavior/things-view-open-behavior.html">
+  
   <link rel="import" href="../things-form-behavior.html">
-  <link rel="import" href="../things-load-view-behavior.html">
   <link rel="import" href="../things-resource-form.html">
   <link rel="import" href="../things-search-form.html">
 
@@ -85,6 +85,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
           title="Item Detail"
           form-fields="[[formFields]]" 
           resource-url="terminologies/:id"
+          resource-id="1"
           last-response="{{lastResponse}}">
         </things-resource-form>
       </div>
@@ -100,7 +101,7 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
         is: 'sample-resource-form',
 
         behaviors: [
-          Things.LoadViewBehavior
+          Things.ViewOpenBehavior
         ],
 
         listeners: {
