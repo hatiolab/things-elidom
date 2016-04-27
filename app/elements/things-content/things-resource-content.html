@@ -93,7 +93,8 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			behaviors: [ 
 				Things.ResourceSelectorBehavior,
 				Things.ResourceMetaBehavior,
-				Things.RouteContentBehavior
+				Things.RouteContentBehavior,
+				Things.LoadViewBehavior
 			],
 			
 			properties: {
@@ -189,15 +190,12 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			showResourceForm: function(selectedRecord) {
 				var viewElement = document.createElement('things-resource-form');
 				viewElement.id = 'resource-form';
-				viewElement.title = this.title + ' Detail';
-				viewElement.resourceType = this.resourceType;
-				viewElement.resourceUrl = this.resourceUrl + '/' + selectedRecord.id;
-				viewElement.resource = selectedRecord;
-				viewElement.formFields = this.resourceFormFields;
-				viewElement.openResourceForm(selectedRecord);
-				var me = this;
+				this._setViewConfig(viewElement, selectedRecord);				
+				this.openPopupView(viewElement, true);
 
+				var me = this;
 				viewElement.addEventListener('things-resource-form-saved', function(e) {
+					me.closePopupView();
 					me.refreshGridData();
 				});
 			},
@@ -210,19 +208,31 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			showCustomView: function(selectedRecord) {
 				var viewElement = document.createElement(this.detailView);
 				viewElement.id = 'detail-view';
-				viewElement.title = this.title + ' Detail';
-				viewElement.resourceType = this.resourceType;
-				viewElement.resourceUrl = this.resourceUrl;
-				viewElement.formFields = this.resourceFormFields;
 				viewElement.attachable = true;
 				viewElement.propExtensible = true;
-				viewElement.showDetailView(selectedRecord);
-				var me = this;
+				this._setViewConfig(viewElement, selectedRecord);
+				viewElement.showDetailView(selectedRecord.id);
 
+				var me = this;
 				viewElement.addEventListener('things-resource-form-saved', function(e) {
+					viewElement.closePopupView();
 					me.refreshGridData();
 				});
-			},			
+			},
+
+			/**
+			 * 선택된 레코드로 상세 뷰 Properties를 설정한다.
+			 *
+			 * @param {Object} viewElement
+			 * @param {Object} selectedRecord
+			 */
+			_setViewConfig: function(viewElement, selectedRecord) {
+				viewElement.title = this.title + ' Detail';
+				viewElement.formFields = this.resourceFormFields;
+				viewElement.resourceType = this.resourceType;
+				viewElement.resourceUrl = this.resourceUrl;
+				viewElement.resourceId = selectedRecord.id;
+			},
 
 			/**
 			 * reload grid data

@@ -17,19 +17,21 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 
   <title>things-search-form demo</title>
 
-  <script src="../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
   
-  <link rel="import" href="../../../bower_components/polymer/polymer.html">
+  <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 
   <link rel="import" href="../../things-ajax/things-ajax.html">
+  <link rel="import" href="../../things-button/things-button.html">
   <link rel="import" href="../../things-spinner/things-spinner.html">
   <link rel="import" href="../../things-setting/things-setting.html">
-  <link rel="import" href="../../things-button/things-button.html">
+
   <link rel="import" href="../things-form-behavior.html">
+  <link rel="import" href="../things-load-view-behavior.html">
   <link rel="import" href="../things-resource-form.html">
   <link rel="import" href="../things-search-form.html">
 
-  <link rel="stylesheet" href="../../../bower_components/paper-styles/demo.css">
+  <link rel="stylesheet" href="../../../../bower_components/paper-styles/demo.css">
 
   <style is="custom-style">
 
@@ -97,6 +99,10 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
 
         is: 'sample-resource-form',
 
+        behaviors: [
+          Things.LoadViewBehavior
+        ],
+
         listeners: {
           'resource-form.things-resource-form-saved': 'onSaved'
         },
@@ -106,7 +112,15 @@ subject to an additional IP rights grant found at https://github.com/hatiolab/th
         },
 
         open: function(evt) {
-          this.$['resource-form'].openResourceForm(evt.detail);
+          // TODO
+          /*this.$['resource-form'].resource = evt.detail;
+          this.openPopupView(this.$['resource-form'], true);
+
+          var me = this;
+          viewElement.addEventListener('things-resource-form-saved', function(e) {
+            me.closePopupView();
+            me.refreshGridData();
+          });*/
         }
 
       });

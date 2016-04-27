@@ -225,13 +225,25 @@ things-resource로 부터 위와 같은 형식의 form-fields meta data를 조�
 			},
 
 			/**
+			 * 모든 Form Element를 리턴 
+			 */
+			getFormElements: function() {
+				var leftElements = this.$['left-fields'].childNodes ? this.$['left-fields'].childNodes : [];
+				var rightElements = this.$['right-fields'].childNodes ? this.$['right-fields'].childNodes : [];
+				var formElements = [];
+				for(var i = 0 ; i < leftElements.length ; i++) { formElements.push(leftElements[i]); }
+				for(var i = 0 ; i < rightElements.length ; i++) { formElements.push(rightElements[i]); }
+				return formElements;
+			},
+
+			/**
 			 * Save Form
 			 *
 			 * @param {Object} e 버튼 클릭 이벤트 
 			 */
 			submitMyForm: function(e) {
 				this.startSpinner();
-				this.saveResourceForm();
+				this.saveResource();
 			},
 
 			/**

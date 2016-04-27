@@ -183,7 +183,14 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			 * @param event 그리드에서 선택된 event
 			 */
 			_showResourceForm: function(event) {
-				this.$['resource-form'].openResourceForm(event.detail);
+        this.$['resource-form'].resource = event.detail;
+        this.openPopupView(this.$['resource-form'], true);
+
+        var me = this;
+        viewElement.addEventListener('things-resource-form-saved', function(e) {
+          me.closePopupView();
+          me.refreshGridData();
+        });
 			},
 
 			/**

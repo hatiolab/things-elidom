@@ -14,6 +14,8 @@
 <link rel="import" href="../things-form/things-search-form.html">
 <link rel="import" href="../things-paginator/things-paginator.html">
 
+<link rel="import" href="./things-load-view-behavior.html">
+
 <!--
 A comment describing this element
 
@@ -112,7 +114,10 @@ Example:
 		Polymer({
 			is: 'things-content',
 
-			behaviors: [ Things.GlobalBehavior ],
+			behaviors: [ 
+				Things.GlobalBehavior,
+				Things.LoadViewBehavior
+			],
 			
 			properties: {
 				layout: {
@@ -163,7 +168,14 @@ Example:
 			 * open resource form dialog
 			 */
 			_showResourceForm: function(row) {
-				this.$['resource-form'].openResourceForm(row);
+				this.$['resource-form'].resource = row;
+				this.openPopupView(this.$['resource-form'], true);
+
+				var me = this;
+				viewElement.addEventListener('things-resource-form-saved', function(e) {
+					me.closePopupView();
+					me._refreshGridData();
+				});
 			},
 
 			_refreshGridData:function(grid){

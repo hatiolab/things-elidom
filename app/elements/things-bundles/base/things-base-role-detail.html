@@ -84,7 +84,8 @@
          * resource id
          */
         resourceId: {
-          type: String
+          type: String,
+          observer: '_resourceIdChanged'
         },
 
         /**
@@ -183,6 +184,17 @@
       /**
        * resource가 변경되었을 경우 
        *
+       * @param {String} newVal
+       */
+      _resourceIdChanged: function(newVal, oldVal) {
+        if(newVal != oldVal) {
+          this.$['get-resource'].generateRequest();
+        }
+      },
+
+      /**
+       * resource가 변경되었을 경우 
+       *
        * @param {Object} resource
        */
       _onResourceChanged: function(resource) {
@@ -213,22 +225,22 @@
         this.formFields = this._parseResourceFormFields(metaDataList);
       },
 
-      /**
-       * detail view를 오픈 
-       *
-       * @param {Object} resource
-       */
-      showDetailView: function(resource) {
-        if(resource) {
-          this.resourceId = resource.id;
-          this.$['get-resource'].generateRequest();
-        }
+      /***************************************************************************************
+       *                      그리드에서 Row 선택시 Detail 화면을 보여주는 함수 
+       ***************************************************************************************/
 
+      /**
+       * Detail 화면 Open
+       *
+       * @param {String} resourceId
+       */
+      showDetailView: function(resourceId, resource) {
+        this.resourceId = resourceId;
         this.openPopupView(this, true);
       },
 
       /***************************************************************************************
-       *                            Start detail item view interface
+       *                      Detail 화면에서 탭 선택시 호출되는 함수 
        ***************************************************************************************/
 
       /**
@@ -240,13 +252,9 @@
       loadDetailData: function(resource) {
         if(resource) {
           this.resource = resource;
-          this.entityId = resource.id;
+          this.resourceId = resource.id;
         }
       }
-
-      /***************************************************************************************
-       *                            End detail item view interface
-       ***************************************************************************************/         
 
     });
   </script>

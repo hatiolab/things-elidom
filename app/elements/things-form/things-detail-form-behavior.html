@@ -2,7 +2,6 @@
 <link rel="import" href="../../../bower_components/iron-form/iron-form.html">
 
 <link rel="import" href="../things-ajax/things-ajax.html">
-<link rel="import" href="../things-content/things-load-view-behavior.html">
 <link rel="import" href="../things-global-behavior/things-global-behavior.html">
 <link rel="import" href="../things-msg-box/things-msgbox-behavior.html">
 <link rel="import" href="../things-spinner/things-spinner-behavior.html">
@@ -12,11 +11,13 @@
 window.Things = window.Things || {};
 
 /**
- * Detail Form Behavior
+ * Detail Form Behavior.
+ * 이 Behavior를 사용하려면 getFormElements() 함수가 구현되어야 한다.
+ * getFormElements() 함수 내용 : Form의 모든 Elements를 리턴 
  *
  * @polymerBehavior Things.DetailFormBehavior
  */
-Things.DetailFormBehaviorImpl = {
+Things.DetailFormBehavior = {
 
 	properties: {
 
@@ -35,6 +36,14 @@ Things.DetailFormBehaviorImpl = {
 		 */
 		resourceUrl: {
 			type: String
+		},
+
+		/**
+		 * Resource Id
+		 */
+		resourceId: {
+			type: String,
+			observer: '_resourceIdChanged'
 		},
 
 		/**
@@ -81,17 +90,16 @@ Things.DetailFormBehaviorImpl = {
 	   */
 	},
 
-	observers: [
-		'_onFormFieldsChanged(formFields)',
-	],
-
 	/**
-	 * FormFields가 변경될 때 
+	 * resourceId가 변경될 때 
 	 *
-	 * @param {Array} formFields 
+	 * @param {String} newVal New resourceId
+	 * @param {String} oldVal Old resourceId
 	 */
-	_onFormFieldsChanged: function(formFields) {
-		this._resourceChanged(this.resource);
+	_resourceIdChanged: function(newVal, oldVal) {
+		if(newVal != oldVal) {
+			this.findResource(newVal);
+		}
 	},
 
 	/**
@@ -100,11 +108,10 @@ Things.DetailFormBehaviorImpl = {
 	 * @param {Object} 리소스 
 	 */
 	_resourceChanged: function(resource) {
-		if(resource && this.isFormConfigured()) {
-			// TODO 이 부분이 Resource Form 쪽으로 올라가야 함 
-			this._bindElementData(this.$['left-fields'].childNodes, resource);
-			this._bindElementData(this.$['right-fields'].childNodes, resource);
-		}
+		this.reconfigureMyForm();
+		var formElements = this.getFormElements();
+		this._bindElementData(formElements, resource);
+		this.resourceId = resource.id;
 	},
 
 	/**
@@ -116,8 +123,9 @@ Things.DetailFormBehaviorImpl = {
 	_bindElementData: function(elements, resource) {
 		for(var i = 0 ; i < elements.length ; i++) {
 			var element = elements[i];
-			if(element.nodeName == 'THINGS-TRISTATE-CHECKBOX') {
-				var val = resource[element.name];
+			var val = resource ? resource[element.name] : null;
+
+			if(element.nodeName == 'THINGS-TRISTATE-CHECKBOX') {				
 				if(val === true)
 					element.state = 'on';
 				else if(val === false)
@@ -125,7 +133,7 @@ Things.DetailFormBehaviorImpl = {
 				else
 					element.state = null;
 			} else {
-				element.value = resource[element.name];
+				element.value = val;
 			}
 		}
 	},
@@ -153,7 +161,7 @@ Things.DetailFormBehaviorImpl = {
 	/**
 	 * save data from resource detail screen
 	 */
-	saveResourceForm: function() {
+	saveResource: function() {
 		var saveAjax = document.createElement('things-ajax');
 		saveAjax.resourceUrl = this.resourceUrl;
 		saveAjax.resourceId = this.resource.id;
@@ -176,29 +184,18 @@ Things.DetailFormBehaviorImpl = {
 	},
 
 	/**
-	 * 리소스 폼을 오픈한다.
-	 * @param {Object} data 리소스 데이터 
-	 */
-	openResourceForm: function(data) {
-		if(!this.isFormConfigured()) {
-			this.reconfigureMyForm();
-		}
-
-		this.findResource(data.id);
-	},
-
-	/**
 	 * 리소스 아이디로 서버에 리소스를 조회 요청한다.
 	 * @param {String} resourceId
 	 */
 	findResource: function(resourceId) {
 		var getAjax = document.createElement('things-ajax');
 		getAjax.resourceUrl = this.resourceUrl;
-		getAjax.resourceId = this.resource.id;
+		getAjax.resourceId = this.resourceId;
 		getAjax.resourceAction = 'find';
 
 		var me = this;
 		getAjax.addEventListener('things-ajax-response', function(event) {
+			me.resource = event.detail;
 			me.fire('things-detail-form-read-success', getAjax.method);
 		});
 
@@ -217,15 +214,12 @@ Things.DetailFormBehaviorImpl = {
 	 */
 	handleSuccessResponse: function(method) {
 		if(method == 'GET') {
-			this.openPopupView(this, true);
 			this.fire('things-resource-form-read', event.detail);
 
 		} else if(method == 'PUT') {
-			this.closePopupView();
 			this.fire('things-resource-form-saved', event.detail);
 
 		} else if(method == 'POST') {
-			this.closePopupView();
 			this.fire('things-resource-form-created', event.detail);
 		}
 	},
@@ -241,10 +235,5 @@ Things.DetailFormBehaviorImpl = {
 	}
 
 };
-
-Things.DetailFormBehavior = [
-	Things.DetailFormBehaviorImpl,
-	Things.LoadViewBehavior,
-];
 
 </script>
