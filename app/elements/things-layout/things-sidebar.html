@@ -24,92 +24,92 @@
 <dom-module id="things-sidebar">
 	<template>
 		<style>
-		:host {
-			display: block;
-			background-color: var(--paper-blue-grey-800);
-		}
-		
-		:host paper-scroll-header-panel {
-			height: 100%;
-		}
-		
-		:host paper-badge {
-			top: 8px !important;
-			left: 210px !important;
-		}
-		
-		:host paper-badge::shadow div.paper-badge {
-			background-color: rgba(0, 0, 0, .15) !important;
-			width: 30px !important;
-			border-radius: 5px;
-			padding: 0px 1px;
-		}
-		
-		:host paper-button {
-			display: block;
-			border-bottom: 1px solid rgba(0, 0, 0, .1);
-			margin: 0;
-			color: var(--paper-blue-grey-300);
-			font-size: 14px;
-			font-weight: 400;
-			text-align: left
-		}
-		
-		:host paper-button iron-icon {
-			width: 18px;
-			height: 18px;
-			margin-top: -2px;
-			margin-right: 4px
-		}
-		
-		:host iron-collapse {
-			background-color: rgba(0, 0, 0, .1);
-			border: 1px solid rgba(0, 0, 0, .05);
-			border-width: 1px 0;
-			border-left: 3px solid var(--paper-cyan-800);
-		}
-		:host paper-listbox {
-			background-color: rgba(0, 0, 0, .1);
-			border: 1px solid rgba(0, 0, 0, .05);
-			border-width: 1px 0;
-			border-left: 3px solid var(--paper-cyan-800);
-		}
-		
-		:host iron-collapse paper-item {
-			padding: 0 10px;
-			display: block !important;
-			min-height: 30px !important;
-			border-bottom: 1px solid rgba(0, 0, 0, .1);
-			font-size: 12px !important;
-			color: var(--paper-blue-grey-100);
-			line-height: 2.5 !important
-		}
-		
-		:host iron-collapse paper-item:hover,
-		[selected] {
-			background-color: teal;
-		}
-		
-		:host iron-collapse paper-item iron-icon {
-			width: 13px;
-			height: 13px;
-			margin-right: 4px;
-		}
-		
-		:host .group-btnline paper-icon-button {
-			color: var(--paper-blue-grey-400);
-		}
-		
-		:host .brand {
-			background: var(--paper-blue-grey-700);
-			color: var(--paper-blue-grey-100);
-			padding: 7px 10px 5px 10px;
-			text-transform: capitalize;
-		}
-		
-		:host .brand iron-icon {
-			background: var(--paper-teal-700);
-		}
+			:host {
+				display: block;
+				background-color: var(--paper-blue-grey-800);
+			}
+			
+			:host paper-scroll-header-panel {
+				height: 100%;
+			}
+			
+			:host paper-badge {
+				top: 8px !important;
+				left: 210px !important;
+			}
+			
+			:host paper-badge::shadow div.paper-badge {
+				background-color: rgba(0, 0, 0, .15) !important;
+				width: 30px !important;
+				border-radius: 5px;
+				padding: 0px 1px;
+			}
+			
+			:host paper-button {
+				display: block;
+				border-bottom: 1px solid rgba(0, 0, 0, .1);
+				margin: 0;
+				color: var(--paper-blue-grey-300);
+				font-size: 14px;
+				font-weight: 400;
+				text-align: left
+			}
+			
+			:host paper-button iron-icon {
+				width: 18px;
+				height: 18px;
+				margin-top: -2px;
+				margin-right: 4px
+			}
+			
+			:host iron-collapse {
+				background-color: rgba(0, 0, 0, .1);
+				border: 1px solid rgba(0, 0, 0, .05);
+				border-width: 1px 0;
+				border-left: 3px solid var(--paper-cyan-800);
+			}
+			:host paper-listbox {
+				background-color: rgba(0, 0, 0, .1);
+				border: 1px solid rgba(0, 0, 0, .05);
+				border-width: 1px 0;
+				border-left: 3px solid var(--paper-cyan-800);
+			}
+			
+			:host iron-collapse paper-item {
+				padding: 0 10px;
+				display: block !important;
+				min-height: 30px !important;
+				border-bottom: 1px solid rgba(0, 0, 0, .1);
+				font-size: 12px !important;
+				color: var(--paper-blue-grey-100);
+				line-height: 2.5 !important
+			}
+			
+			:host iron-collapse paper-item:hover,
+			[selected] {
+				background-color: teal;
+			}
+			
+			:host iron-collapse paper-item iron-icon {
+				width: 13px;
+				height: 13px;
+				margin-right: 4px;
+			}
+			
+			:host .group-btnline paper-icon-button {
+				color: var(--paper-blue-grey-400);
+			}
+			
+			:host .brand {
+				background: var(--paper-blue-grey-700);
+				color: var(--paper-blue-grey-100);
+				padding: 7px 10px 5px 10px;
+				text-transform: capitalize;
+			}
+			
+			:host .brand iron-icon {
+				background: var(--paper-teal-700);
+			}
 		</style>
 
 		<things-ajax
@@ -137,7 +137,7 @@
 						<template is="dom-repeat" items="{{group.child}}" as=item>
 							<paper-item data$="{{item}}">
 								<iron-icon icon="icons:folder-open">
-								</iron-icon>[[item.name]]	
+								</iron-icon>[[item.title]]	
 							</paper-item>
 						</template>
 					</paper-listbox>
@@ -152,9 +152,6 @@
 	</template>
 
 	<script>
-	(function() {
-		'use strict';
-
 		Polymer({
 			is: 'things-sidebar',
 
@@ -175,16 +172,11 @@
 				
 				/**
 				 * menu group returns menu tree as Array
-				 * [
-				 * 	parent1{
-				 * 		child:[
-				 * 			...
-				 * 		]
-				 * 	},
-				 * 	parent2{
-				 * 		...
-				 * 	}
-				 * ]
+				 * [ { 
+				 * 		id: 1, name: 'System', title: 'System', menu_type: 'Menu', child: [ { child menus ...} ]
+				 * }, { 
+				 *		id: 2, name: 'Base', title: 'Base', menu_type: 'Menu', child: [ { child menus ...} ]
+				 * } ]
 				 */
 				menuGroup: {
 					type: Array,
@@ -219,6 +211,9 @@
 				Things.GlobalBehavior
 			],
 
+			/**
+			 * Life Cycle
+			 */
 			attached: function() {
 				this.addDefaultRouting('home', 'login');
 			},
@@ -232,8 +227,7 @@
 			 */
 			_onChangeMenu: function(menu) {
 				if(menu && menu.items.length > 0) {
-					var groups = [], screens = [];
-					var me = this;
+					var groups = [], screens = [], me = this;
 
 					menu.items.forEach(function(item) {
 						if (item.menu_type === 'MENU') {
@@ -253,12 +247,12 @@
 					// *********************************
 
 					this.menuGroup = groups;
-					this.screens = screens;					
+					this.screens = screens;
 				}
 			},
 
 			/**
-			 * filter child menu and return it
+			 * Filter child menu and return it
 			 * @param  {Array} parent group id
 			 * @param  {Array} all menu list
 			 * @return {Array} child screen array
@@ -270,9 +264,8 @@
 			},
 
 			/**
-			 * when selected menu changed route screen to the menu screen
+			 * When selected menu changed route screen to the menu screen
 			 * @param  {String}
-			 * @return {null}
 			 */
 			_onSelectedMenuChange: function(selectedMenu) {
 				if(selectedMenu) {
@@ -283,9 +276,8 @@
 			},
 
 			/**
-			 * refresh menu content
-			 * @param  {event}
-			 * @return {null}
+			 * Refresh menu content
+			 * @param {Object} e 버튼 클릭 이벤트 
 			 */
 			refreshmenu: function(e) {
 				// TODO Check 메뉴를 리프레쉬하면 라우팅도 중복되어 추가될 듯 한데 체크 필요 
@@ -293,15 +285,13 @@
 			},
 			
 			/**
-			 * toggle menu group box
-			 * @param  {event}
-			 * @return {null}
+			 * Toggle menu group box
+			 * @param {Object} e 버튼 클릭 이벤트
 			 */
 			toggle: function(e) {
 				this.$$('#' + e.target.ariaControls).toggle();
 			}
 
 		});
-	})();
 	</script>
 </dom-module>
