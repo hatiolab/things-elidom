@@ -190,7 +190,7 @@
         'grid.things-grid-save-success' : 'reloadGrid',
         'grid.things-grid-resource-column-edit' : '_openResourceSelector',
         'grid.things-grid-handle-addrow' : '_addRow',
-        'grid.things-grid-pre-save' : '_beforeColumnsSave'
+        'grid.things-grid-handle-save' : '_beforeColumnsSave'
       },
 
       /**
@@ -267,15 +267,12 @@
         var grid = event.target;
         var changedList = grid.writeData;
 
-        if(!changedList || changedList.length == 0)         
-          return event;
-
-        grid.writeData = changedList.map(function(changedData) {
-          return {id : changedData.id, cud_flag_ : changedData.cud_flag_};
-        });
-
-        return event;
-      },      
+        if(changedList && changedList.length > 0) {
+          grid.writeData = changedList.map(function(changedData) {
+            return {id : changedData.id, cud_flag_ : changedData.cud_flag_};
+          });
+        }
+      },   
 
       /**
        * reload grid data

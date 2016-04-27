@@ -79,14 +79,20 @@
 		exportExcel: function(e) {
 			var evt = this.fire('things-grid-handle-export', e.detail, { cancelable: true });
 			if(!evt.defaultPrevented) {
-				new DataLudi.GridExcelExporter().export(this.grid, {
-					target: 'local',
-					fileName: this.exportFileName,
-					numberFormat: '#,##0.00',
-					datetimeFormat: 'yyyy.mm.dd'
-				});
 
-				// TODO listen export-finish event and fire event
+				if(!this.grid.data || this.grid.data.length == 0) {
+					this.openInfoMsg({ title : 'Nothing to Export', text : "There's nothing to export", type : 'info' });
+
+				} else {
+					new DataLudi.GridExcelExporter().export(this.grid, {
+						target: 'local',
+						fileName: this.exportFileName,
+						numberFormat: '#,##0.00',
+						datetimeFormat: 'yyyy.mm.dd'
+					});
+
+					// TODO listen export-finish event and fire event
+				}
 			}
 		}
 

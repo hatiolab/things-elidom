@@ -152,7 +152,7 @@
 
       listeners: {
         'get-params.things-ajax-response': '_onParametersSaved',        
-        'grid.things-grid-pre-save' : '_beforeParamsSave',
+        'grid.things-grid-handle-save' : '_beforeParamsSave',
         'grid.things-grid-save-success' : 'reloadGrid'
       },
 
@@ -194,20 +194,15 @@
        */
       _beforeParamsSave: function(event) {
         var grid = event.target;
-        var changedList = grid.writeData;
-
-        if(!changedList || changedList.length == 0)         
-          return event;
-
-        var resourceId = this.diyServiceId;
-        changedList.forEach(function(changedData) {
-          if(changedData.cud_flag_ == 'c') {
-            changedData.resource_type = 'DiyService';
-            changedData.resource_id = resourceId;
-          }
-        });
-
-        return event;
+        if(grid.writeData && grid.writeData.length > 0) {
+          var resourceId = this.diyServiceId;
+          grid.writeData.forEach(function(changedData) {
+            if(changedData.cud_flag_ == 'c') {
+              changedData.resource_type = 'DiyService';
+              changedData.resource_id = resourceId;
+            }
+          });
+        }
       },      
 
       /**

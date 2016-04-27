@@ -253,7 +253,7 @@
       },
 
       listeners: {
-        'grid.things-grid-pre-save' : '_beforeColumnsSave',
+        'grid.things-grid-handle-save' : '_beforeColumnsSave',
         'grid.things-grid-save-success' : 'reloadGrid'
       },
 
@@ -272,19 +272,14 @@
        */
       _beforeColumnsSave: function(event) {
         var grid = event.target;
-        var changedList = grid.writeData;
-
-        if(!changedList || changedList.length == 0)         
-          return event;
-
-        var entityId = this.resource.id;
-        changedList.forEach(function(changedData) {
-          if(changedData.cud_flag_ == 'c' && (!changedData.entity || !changedData.entity_id)) {
-            changedData.entity_id = entityId;
-          }
-        });
-
-        return event;
+        if(grid.writeData && grid.writeData.length > 0) {
+          var entityId = this.resource.id;
+          grid.writeData.forEach(function(changedData) {
+            if(changedData.cud_flag_ == 'c' && (!changedData.entity || !changedData.entity_id)) {
+              changedData.entity_id = entityId;
+            }
+          });
+        }
       },      
 
       /**

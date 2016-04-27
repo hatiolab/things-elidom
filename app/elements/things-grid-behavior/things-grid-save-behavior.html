@@ -22,6 +22,14 @@
 			 */
 			gridSaveAction: {
 				type: String
+			},
+
+			/**
+			 * Save 버튼 클릭시에 Save할 데이터를 모두 추출하여 이 Property에 assign한다.
+			 * 외부에서 Save 데이터를 저장 바로 직전에 핸들링 가능하다.
+			 */
+			writeData: {
+				type: Array
 			}
 
 			/**
@@ -35,10 +43,23 @@
 			 * @event things-grid-save-error
 			 */
 			/**
+			 * 그리드 Save(저장/삭제/추가) 버튼 클릭시 서버에 업데이트 요청할 writeData를 셋업하기 전 발생하는 이벤트
+			 * 따라서 외부에서 이 이벤트를 잡아서 event.preventDefault()를 호출하고 
+			 * 별도로 writeData 할당 로직을 작성하면 기본 로직을 override 할 수 있다.
+			 *
+			 * @event things-grid-handle-build-writedata
+			 */
+			/**
+			 * 그리드 Save(저장/삭제/추가) 버튼 클릭시 서버에 업데이트 요청할 writeData가 할당된 이후 발생하는 이벤트
+			 * 이 이벤트에는 writeData가 포함되어 있으므로 외부에서 이 이벤트를 받은 후에 writeData를 조작할 수 있다.
+			 *
+			 * @event things-grid-handle-built-writedata	
+			 */		 
+			/**
 			 * 그리드 Save(저장/삭제/추가) 로직 수행 전 발생하는 이벤트. 
 			 * 이 이벤트를 잡아서 event.preventDefault()를 호출하고 별도 로직을 작성하면 기본 로직을 override 할 수 있다.
 			 *
-			 * @event things-grid-pre-save
+			 * @event things-grid-handle-save
 			 */
 			/**
 			 * 그리드 데이터 Save(저장/삭제/추가) 액션이 성공시 발생하는 이벤트
@@ -81,16 +102,41 @@
 		 * @param {Object} e button tap event
 		 */
 		saveGridData: function(e) {
-			var changedDataList = [];
 			this.grid.commit();
+
+			// 1. 업데이트할 데이터를 셋업한다.
+			var evt = this.fire('things-grid-handle-build-writedata', this.grid, { cancelable: true });
+			if(!evt.defaultPrevented) {
+				this.setupWriteData();
+			}
+
+			// 2. 업데이트할 데이터를 서버에 요청하여 업데이트한다.
+			evt = this.fire('things-grid-handle-save', this.grid, { cancelable: true });
+			if(!evt.defaultPrevented) {
+				if(!this.writeData || this.writeData.length == 0) {
+					this.openInfoMsg({ title : 'Nothing to Save', text : "There's nothing to save", type : 'info' });
+				} else {
+					this.updateMultipleData(this.gridSaveAction);
+				}
+			}
+		},
+
+		/**
+		 * 그리드에서 정보를 추출하여 Save(저장/삭제/추가)할 정보를 writeData에 할당한다.
+		 * 이 로직을 override하려면 things-grid-handle-build-writedata 이벤트를 prevent시키고 별도의 할당 로직을 작성해야 한다.
+		 * writeData가 셋업되면 things-grid-handle-built-writedata 이벤트가 발생한다. 이 이벤트 내에는 셋업된 데이터가 포함되어 있다.
+		 */
+		setupWriteData: function() {
+			var changedDataList = [];
 			try {
 				this._configureChangedData(changedDataList, 'created', 'c');
 				this._configureChangedData(changedDataList, 'updated', 'u');
 				this._configureChangedData(changedDataList, 'deleted', 'd');
-				this._updateMultiple(changedDataList);
+				this.writeData = changedDataList;
+				this.fire('things-grid-handle-built-writedata', this.writeData);
 			} catch (err) {
 				this.openInfoMsg({ type : 'warning', title : 'Grid Error', text : err.message });
-			}
+			}				
 		},
 
 		/**
@@ -110,30 +156,25 @@
 		},
 
 		/**
-		 * Update Multiple Data 
-		 *
-		 * @param {Array} changedDataList
+		 * 변경된 데이터(writeData)를 서버에 업데이트 요청한다.
+		 * 이 로직을 override하려면 things-grid-handle-save 이벤트를 prevent시키고 별도의 할당 로직을 작성해야 한다.
 		 */
-		_updateMultiple: function(changedDataList) {
-			var event = this.fire('things-grid-pre-save', {}, { cancelable: true });
+		updateMultipleData: function(gridSaveUrl) {
+			var ajax = document.createElement('things-ajax');
+			ajax.resourceUrl = gridSaveUrl;
+			ajax.resourceAction = 'update_multiple';
+			ajax.body = this.writeData;
+			var me = this;
 
-			if(!event.defaultPrevented) {
-				var ajax = document.createElement('things-ajax');
-				ajax.resourceUrl = this.gridSaveAction;
-				ajax.resourceAction = 'update_multiple';
-				ajax.body = changedDataList;
-				var me = this;
+			ajax.addEventListener('things-ajax-response', function(event) {
+				me.fire('things-grid-save-success', me.grid);
+			});
 
-				ajax.addEventListener('things-ajax-response', function(event) {
-					me.fire('things-grid-save-success', me.grid);
-				});
+			ajax.addEventListener('things-ajax-error', function(event) {
+				me.fire('things-grid-save-error', event.detail);
+			});
 
-				ajax.addEventListener('things-ajax-error', function(event) {
-					me.fire('things-grid-save-error', event.detail);
-				});
-
-				ajax.generateRequest();
-			}
+			ajax.generateRequest();
 		}
 		
 	};

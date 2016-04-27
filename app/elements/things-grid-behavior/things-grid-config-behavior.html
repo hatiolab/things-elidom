@@ -411,7 +411,7 @@
     _setGridModel: function(gridModel) {
       if(!gridModel || !this.grid) return;
 
-      var fields = (typeof(gridModel) === 'string') ? JSON.parse(gridModel) : gridModel;
+      var fields = (typeof(gridModel) === 'string') ? JSON.parse(gridModel) : gridModel.slice();
 
       if (fields && fields.length > 0) {
         this.dataSet.setFields(fields);
@@ -427,7 +427,7 @@
     _setGridColumns: function(columns) {
       if(!columns || !this.grid) return;
 
-      var gridColumns = (typeof(columns) === 'string') ? JSON.parse(columns) : columns;
+      var gridColumns = (typeof(columns) === 'string') ? JSON.parse(columns) : columns.slice();
 
       if(this.enableDetailColumn) {
         gridColumns.unshift({
