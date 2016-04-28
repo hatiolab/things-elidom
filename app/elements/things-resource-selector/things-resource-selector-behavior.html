@@ -1,6 +1,7 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
 <link rel="import" href="./things-resource-dialog.html">
+<link rel="import" href="./things-selector-content.html">
 
 <script>
 
@@ -41,9 +42,8 @@ Things.ResourceSelectorBehavior = {
     selector.id = "resource-selector";
     selector.layout = "fullbleed layout vertical";
     selector.title = resourceType;
-    selector.resourceType = resourceType;
+    selector.resourceType=resourceType;
     selector.resourceUrl = resourceUrl;
-    selector.enableToolbar = false;
     selector.initializeContent();
     return selector;
   },

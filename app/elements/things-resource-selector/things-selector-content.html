@@ -10,15 +10,10 @@
 
 <link rel="import" href="../things-ajax/things-ajax.html">
 <link rel="import" href="../things-button/things-button.html">
-<link rel="import" href="../things-form/things-resource-form.html">
-<link rel="import" href="../things-form/things-search-form.html">
+<link rel="import" href="things-selector-form.html">
 <link rel="import" href="../things-full-dialog/things-full-dialog.html">
 <link rel="import" href="../things-grid/things-resource-grid.html">
 <link rel="import" href="../things-meta/things-resource-meta-behavior.html">
-<link rel="import" href="../things-resource-selector/things-resource-selector-behavior.html">
-
-<link rel="import" href="../things-view-open-behavior/things-view-open-behavior.html">
-<link rel="import" href="./things-route-content-behavior.html">
 
 <!--
 하나의 리소스에 대한 기본 액션 (List, Create, Find, Upate, Delete) 및 Import, Export 등의 기능을 제공하는 화면 셋 
@@ -54,7 +49,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				last-response="{{metaData}}">
 			</things-ajax>
 
-			<things-search-form 
+			<things-selector-form 
 				id="search-form"
 				class="flex"
 				active="[[active]]"
@@ -66,7 +61,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				page="{{page}}"
 				per-page="[[perPage]]"
 				last-response="{{lastResponse}}">
-			</things-search-form>
+			</things-selector-form>
 
 			<things-resource-grid 
 				id="grid"
@@ -91,10 +86,7 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			is: 'things-selector-content',
 
 			behaviors: [ 
-				Things.ResourceSelectorBehavior,
-				Things.ResourceMetaBehavior,
-				Things.RouteContentBehavior,
-				Things.ViewOpenBehavior
+				Things.ResourceMetaBehavior
 			],
 			
 			properties: {
@@ -110,56 +102,9 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				 */
 				title: {
 					type: String
-				},
-
-				/**
-				 * 그리드 저장 (Multiple Save) URL
-				 */
-				gridSaveUrl: {
-					type: String,
-					computed: '_computeGridSaveUrl(resourceUrl)'
-				},
-
-				/**
-				 * Detail 버튼을 활성화 시킬 지 여부
-				 */
-				enableDetailColumn: {
-					type: Boolean,
-					value: false
-				},
-
-				/**
-				 * Toolbar를 활성화 시킬 지 여부 
-				 */
-				enableToolbar: {
-					type: Boolean,
-					value: true
-				},
-
-				/**
-				 * detail element name
-				 */
-				detailView: {
-					type: String,
-					value: 'things-resource-form'
 				}
 			},
 
-			listeners : {
-				'grid.things-grid-detail-tap': 'showDetailView',
-				'grid.things-grid-save-success': 'refreshGridData',
-				'grid.things-grid-resource-column-edit' : 'openResourceSelector'
-			},
-
-			/**
-			 * resourceUrl로 grid save url을 생성
-			 *
-			 * @param {String} resourceUrl
-			 * @return {String} grid save URL
-			 */
-			_computeGridSaveUrl: function(resourceUrl) {
-				return resourceUrl + '/update_multiple.json';
-			},
 
 			/**
 			 * 화면 초기화 함수 
@@ -170,86 +115,11 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 			},
 
 			/**
-			 * 디테일 뷰를 표시한다.
-			 *
-			 * @param {Event} event 그리드에서 선택된 event
-			 */
-			showDetailView: function(event) {
-				if(!this.detailView || this.detailView == 'things-resource-form') {
-					this.showResourceForm(event.detail);
-				} else {
-					this.showCustomView(event.detail);
-				}
-			},
-
-			/**
-			 * 표준화된 리소스 디테일 폼을 표시한다.
-			 *
-			 * @param {Object} selectedRecord 그리드에서 선택된 Row Data
-			 */
-			showResourceForm: function(selectedRecord) {
-				var viewElement = document.createElement('things-resource-form');
-				this._setViewConfig('resource-form', viewElement, selectedRecord);
-				this.openPopupView(viewElement, true);
-
-				var me = this;
-				viewElement.addEventListener('things-resource-form-saved', function(e) {
-					me.closePopupView();
-					me.refreshGridData();
-				});
-			},
-
-			/**
-			 * 프레임 웍에서 기본으로 제공하지 않는 리소스 디테일 폼을 표시한다.
-			 *
-			 * @param {Object} selectedRecord 그리드에서 선택된 Row Data
-			 */
-			showCustomView: function(selectedRecord) {
-				var viewElement = document.createElement(this.detailView);
-				viewElement.attachable = true;
-				viewElement.propExtensible = true;
-				this._setViewConfig('detail-view', viewElement, selectedRecord);
-				viewElement.showDetailView(selectedRecord.id, selectedRecord);
-
-				var me = this;
-				viewElement.addEventListener('things-resource-form-saved', function(e) {
-					viewElement.closePopupView();
-					me.refreshGridData();
-				});
-			},
-
-			/**
-			 * 선택된 레코드로 상세 뷰 Properties를 설정한다.
-			 *
-			 * @param {String} elementId
-			 * @param {Object} viewElement
-			 * @param {Object} selectedRecord
-			 */
-			_setViewConfig: function(elementId, viewElement, selectedRecord) {
-				viewElement.id = elementId;
-				viewElement.title = this.title + ' Detail';
-				viewElement.formFields = this.resourceFormFields;
-				viewElement.resourceType = this.resourceType;
-				viewElement.resourceId = selectedRecord.id;
-				viewElement.resourceUrl = this.resourceUrl + '/:id';
-			},
-
-			/**
 			 * reload grid data
 			 * 결국 서치 폼에서 다시 검색한다.
 			 */
 			refreshGridData: function(grid) {
 				this.$['search-form'].submitMyForm();
-			},
-
-			/**
-			 * Open Resource Selector Dialog
-			 *
-			 * @param {Object} event
-			 */
-			openResourceSelector: function(event) {
-				var index = event.detail.index;
-				this.openResourceSelectorByGrid(index._grid, index.rowIndex, event.detail.userObj, true);
 			}
 
 		});
