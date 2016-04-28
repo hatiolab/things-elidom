@@ -1,8 +1,8 @@
 <script>
 
 window.Things = window.Things || {};
+window.Things.DataGlobal = window.Things.DataGlobal || {};
 var _thingsGlobalBehaviorInstances = [];
-var _thingsDataGlobal = {};
 
 /**
  * Global변수의 Set/Get을 Elements를 통하여 접속이 가능하게하는 Behavior이다.
@@ -25,7 +25,7 @@ Things.GlobalBehavior = {
     globals: {
       type: Object,
       notify: true,
-      value: _thingsDataGlobal
+      value: Things.DataGlobal
     }
   },
   

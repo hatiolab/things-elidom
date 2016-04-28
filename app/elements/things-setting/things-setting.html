@@ -79,11 +79,11 @@
          * @param {Object} user
          */
         initializeSettings: function(baseUrl, termUrl, locale, user) {
-          if(!_thingsDataGlobal.fetchedLang) {
+          if(!Things.DataGlobal.fetchedLang) {
             this._initializeI18n(baseUrl, termUrl, locale, user);
 
-          } else if(_thingsDataGlobal.fetchedLang != 'loading') {
-            if(!_thingsDataGlobal.locales[locale]) {
+          } else if(Things.DataGlobal.fetchedLang != 'loading') {
+            if(!Things.DataGlobal.locales[locale]) {
               this._initializeI18n(baseUrl, termUrl, locale, user);  
             } else {
               var event = new CustomEvent('things-i18n-ready', { language: locale });
@@ -116,7 +116,7 @@
 
         /**
          * baseUrl, termUrl, locale 그리고 user 정보로 부터 Request를 설정하여 i18n 메시지를 서버에 요청하여 초기화한다.
-         * i18n 데이터를 응답받아서 window 변수인 _thingsDataGlobal.locales에 정보를 저장한다.
+         * i18n 데이터를 응답받아서 window 변수인 Things.DataGlobal.locales에 정보를 저장한다.
          *
          * @param {String} baseUrl
          * @param {String} termUrl
@@ -124,7 +124,7 @@
          * @param {Object} user
          */
         _initializeI18n: function(baseUrl, termUrl, locale, user) {
-          _thingsDataGlobal.fetchedLang = 'loading';
+          Things.DataGlobal.fetchedLang = 'loading';
 
           if(!locale) {
             locale = this.defaultLocale;
@@ -141,13 +141,13 @@
           // 2. add response event
           xhr.onload = function(e) {
             if (e.target.status !== 200 && e.target.status !== 0) {
-              _thingsDataGlobal.fetchedLang = 'not-yet';
+              Things.DataGlobal.fetchedLang = 'not-yet';
               this.fire('things-i18n-load-failure', e.target);
             } else {
               var resp = JSON.parse(e.target.response)[locale];
-              if(!_thingsDataGlobal.locales) _thingsDataGlobal.locales = {};
-              _thingsDataGlobal.locales[locale] = resp;
-              _thingsDataGlobal.fetchedLang = 'completed';
+              if(!Things.DataGlobal.locales) Things.DataGlobal.locales = {};
+              Things.DataGlobal.locales[locale] = resp;
+              Things.DataGlobal.fetchedLang = 'completed';
 
               var event = new CustomEvent('things-i18n-ready', { language: locale });
               document.dispatchEvent(event);
@@ -156,7 +156,7 @@
 
           // 3. add error event
           xhr.onerror = function(e) {
-            _thingsDataGlobal.fetchedLang = 'not-yet';
+            Things.DataGlobal.fetchedLang = 'not-yet';
             this.fire('i18n-load-error', e.target);
           };
 

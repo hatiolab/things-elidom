@@ -10,8 +10,8 @@ window.Things = window.Things || {};
 Things.I18nTranslateBehavior = {
 
   ready: function() {
-    if(!_thingsDataGlobal.t) {
-      _thingsDataGlobal.t = this.i18nTranslate;
+    if(!Things.DataGlobal.t) {
+      Things.DataGlobal.t = this.i18nTranslate;
     }
   },
   
@@ -27,16 +27,16 @@ Things.I18nTranslateBehavior = {
    * @return {string|null} a message in the current locale. Translated message or `null` if not found, 
    */
   i18nTranslate: function(msgId, dataSet) {
-    if(!_thingsDataGlobal || !_thingsDataGlobal.locales || !_thingsDataGlobal.locale) {
+    if(!msgId || !Things.DataGlobal || !Things.DataGlobal.locales || !Things.DataGlobal.locale) {
       return null;
     }
 
-    var langSet = _thingsDataGlobal.locales[_thingsDataGlobal.locale];
+    var langSet = Things.DataGlobal.locales[Things.DataGlobal.locale];
     if (langSet && langSet[msgId]) {
       return dataSet ? this._i18nTranslateByVariables(langSet[msgId], dataSet) : langSet[msgId];
     } else {
-      var warnMsg = this.localName ? this.localName + ': (' : '(';
-      warnMsg += this.msgid + ') message id was not found'
+      var warnMsg = this.localName ? this.localName + ': msgid (' : '(';
+      warnMsg += this.msgid + ') was not found!'
       console.warn(warnMsg);
       return msgId;
     }
