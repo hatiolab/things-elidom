@@ -8,9 +8,28 @@ window.Things = window.Things || {};
  * View를 Open해주는 Behavior.
  * view를 기본 다이얼로그로 오픈하는 함수와 FullScreen 다이얼로그로 오픈하는 함수가 있다.
  *
+ *
  * @polymerBehavior Things.ViewOpenBehavior
  */
 Things.ViewOpenBehavior = {
+
+	properties:{
+		/**
+		 * view를 full screen 다이얼로그로 오픈요청
+		 * 
+		 * @event things-open-full-screen-view
+		 */
+		/**
+		 * view를 기본 다이얼로그로 오픈요청
+		 * 
+		 * @event things-open-popup-view
+		 */
+		/**
+		 * 다이얼로그 닫기 요청 .
+		 * 
+		 * @event things-close-popup-view
+		 */
+	},
 
 	/**
 	 * view를 full screen 다이얼로그로 오픈한다.
