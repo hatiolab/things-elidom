@@ -1,0 +1,70 @@
+<link rel="import" href="./things-i18n-translate-behavior.html">
+
+<script>
+
+window.Things = window.Things || {};
+
+/**
+ * I18n 메시지 Behavior. Things.I18nTranslateBehavior를 확장한 Behavior
+ * auto를 true로 설정하면 i18n DataSet이 변경될 때 마다 이벤트를 받아 값을 갱신한다. 
+ * auto 모드일 경우 이벤트를 Listen하고 있어야 하므로 이에 따른 오버헤드도 생각해야 한다.
+ *
+ * @polymerBehavior Things.I18nMsgBehavior
+ */
+Things.I18nMsgBehaviorImpl = {
+  
+  properties: {
+
+    /**
+     * 메시지 아이디
+     */
+    msgid: {
+      type: String,
+      observer: '_msgidChanged'
+    },
+
+    /**
+     * 메시지 
+     */
+    msg: {
+      type: String,
+      notify: true
+    },
+
+    /**
+     * i18n 데이터 셋의 변경을 자동으로 반영할 것인지 여
+     */
+    auto: {
+      type: Boolean,
+      value: false,
+
+    }
+  },
+
+  attached: function() {
+    if(this.auto) {
+      document.addEventListener('things-i18n-ready', function() {
+        var msgId = this.msgid;
+        this.msgid = null;
+        this.msgid = msgId;
+      }.bind(this));
+    }
+  },
+
+  /**
+   * msgid가 바뀌면 메시지 변경
+   */
+  _msgidChanged: function(newMsgid, oldMsgid) {
+    if(newMsgid != oldMsgid) {
+      this.msg = this.i18nTranslate(newMsgid);
+      this.innerHTML = this.msg;
+    }
+  }
+};
+
+Things.I18nMsgBehavior = [
+  Things.I18nMsgBehaviorImpl,
+  Things.I18nTranslateBehavior
+]
+
+</script>

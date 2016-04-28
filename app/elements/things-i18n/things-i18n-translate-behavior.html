@@ -1,0 +1,64 @@
+<script>
+
+window.Things = window.Things || {};
+
+/**
+ * I18n 기본 메시지 Behavior. msgid로 부터 메시지를 translate한다.
+ *
+ * @polymerBehavior Things.I18nTranslateBehavior
+ */
+Things.I18nTranslateBehavior = {
+
+  ready: function() {
+    if(!_thingsDataGlobal.t) {
+      _thingsDataGlobal.t = this.i18nTranslate;
+    }
+  },
+  
+  /**
+   * i18n Language Set에서 메시지 아이디로 메시지를 찾는다.
+   *
+   * @param {string=} msgId Optional message id to lookup. If left off,
+   * the instance's `msgid` property is used.
+   * 
+   * @param {Object=} dataSet 검색하는 Message중에서 대체해야하는 변수를 key:Value 형태로 
+   * 전송하여 msg내 해당 되는 Key와 같은 변수가 있으면 replace 없으면 아무작업하지 않음.
+   * 
+   * @return {string|null} a message in the current locale. Translated message or `null` if not found, 
+   */
+  i18nTranslate: function(msgId, dataSet) {
+    if(!_thingsDataGlobal || !_thingsDataGlobal.locales || !_thingsDataGlobal.locale) {
+      return null;
+    }
+
+    var langSet = _thingsDataGlobal.locales[_thingsDataGlobal.locale];
+    if (langSet && langSet[msgId]) {
+      return dataSet ? this._i18nTranslateByVariables(langSet[msgId], dataSet) : langSet[msgId];
+    } else {
+      var warnMsg = this.localName ? this.localName + ': (' : '(';
+      warnMsg += this.msgid + ') message id was not found'
+      console.warn(warnMsg);
+      return msgId;
+    }
+  },
+
+  /**
+   * 메시지 내에 포함되어 있는 변수를 교채한다.
+   *
+   * @param {string=} message 내용
+   * @param {Object=} dataSet 검색하는 Message 중에서 대체 해야하는 변수를 key:Value 형태로
+   * 전송하여 msg내 해당 되는 Key와 같은 변수가 있으면 replace 없으면 아무작업하지 않음.
+   */
+  _i18nTranslateByVariables: function (message, dataSet) {
+    Object.keys(dataSet).forEach(function(data) {
+      var bracedData = '{' + data.replace(/\$/, '\\$') + '}';
+      var regEx = new RegExp(bracedData, "gi");
+      message = message.replace(regEx, dataSet[data]);
+    });
+
+    return message;
+  }
+
+};
+
+</script>

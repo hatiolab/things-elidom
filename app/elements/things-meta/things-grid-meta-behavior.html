@@ -193,7 +193,7 @@ Things.GridMetaBehavior = {
 
 		field.name = field.name.substr(0, field.name.indexOf('_id'));
 		field.fieldName = field.name;
-		field.header.text = field.name;
+		field.header.text = _thingsDataGlobal.t('label.' + field.name);
 		field.valueType = 'text';
 		field.type = 'calced';
 

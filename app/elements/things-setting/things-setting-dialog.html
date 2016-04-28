@@ -3,14 +3,15 @@
 <link rel="import" href="../../../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
 <link rel="import" href="../../../bower_components/paper-dialog-behavior/paper-dialog-shared-styles.html">
 
-<link rel="import" href="../things-resource-combo/things-locale-combo.html">
 <link rel="import" href="../things-global-behavior/things-global-behavior.html">
+<link rel="import" href="../things-i18n/things-i18n-msg.html">
+<link rel="import" href="../things-resource-combo/things-locale-combo.html">
 
 <dom-module id="things-setting-dialog">
   <template>
     <style include="paper-dialog-shared-styles"></style>
 
-    <h2>Setting (Only Client Side Setting)</h2>
+    <h2><things-i18n-msg auto msgid="button.setting"></things-i18n-msg> (Only Client Side Setting)</h2>
 
     <!-- Base URL -->
     <paper-input 
