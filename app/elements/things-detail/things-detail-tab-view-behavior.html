@@ -1,0 +1,130 @@
+<link rel="import" href="../things-view-open-behavior/things-view-open-behavior.html">
+
+<script>
+
+window.Things = window.Things || {};
+
+/**
+ * 그리드에서 선택한 레코드에 대한 상세 뷰의 Behavior를 정의
+ *
+ * @polymerBehavior Things.DetailTabViewBahavior
+ */
+Things.DetailTabViewBahaviorImpl = {
+  
+  properties: {
+
+    /**
+     * 폼 타이틀 
+     */
+    title: {
+      type: String
+    },
+
+    /**
+     * resource type
+     */
+    resourceType: {
+      type: String
+    },
+
+    /**
+     * resource 대표 url
+     * User Resource라면 users
+     */
+    resourceUrl: {
+      type: String
+    },
+
+    /**
+     * resource id
+     */
+    resourceId: {
+      type: String
+    },    
+
+    /**
+     * 폼에 채우기 위한 리소스
+     * 최초 폼이 실행되는 시점에 서버에 요청하여 리턴받은 데이터
+     */
+    resource: {
+      type: Object
+    },
+
+    /**
+     * 현재 선택된 탭 index
+     */
+    currentTabIdx: {
+      type: Number,
+      value: 0
+    },
+
+    /**
+     * 탭에 포함될 패널들
+     */
+    _panels: {
+      type: Array,
+      value: function() {
+        return [];
+      }
+    }
+  },
+
+  observers: [
+    '_onResourceChanged(resource)',
+  ],
+
+  listeners: {
+    'tabPages.iron-select': '_onPageSelected'
+  },
+
+  /**
+   * Resource가 변경되었을 경우 
+   *
+   * @param {Object} resource
+   */
+  _onResourceChanged: function(resource) {
+    if(resource && resource.id) {
+      this.resourceId = resource.id;
+      this.setActiveTab(0);
+    }
+  },
+
+  /**
+   * fire element id+selected event with page element detail
+   */
+  _onPageSelected: function(event) {
+    var detailItemView = event.detail.item;
+    this.fire('things-detail-view-selected', this.resource, { node : detailItemView });
+  },  
+
+  /**
+   * Active Tab을 설정한다.
+   *
+   * @param {Number} currentTabIdx
+   */
+  setActiveTab: function(currentTabIdx) {
+    this.currentTabIdx = currentTabIdx;
+  },
+
+  /**
+   * Detail 화면을 오픈한다.
+   *
+   * @param {String} resourceId
+   * @param {Object} resource
+   */
+  showDetailView: function(resourceId, resource) {
+    if(this.resourceId != resourceId) {
+      this.resourceId = resourceId;
+    }
+
+    this.openPopupView(this, true);
+  }
+
+};
+
+Things.DetailTabViewBahavior = [
+  Things.DetailTabViewBahaviorImpl,
+  Things.ViewOpenBehavior
+]
+
+</script>

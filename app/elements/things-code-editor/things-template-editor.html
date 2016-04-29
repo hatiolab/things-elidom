@@ -270,27 +270,8 @@ things-template-editor. template성 텍스트를 편집 및 저장 할 수 있�
           this.$['html-preview'].hidden = false;
           this.$['html-preview'].srcdoc = this.$['template-editor'].editor.getValue();
         }
-      },
-
-      /***************************************************************************************
-       *                            Start detail item view interface
-       ***************************************************************************************/
-
-      /**
-       * detail item view를 구성하기 위한 필수 함수 
-       * item view를 구성한다.
-       *
-       * @return {Object} resource 리소스 데이터 (Object) 혹은 리소스 아이디 (Number)
-       */
-      loadDetailData: function(resource) {
-        if(resource) {
-          this.resource = resource;
-        }
       }
 
-      /***************************************************************************************
-       *                            End detail item view interface
-       ***************************************************************************************/      
     });
 
   </script>

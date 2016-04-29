@@ -9,6 +9,7 @@
   <template>
     <div class="[[layout]]">
       <things-ajax 
+        auto
         id="resource-search"
         resource-url="[[gridSearchUrl]]"
         resource-action="index"
@@ -40,14 +41,14 @@
       properties: {
 
         /**
-         * resource type
+         * Resource type
          */
         resourceType: {
           type: String
         },
 
         /**
-         * resource id
+         * Resource Id
          */
         resourceId: {
           type: String
@@ -58,7 +59,7 @@
          */
         gridSearchUrl: {
           type: String,
-          computed: '_computeGridSearchUrl(resourceType,resourceId)',
+          computed: '_computeGridSearchUrl(resourceType,resourceId)'
         },
 
         /**
@@ -199,44 +200,8 @@
        * load data
        */      
       loadData: function() {
-        if(this.gridSearchUrl) {
-          this.$['resource-search'].generateRequest();
-        }
-      },
-
-      /***************************************************************************************
-       *                            Start detail item view interface
-       ***************************************************************************************/
-
-      /**
-       * detail item view를 구성하기 위한 필수 함수 
-       * item view를 구성한다.
-       *
-       * @return {Object} resource 리소스 데이터 (Object) 혹은 리소스 아이디 (Number)
-       */
-      loadDetailData: function(resource) {
-        if(resource) {
-          var rId = (typeof(resource) === 'object') ? resource.id : resource;
-          if(!this.extProps || rId != this.resourceId) {
-            this.resourceId = rId;
-            this.loadData();
-          }
-        }
-      },
-
-      /**
-       * detail item view를 구성하기 위한 필수 함수 
-       * data로 부터 item view의 데이터를 직접 로딩한다. 외부에서 직접 데이터를 설정한다.
-       *
-       * @param {Object} data
-       */
-      loadDetailDataDirectly: function(data) {
-        this.extProps = data;
+        this.$['resource-search'].generateRequest();
       }
-
-      /***************************************************************************************
-       *                            End detail item view interface
-       ***************************************************************************************/
 
     });
   </script>

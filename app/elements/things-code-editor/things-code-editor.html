@@ -196,6 +196,8 @@ things-code-editor. Code성 텍스트를 편집 및 저장 할 수 있는 컴퍼
        * @param {String} codeField
        */
       _onResourceChanged: function(resource, codeField) {
+        this.resource = resource;
+
         if(codeField) {
           this.source = resource[codeField]
         }
@@ -237,27 +239,7 @@ things-code-editor. Code성 텍스트를 편집 및 저장 할 수 있는 컴퍼
         this.saveResource[this.codeField] = this.resource[this.codeField];
         this.$['save-code'].resourceId = this.resource.id;
         this.$['save-code'].generateRequest();
-      },
-
-      /***************************************************************************************
-       *                            Start detail item view interface
-       ***************************************************************************************/
-
-      /**
-       * detail item view를 구성하기 위한 필수 함수 
-       * item view를 구성한다.
-       *
-       * @return {Object} resource 리소스 데이터 (Object) 혹은 리소스 아이디 (Number)
-       */
-      loadDetailData: function(resource) {
-        if(resource) {
-          this.resource = resource;
-        }
       }
-
-      /***************************************************************************************
-       *                            End detail item view interface
-       ***************************************************************************************/      
     });
 
   </script>
