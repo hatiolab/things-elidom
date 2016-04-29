@@ -147,7 +147,7 @@ Example:
 				 */
 				memberResourceUrl: {
 					type: String,
-					computed: '_computeMemberResourceUrl(resourceUrl,resourceId)'
+					computed: '_computeMemberResourceUrl(resourceUrl)'
 				},
 
 				/**
@@ -286,11 +286,10 @@ Example:
 			 * resourceUrl로 resource member url을 생성
 			 *
 			 * @param {String} resourceUrl
-			 * @param {String} resourceId
 			 * @return {String} resource member URL
 			 */
-			_computeMemberResourceUrl: function(resourceUrl, resourceId) {
-				return resourceUrl + '/' + resourceId;
+			_computeMemberResourceUrl: function(resourceUrl) {
+				return resourceUrl + '/:id';
 			},
 
 			/**
