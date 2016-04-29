@@ -1,46 +1,30 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
 
+<link rel="import" href="../../things-ajax/things-ajax.html">
+<link rel="import" href="../../things-attached-file/things-attached-file.html">
 <link rel="import" href="../../things-code-editor/things-code-editor.html">
 <link rel="import" href="../../things-code-editor/things-template-editor.html">
-<link rel="import" href="../../things-meta/things-detail-form-meta-behavior.html">
-<link rel="import" href="../../things-view-open-behavior/things-view-open-behavior.html">
-<link rel="import" href="../../things-attached-file/things-attached-file.html">
+<link rel="import" href="../../things-detail/things-resource-detail-tab-view-behavior.html">
 <link rel="import" href="../../things-extension/things-extension.html">
+<link rel="import" href="../../things-form/things-resource-form.html">
 
 <!--
-A comment describing this element
+Diy Grid 상세 View
 
 Example:
 
-  <div>
-    <things-ajax 
-      auto
-      id="resource-meta"
-      method="GET"
-      resource-url="entities/Alarm/resource_columns"
-      last-response="{{metaData}}">
-    </things-ajax>
-
-    <things-ajax
-      auto
-      resource-url="alarams/:id"
-      resource-action="find"
-      resource-id="1"
-      last-response="{{detailViewData}}">
-    </things-ajax>
-
-    <things-detail-with-code-editor 
-      search-meta
-      meta-data="{{metaData}}"
-      resource-type="Alarm" 
-      resource-url="alarms"
-      resource="{{detailViewData}}" 
-      attachable 
-      prop-extensible>
-    </things-detail-with-code-editor>
-  </div>
+  <things-base-diy-grid-detail 
+    id="alarm-detail"
+    title="Alarm"
+    resource-type="Alarm"
+    resource-url="alarms/:id"
+    resource-id="1"
+    form-fields="[[formFields]]"
+    last-response="{{metaData}}">
+  </things-base-diy-grid-detail>
 
 @demo demo/index.html
 -->
@@ -82,6 +66,7 @@ Example:
         id="configuration"
         theme="ace/theme/monokai"
         mode="ace/mode/json"
+        resource="{{resource}}"
         template-field="config"
         save-url="[[resourceUrl]]">
       </things-template-editor>
@@ -90,6 +75,7 @@ Example:
         id="fields"
         theme="ace/theme/monokai"
         mode="ace/mode/json"
+        resource="{{resource}}"
         template-field="fields"
         save-url="[[resourceUrl]]">
       </things-template-editor>
@@ -98,10 +84,10 @@ Example:
         id="columns"
         theme="ace/theme/monokai"
         mode="ace/mode/json"
+        resource="{{resource}}"
         template-field="columns"
         save-url="[[resourceUrl]]">
       </things-template-editor>
-
     </iron-pages>
 
   </template>
@@ -112,161 +98,33 @@ Example:
       is: 'things-base-diy-grid-detail',
 
       behaviors: [ 
-        Things.DetailFormMetaBehavior,
-        Things.ViewOpenBehavior
+        Things.ResourceDetailTabViewBahavior
       ],
 
       properties: {
-        /**
-         * 폼 타이틀 
-         */
-        title: {
-          type: String
-        },
-
-        /**
-         * meta data for detail form
-         */
-        metaData: {
-          type: Array,
-          observer: '_parseMetaData'
-        },        
-
-        /**
-         * resource type
-         */
-        resourceType: {
-          type: String
-        },
-
-        /**
-         * resource id
-         */
-        resourceId: {
-          type: String
-        },
-
-        /**
-         * resource 대표 url
-         * User Resource라면 users
-         */
-        resourceUrl: {
-          type: String
-        },
-
-        /**
-         * 폼에 채우기 위한 리소스
-         * 최초 폼이 실행되는 시점에 서버에 요청하여 리턴받은 데이터
-         */
-        resource: {
-          type: Object
-        },
-
-        /**
-         * form fields
-         */
-        formFields: {
-          type: Array
-        },
-
         /**
          * Save 하기 전에 폼에는 있지만 Save하는데 필요 없는 필드를 삭제하기 위한 필드명
          */
         removeFieldsOnSave: {
           type: Array,
           value: ['creator', 'updater', 'creator_id', 'updater_id', 'created_at', 'updated_at']
-        },
-
-        /**
-         * 현재 선택된 탭 index
-         */
-        currentTabIdx: {
-          type: Number,
-          value: 0
-        },
-
-        /**
-         * default panel array
-         */
-        _panels: {
-          type: Array,
-          value: [ {
-            title: 'Basic', 
-            elementId: 'things-resource-form'
-          }, {
-            title: 'Configuration', 
-            elementId: 'things-template-editor'
-          }, {
-            title: 'Fields', 
-            elementId: 'things-template-editor'
-          }, {
-            title: 'Columns',
-            elementId: 'things-template-editor'
-          } ]
         }
       },
 
-      observers: [
-        '_onResourceChanged(resource)',
-      ],
-
-      listeners: {
-        'tabPages.iron-select': '_onPageSelected'
-      },
-
-      /**
-       * Active Tab을 설정한다.
-       * @param {Number} currentTabIdx
-       */
-      setActiveTab: function(currentTabIdx) {
-        this.currentTabIdx = currentTabIdx;
-      },
-
-      /**
-       * fire element id+selected event with page element detail
-       */
-      _onPageSelected: function(event) {
-        if(!this.resource) return;
-
-        var detailItemView = event.detail.item;
-        detailItemView.loadDetailData(this.resource);       
-        this.fire(detailItemView.id + '-selected', detailItemView);
-      },
-
-      /**
-       * resource가 변경되었을 경우 
-       *
-       * @param {Object} resource
-       */
-      _onResourceChanged: function(resource) {
-        if(resource && resource.id) {
-          this.resourceId = resource.id;
-          this.currentTabIdx = 0;
-        }
-      },
-
-      /**
-       * meta data를 파싱한다.
-       *
-       * @param {Array} metaDataList
-       */
-      _parseMetaData: function(metaDataList) {
-        if(!metaDataList || metaDataList.length == 0) return;
-        this.formFields = this._parseResourceFormFields(metaDataList);
-      },
-
-      /**
-       * Detail 화면 Open
-       *
-       * @param {String} resourceId
-       * @param {Object} resource
-       */
-      showDetailView: function(resourceId, resource) {
-        if(this.resourceId != resourceId) {
-          this.resourceId = resourceId;
-        }
-
-        this.openPopupView(this, true);
+      ready: function() {
+        this._panels = [ {
+          title: 'Basic', 
+          elementId: 'things-resource-form'
+        }, {
+          title: 'Configuration', 
+          elementId: 'things-template-editor'
+        }, {
+          title: 'Fields', 
+          elementId: 'things-template-editor'
+        }, {
+          title: 'Columns',
+          elementId: 'things-template-editor'
+        } ];
       }
 
     });

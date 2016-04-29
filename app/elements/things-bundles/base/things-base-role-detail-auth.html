@@ -12,6 +12,7 @@
   <template>
     <div class="[[layout]]">
       <things-ajax 
+        auto
         id="resource-search"
         method="GET"
         resource-url="[[gridSearchUrl]]"
@@ -64,7 +65,8 @@
          * role resource
          */
         resource: {
-          type: Object
+          type: Object,
+          observer: '_onResourceChanged'
         },
 
         /**
@@ -202,6 +204,16 @@
         'grid.things-grid-configured' : '_onGridConfigured',
         'grid.things-grid-save-success' : 'reloadGrid',
         'grid.things-grid-handle-build-writedata' : '_setupPermissionsToUpdate'
+      },
+
+      /**
+       * Resource 변경시
+       *
+       * @param {Object} resource
+       */
+      _onResourceChanged: function(resource) {
+        this.roleId = resource.id;
+        this.roleName = resource.name;
       },
 
       /**
@@ -349,29 +361,8 @@
        */
       reloadGrid: function(e) {
         this.$['resource-search'].generateRequest();
-      },
-
-      /***************************************************************************************
-       *                            Start detail item view interface
-       ***************************************************************************************/
-
-      /**
-       * detail item view를 구성하기 위한 필수 함수 
-       * item view를 구성한다.
-       *
-       * @return {Object} resource 리소스 데이터 (Object) 혹은 리소스 아이디 (Number)
-       */
-      loadDetailData: function(resource) {
-        if(resource) {
-          this.resource = resource;
-          this.roleId = resource.id;
-          this.roleName = resource.name;
-        }
       }
 
-      /***************************************************************************************
-       *                            End detail item view interface
-       ***************************************************************************************/       
     });
   </script>
 </dom-module>

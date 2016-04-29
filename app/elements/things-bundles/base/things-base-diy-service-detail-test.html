@@ -38,7 +38,7 @@ Example:
 			<paper-textarea id="result" label="Result" rows=4></paper-textarea>
 		</form>
 
-		<paper-button raised on-click ="submitMyForm">invoke</paper-button>
+		<paper-button raised on-click ="_invoke">invoke</paper-button>
 		<paper-button raised on-click ="_resetMyForm">reset</paper-button>
 	</template>
 
@@ -53,7 +53,7 @@ Example:
 				 */
 				resource: {
 					type: Object,
-					observer: '_resourceChanged'
+					observer: '_onResourceChanged'
 				},
 
 				/**
@@ -70,11 +70,23 @@ Example:
 			],
 
 			listeners : {
-				'iron-form-presubmit' :'_preSubmitHandler'
+				'iron-form-presubmit' :'_preSubmitHandler',
+				'iron-form-response' :'_successResponseHandler',
+				'iron-form-error' : '_errorResponseHandler'
+			},
+
+			/**
+			 * 서비스 Invoke
+			 *
+			 * @param {Event} event
+			 *
+			_invoke: function(e) {
+				this.getMyForm().submit();
 			},
 
 			/**
 			 * Submit 전에 전처리
+			 *
 			 * @param {Event} event
 			 */
 			_preSubmitHandler: function(event) {
@@ -85,12 +97,14 @@ Example:
 			},
 
 			/**
-			 * resource가 변경되었을 경우
+			 * Resource가 변경되었을 경우
+			 *
 			 * @param {Object} resource
 			 */
-			_resourceChanged: function(resource) {
+			_onResourceChanged: function(resource) {
 				this.actionUrl = 'diy_services/' + resource.name + '/shoot.json';
 				this.$['invoke-url'].value = this.actionUrl;
+				this.inputParams = resource.service_in_params;
 			},
 
 			/**
@@ -143,8 +157,6 @@ Example:
 			 * @param {Event} event
 			 */
 			_successResponseHandler: function (event) {
-				this.stopSpinner();
-
 				if(event.detail.xhr.response) {
 					this.$.result.value = JSON.stringify(event.detail.xhr.response, null, 4);
 				} else {
@@ -157,8 +169,6 @@ Example:
 			 * @param {Event} event
 			 */			
 			_errorResponseHandler: function (event) {
-				this.stopSpinner();
-
 				if(event.detail.request.xhr.response) {
 					this.$.result.value = JSON.stringify(event.detail.request.xhr.response, null, 4);
 				} else {
@@ -172,28 +182,7 @@ Example:
 			_resetMyForm: function (event) {
 				this.resetMyForm();
 				this._resourceChanged(this.resource);
-			},
-
-      /***************************************************************************************
-       *                            Start detail item view interface
-       ***************************************************************************************/
-
-      /**
-       * detail item view를 구성하기 위한 필수 함수 
-       * item view를 구성한다.
-       *
-       * @return {Object} resource 리소스 데이터 (Object) 혹은 리소스 아이디 (Number)
-       */
-      loadDetailData: function(resource) {
-        if(resource) {
-          this.resource = resource;
-          this.inputParams = resource.service_in_params;
-        }
-      }
-
-      /***************************************************************************************
-       *                            End detail item view interface
-       ***************************************************************************************/ 			
+			}	
 			
 		});
 	</script>

@@ -11,6 +11,7 @@
   <template>
     <div class="[[layout]]">
       <things-ajax 
+        auto
         id="get-params"
         method="GET"
         resource-url="[[gridSearchUrl]]"
@@ -35,16 +36,12 @@
 
       is: 'things-base-diy-service-detail-inout',
 
-      behaviors: [ 
-        Things.ViewOpenBehavior
-      ],
-
       properties: {
 
         /**
-         * diy service id
+         * DiyService Id
          */
-        diyServiceId: {
+        resourceId: {
           type: String
         },
 
@@ -52,7 +49,8 @@
          * entity resource
          */
         resource: {
-          type: Object
+          type: Object,
+          observer: '_onResourceChanged'
         },
 
         /**
@@ -118,7 +116,7 @@
          */
         gridSearchUrl: {
           type: String,
-          computed: '_computeInoutSearchUrl(diyServiceId,mode)'
+          computed: '_computeInoutSearchUrl(resourceId,mode)'
         },
 
         /**
@@ -126,7 +124,7 @@
          */
         gridSaveUrl: {
           type: String,
-          computed: '_computeInoutSaveUrl(diyServiceId,mode)'
+          computed: '_computeInoutSaveUrl(resourceId,mode)'
         },
 
         /**
@@ -157,25 +155,34 @@
       },
 
       /**
+       * Resource 변경시
+       *
+       * @param {Object} resource
+       */
+      _onResourceChanged: function(resource) {
+        this.items = (this.mode == 'in') ? this.resource.service_in_params : this.resource.service_out_params;
+      },
+
+      /**
        * DiyServiceId, Mode(in/out) 데이터로 In/Out Parameters Search URL 생성
        *
-       * @param {String} diyServiceId
+       * @param {String} resourceId
        * @param {String} mode
        * @return {String} in/out parameteres search url
        */
-      _computeInoutSearchUrl: function(diyServiceId, mode) {
-        return 'diy_services/' + diyServiceId + '/parameters/' + mode;
+      _computeInoutSearchUrl: function(resourceId, mode) {
+        return 'diy_services/' + resourceId + '/parameters/' + mode;
       },
 
       /**
        * DiyServiceId, Mode(in/out) 데이터로 In/Out Parameters Save URL 생성
        *
-       * @param {String} diyServiceId
+       * @param {String} resourceId
        * @param {String} mode
        * @return {String} in/out parameteres save url
        */
-      _computeInoutSaveUrl: function(diyServiceId, mode) {
-        return 'diy_services/' + diyServiceId + '/update_multiple_parameters/' + mode;
+      _computeInoutSaveUrl: function(resourceId, mode) {
+        return 'diy_services/' + resourceId + '/update_multiple_parameters/' + mode;
       },
 
       /**
@@ -195,7 +202,7 @@
       _beforeParamsSave: function(event) {
         var grid = event.target;
         if(grid.writeData && grid.writeData.length > 0) {
-          var resourceId = this.diyServiceId;
+          var resourceId = this.resourceId;
           grid.writeData.forEach(function(changedData) {
             if(changedData.cud_flag_ == 'c') {
               changedData.resource_type = 'DiyService';
@@ -210,29 +217,7 @@
        */
       reloadGrid: function(e) {
         this.$['get-params'].generateRequest();
-      },
-
-      /***************************************************************************************
-       *                            Start detail item view interface
-       ***************************************************************************************/
-
-      /**
-       * detail item view를 구성하기 위한 필수 함수 
-       * item view를 구성한다.
-       *
-       * @return {Object} resource 리소스 데이터 (Object) 혹은 리소스 아이디 (Number)
-       */
-      loadDetailData: function(resource) {
-        if(resource) {
-          this.diyServiceId = this.resource.id;
-          this.resource = resource;
-          this.items = (this.mode == 'in') ? this.resource.service_in_params : this.resource.service_out_params;
-        }
       }
-
-      /***************************************************************************************
-       *                            End detail item view interface
-       ***************************************************************************************/ 
 
     });
   </script>

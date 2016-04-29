@@ -10,6 +10,7 @@
   <template>
     <div class="[[layout]]">
       <things-ajax 
+        auto
         id="resource-search"
         method="GET"
         resource-url="[[gridSearchUrl]]"
@@ -30,7 +31,6 @@
         enable-toolbar>
       </things-resource-grid>
     </div>
-
   </template>
 
   <script>
@@ -63,7 +63,8 @@
          * role detail user resource
          */
         resource: {
-          type: Object
+          type: Object,
+          observer: '_onResourceChanged'
         },
 
         /**
@@ -192,6 +193,16 @@
         'grid.things-grid-handle-addrow' : '_addRow',
         'grid.things-grid-handle-save' : '_beforeColumnsSave'
       },
+
+      /**
+      * Resource 변경시
+      *
+      * @param {Object} resource
+      */
+      _onResourceChanged: function(resource) {
+        this.roleId = resource.id;
+        this.roleName = resource.name;
+      },      
 
       /**
        * Resource Selector의 선택된 detail 정보

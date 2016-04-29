@@ -94,6 +94,7 @@ Things.DetailTabViewBahaviorImpl = {
    */
   _onPageSelected: function(event) {
     var detailItemView = event.detail.item;
+    detailItemView.resource = this.resource;
     this.fire('things-detail-view-selected', this.resource, { node : detailItemView });
   },  
 

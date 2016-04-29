@@ -1,7 +1,9 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
 
+<link rel="import" href="../../things-ajax/things-ajax.html">
 <link rel="import" href="../../things-attached-file/things-attached-file.html">
 <link rel="import" href="../../things-code-editor/things-code-editor.html">
 <link rel="import" href="../../things-code-editor/things-template-editor.html">
@@ -10,35 +12,19 @@
 <link rel="import" href="../../things-form/things-resource-form.html">
 
 <!--
-A comment describing this element
+Alarm 상세 View
 
 Example:
 
-  <div>
-    <things-ajax 
-      auto
-      id="resource-meta"
-      resource-url="entities/Alarm/resource_columns"
-      last-response="{{metaData}}">
-    </things-ajax>
-
-    <things-ajax
-      auto
-      resource-url="alarms/:id"
-      resource-id="1"
-      last-response="{{detailViewData}}">
-    </things-ajax>
-
-    <things-detail-with-code-editor 
-      search-meta
-      meta-data="{{metaData}}"
-      resource-type="Alarm" 
-      resource-url="alarms"
-      resource="{{detailViewData}}" 
-      attachable 
-      prop-extensible>
-    </things-detail-with-code-editor>
-  </div>
+  <things-base-alarm-detail 
+    id="alarm-detail"
+    title="Alarm"
+    resource-type="Alarm"
+    resource-url="alarms/:id"
+    resource-id="1"
+    form-fields="[[formFields]]"
+    last-response="{{metaData}}">
+  </things-base-alarm-detail>
 
 @demo demo/index.html
 -->
@@ -93,23 +79,18 @@ Example:
         save-url="[[resourceUrl]]">
       </things-code-editor>
 
-      <template is="dom-if" if={{attachable}}>
-        <things-attached-file 
-          id="attachments"
-          target-url="upload_resource"
-          resource-type="[[resourceType]]"
-          resource-id="{{resourceId}}">
-        </things-attached-file>
-      </template>      
+      <things-attached-file 
+        id="attachments"
+        target-url="upload_resource"
+        resource-type="[[resourceType]]"
+        resource-id="{{resourceId}}">
+      </things-attached-file>
 
-      <template is="dom-if" if={{propExtensible}}>
-        <things-extension 
-          id="ext-properties"
-          resource-type="[[resourceType]]"
-          resource-id="{{resourceId}}">
-        </things-extension>           
-      </template>
-
+      <things-extension 
+        id="ext-properties"
+        resource-type="[[resourceType]]"
+        resource-id="{{resourceId}}">
+      </things-extension>
     </iron-pages>
 
   </template>
