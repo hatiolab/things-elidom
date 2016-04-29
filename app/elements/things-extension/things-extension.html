@@ -148,7 +148,7 @@
           type: Array,
           readonly: true,
           value: [ {
-            id: 'new-btn',
+            id: 'add-btn',
             text: 'add',
             icon: 'icons:add'
           }, {
@@ -168,8 +168,8 @@
       },
 
       listeners: {
-        'grid.things-button-new-btn-tap' : 'addRow',
-        'grid.things-button-refresh-btn-tap' : 'loadData',
+        'grid.things-grid-handle-addrow' : 'addRow',
+        'grid.refresh-btn-tap' : 'loadData',
         'grid.things-grid-save-success' : 'loadData'
       },
 
@@ -188,6 +188,8 @@
        * add grid row
        */
       addRow: function(e) {
+        event.preventDefault();
+
         this.$.grid.dataSet.insertRow(0, { 
           id: null, name : '', value : '', on_type : this.resourceType, on_id : this.resourceId
         });

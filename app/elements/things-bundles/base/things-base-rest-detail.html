@@ -29,7 +29,7 @@
         columns="[[gridColumns]]"
         data="[[items]]"
         grid-save-action="[[gridSaveUrl]]"
-        buttons="[[buttons]]"
+        buttons='[]'
         !show-grid-footer
         enable-detail-column>
       </things-basic-grid>
@@ -166,14 +166,14 @@
        * @param {Object} resource
        */
       showDetailView: function(resourceId, resource) {
-        if(this.resourceId != resourceId) {
-          this.resourceId = resourceId;  
+        if(this.resourceId != resource.bean_class_name) {
+          this.resourceId = resource.bean_class_name;
         }
         
         this.resource = resource;
-        this.openPopupView(this, true);
         this.$['resource-search'].resourceUrl = 'rests/api?id=' + resource.bean_class_name;
-        this.$['resource-search'].generateRequest();
+        this.$['resource-search'].generateRequest();        
+        this.openPopupView(this, true);
       }
 
     });

@@ -91,10 +91,12 @@ Example:
 				Things.FormBehavior
 			],
 
-			listeners : {
+			listeners : {				
+				'iron-form-presubmit': '_preSubmitHandler',
+      	'iron-form-response' :'_successResponseHandler',
+      	'iron-form-error' : '_errorResponseHandler',
 				'put-resource.things-ajax-response': '_successResponseHandler',
-				'put-resource.things-ajax-error': '_errorResponseHandler',
-				'iron-form-presubmit': '_preSubmitHandler'
+				'put-resource.things-ajax-error': '_errorResponseHandler'      	
 			},
 
 			/**
@@ -192,7 +194,6 @@ Example:
 			 * @param {Event} event
 			 */
 			_successResponseHandler: function (event) {
-				this.stopSpinner();
 				var responseValue = null;
 
 				if(this.resource.http_method == 'PUT') {
@@ -213,7 +214,6 @@ Example:
 			 * @param {Event} event
 			 */			
 			_errorResponseHandler: function (event) {
-				this.stopSpinner();
 				var errorInfo = null;
 
 				if(this.resource.http_method == 'PUT') {
@@ -246,7 +246,7 @@ Example:
 					if(this.resource.http_method == 'PUT') {
 						this._invokePutApi(validResult);
 					} else {
-						this.submitMyForm();
+						this.getMyForm().submit();
 					}					
 				}
 			},

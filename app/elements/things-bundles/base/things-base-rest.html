@@ -19,6 +19,8 @@
 <link rel="import" href="../../things-msg-box-behavior/things-msg-box-behavior.html">
 <link rel="import" href="../../things-global-behavior/things-global-behavior.html">
 
+<link rel="import" href="./things-base-rest-detail.html">
+
 <!--
 서버에서 제공하는 모든 REST API를 확인 및 테스트 기능을 제공하는 화면 셋 
 
@@ -118,7 +120,7 @@
 			},
 
 			listeners : {
-				'grid.things-grid-detail-tap': '_showDetailView'
+				'grid.things-grid-detail-tap': 'showDetailView'
 			},
 
 			/**
@@ -131,8 +133,10 @@
 			/**
 			 * 그리드 셀 선택이 변경되었을 경우 파일 다운로드  
 			 */
-			_showDetailView: function(e) {
-				// TODO 
+			showDetailView: function(e) {
+				var viewElement = document.createElement('things-base-rest-detail');
+				viewElement.title = this.title + ' Detail';
+				viewElement.showDetailView(selectedRecord.id, selectedRecord);
 			},
 
 			/**
