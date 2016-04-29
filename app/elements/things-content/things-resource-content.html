@@ -142,6 +142,14 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				detailView: {
 					type: String,
 					value: 'things-resource-form'
+				},
+
+				/**
+				 * 그리드 버튼 Override
+				 */
+				gridButtons: {
+					type: Array,
+					observer: '_gridButtonsChanged'
 				}
 			},
 
@@ -149,6 +157,15 @@ Things Reource Content는 검색 폼, 그리드가 기본으로 표시되고 그
 				'grid.things-grid-detail-tap': 'showDetailView',
 				'grid.things-grid-save-success': 'refreshGridData',
 				'grid.things-grid-resource-column-edit' : 'openResourceSelector'
+			},
+
+			/**
+			 * 그리드 버튼 변경시
+			 *
+			 * @param {Array} buttons
+			 */
+			_gridButtonsChanged: function(buttons) {
+				this.$['grid'].buttons = buttons;
 			},
 
 			/**

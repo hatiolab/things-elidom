@@ -1,0 +1,117 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../things-content/things-resource-content.html">
+<link rel="import" href="../../things-content/things-route-content-behavior.html">
+
+<!--
+용어 정의 화면 셋 
+
+	Example:
+
+		<things-base-terminology 
+			data-route="[[screen.routing]]"
+			title="[[screen.title]]"
+			current-route="[[route]]"
+			resource-type="[[screen.name]]"
+			resource-url="[[screen.routing]]"
+			detail-view="[[screen.detail_form_id]]"
+			layout="fullbleed layout vertical"
+			enable-detail-column>
+		</things-base-terminology>
+-->
+
+<dom-module id="things-base-terminology">
+	<template>
+		<things-ajax 
+			id="reload-cache"
+			method="GET"
+			resource-url="terminologies/resource_refresh">
+		</things-ajax>
+
+		<things-resource-content
+			id="terminology-content"
+			layout="fullbleed layout vertical"
+			title="[[title]]"
+			current-route="[[route]]"
+			resource-type="{{resourceType}}"
+			resource-url="{{resourceUrl}}"
+			grid-buttons="{{gridButtons}}"
+			enable-detail-column>
+		</things-resource-content>
+	</template>
+
+	<script>
+		Polymer({
+			is: 'things-base-terminology',
+			
+			behaviors: [ 
+				Things.RouteContentBehavior
+			],
+
+			properties: {
+				/**
+				 * 화면 타이틀 
+				 */
+				title: {
+					type: String,
+					value: function() {
+						return Things.DataGlobal.t('menu.Terminology')
+					}
+				},
+
+				gridButtons : {
+					type: Array,
+					value: function() {
+						return [ {
+                id: 'reload-btn',
+                text: 'reload_cache',
+                icon: 'icons:reload'
+              }, {
+                id: 'export-btn',
+                text: 'export',
+                icon: 'icons:swap-vert'
+              }, {
+                id: 'add-btn',
+                text: 'add',
+                icon: 'icons:add'
+              }, {
+                id: 'delete-btn',
+                text: 'delete',
+                icon: 'icons:delete'
+              }, {
+                id: 'save-btn',
+                text: 'save',
+                icon: 'icons:save'
+              }, {
+                id: 'import-btn',
+                text: 'import',
+                icon: 'icons:file-upload'
+              } ];
+            }
+					}				
+			},
+
+			listeners : {
+				'reload-btn-tap': 'reloadCache',
+			},
+
+			/**
+			 * Reload Cache
+			 *
+			 * @param {Object} e
+			 */
+			reloadCache: function(e) {
+				this.$['reload-cache'].generateRequest();
+			},
+
+			/**
+			 * 화면 초기화 함수 
+			 * 메타 데이터를 서버로 요청하여 화면을 구성한다.
+			 */
+			initializeContent: function() {
+				this.$['terminology-content'].initializeContent();
+			}			
+
+		});
+	</script>
+</dom-module>
