@@ -1,11 +1,8 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../../bower_components/paper-icon-button/paper-icon-button.html">
 
 <link rel="import" href="../../things-ajax/things-ajax.html">
-<link rel="import" href="../../things-resource-selector/things-resource-selector-behavior.html">
-<link rel="import" href="../../things-view-open-behavior/things-view-open-behavior.html">
-<link rel="import" href="../../things-msg-box-behavior/things-msg-box-behavior.html">
-<link rel="import" href="../../things-grid/things-tree-grid.html">
+<link rel="import" href="../../things-grid/things-resource-grid.html">
 
 <dom-module id="things-base-role-detail-auth">
 
@@ -39,11 +36,6 @@
     Polymer({
 
       is: 'things-base-role-detail-auth',
-
-      behaviors: [ 
-        Things.ViewOpenBehavior,
-        Things.MsgBoxBehavior
-      ],
 
       properties: {
 
